@@ -21,15 +21,7 @@ const nextConfig: NextConfig = {
   },
   // Otras configuraciones
   serverExternalPackages: ['typeorm', 'mysql2'],
-  async redirects() {
-    return [
-      {
-        source: '/',
-        destination: '/landing.html',
-        permanent: false,
-      },
-    ];
-  },
+
 };
 
 export default nextConfig;

@@ -7,7 +7,8 @@ import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import MemopsyLogo from "@/app/components/MemopsyLogo";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Users, Calendar, FileText, LogOut, Settings, Shield, HomeIcon } from 'lucide-react';
+import { Menu, X, Users, Calendar, FileText, LogOut, Settings, Shield, HomeIcon, KeyRound, Loader2 } from 'lucide-react'; // Added KeyRound, Loader2
+import MfaSetupModal from "@/components/mfa-setup-modal"; // Import the MFA setup modal
 
 interface ModuloConfig {
   id: string;
@@ -54,10 +55,18 @@ const MODULOS_DISPONIBLES: ModuloConfig[] = [
 ];
 
 export default function WelcomePage() {
-  const { data: session, status } = useSession();
+  const { data: session, status, update: updateSession } = useSession(); // Added updateSession
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [modulosPermitidos, setModulosPermitidos] = useState<ModuloConfig[]>([]);
+
+  // MFA State
+  const [isMfaModalOpen, setIsMfaModalOpen] = useState(false);
+  const [mfaEnabled, setMfaEnabled] = useState<boolean | null>(null); // null initially, then boolean
+  const [loadingMfaStatus, setLoadingMfaStatus] = useState(true);
+  const [mfaError, setMfaError] = useState<string | null>(null);
+  const [isTogglingMfa, setIsTogglingMfa] = useState(false);
+
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -81,37 +90,103 @@ export default function WelcomePage() {
     }
   }, [session]);
 
+  // Fetch MFA status
+  useEffect(() => {
+    if (status === "authenticated" && session?.user) {
+      setLoadingMfaStatus(true);
+      setMfaError(null);
+      fetch("/api/auth/mfa", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "status" }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            setMfaEnabled(data.mfaEnabled);
+            // Potentially update session if auth0Id was missing and is now set after enabling MFA elsewhere
+            // For instance, if the user object in session needs to reflect auth0Id presence
+            // updateSession({ user: { ...session.user, auth0Id: data.auth0Id } }); // Example
+          } else {
+            console.error("Error fetching MFA status:", data.error);
+            setMfaError("No se pudo verificar el estado de 2FA.");
+            setMfaEnabled(false); // Default to false on error
+          }
+        })
+        .catch((err) => {
+          console.error("Error al verificar estado de 2FA:", err);
+          setMfaError("Error de conexión al verificar 2FA.");
+          setMfaEnabled(false); // Default to false on error
+        })
+        .finally(() => {
+          setLoadingMfaStatus(false);
+        });
+    }
+  }, [session, status, updateSession]); // updateSession added as dep
+
+  const handleToggleMfa = async () => {
+    setIsTogglingMfa(true);
+    setMfaError(null);
+    if (mfaEnabled) {
+      // Desactivar 2FA
+      try {
+        const response = await fetch("/api/auth/mfa", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "disable" }),
+        });
+        const data = await response.json();
+        if (data.success) {
+          setMfaEnabled(false);
+          // Potentially update session if MFA status change affects session data
+          // await updateSession(); 
+        } else {
+          console.error("Error al desactivar 2FA:", data.error);
+          setMfaError(data.error || "No se pudo desactivar 2FA.");
+        }
+      } catch (err) {
+        console.error("Error al desactivar 2FA:", err);
+        setMfaError("Error de conexión al desactivar 2FA.");
+      }
+    } else {
+      // Abrir modal para activar 2FA
+      setIsMfaModalOpen(true);
+    }
+    setIsTogglingMfa(false);
+  };
+
+  const handleMfaSuccess = async () => {
+    setMfaEnabled(true);
+    setIsMfaModalOpen(false);
+    // Optionally, re-fetch user session if MFA enabling adds auth0Id or similar to user object
+    // await updateSession();
+    // Or simply update local state and trust backend consistency for next login
+  };
+  
   const handleLogout = async () => {
-    await signOut({ 
-      redirect: true,
-      callbackUrl: '/login'
-    });
+    await signOut({ redirect: true, callbackUrl: '/login' });
   };
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
-
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const navigateToModule = (ruta: string) => {
     router.push(ruta);
     setIsMenuOpen(false);
   };
 
-  if (status === 'loading') {
+  if (status === 'loading' || (status === 'authenticated' && !session?.user)) {
     return (
       <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: '#152A2A' }}>
-        <div className="text-white text-lg">Cargando...</div>
+        <Loader2 className="w-12 h-12 animate-spin text-[#F1C77A]" />
+        <p className="text-white text-lg ml-4">Cargando...</p>
       </div>
     );
   }
 
-  if (!session) {
+  if (!session?.user) { // Should be caught by status === 'unauthenticated' and redirected
     return null;
   }
 
-  const nombreCompleto = session.user.persona 
-    ? `${session.user.persona.nombre} ${session.user.persona.apellido}` 
-    : 'Usuario';
+  const nombreCompleto = session.user.persona ? `${session.user.persona.nombre} ${session.user.persona.apellido}` : session.user.email || 'Usuario';
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#152A2A' }}>
@@ -313,10 +388,53 @@ export default function WelcomePage() {
                   {session.user.permisos?.length || 0}
                 </span>
               </div>
+              
+              {/* MFA Section */}
+              <div className="pt-3 mt-3 border-t border-gray-700">
+                <h4 className="text-md font-semibold mb-2" style={{ color: '#F1C77A' }}>Seguridad de Cuenta</h4>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-300">Autenticación en dos pasos (2FA):</span>
+                  {loadingMfaStatus ? (
+                    <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
+                  ) : (
+                    <span className={mfaEnabled ? "text-green-400" : "text-yellow-400"}>
+                      {mfaEnabled ? "Activada" : "Desactivada"}
+                    </span>
+                  )}
+                </div>
+                {mfaError && <p className="text-red-400 text-xs mt-1">{mfaError}</p>}
+                <div className="mt-3">
+                  <Button
+                    onClick={handleToggleMfa}
+                    disabled={loadingMfaStatus || isTogglingMfa || mfaEnabled === null} // Disable if status is unknown
+                    className="w-full flex items-center justify-center text-sm py-2"
+                    style={{
+                      backgroundColor: mfaEnabled ? "transparent" : "#F1C77A",
+                      color: mfaEnabled ? "#F1C77A" : "#1D3434",
+                      border: "1px solid #F1C77A",
+                    }}
+                  >
+                    {isTogglingMfa ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <KeyRound className="w-4 h-4 mr-2" />}
+                    {mfaEnabled ? "Desactivar 2FA" : "Activar 2FA"}
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </main>
+
+      {/* Modal de configuración de 2FA */}
+      {session?.user && ( // Only render modal if session is available
+        <MfaSetupModal
+            isOpen={isMfaModalOpen}
+            onClose={() => {
+                setIsMfaModalOpen(false);
+                setMfaError(null); // Clear any errors when closing modal
+            }}
+            onSuccess={handleMfaSuccess}
+        />
+      )}
     </div>
   );
 }

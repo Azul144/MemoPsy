@@ -126,3 +126,17 @@ body {
     @apply bg-background text-foreground;
   }
 }
+.campo {
+  @apply h-14 w-full rounded-lg border border-border bg-secondary px-4 text-white placeholder:text-white/60;
+  color-scheme: dark;
+}
+.campo:focus {
+  @apply border-primary outline-none;
+}
+html {
+  scroll-behavior: smooth;
+}
+section,
+footer {
+  scroll-margin-top: 5rem;
+}

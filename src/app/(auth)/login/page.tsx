@@ -1,47 +1,160 @@
-// app/(auth)/login/page.tsx
-// app/(auth)/login/page.tsx
-'use client'; // Necesario para hooks y manejo de eventos
+// src/app/(auth)/login/page.tsx
+'use client';
 
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, useEffect } from 'react'; // Added useEffect
 import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation'; // Usar 'next/navigation' en App Router
+import { useRouter, useSearchParams } from 'next/navigation'; // Added useSearchParams
 import MemopsyLogo from "@/app/components/MemopsyLogo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import MfaVerificationModal from "@/components/mfa-verification-modal"; // Import the MFA modal
+import { Loader2 } from 'lucide-react'; // For loading state
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false); // Added for general loading state
+
+  // MFA State
+  const [showMfaVerification, setShowMfaVerification] = useState(false);
+  const [mfaLoginData, setMfaLoginData] = useState<{ email: string, password?: string } | null>(null); // Password optional if not needed by modal directly
+
   const [resetEmailSent, setResetEmailSent] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams(); // For reading error from URL
+
+  useEffect(() => {
+    const nextAuthError = searchParams.get('error');
+    if (nextAuthError) {
+      // Map NextAuth error codes to user-friendly messages if needed
+      if (nextAuthError === "CredentialsSignin") {
+        setError("Email o contraseña incorrectos.");
+      } else if (nextAuthError === "MFA_REQUIRED") {
+         // This case should ideally be handled by showing the modal,
+         // but if redirected here, it means direct navigation or an issue.
+        setError("Se requiere autenticación de dos factores.");
+      } else if (nextAuthError === "INVALID_MFA_CODE") {
+        setError("Código de autenticación de dos factores inválido.");
+      } else {
+        setError("Error de autenticación. Inténtalo de nuevo.");
+      }
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    setError(null); // Limpiar errores previos
+    setError(null);
+    setIsLoading(true);
 
     try {
+      // 1. Check if MFA is required for the user
+      const mfaCheckResponse = await fetch('/api/auth/check-mfa', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+
+      if (!mfaCheckResponse.ok) {
+        // If check-mfa itself fails, treat as a general error
+        // (unless specific errors from check-mfa need to be handled)
+        setError('Error al verificar el estado de 2FA. Inténtalo de nuevo.');
+        setIsLoading(false);
+        return;
+      }
+
+      const mfaCheckData = await mfaCheckResponse.json();
+
+      if (mfaCheckData.mfaRequired) {
+        // 2a. MFA is required. Try to pre-authenticate (check password without full login)
+        const preAuthResult = await signIn('credentials', {
+          redirect: false,
+          email,
+          password,
+          skipMfa: 'true', // Send as string, matching authConfig
+        });
+
+        if (preAuthResult?.error) {
+          if (preAuthResult.error === 'INVALID_PRIMARY_CREDENTIALS' || preAuthResult.error === 'EMAIL_OR_PASSWORD_MISSING') {
+            setError('Email o contraseña incorrectos.');
+          } else {
+            setError('Error de autenticación. Inténtalo de nuevo.');
+          }
+        } else if (preAuthResult?.ok) {
+          // Primary credentials are correct, show MFA modal
+          setMfaLoginData({ email, password }); // Store credentials for MFA step
+          setShowMfaVerification(true);
+        } else {
+            setError('Error inesperado durante la pre-autenticación.');
+        }
+      } else {
+        // 2b. MFA is NOT required. Proceed with normal login.
+        const result = await signIn('credentials', {
+          redirect: false,
+          email,
+          password,
+        });
+
+        if (result?.error) {
+          if (result.error === 'INVALID_PRIMARY_CREDENTIALS' || result.error === 'EMAIL_OR_PASSWORD_MISSING') {
+            setError('Email o contraseña incorrectos.');
+          } else {
+             setError('Error de autenticación. Inténtalo de nuevo.');
+          }
+        } else if (result?.ok) {
+          router.push('/welcome');
+          router.refresh(); // Ensure session is updated client-side
+        } else {
+            setError('Error inesperado durante el inicio de sesión.');
+        }
+      }
+    } catch (err) {
+      console.error("Error en handleSubmit:", err);
+      setError('Ocurrió un error inesperado. Inténtalo de nuevo.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleVerifyMfa = async (mfaCode: string): Promise<boolean> => {
+    if (!mfaLoginData?.email || !mfaLoginData?.password) {
+      setError("Error interno: faltan datos de inicio de sesión para 2FA."); // Should not happen
+      return false;
+    }
+    setIsLoading(true); // Use general loading for MFA verification step
+    let success = false;
+    try {
       const result = await signIn('credentials', {
-        redirect: false, // No redirigir automáticamente, manejaremos manualmente
-        email: email,
-        password: password,
+        redirect: false,
+        email: mfaLoginData.email,
+        password: mfaLoginData.password,
+        mfaCode: mfaCode,
       });
 
       if (result?.error) {
-        // Manejar errores de autenticación (ej. credenciales incorrectas)
-        console.error("Login error:", result.error);
-        setError('Email o contraseña incorrectos.');
+        console.error("MFA verification error from signIn:", result.error);
+        // Error already set by MfaVerificationModal based on return false
+        // setError(result.error === 'INVALID_MFA_CODE' ? 'Código 2FA inválido.' : 'Error en la verificación 2FA.');
+        success = false;
       } else if (result?.ok) {
-        // Inicio de sesión exitoso, redirigir al dashboard o página principal
-        router.push('/welcome'); // O la ruta deseada después del login
-        router.refresh(); // Asegura que el estado del servidor se actualice
+        setShowMfaVerification(false); // Close modal on success
+        router.push('/welcome');
+        router.refresh();
+        success = true;
+      } else {
+        // setError('Error inesperado durante la verificación 2FA.');
+        success = false;
       }
     } catch (err) {
-      console.error("Unexpected login error:", err);
-      setError('Ocurrió un error inesperado. Inténtalo de nuevo.');
+      console.error("Error en handleVerifyMfa:", err);
+      // setError('Ocurrió un error inesperado al verificar 2FA.');
+      success = false;
+    } finally {
+      setIsLoading(false);
     }
+    return success;
   };
 
   const handlePasswordReset = async () => {
@@ -123,61 +236,6 @@ export default function LoginPage() {
     }
   };
 
-
-/*
-  const handlePasswordReset = async () => {
-    if (!email) {
-      setError('Por favor, ingresa tu email para recuperar la contraseña.');
-      return;
-    }
-
-    setIsResetting(true);
-    setError(null);
-
-    try {
-      // Verifica si el usuario existe
-      const checkUserResponse = await fetch('/api/auth/check-user', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
-      });
-
-      if (!checkUserResponse.ok) {
-        throw new Error('Usuario no encontrado');
-      }
-
-      const resetTimestamp = Date.now();
-      const expirationTime = resetTimestamp + (60 * 60 * 1000); // 1 hora
-
-      const resetUrl = `${window.location.origin}/reset-password?email=${encodeURIComponent(email)}&timestamp=${resetTimestamp}&expires=${expirationTime}`;
-
-      // Enviar al backend que se encargue del correo
-      const response = await fetch('/api/auth/send-reset-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, resetUrl })
-      });
-
-      if (response.ok) {
-        setResetEmailSent(true);
-      } else {
-        throw new Error('Error al enviar el correo');
-      }
-
-    } catch (err) {
-      console.error("Password reset error:", err);
-      if (err instanceof Error && err.message === 'Usuario no encontrado') {
-        setError('No se encontró una cuenta con ese email.');
-      } else {
-        setError('Error al enviar el correo de recuperación. Inténtalo de nuevo.');
-      }
-    } finally {
-      setIsResetting(false);
-    }
-  };
-*/
-    
-
   if (resetEmailSent) {
     return (
       <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: '#152A2A' }}>
@@ -225,6 +283,7 @@ export default function LoginPage() {
               required
               placeholder='Correo electrónico'
               className="mt-1"
+              disabled={isLoading || isResetting}
             />
           </div>
           <div>
@@ -236,30 +295,45 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               placeholder='Contraseña'
-              className="mt-1 white"
+              className="mt-1 white" // Assuming 'white' is a custom class for text color
+              disabled={isLoading || isResetting}
             />
           </div>
-          {error && <p className="text-red-500 text-center">{error}</p>}
-          <Button type="submit" variant="outline" className="w-full">Ingresar</Button>
+          {error && <p className="text-red-500 text-center text-sm py-1">{error}</p>}
+          <Button type="submit" variant="outline" className="w-full" disabled={isLoading || isResetting}>
+            {isLoading && !showMfaVerification ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+            Ingresar
+          </Button>
         </form>
-        
-       
-        <div className="mt-4 text-center">
-          <button
-            type="button"
-            onClick={handlePasswordReset}
-            disabled={isResetting}
-            className="text-sm text-blue-400 hover:text-blue-300 underline disabled:opacity-50"
-          >
-            {isResetting ? 'Enviando...' : '¿Olvidó su contraseña?'}
-          </button>
+          <div className="mt-4 text-center">
+            <button
+              type="button"
+              onClick={handlePasswordReset}
+              disabled={isResetting || isLoading}
+              className="text-sm text-blue-400 hover:text-blue-300 underline disabled:opacity-50"
+            >
+              {isResetting ? 'Enviando...' : '¿Olvidó su contraseña?'}
+            </button>
+          </div>
         </div>
+        {mfaLoginData?.email && ( // Ensure email is present before rendering modal
+        <MfaVerificationModal
+            isOpen={showMfaVerification}
+            onClose={() => {
+                setShowMfaVerification(false);
+                setMfaLoginData(null); // Clear MFA login data on close
+                setError(null); // Clear any previous errors
+            }}
+            onVerify={handleVerifyMfa}
+            email={mfaLoginData.email}
+        />
+      )}
       </div>
-    </div>
   );
 }
 
 /*
+// src/app/(auth)/login/page.tsx
 'use client'; // Necesario para hooks y manejo de eventos
 
 import { useState, FormEvent } from 'react';

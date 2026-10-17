@@ -1,0 +1,81 @@
+import Image from "next/image";
+import Link from "next/link";
+import { MapPin, Phone, Mail } from "lucide-react";
+
+const contacto = {
+  direccion: "Av. 25 de Mayo 450, Oficina 2",
+  ciudad: "Formosa (P3600), Argentina",
+  telefono: "+54 370 400-1234",
+  email: "contacto@memopsy.com",
+};
+
+export default function PiePagina() {
+  const anio = new Date().getFullYear();
+
+  return (
+    <footer id="sobre-nosotros" className="border-t border-white/10 bg-card px-6">
+      <div className="mx-auto grid max-w-7xl gap-12 py-16 md:grid-cols-3">
+
+        {/* Columna 1: Sobre nosotros */}
+        <div>
+          <h2 className="text-xl font-bold text-white">Sobre nosotros</h2>
+          <div className="mt-6 space-y-3 text-white/85">
+            <p className="flex gap-3">
+              <MapPin className="h-5 w-5 shrink-0 text-primary" />
+              <span>
+                {contacto.direccion}
+                <br />
+                {contacto.ciudad}
+              </span>
+            </p>
+            <p className="flex gap-3">
+              <Phone className="h-5 w-5 shrink-0 text-primary" />
+              {contacto.telefono}
+            </p>
+            <p className="flex gap-3">
+              <Mail className="h-5 w-5 shrink-0 text-primary" />
+              <a href={`mailto:${contacto.email}`} className="hover:text-primary">
+                {contacto.email}
+              </a>
+            </p>
+          </div>
+        </div>
+
+        {/* Columna 2: Acceso */}
+        <div>
+          <h2 className="text-xl font-bold text-white">Acceso</h2>
+          <ul className="mt-6 space-y-3 text-white/85">
+            <li><a href="#inicio" className="hover:text-primary">Home</a></li>
+            <li><a href="#funciones" className="hover:text-primary">Funciones Clave</a></li>
+            <li><a href="#testimonios" className="hover:text-primary">Testimonios</a></li>
+            <li><a href="#por-que" className="hover:text-primary">¿Por qué MemoPsy?</a></li>
+            <li><a href="#contacto" className="hover:text-primary">Agendar</a></li>
+            <li><Link href="/login" className="hover:text-primary">Iniciar Sesión</Link></li>
+          </ul>
+        </div>
+
+        {/* Columna 3: Marca */}
+        <div className="md:text-right">
+          <div className="flex items-center gap-3 md:justify-end">
+            <Image src="/assets/logopng.png" alt="Logo de MemoPsy" width={36} height={44} />
+            <span className="text-2xl font-bold text-primary">MemoPsy</span>
+          </div>
+          <p className="mt-4 text-white/80">
+            En MemoPsy impulsamos la psicología moderna con herramientas intuitivas y seguras,
+            pensadas para consultorios de psicología clínica de Formosa.
+          </p>
+          <div className="mt-6 grid grid-cols-3 border border-white/15 text-center text-sm font-semibold text-primary">
+            <span className="py-3">NOTAS</span>
+            <span className="border-x border-white/15 py-3">MEMOPSY</span>
+            <span className="py-3">PSICOLOGÍA</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div className="mx-auto max-w-7xl border-t border-white/10 py-6 text-center text-sm text-white/70">
+        © {anio} MemoPsy. Todos los derechos reservados.
+      </div>
+    </footer>
+  );
+}
