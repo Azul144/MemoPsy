@@ -21,6 +21,20 @@ export class UsuarioEntity extends BaseEntity {
   @JoinColumn({ name: "persona_id" })
   persona: PersonaEntity;
 
-  @Column({ name: "auth0Id", unique: true, nullable: true})
+  @Column({ name: "auth0Id", unique: true, nullable: true })
   auth0Id: string;
+  @Column({ name: "mfa_habilitado", type: "tinyint", default: 0 })
+  mfaHabilitado: boolean;
+
+  @Column({ name: "mfa_secreto", type: "varchar", length: 255, nullable: true, select: false })
+  mfaSecreto: string | null;
+
+  @Column({ name: "mfa_codigos_recuperacion", type: "text", nullable: true, select: false })
+  mfaCodigosRecuperacion: string | null;
+
+  @Column({ name: "intentos_fallidos", type: "int", default: 0 })
+  intentosFallidos: number;
+
+  @Column({ name: "bloqueado_hasta", type: "datetime", nullable: true })
+  bloqueadoHasta: Date | null;
 }
