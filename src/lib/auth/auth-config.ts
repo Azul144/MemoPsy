@@ -1,7 +1,6 @@
 // src/lib/auth/auth-config.ts
 import { NextAuthOptions, User as NextAuthUser } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import type { JWT } from "next-auth/jwt";
 import {
   UsuarioService,
   UsuarioTienePerfilService,
@@ -23,6 +22,7 @@ import {
 } from "@/repositories/index";
 import { initializeDatabase } from "@/lib/database";
 import { verificarLogin } from "./login";
+import { codificarJwt, decodificarJwt } from "./jwt";
 
 declare module "next-auth" {
   interface User {
@@ -150,26 +150,8 @@ export const authConfig: NextAuthOptions = {
   },
   jwt: {
     maxAge: 2 * 60 * 60, // 2 horas
-    async encode({ secret, token }) {
-      const { SignJWT } = await import("jose");
-      const secretKey = new TextEncoder().encode(secret as string);
-      return await new SignJWT(token!)
-        .setProtectedHeader({ alg: "HS256" })
-        .setIssuedAt()
-        .setExpirationTime("2h")
-        .sign(secretKey);
-    },
-    async decode({ secret, token }) {
-      if (!token) return null;
-      const { jwtVerify } = await import("jose");
-      const secretKey = new TextEncoder().encode(secret as string);
-      try {
-        const { payload } = await jwtVerify(token, secretKey, { algorithms: ["HS256"] });
-        return payload as JWT;
-      } catch {
-        return null;
-      }
-    },
+    encode: codificarJwt,
+    decode: decodificarJwt,
   },
   callbacks: {
     async jwt({ token, user }) {
