@@ -1,268 +1,127 @@
-// app/(auth)/reset-password/page.tsx
-'use client';
+// src/app/(auth)/reset-password/page.tsx
+"use client";
 
-import { useState, useEffect, FormEvent } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense, useState, type FormEvent } from "react";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { CheckCircle2, Loader2 } from "lucide-react";
 import MemopsyLogo from "@/app/components/MemopsyLogo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import RequisitosPassword from "@/components/RequisitosPassword";
+import { validarPassword } from "@/lib/validaciones/password";
 
+// Next pide envolver en <Suspense> a los componentes que leen la URL con useSearchParams
 export default function ResetPasswordPage() {
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isValidLink, setIsValidLink] = useState(false);
-  const [email, setEmail] = useState('');
-  const [timeRemaining, setTimeRemaining] = useState('');
-  
-  const router = useRouter();
-  const searchParams = useSearchParams();
+  return (
+    <Suspense>
+      <FormularioNuevaPassword />
+    </Suspense>
+  );
+}
 
-  useEffect(() => {
-    const emailParam = searchParams.get('email');
-    const timestamp = searchParams.get('timestamp');
-    const expires = searchParams.get('expires');
-    
-    if (!emailParam || !timestamp || !expires) {
-      setError('Enlace de recuperación inválido o incompleto.');
-      return;
-    }
+function FormularioNuevaPassword() {
+  const token = useSearchParams().get("token") ?? "";
 
-    const currentTime = Date.now();
-    const expirationTime = parseInt(expires);
-    
-    // Verificar si el enlace ha expirado
-    if (currentTime > expirationTime) {
-      setError('El enlace de recuperación ha expirado. Solicita uno nuevo.');
-      return;
-    }
+  const [password, setPassword] = useState("");
+  const [confirmacion, setConfirmacion] = useState("");
+  const [errores, setErrores] = useState<string[]>([]);
+  const [listo, setListo] = useState(false);
+  const [cargando, setCargando] = useState(false);
 
-    // Calcular tiempo restante
-    const timeLeft = expirationTime - currentTime;
-    const minutesLeft = Math.floor(timeLeft / (1000 * 60));
-    
-    if (minutesLeft > 0) {
-      setTimeRemaining(`${minutesLeft} minuto${minutesLeft !== 1 ? 's' : ''}`);
-    } else {
-      setTimeRemaining('menos de 1 minuto');
-    }
+  const cumpleRequisitos = validarPassword(password).length === 0;
+  const coinciden = password.length > 0 && password === confirmacion;
 
-    setIsValidLink(true);
-    setEmail(decodeURIComponent(emailParam));
-
-    // Actualizar el tiempo restante cada minuto
-    const interval = setInterval(() => {
-      const now = Date.now();
-      if (now > expirationTime) {
-        setError('El enlace de recuperación ha expirado.');
-        setIsValidLink(false);
-        clearInterval(interval);
-        return;
-      }
-      
-      const timeLeft = expirationTime - now;
-      const minutesLeft = Math.floor(timeLeft / (1000 * 60));
-      
-      if (minutesLeft > 0) {
-        setTimeRemaining(`${minutesLeft} minuto${minutesLeft !== 1 ? 's' : ''}`);
-      } else {
-        setTimeRemaining('menos de 1 minuto');
-      }
-    }, 60000); // Actualizar cada minuto
-
-    return () => clearInterval(interval);
-  }, [searchParams]);
-
-  const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault();
-    setError(null);
-
-    if (password !== confirmPassword) {
-      setError('Las contraseñas no coinciden.');
-      return;
-    }
-
-    if (!password) {
-      setError("La contraseña es requerida.");
-      return;
-    } else if (password.length < 8) {
-      setError("La contraseña debe tener al menos 8 caracteres.");
-      return;
-    } else if (!/[A-Z]/.test(password)) {
-      setError("La contraseña debe contener al menos una letra mayúscula.");
-      return;
-    } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-      setError("La contraseña debe contener al menos un carácter especial.");
-      return;
-    }
-
-    // Verificar nuevamente que el enlace no haya expirado
-    const expires = searchParams.get('expires');
-    if (expires && Date.now() > parseInt(expires)) {
-      setError('El enlace ha expirado durante el proceso. Solicita uno nuevo.');
-      return;
-    }
-
-    setIsLoading(true);
-
+  async function guardar(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setErrores([]);
+    setCargando(true);
     try {
-      // Llamada a tu API para actualizar la contraseña
-      const response = await fetch('/api/auth/reset-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: email,
-          newPassword: password,
-          timestamp: searchParams.get('timestamp'),
-          expires: searchParams.get('expires')
-        })
+      const respuesta = await fetch("/api/auth/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token, password }),
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Error al actualizar la contraseña');
-      }
-      
-      setSuccess(true);
-      
-      // Redirigir al login después de 3 segundos
-      setTimeout(() => {
-        router.push('/login');
-      }, 3000);
-
-    } catch (err) {
-      console.error("Password reset error:", err);
-      if (err instanceof Error) {
-        setError(err.message);
+      const datos = await respuesta.json();
+      if (respuesta.ok) {
+        setListo(true);
       } else {
-        setError('Error al actualizar la contraseña. Inténtalo de nuevo.');
+        setErrores([datos.message, ...(datos.errores ?? [])]);
       }
+    } catch {
+      setErrores(["No se pudo conectar. Revisá tu conexión e intentá de nuevo."]);
     } finally {
-      setIsLoading(false);
+      setCargando(false);
     }
-  };
-
-  if (!isValidLink || error === 'Enlace de recuperación inválido o incompleto.' || error === 'El enlace de recuperación ha expirado. Solicita uno nuevo.' || error === 'El enlace de recuperación ha expirado.') {
-    return (
-      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: '#152A2A' }}>
-        <div className="p-8 rounded-2xl shadow-2xl w-full max-w-md" style={{ backgroundColor: '#1D3434' }}>
-          <MemopsyLogo />
-          <div className="text-center mt-4">
-            <h1 className="text-2xl font-bold mb-4" style={{ color: '#F1C77A' }}>
-              Enlace Inválido
-            </h1>
-            <p className="text-white mb-6">
-              {error || 'El enlace de recuperación no es válido o ha expirado.'}
-            </p>
-            <Button 
-              onClick={() => router.push('/login')}
-              variant="outline" 
-              className="w-full mb-3"
-            >
-              Volver al Login
-            </Button>
-            <p className="text-gray-400 text-sm">
-              Puedes solicitar un nuevo enlace de recuperación desde la página de login.
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (success) {
-    return (
-      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: '#152A2A' }}>
-        <div className="p-8 rounded-2xl shadow-2xl w-full max-w-md" style={{ backgroundColor: '#1D3434' }}>
-          <MemopsyLogo />
-          <div className="text-center mt-4">
-            <h1 className="text-2xl font-bold mb-4" style={{ color: '#F1C77A' }}>
-              ¡Contraseña Actualizada!
-            </h1>
-            <p className="text-white mb-6">
-              Tu contraseña ha sido actualizada exitosamente. Serás redirigido al login en unos segundos.
-            </p>
-            <Button 
-              onClick={() => router.push('/login')}
-              variant="outline" 
-              className="w-full"
-            >
-              Ir al Login
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: '#152A2A' }}>
-      <div className="p-8 rounded-2xl shadow-2xl w-full max-w-md" style={{ backgroundColor: '#1D3434' }}>
+    <main className="flex min-h-screen items-center justify-center bg-background px-4">
+      <div className="w-full max-w-md rounded-2xl bg-card p-8 shadow-2xl">
         <MemopsyLogo />
-        <h1 className="text-2xl font-bold text-center mt-4 mb-2" style={{ color: '#F1C77A' }}>
-          Nueva Contraseña
-        </h1>
-        <p className="text-center text-gray-300 mb-2 text-sm">
-          Ingresa tu nueva contraseña para {email}
-        </p>
-        <p className="text-center text-yellow-400 mb-6 text-xs">
-          ⏰ Este enlace expira en {timeRemaining}
-        </p>
-        
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="password">Nueva Contraseña:</Label>
-            <Input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              placeholder='Nueva contraseña'
-              className="mt-1"
-              minLength={6}
-            />
+
+        {!token ? (
+          <div className="mt-6 text-center">
+            <p className="text-white/90">Este enlace no es válido.</p>
+            <Link href="/olvide-password" className="mt-4 inline-block text-primary underline">Pedir un enlace nuevo</Link>
           </div>
-          <div>
-            <Label htmlFor="confirmPassword">Confirmar Contraseña:</Label>
-            <Input
-              type="password"
-              id="confirmPassword"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-              placeholder='Confirmar contraseña'
-              className="mt-1"
-              minLength={6}
-            />
+        ) : listo ? (
+          <div className="mt-6 text-center">
+            <CheckCircle2 className="mx-auto h-10 w-10 text-primary" aria-hidden="true" />
+            <p role="status" className="mt-3 text-white/90">Tu contraseña se actualizó.</p>
+            <Link href="/login" className="mt-6 inline-block text-primary underline">Iniciar sesión</Link>
           </div>
-          {error && <p className="text-red-500 text-center text-sm">{error}</p>}
-          <Button 
-            type="submit" 
-            variant="outline" 
-            className="w-full"
-            disabled={isLoading}
-          >
-            {isLoading ? 'Actualizando...' : 'Actualizar Contraseña'}
-          </Button>
-        </form>
-        
-        <div className="mt-4 text-center">
-          <button
-            type="button"
-            onClick={() => router.push('/login')}
-            className="text-sm text-blue-400 hover:text-blue-300 underline"
-          >
-            Volver al Login
-          </button>
-        </div>
+        ) : (
+          <>
+            <h1 className="mt-4 mb-6 text-center text-2xl font-bold text-primary">Elegí tu contraseña nueva</h1>
+            <form onSubmit={guardar} className="space-y-4">
+              <div>
+                <Label htmlFor="password">Contraseña nueva</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  autoComplete="new-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  aria-describedby="requisitos"
+                  disabled={cargando}
+                  className="mt-1"
+                />
+                <div id="requisitos">
+                  <RequisitosPassword password={password} />
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="confirmacion">Repetí la contraseña</Label>
+                <Input
+                  id="confirmacion"
+                  type="password"
+                  autoComplete="new-password"
+                  value={confirmacion}
+                  onChange={(e) => setConfirmacion(e.target.value)}
+                  disabled={cargando}
+                  className="mt-1"
+                />
+                {confirmacion.length > 0 && !coinciden && (
+                  <p className="mt-1 text-sm text-red-300">Las contraseñas no coinciden.</p>
+                )}
+              </div>
+
+              {errores.length > 0 && (
+                <ul role="alert" className="space-y-1 text-center text-sm text-red-300">
+                  {errores.map((error) => <li key={error}>{error}</li>)}
+                </ul>
+              )}
+
+              <Button type="submit" className="w-full" disabled={!cumpleRequisitos || !coinciden || cargando}>
+                {cargando && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Guardar contraseña
+              </Button>
+            </form>
+          </>
+        )}
       </div>
-    </div>
+    </main>
   );
 }

@@ -4,6 +4,7 @@
 import { useState, type FormEvent } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Loader2, ShieldCheck } from "lucide-react";
 import MemopsyLogo from "@/app/components/MemopsyLogo";
 import { Button } from "@/components/ui/button";
@@ -110,8 +111,10 @@ export default function LoginPage() {
               </Button>
             </form>
 
-            <p className="mt-6 text-center text-sm text-white/70">
-              ¿Olvidaste tu contraseña? Contactá al administrador del consultorio.
+            <p className="mt-6 text-center text-sm">
+              <Link href="/olvide-password" className="text-primary underline">
+                ¿Olvidaste tu contraseña?
+              </Link>
             </p>
           </>
         ) : (

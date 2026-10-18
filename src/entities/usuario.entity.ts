@@ -37,4 +37,10 @@ export class UsuarioEntity extends BaseEntity {
 
   @Column({ name: "bloqueado_hasta", type: "datetime", nullable: true })
   bloqueadoHasta: Date | null;
+
+  @Column({ name: "reset_token_hash", type: "char", length: 64, nullable: true, select: false })
+  resetTokenHash: string | null;
+
+  @Column({ name: "reset_expira", type: "datetime", nullable: true })
+  resetExpira: Date | null;
 }
