@@ -20,15 +20,23 @@ export default function PorQue() {
           <h2 className="titulo text-4xl text-crema sm:text-5xl">¿Por qué MemoPsy?</h2>
 
           <p className="mt-6 text-lg leading-relaxed text-crema/85">
-            Porque tu vocación es acompañar a tus pacientes, no perder tiempo en la gestión.
-            MemoPsy reúne en un solo lugar las notas clínicas, la agenda y el material de
-            seguimiento, para que el proceso terapéutico no se corte entre una sesión y la otra.
+            La historia clínica y las notas de cada sesión son el corazón del trabajo terapéutico: ahí
+            queda registrado cómo evoluciona cada paciente. Sin embargo, en muchos consultorios de la
+            Provincia de Formosa todavía se llevan en papel, en planillas o en aplicaciones que no fueron
+            pensadas para información de salud.
           </p>
 
           <p className="mt-5 text-lg leading-relaxed text-crema/85">
-            Y porque la confidencialidad no es opcional: las notas se guardan cifradas, cada rol
-            ve solo lo que le corresponde y cada acceso queda registrado, en línea con la Ley
-            25.326 y con el secreto profesional que exige la Ley 461 de la Provincia de Formosa.
+            MemoPsy ordena ese registro en un solo lugar: notas clínicas estructuradas y fáciles de
+            encontrar antes de cada sesión, la agenda de turnos y el material que el psicólogo decide
+            compartir con su paciente, para que el seguimiento no se corte entre una sesión y la otra.
+          </p>
+
+          <p className="mt-5 text-lg leading-relaxed text-crema/85">
+            Y lo hace cuidando lo más sensible: las notas se guardan cifradas y cada rol ve solo lo que
+            le corresponde, con las garantías que pide la Ley 26.529 para la historia clínica digital y
+            la Ley 25.326 de Protección de Datos Personales, y respetando el ejercicio profesional que
+            regula la Ley 461 de la Provincia de Formosa.
           </p>
 
           <a
