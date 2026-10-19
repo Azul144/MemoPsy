@@ -1,6 +1,7 @@
 // src/app/api/sesiones/route.ts
 // src/app/api/sesiones/route.ts
 import { type NextRequest, NextResponse } from "next/server"
+import { alcanceSesiones, puedeVerSesion } from "@/lib/auth/alcance-sesiones"
 import { getServerSession } from "next-auth/next"
 import { authConfig } from "@/lib/auth/auth-config"
 import { initializeDatabase } from "@/lib/database"
@@ -106,7 +107,11 @@ export async function GET(request: NextRequest) {
     )
 
     // Filtrar sesiones null que pudieron resultar de validaciones fallidas
-    const sesionesValidas = sesionesTransformadas.filter(Boolean)
+    // y dejar SOLO las que esta persona puede ver según su rol
+    const alcance = alcanceSesiones(session.user)
+    const sesionesValidas = sesionesTransformadas.filter(
+      (sesion) => sesion !== null && puedeVerSesion(alcance, sesion),
+    )
 
     return NextResponse.json(sesionesValidas)
   } catch (error) {

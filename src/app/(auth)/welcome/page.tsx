@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Menu, X, Users, Calendar, FileText, LogOut, Shield, HomeIcon, KeyRound, Loader2, ArrowRight, ShieldCheck, ShieldAlert } from 'lucide-react';
 import MfaSetupModal from "@/components/mfa-setup-modal"; // Import the MFA setup modal
 import MfaDesactivarModal from "@/components/mfa-desactivar-modal";
+import toast from "react-hot-toast";
 
 interface ModuloConfig {
   id: string;
@@ -70,6 +71,16 @@ export default function WelcomePage() {
   const [isTogglingMfa, setIsTogglingMfa] = useState(false);
   const [isDesactivarOpen, setIsDesactivarOpen] = useState(false);
 
+
+  // Si el sistema la trajo acá porque intentó entrar a una sección sin permiso, se lo avisa
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (url.searchParams.get('sinPermiso')) {
+      toast.error('No tenés permiso para entrar a esa sección.');
+      url.searchParams.delete('sinPermiso');
+      window.history.replaceState(null, '', url.pathname);
+    }
+  }, []);
 
   useEffect(() => {
     if (status === 'unauthenticated') {

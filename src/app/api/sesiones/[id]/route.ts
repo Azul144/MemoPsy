@@ -2,6 +2,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authConfig } from "@/lib/auth/auth-config";
+import { alcanceSesiones, puedeVerSesion } from "@/lib/auth/alcance-sesiones";
 import { initializeDatabase } from "@/lib/database";
 import { SesionEntity, PacienteTieneSesionEntity, PsicologoEntity, ModalidadEntity, EstadoEntity } from "@/entities";
 import { ZodError, z } from "zod";
@@ -89,6 +90,10 @@ export async function GET(request: NextRequest, { params: paramsPromise }: { par
         pacientes: pacientesAsociados,
     };
 
+    // Solo puede verla quien corresponde según su rol (si no, respondemos como si no existiera)
+    if (!puedeVerSesion(alcanceSesiones(session.user), sesionTransformada)) {
+      return NextResponse.json({ error: "Sesión no encontrada" }, { status: 404 });
+    }
     return NextResponse.json(sesionTransformada);
 
   } catch (error) {
@@ -132,6 +137,20 @@ export async function PUT(request: NextRequest, { params: paramsPromise }: { par
     const dataSource = await initializeDatabase();
     const sesionRepository = dataSource.getRepository(SesionEntity);
     const pacienteTieneSesionRepository = dataSource.getRepository(PacienteTieneSesionEntity);
+
+    // Un psicólogo solo puede modificar sus propias sesiones (recepción puede modificar todas)
+    const alcance = alcanceSesiones(session.user);
+    if (alcance.tipo !== "todas") {
+      const actual = await sesionRepository.findOne({ where: { id }, relations: ["psicologo"] });
+      if (!actual) {
+        return NextResponse.json({ error: "Sesión no encontrada" }, { status: 404 });
+      }
+      const esSuya = alcance.tipo === "psicologo" && String(actual.psicologo?.id ?? "") === alcance.id;
+      const reasignaAOtro = alcance.tipo === "psicologo" && psicologoId !== undefined && String(psicologoId) !== alcance.id;
+      if (!esSuya || reasignaAOtro) {
+        return NextResponse.json({ error: "No tenés permiso para modificar esta sesión." }, { status: 403 });
+      }
+    }
 
     // Start transaction
     let updatedSesionEntity;
