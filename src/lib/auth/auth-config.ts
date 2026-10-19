@@ -31,7 +31,6 @@ declare module "next-auth" {
     persona: any;
     perfiles: any[];
     permisos: any[];
-    auth0Id?: string | null;
     pacienteId?: string | null;
     psicologoId?: string | null;
   }

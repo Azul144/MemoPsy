@@ -21,8 +21,6 @@ export class UsuarioEntity extends BaseEntity {
   @JoinColumn({ name: "persona_id" })
   persona: PersonaEntity;
 
-  @Column({ name: "auth0Id", unique: true, nullable: true })
-  auth0Id: string;
   @Column({ name: "mfa_habilitado", type: "tinyint", default: 0 })
   mfaHabilitado: boolean;
 

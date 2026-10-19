@@ -53,7 +53,6 @@ export class UsuarioService {
       activo: createUsuarioDto.activo ?? true,
       ultimoAcceso: new Date(),
       persona: personaModel,
-      auth0Id: '',
     });
 
     // Convertir a entidad y guardar

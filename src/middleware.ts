@@ -35,13 +35,7 @@ export const config = {
     "/sesiones/:path*",
     "/informes/:path*",
     "/perfiles/:path*",
-    "/z-profile/:path*",
-    "/z-register/:path*",
-    "/z-pacientes/:path*",
-    "/z-psicologos/:path*",
     "/api/((?!auth/).*)",
     "/api/auth/mfa/:path*",
-    "/api/auth/profile/:path*",
-    "/api/auth/register/:path*",
   ],
 };
