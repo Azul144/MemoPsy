@@ -10,7 +10,8 @@ import { PacienteEntity } from '@/entities/paciente.entity';
 import { AppDataSource } from '@/lib/database';
 import { In } from 'typeorm';
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
+  const params = await paramsPromise;
   try {
     const session = await getServerSession(authConfig);
     if (!session?.user) {
@@ -108,7 +109,8 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 }
 
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
+  const params = await paramsPromise;
   try {
     const session = await getServerSession(authConfig);
     if (!session?.user || !session.user.psicologoId) { // Check for psicologoId directly
@@ -223,7 +225,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-// export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+// export async function DELETE(request: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
 //   // ... implementation ...
 // }
 
@@ -233,22 +235,25 @@ import { InformeController } from '@/lib/controllers/informe.controller'; // Adj
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params: paramsPromise }: { params: Promise<{ id: string }> }
 ) {
+  const params = await paramsPromise;
   return InformeController.getInformeById(request, { params });
 }
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params: paramsPromise }: { params: Promise<{ id: string }> }
 ) {
+  const params = await paramsPromise;
   return InformeController.updateInforme(request, { params });
 }
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params: paramsPromise }: { params: Promise<{ id: string }> }
 ) {
+  const params = await paramsPromise;
   return InformeController.deleteInforme(request, { params });
 }
   */

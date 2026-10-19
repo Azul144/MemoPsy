@@ -4,7 +4,8 @@ import { UsuarioController } from '@/lib/controllers/usuario.controller';
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params: paramsPromise }: { params: Promise<{ id: string }> }
 ) {
+  const params = await paramsPromise;
   return UsuarioController.toggleUsuarioStatus(request, { params });
 }

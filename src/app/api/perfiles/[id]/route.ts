@@ -6,7 +6,8 @@ import { initializeDatabase } from "@/lib/database"
 import { Perfil } from "@/models/perfil.model"
 
 // GET /api/perfiles/[id] - Obtener perfil específico
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
+  const params = await paramsPromise;
   try {
     const session = await getServerSession(authConfig)
 
@@ -81,7 +82,8 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 }
 
 // DELETE /api/perfiles/[id] - Eliminar perfil
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
+  const params = await paramsPromise;
   try {
     const session = await getServerSession(authConfig)
 
@@ -144,7 +146,8 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
 }
 
 // PUT /api/perfiles/[id] - Actualizar perfil
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
+  const params = await paramsPromise;
   try {
     const session = await getServerSession(authConfig)
 
@@ -302,7 +305,8 @@ import { initializeDatabase } from "@/lib/database"
 import { Perfil } from "@/models/perfil.model"
 
 // GET /api/perfiles/[id] - Obtener perfil específico
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
+  const params = await paramsPromise;
   try {
     const session = await getServerSession(authConfig)
 
@@ -369,7 +373,8 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 }
 
 // DELETE /api/perfiles/[id] - Eliminar perfil
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
+  const params = await paramsPromise;
   try {
     const session = await getServerSession(authConfig)
 
@@ -424,7 +429,8 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
 }
 
 // PUT /api/perfiles/[id] - Actualizar perfil
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
+  const params = await paramsPromise;
   try {
     const session = await getServerSession(authConfig)
 
@@ -565,21 +571,24 @@ import { PerfilController } from '@/lib/controllers/perfil.controller'; // Adjus
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params: paramsPromise }: { params: Promise<{ id: string }> }
 ) {
+  const params = await paramsPromise;
   return PerfilController.getPerfilById(request, { params });
 }
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params: paramsPromise }: { params: Promise<{ id: string }> }
 ) {
+  const params = await paramsPromise;
   return PerfilController.updatePerfil(request, { params });
 }
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params: paramsPromise }: { params: Promise<{ id: string }> }
 ) {
+  const params = await paramsPromise;
   return PerfilController.deletePerfil(request, { params });
 }*/

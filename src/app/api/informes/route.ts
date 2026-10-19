@@ -215,7 +215,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ message: 'Psicólogo no encontrado' }, { status: 404 });
     }
 
-    let fechaCreacion = new Date();
+    const fechaCreacion = new Date();
     //try {
     //  fechaCreacion = await obtenerFechaDesdeInternet();
     //} catch {

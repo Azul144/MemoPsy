@@ -2,7 +2,8 @@ import { type NextRequest, NextResponse } from "next/server"
 import { getRepository } from "@/lib/database"
 import { UsuarioEntity } from "@/entities"
 
-export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(request: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
+  const params = await paramsPromise;
   try {
     const { id } = params
     const body = await request.json()

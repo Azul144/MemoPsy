@@ -4,15 +4,15 @@ import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth-config';
 import { EstadoService } from '@/services/estado.service';
 import { EstadoRepository } from '@/repositories/estado.repository';
-import { AppDataSource } from '@/lib/database';
+import { initializeDatabase } from '@/lib/database';
 import { EstadoEntity } from '@/entities/estado.entity';
 import { CreateEstadoDto, UpdateEstadoDto } from '@/dto/estado.dto';
 
-// Initialize repository and service
-// EstadoRepository constructor expects Repository<EstadoEntity>
-const typeOrmEstadoRepository = AppDataSource.getRepository(EstadoEntity);
-const estadoRepository = new EstadoRepository(typeOrmEstadoRepository);
-const estadoService = new EstadoService(estadoRepository);
+// Crea el servicio en el momento de usarlo, con la base ya conectada
+async function obtenerServicio() {
+  const dataSource = await initializeDatabase();
+  return new EstadoService(new EstadoRepository(dataSource));
+}
 
 export class EstadoController {
 
@@ -37,7 +37,7 @@ export class EstadoController {
       //   filters.nombre = searchParams.get('nombre')!;
       // }
       
-      const estados = await estadoService.getAllEstados();
+      const estados = await (await obtenerServicio()).getAllEstados();
       return NextResponse.json({ success: true, data: estados });
     } catch (error: any) {
       console.error('Error al obtener estados:', error);
@@ -65,7 +65,7 @@ export class EstadoController {
 
       const body = await request.json();
       const createEstadoDto: CreateEstadoDto = body; 
-      const nuevoEstado = await estadoService.createEstado(createEstadoDto);
+      const nuevoEstado = await (await obtenerServicio()).createEstado(createEstadoDto);
       return NextResponse.json({ success: true, data: nuevoEstado }, { status: 201 });
     } catch (error: any) {
       console.error('Error al crear estado:', error);
@@ -95,7 +95,7 @@ export class EstadoController {
       }
 
       const { id } = params;
-      const estado = await estadoService.getEstadoById(id);
+      const estado = await (await obtenerServicio()).getEstadoById(id);
       // Service method throws error if not found, so an explicit check here might be redundant
       // if (!estado) { 
       //   return NextResponse.json({ success: false, error: 'Estado no encontrado' }, { status: 404 });
@@ -129,7 +129,7 @@ export class EstadoController {
       const { id } = params;
       const body = await request.json();
       const updateEstadoDto: UpdateEstadoDto = body;
-      const estadoActualizado = await estadoService.updateEstado(id, updateEstadoDto);
+      const estadoActualizado = await (await obtenerServicio()).updateEstado(id, updateEstadoDto);
       // Service method throws error if not found
       // if (!estadoActualizado) {
       //   return NextResponse.json({ success: false, error: 'Estado no encontrado para actualizar' }, { status: 404 });
@@ -163,7 +163,7 @@ export class EstadoController {
       }
 
       const { id } = params;
-      await estadoService.deleteEstado(id); 
+      await (await obtenerServicio()).deleteEstado(id); 
       return NextResponse.json({ success: true, message: 'Estado eliminado correctamente' });
     } catch (error: any) {
       console.error('Error al eliminar estado:', error);

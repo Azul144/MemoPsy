@@ -103,7 +103,7 @@ export class InformeController {
         return NextResponse.json({ error: 'No tienes permisos para crear informes' }, { status: 403 });
       }
 
-      let body = await request.json();
+      const body = await request.json();
       
       // Auto-fill psicologoId from session if not provided or if user is not admin trying to set it for someone else
       // For simplicity, if a non-admin user creates an informe, it's for themselves.

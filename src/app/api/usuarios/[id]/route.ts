@@ -20,7 +20,8 @@ function formatDateToISO(date: any): string {
 }
 
 // GET - Obtener usuario por ID con todos sus datos
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
+  const params = await paramsPromise;
   try {
     const { id } = params
     const usuarioRepo = await getRepository(UsuarioEntity)
@@ -113,7 +114,8 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 }
 
 // PUT - Actualizar usuario completo
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
+  const params = await paramsPromise;
   const dataSource = await getDataSource()
   const queryRunner = dataSource.createQueryRunner()
 
@@ -332,7 +334,8 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 }
 
 // DELETE - Eliminar usuario (opcional)
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
+  const params = await paramsPromise;
   try {
     const { id } = params
     const usuarioRepo = await getRepository(UsuarioEntity)
@@ -374,7 +377,8 @@ function formatDateToISO(date: any): string {
 }
 
 // GET - Obtener usuario por ID con todos sus datos
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
+  const params = await paramsPromise;
   try {
     const { id } = params
     const usuarioRepo = await getRepository(UsuarioEntity)
@@ -467,7 +471,8 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 }
 
 // PUT - Actualizar usuario completo
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
+  const params = await paramsPromise;
   const dataSource = await getDataSource()
   const queryRunner = dataSource.createQueryRunner()
 
@@ -653,7 +658,8 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 }
 
 // DELETE - Eliminar usuario (opcional)
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
+  const params = await paramsPromise;
   try {
     const { id } = params
     const usuarioRepo = await getRepository(UsuarioEntity)

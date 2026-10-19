@@ -16,7 +16,8 @@ const updateSesionSchema = z.object({
   pacientesIds: z.array(z.number().int().positive({ message: "Invalid pacienteId" })).optional(), // ✅ Array de enteros positivos
 });
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
+  const params = await paramsPromise;
   try {
     const session = await getServerSession(authConfig);
     const { id } = params;
@@ -100,7 +101,8 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 }
 
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
+  const params = await paramsPromise;
   try {
     const session = await getServerSession(authConfig);
     const { id } = params;

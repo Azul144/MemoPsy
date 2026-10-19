@@ -4,14 +4,15 @@ import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth-config';
 import { ModalidadService } from '@/services/modalidad.service';
 import { ModalidadRepository } from '@/repositories/modalidad.repository';
-import { AppDataSource } from '@/lib/database';
+import { initializeDatabase } from '@/lib/database';
 import { ModalidadEntity } from '@/entities/modalidad.entity';
 import { CreateModalidadDto, UpdateModalidadDto } from '@/dto/modalidad.dto';
 
-// Initialize repository and service
-const typeOrmModalidadRepository = AppDataSource.getRepository(ModalidadEntity);
-const modalidadRepository = new ModalidadRepository(typeOrmModalidadRepository);
-const modalidadService = new ModalidadService(modalidadRepository);
+// Crea el servicio en el momento de usarlo, con la base ya conectada
+async function obtenerServicio() {
+  const dataSource = await initializeDatabase();
+  return new ModalidadService(new ModalidadRepository(dataSource));
+}
 
 export class ModalidadController {
 
@@ -34,7 +35,7 @@ export class ModalidadController {
       // const filters: any = {}; 
       // if (searchParams.get('nombre')) { filters.nombre = searchParams.get('nombre'); }
       
-      const modalidades = await modalidadService.getAllModalidades();
+      const modalidades = await (await obtenerServicio()).getAllModalidades();
       return NextResponse.json({ success: true, data: modalidades });
     } catch (error: any) {
       console.error('Error al obtener modalidades:', error);
@@ -61,7 +62,7 @@ export class ModalidadController {
 
       const body = await request.json();
       const createModalidadDto: CreateModalidadDto = body; 
-      const nuevaModalidad = await modalidadService.createModalidad(createModalidadDto);
+      const nuevaModalidad = await (await obtenerServicio()).createModalidad(createModalidadDto);
       return NextResponse.json({ success: true, data: nuevaModalidad }, { status: 201 });
     } catch (error: any) {
       console.error('Error al crear modalidad:', error);
@@ -91,7 +92,7 @@ export class ModalidadController {
       }
 
       const { id } = params;
-      const modalidad = await modalidadService.getModalidadById(id);
+      const modalidad = await (await obtenerServicio()).getModalidadById(id);
       // Service method throws error if not found
       return NextResponse.json({ success: true, data: modalidad });
     } catch (error: any) {
@@ -122,7 +123,7 @@ export class ModalidadController {
       const { id } = params;
       const body = await request.json();
       const updateModalidadDto: UpdateModalidadDto = body;
-      const modalidadActualizada = await modalidadService.updateModalidad(id, updateModalidadDto);
+      const modalidadActualizada = await (await obtenerServicio()).updateModalidad(id, updateModalidadDto);
       // Service method throws error if not found
       return NextResponse.json({ success: true, data: modalidadActualizada });
     } catch (error: any) {
@@ -153,7 +154,7 @@ export class ModalidadController {
       }
 
       const { id } = params;
-      await modalidadService.deleteModalidad(id); 
+      await (await obtenerServicio()).deleteModalidad(id); 
       return NextResponse.json({ success: true, message: 'Modalidad eliminada correctamente' });
     } catch (error: any) {
       console.error('Error al eliminar modalidad:', error);
