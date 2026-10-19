@@ -1,6 +1,8 @@
 import { authenticator } from "otplib";
 import * as bcrypt from "bcrypt";
-import { descifrar } from "./cifrado";
+import { randomBytes } from "crypto";
+import QRCode from "qrcode";
+import { cifrar, descifrar } from "./cifrado";
 
 // Acepta también el código anterior y el siguiente (±30 segundos),
 // por si el reloj del celular está un poco desfasado
@@ -39,4 +41,33 @@ export async function usarCodigoRecuperacion(
     }
   }
   return null;
+}
+// ---------- Activación del MFA (paso L3) ----------
+
+
+// Crea el secreto del autenticador: lo devolvemos en claro (para el QR) y cifrado (para la base)
+export function generarSecretoMfa() {
+  const secreto = authenticator.generateSecret(20);
+  return { secreto, secretoCifrado: cifrar(secreto) };
+}
+
+// Arma la imagen del QR que se escanea con Google Authenticator, Microsoft Authenticator, etc.
+export async function generarQrMfa(email: string, secreto: string): Promise<string> {
+  const uri = authenticator.keyuri(email, "MemoPsy", secreto);
+  return await QRCode.toDataURL(uri, { margin: 1, width: 240 });
+}
+
+// 8 códigos de recuperación tipo "K7PM-3QXD", sin letras que se confunden (0/O, 1/I/L)
+const ALFABETO = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+
+export async function crearCodigosRecuperacion(cantidad = 8) {
+  const codigos: string[] = [];
+  for (let i = 0; i < cantidad; i++) {
+    const bytes = randomBytes(8);
+    const letras = Array.from(bytes, (b) => ALFABETO[b % ALFABETO.length]).join("");
+    codigos.push(`${letras.slice(0, 4)}-${letras.slice(4)}`);
+  }
+  // En la base se guarda solo el hash de cada código (como con las contraseñas)
+  const hashes = await Promise.all(codigos.map((c) => bcrypt.hash(c.replace("-", ""), 10)));
+  return { codigos, hashesGuardados: JSON.stringify(hashes) };
 }

@@ -1,200 +1,218 @@
-// src/app/components/mfa-setup-modal.tsx
+// src/components/mfa-setup-modal.tsx
+// Ventana para ACTIVAR la verificación en dos pasos:
+// 1) escanear el QR  2) escribir el código de la app  3) guardar los códigos de recuperación
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import { Loader2, ShieldCheck, Copy, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2 } from "lucide-react"; 
-// Ensure 'qr-code-styling' is added to package.json if you intend to use it.
-// npm install qr-code-styling
-import QRCodeStyling from 'qr-code-styling'; 
 
-interface MfaSetupModalProps {
+type Props = {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
-}
+};
 
-const MfaSetupModal: React.FC<MfaSetupModalProps> = ({ isOpen, onClose, onSuccess }) => {
-  const [qrCodeData, setQrCodeData] = useState<string | null>(null);
-  const [secret, setSecret] = useState<string | null>(null);
-  const [otpCode, setOtpCode] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+type Paso = "cargando" | "qr" | "codigos" | "error";
+
+export default function MfaSetupModal({ isOpen, onClose, onSuccess }: Props) {
+  const [paso, setPaso] = useState<Paso>("cargando");
+  const [qr, setQr] = useState("");
+  const [secreto, setSecreto] = useState("");
+  const [codigo, setCodigo] = useState("");
+  const [codigosRecuperacion, setCodigosRecuperacion] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [isVerifying, setIsVerifying] = useState(false);
-  const qrRef = useRef<HTMLDivElement>(null);
-  const qrCodeInstanceRef = useRef<QRCodeStyling | null>(null);
+  const [verificando, setVerificando] = useState(false);
+  const [copiado, setCopiado] = useState(false);
 
+  // Evita pedir el QR dos veces (React, en modo desarrollo, ejecuta los efectos dos veces)
+  const yaPedido = useRef(false);
+
+  // Al abrir la ventana, pedimos al servidor un secreto nuevo y su QR
   useEffect(() => {
-    if (isOpen) {
-      // Reset state when modal opens
-      setQrCodeData(null);
-      setSecret(null);
-      setOtpCode("");
-      setError(null);
-      setIsLoading(true);
-      setIsVerifying(false);
-
-      if (qrRef.current) {
-        qrRef.current.innerHTML = ''; // Clear previous QR
-      }
-
-      fetch("/api/auth/mfa", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "enable" }),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.success && data.qrCode && data.secret) {
-            setQrCodeData(data.qrCode); // This is barcode_uri
-            setSecret(data.secret);
-          } else {
-            setError(data.error || "Error al generar el código QR para 2FA.");
-          }
-        })
-        .catch((err) => {
-          console.error("Error al habilitar 2FA:", err);
-          setError("No se pudo conectar con el servidor para habilitar 2FA.");
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
-    } else {
-        if (qrRef.current) {
-            qrRef.current.innerHTML = ''; // Clear QR when modal is closed
-        }
-    }
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (qrCodeData && qrRef.current && isOpen) { // Ensure modal is open before trying to append
-      qrCodeInstanceRef.current = new QRCodeStyling({
-        width: 250,
-        height: 250,
-        data: qrCodeData,
-        image: "/memopsy-logo.png", // Make sure this path is correct in your public folder
-        dotsOptions: {
-          color: "#1D3434", // Dark color for dots
-          type: "rounded"
-        },
-        backgroundOptions: {
-          color: "#FFFFFF", // Pure white background for QR for better scanability
-        },
-        imageOptions: {
-          crossOrigin: "anonymous",
-          margin: 5,
-          imageSize: 0.3
-        },
-        qrOptions: {
-          errorCorrectionLevel: 'H' // High error correction
-        }
-      });
-      if (qrRef.current) { // Double check ref before appending
-        qrRef.current.innerHTML = ''; // Clear previous before appending
-        qrCodeInstanceRef.current.append(qrRef.current);
-      }
-    }
-  }, [qrCodeData, isOpen]); // Add isOpen to dependency array
-
-  const handleVerifyOtp = async () => {
-    if (!otpCode.trim()) {
-      setError("Por favor, ingresa el código de tu aplicación de autenticación.");
+    if (!isOpen) {
+      yaPedido.current = false; // al cerrar, la próxima apertura vuelve a pedirlo
       return;
     }
-    setIsVerifying(true);
-    setError(null);
+    if (yaPedido.current) return;
+    yaPedido.current = true;
 
+    setPaso("cargando");
+    setCodigo("");
+    setError(null);
+    fetch("/api/auth/mfa", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "enable" }),
+    })
+      .then((r) => r.json())
+      .then((datos) => {
+        if (datos.success) {
+          setQr(datos.qrCode);
+          setSecreto(datos.secret);
+          setPaso("qr");
+        } else {
+          setError(datos.error ?? "No se pudo iniciar la configuración.");
+          setPaso("error");
+        }
+      })
+      .catch(() => {
+        setError("No se pudo conectar con el servidor.");
+        setPaso("error");
+      });
+  }, [isOpen]);
+
+  async function verificar(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setError(null);
+    setVerificando(true);
     try {
-      const response = await fetch("/api/auth/mfa", {
+      const respuesta = await fetch("/api/auth/mfa", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "verify", code: otpCode }),
+        body: JSON.stringify({ action: "verify", code: codigo }),
       });
-      const data = await response.json();
-
-      if (data.success) {
-        onSuccess(); 
+      const datos = await respuesta.json();
+      if (datos.success) {
+        setCodigosRecuperacion(datos.codigosRecuperacion);
+        setPaso("codigos");
       } else {
-        setError(data.error || "El código de verificación es incorrecto o ha expirado.");
+        setError(datos.error ?? "El código no es correcto.");
+        setCodigo("");
       }
-    } catch (err) {
-      console.error("Error al verificar OTP:", err);
-      setError("Error al verificar el código. Inténtalo de nuevo.");
+    } catch {
+      setError("No se pudo conectar con el servidor.");
     } finally {
-      setIsVerifying(false);
+      setVerificando(false);
     }
-  };
-
-  if (!isOpen) {
-    return null;
   }
 
+  async function copiarCodigos() {
+    try {
+      await navigator.clipboard.writeText(codigosRecuperacion.join("\n"));
+      setCopiado(true);
+    } catch {
+      setCopiado(false);
+    }
+  }
+
+  function descargarCodigos() {
+    const texto = `Códigos de recuperación de MemoPsy\nCada código sirve una sola vez.\n\n${codigosRecuperacion.join("\n")}\n`;
+    const url = URL.createObjectURL(new Blob([texto], { type: "text/plain" }));
+    const enlace = document.createElement("a");
+    enlace.href = url;
+    enlace.download = "memopsy-codigos-recuperacion.txt";
+    enlace.click();
+    URL.revokeObjectURL(url);
+  }
+
+  if (!isOpen) return null;
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[100] p-4 backdrop-blur-sm">
-      <div className="bg-[#1D3434] p-6 rounded-lg shadow-xl w-full max-w-md text-[#F1C77A]">
-        <h2 className="text-xl font-semibold mb-4 text-center">Activar Autenticación en Dos Pasos (2FA)</h2>
-        {isLoading && (
-          <div className="flex flex-col items-center justify-center h-64">
-            <Loader2 className="w-12 h-12 animate-spin text-[#F1C77A]" />
-            <p className="mt-2 text-gray-300">Generando configuración...</p>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="titulo-mfa"
+        className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl bg-card p-6 text-white shadow-xl"
+      >
+        <h2 id="titulo-mfa" className="mb-4 text-center text-xl font-bold text-primary">
+          Activar verificación en dos pasos
+        </h2>
+
+        {paso === "cargando" && (
+          <div className="flex h-48 flex-col items-center justify-center">
+            <Loader2 className="h-10 w-10 animate-spin text-primary" />
+            <p className="mt-2 text-white/80">Generando configuración…</p>
           </div>
         )}
-        {!isLoading && error && !qrCodeData && (
-           <div className="text-center text-red-400 mb-4 p-4 bg-red-900 bg-opacity-30 rounded">
-             <p>Error al configurar 2FA:</p>
-             <p>{error}</p>
-             <Button onClick={onClose} variant="outline" className="mt-4 w-full" style={{ borderColor: '#F1C77A', color: '#F1C77A' }}>Cerrar</Button>
-           </div>
+
+        {paso === "error" && (
+          <div className="space-y-4 text-center">
+            <p role="alert" className="text-red-300">{error}</p>
+            <Button variant="outline" className="w-full" onClick={onClose}>Cerrar</Button>
+          </div>
         )}
-        {!isLoading && qrCodeData && secret && (
-          <>
-            <p className="text-sm text-gray-300 mb-2">
-              1. Escanea el siguiente código QR con tu aplicación de autenticación (Google Authenticator, Authy, etc.).
+
+        {paso === "qr" && (
+          <form onSubmit={verificar} className="space-y-4">
+            <p className="text-sm text-white/85">
+              <strong>1.</strong> Abrí una app de autenticación (Google Authenticator, Microsoft
+              Authenticator, Authy…) y escaneá este código:
             </p>
-            <div ref={qrRef} id="qr-canvas" className="flex justify-center my-4 p-2 bg-white rounded-md mx-auto" style={{ width: 250 + 4, height: 250 + 4 }}>
-              {/* QR code will be appended here by useEffect */}
-            </div>
-            <p className="text-sm text-gray-300 mb-1">
-              Si no puedes escanear el código, puedes ingresar manualmente la siguiente clave:
-            </p>
-            <p className="font-mono bg-gray-700 text-center text-white p-2 rounded mb-4 break-all text-sm">{secret}</p>
-            
-            <p className="text-sm text-gray-300 mb-2">
-              2. Ingresa el código de 6 dígitos generado por tu aplicación:
-            </p>
-            <Label htmlFor="otpCodeSetup" className="sr-only">Código OTP</Label>
-            <Input
-              id="otpCodeSetup"
-              type="text"
-              value={otpCode}
-              onChange={(e) => setOtpCode(e.target.value)}
-              placeholder="123456"
-              maxLength={6}
-              className="text-center text-lg mb-2 text-[#1D3434] bg-[#F1C77A] placeholder:text-gray-500"
-              style={{ borderColor: '#F1C77A' }}
+            {/* El QR viene como imagen (data URL) generada en el servidor */}
+            <img
+              src={qr}
+              alt="Código QR para configurar la app de autenticación"
+              width={240}
+              height={240}
+              className="mx-auto rounded-lg bg-white p-2"
             />
-            {error && !isVerifying && <p className="text-red-400 text-sm mb-2 text-center">{error}</p>}
-            <Button
-              onClick={handleVerifyOtp}
-              disabled={isVerifying}
-              className="w-full mb-2"
-              style={{ backgroundColor: '#F1C77A', color: '#1D3434' }}
-            >
-              {isVerifying ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
-              Activar y Verificar
+            <p className="text-xs text-white/70">Si no podés escanearlo, cargá esta clave a mano:</p>
+            <p className="break-all rounded bg-secondary p-2 text-center font-mono text-sm">{secreto}</p>
+
+            <div>
+              <Label htmlFor="codigo-activacion" className="text-sm text-white/85">
+                <strong>2.</strong> Escribí el código de 6 dígitos que muestra la app:
+              </Label>
+              <Input
+                id="codigo-activacion"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                maxLength={6}
+                value={codigo}
+                onChange={(e) => setCodigo(e.target.value.replace(/\D/g, ""))}
+                className="mt-2 text-center text-lg tracking-widest"
+                required
+              />
+            </div>
+
+            {error && <p role="alert" className="text-center text-sm text-red-300">{error}</p>}
+
+            <Button type="submit" className="w-full" disabled={codigo.length !== 6 || verificando}>
+              {verificando && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Activar
             </Button>
-          </>
+            <Button type="button" variant="outline" className="w-full" onClick={onClose}>
+              Cancelar
+            </Button>
+          </form>
         )}
-        {!isLoading && (
-          <Button onClick={onClose} variant="outline" className="w-full" style={{ borderColor: '#F1C77A', color: '#F1C77A' }}>
-            Cancelar
-          </Button>
+
+        {paso === "codigos" && (
+          <div className="space-y-4">
+            <div className="text-center">
+              <ShieldCheck className="mx-auto h-10 w-10 text-primary" aria-hidden="true" />
+              <p className="mt-2 font-semibold">¡Listo! La verificación en dos pasos quedó activada.</p>
+            </div>
+            <p className="text-sm text-white/85">
+              Guardá estos <strong>códigos de recuperación</strong> en un lugar seguro. Si perdés el
+              celular, cada uno te deja entrar <strong>una sola vez</strong>.
+              <strong> No se vuelven a mostrar.</strong>
+            </p>
+            <ul className="grid grid-cols-2 gap-2 rounded-lg bg-secondary p-4 text-center font-mono">
+              {codigosRecuperacion.map((c) => (
+                <li key={c}>{c}</li>
+              ))}
+            </ul>
+            <div className="flex gap-2">
+              <Button type="button" variant="outline" className="flex-1" onClick={copiarCodigos}>
+                <Copy className="mr-2 h-4 w-4" aria-hidden="true" />
+                {copiado ? "¡Copiados!" : "Copiar"}
+              </Button>
+              <Button type="button" variant="outline" className="flex-1" onClick={descargarCodigos}>
+                <Download className="mr-2 h-4 w-4" aria-hidden="true" />
+                Descargar
+              </Button>
+            </div>
+            <Button type="button" className="w-full" onClick={onSuccess}>
+              Ya los guardé
+            </Button>
+          </div>
         )}
       </div>
     </div>
   );
-};
-
-export default MfaSetupModal;
+}

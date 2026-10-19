@@ -9,6 +9,7 @@ import MemopsyLogo from "@/app/components/MemopsyLogo";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Users, Calendar, FileText, LogOut, Settings, Shield, HomeIcon, KeyRound, Loader2 } from 'lucide-react'; // Added KeyRound, Loader2
 import MfaSetupModal from "@/components/mfa-setup-modal"; // Import the MFA setup modal
+import MfaDesactivarModal from "@/components/mfa-desactivar-modal";
 
 interface ModuloConfig {
   id: string;
@@ -66,6 +67,7 @@ export default function WelcomePage() {
   const [loadingMfaStatus, setLoadingMfaStatus] = useState(true);
   const [mfaError, setMfaError] = useState<string | null>(null);
   const [isTogglingMfa, setIsTogglingMfa] = useState(false);
+  const [isDesactivarOpen, setIsDesactivarOpen] = useState(false);
 
 
   useEffect(() => {
@@ -124,35 +126,15 @@ export default function WelcomePage() {
     }
   }, [session, status, updateSession]); // updateSession added as dep
 
-  const handleToggleMfa = async () => {
-    setIsTogglingMfa(true);
+  const handleToggleMfa = () => {
     setMfaError(null);
     if (mfaEnabled) {
-      // Desactivar 2FA
-      try {
-        const response = await fetch("/api/auth/mfa", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action: "disable" }),
-        });
-        const data = await response.json();
-        if (data.success) {
-          setMfaEnabled(false);
-          // Potentially update session if MFA status change affects session data
-          // await updateSession(); 
-        } else {
-          console.error("Error al desactivar 2FA:", data.error);
-          setMfaError(data.error || "No se pudo desactivar 2FA.");
-        }
-      } catch (err) {
-        console.error("Error al desactivar 2FA:", err);
-        setMfaError("Error de conexión al desactivar 2FA.");
-      }
+      // Desactivar: pide un código para confirmar
+      setIsDesactivarOpen(true);
     } else {
-      // Abrir modal para activar 2FA
+      // Activar: abre la ventana con el QR
       setIsMfaModalOpen(true);
     }
-    setIsTogglingMfa(false);
   };
 
   const handleMfaSuccess = async () => {
@@ -426,6 +408,7 @@ export default function WelcomePage() {
 
       {/* Modal de configuración de 2FA */}
       {session?.user && ( // Only render modal if session is available
+        <>
         <MfaSetupModal
             isOpen={isMfaModalOpen}
             onClose={() => {
@@ -434,6 +417,15 @@ export default function WelcomePage() {
             }}
             onSuccess={handleMfaSuccess}
         />
+        <MfaDesactivarModal
+            isOpen={isDesactivarOpen}
+            onClose={() => setIsDesactivarOpen(false)}
+            onSuccess={() => {
+                setMfaEnabled(false);
+                setIsDesactivarOpen(false);
+            }}
+        />
+        </>
       )}
     </div>
   );
