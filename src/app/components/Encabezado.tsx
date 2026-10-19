@@ -6,30 +6,30 @@ import { useState } from "react";
 import { Menu, X } from "lucide-react";
 
 const links = [
-  { href: "#inicio", texto: "Home" },
-  { href: "#funciones", texto: "Funciones Clave" },
+  { href: "#funciones", texto: "Funciones" },
+  { href: "#modulos", texto: "Módulos" },
   { href: "#testimonios", texto: "Testimonios" },
   { href: "#por-que", texto: "¿Por qué MemoPsy?" },
-  { href: "#sobre-nosotros", texto: "Sobre nosotros" },
+  { href: "#contacto", texto: "Contacto" },
 ];
 
 export default function Encabezado() {
   const [abierto, setAbierto] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/10 bg-background">
+    <header className="sticky top-0 z-50 border-b border-white/10 bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
 
         {/* Logo */}
         <a href="#inicio" className="flex items-center gap-3">
           <Image src="/assets/logopng.png" alt="Logo de MemoPsy" width={36} height={44} />
-          <span className="text-2xl font-bold text-primary">MemoPsy</span>
+          <span className="titulo text-2xl font-semibold text-primary">MemoPsy</span>
         </a>
 
         {/* Menú de computadora */}
         <nav className="hidden gap-8 lg:flex">
           {links.map((link) => (
-            <a key={link.href} href={link.href} className="text-white/90 hover:text-primary">
+            <a key={link.href} href={link.href} className="text-crema/85 transition-colors hover:text-primary">
               {link.texto}
             </a>
           ))}
@@ -37,11 +37,11 @@ export default function Encabezado() {
 
         {/* Botones de computadora */}
         <div className="hidden items-center gap-3 lg:flex">
-          <a href="#contacto" className="rounded-md border border-primary px-5 py-2 font-semibold text-primary">
-            Agendar
+          <a href="#contacto" className="rounded-full border border-primary/70 px-5 py-2 font-semibold text-primary transition-colors hover:bg-primary/10">
+            Pedir demostración
           </a>
-          <Link href="/login" className="rounded-md bg-primary px-5 py-2 font-semibold text-primary-foreground">
-            Iniciar Sesión
+          <Link href="/login" className="rounded-full bg-primary px-5 py-2 font-semibold text-primary-foreground">
+            Iniciar sesión
           </Link>
         </div>
 
@@ -73,15 +73,15 @@ export default function Encabezado() {
             <a
               href="#contacto"
               onClick={() => setAbierto(false)}
-              className="flex-1 rounded-md border border-primary py-3 text-center font-semibold text-primary"
+              className="flex-1 rounded-full border border-primary py-3 text-center font-semibold text-primary"
             >
-              Agendar
+              Demostración
             </a>
             <Link
               href="/login"
-              className="flex-1 rounded-md bg-primary py-3 text-center font-semibold text-primary-foreground"
+              className="flex-1 rounded-full bg-primary py-3 text-center font-semibold text-primary-foreground"
             >
-              Iniciar Sesión
+              Iniciar sesión
             </Link>
           </div>
         </nav>

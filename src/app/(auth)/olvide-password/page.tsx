@@ -4,7 +4,7 @@
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { Loader2, Mail } from "lucide-react";
-import MemopsyLogo from "@/app/components/MemopsyLogo";
+import PantallaAcceso from "@/components/PantallaAcceso";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -46,21 +46,19 @@ export default function OlvidePasswordPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="w-full max-w-md rounded-2xl bg-card p-8 shadow-2xl">
-        <MemopsyLogo />
-        <h1 className="mt-4 text-center text-2xl font-bold text-primary">¿Olvidaste tu contraseña?</h1>
+    <PantallaAcceso>
+        <h1 className="mt-4 titulo text-3xl text-crema">¿Olvidaste tu contraseña?</h1>
 
         {mensaje ? (
-          <div className="mt-6 text-center">
-            <Mail className="mx-auto h-10 w-10 text-primary" aria-hidden="true" />
+          <div className="mt-6">
+            <Mail className="h-10 w-10 text-primary" aria-hidden="true" />
             <p role="status" className="mt-3 text-white/90">{mensaje}</p>
             <p className="mt-2 text-sm text-white/70">Revisá también la carpeta de spam. El enlace vence en 30 minutos.</p>
             <Link href="/login" className="mt-6 inline-block text-primary underline">Volver al inicio de sesión</Link>
           </div>
         ) : (
           <>
-            <p className="mt-2 mb-6 text-center text-sm text-white/80">
+            <p className="mt-2 mb-6 text-sm text-white/80">
               Escribí el email de tu cuenta y te mandamos un enlace para elegir una contraseña nueva.
             </p>
             <form onSubmit={enviar} className="space-y-4" noValidate>
@@ -78,19 +76,18 @@ export default function OlvidePasswordPage() {
                 />
               </div>
 
-              {error && <p role="alert" className="text-center text-sm text-red-300">{error}</p>}
+              {error && <p role="alert" className="text-sm text-red-300">{error}</p>}
 
               <Button type="submit" className="w-full" disabled={cargando}>
                 {cargando && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Enviar enlace
               </Button>
             </form>
-            <p className="mt-6 text-center text-sm">
+            <p className="mt-6 text-sm">
               <Link href="/login" className="text-primary underline">Volver al inicio de sesión</Link>
             </p>
           </>
         )}
-      </div>
-    </main>
+    </PantallaAcceso>
   );
 }

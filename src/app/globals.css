@@ -42,8 +42,9 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: "Plus Jakarta Sans Variable", ui-sans-serif, system-ui, sans-serif;
+  --color-crema: #F6EFE2;
+  --color-salvia: #7FB3A6;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -149,4 +150,72 @@ html {
 section,
 footer {
   scroll-margin-top: 5rem;
+}
+/* ---------- Títulos ---------- */
+.titulo {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+/* ---------- Animaciones de la portada ---------- */
+@keyframes aparecer {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes flotar {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
+@keyframes acercar {
+  from { transform: scale(1); }
+  to   { transform: scale(1.08); }
+}
+/* Manchas de luz del fondo: se mueven y cambian de tamaño muy despacio */
+@keyframes deriva {
+  0%   { transform: translate(0, 0) scale(1); }
+  33%  { transform: translate(8%, -6%) scale(1.15); }
+  66%  { transform: translate(-6%, 8%) scale(0.92); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+@keyframes deslizar {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* Entra con un pequeño retraso: se usa con style={{ animationDelay: "..." }} */
+.entrar {
+  animation: aparecer 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+/* Tarjetitas de la portada: entran y después flotan suave */
+.tarjeta-flotante {
+  animation:
+    aparecer 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both,
+    flotar 6s ease-in-out 1.6s infinite;
+}
+/* Foto del login: se acerca muy despacio */
+.foto-lenta {
+  animation: acercar 24s ease-out both alternate infinite;
+}
+/* Cinta de testimonios: se desliza sola y se frena con el mouse */
+.cinta {
+  animation: deslizar 60s linear infinite;
+}
+.mancha {
+  animation: deriva 22s ease-in-out infinite;
+}
+.cinta:hover,
+.cinta:focus-within {
+  animation-play-state: paused;
+}
+
+/* Quien tiene activado "reducir movimiento" en su compu o celular no ve animaciones */
+@media (prefers-reduced-motion: reduce) {
+  .entrar,
+  .tarjeta-flotante,
+  .foto-lenta,
+  .mancha,
+  .cinta {
+    animation: none;
+  }
 }

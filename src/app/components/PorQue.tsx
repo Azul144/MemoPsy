@@ -1,33 +1,41 @@
-import { Sparkles } from "lucide-react";
+import Image from "next/image";
 
 export default function PorQue() {
   return (
-    <section id="por-que" className="px-4 py-20">
-      <div className="mx-auto max-w-3xl text-center">
-        <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full border border-white/10 bg-card">
-          <Sparkles className="h-9 w-9 text-primary" />
+    <section id="por-que" className="px-6 py-24">
+      <div className="mx-auto grid max-w-6xl items-center gap-12 overflow-hidden rounded-[2.5rem] border border-white/10 bg-card lg:grid-cols-[1fr_1.2fr]">
+        <div className="relative min-h-80 lg:h-full">
+          <Image
+            src="/assets/consultorio2.jpg"
+            alt="Paciente sonriendo durante una sesión"
+            fill
+            sizes="(min-width: 1024px) 40vw, 100vw"
+            className="object-cover"
+          />
         </div>
 
-        <h2 className="mt-6 text-4xl font-bold text-primary">¿Por qué MemoPsy?</h2>
+        <div className="px-8 pb-12 lg:py-16 lg:pr-16 lg:pl-0">
+          <h2 className="titulo text-4xl text-crema sm:text-5xl">¿Por qué MemoPsy?</h2>
 
-        <p className="mt-6 text-lg leading-relaxed text-white/90">
-          Porque tu vocación es acompañar a tus pacientes, no perder tiempo en la gestión.
-          MemoPsy reúne en un solo lugar las notas clínicas, la agenda y el material de
-          seguimiento, para que el proceso terapéutico no se corte entre una sesión y la otra.
-        </p>
+          <p className="mt-6 text-lg leading-relaxed text-crema/85">
+            Porque tu vocación es acompañar a tus pacientes, no perder tiempo en la gestión.
+            MemoPsy reúne en un solo lugar las notas clínicas, la agenda y el material de
+            seguimiento, para que el proceso terapéutico no se corte entre una sesión y la otra.
+          </p>
 
-        <p className="mt-5 text-lg leading-relaxed text-white/90">
-          Y porque la confidencialidad no es opcional: las notas se guardan cifradas, cada rol
-          ve solo lo que le corresponde y cada acceso queda registrado, en línea con la Ley
-          25.326 y con el secreto profesional que exige la Ley 461 de la Provincia de Formosa.
-        </p>
+          <p className="mt-5 text-lg leading-relaxed text-crema/85">
+            Y porque la confidencialidad no es opcional: las notas se guardan cifradas, cada rol
+            ve solo lo que le corresponde y cada acceso queda registrado, en línea con la Ley
+            25.326 y con el secreto profesional que exige la Ley 461 de la Provincia de Formosa.
+          </p>
 
-        <a
-          href="#contacto"
-          className="mt-10 inline-block rounded-md border border-primary px-7 py-3 font-semibold text-primary hover:bg-primary/10"
-        >
-          Contáctenos
-        </a>
+          <a
+            href="#contacto"
+            className="mt-10 inline-block rounded-full bg-primary px-7 py-3.5 font-semibold text-primary-foreground transition-transform hover:-translate-y-0.5"
+          >
+            Pedir una demostración
+          </a>
+        </div>
       </div>
     </section>
   );

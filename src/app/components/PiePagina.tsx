@@ -45,12 +45,13 @@ export default function PiePagina() {
         <div>
           <h2 className="text-xl font-bold text-white">Acceso</h2>
           <ul className="mt-6 space-y-3 text-white/85">
-            <li><a href="#inicio" className="hover:text-primary">Home</a></li>
-            <li><a href="#funciones" className="hover:text-primary">Funciones Clave</a></li>
+            <li><a href="#inicio" className="hover:text-primary">Inicio</a></li>
+            <li><a href="#funciones" className="hover:text-primary">Funciones</a></li>
+            <li><a href="#modulos" className="hover:text-primary">Módulos</a></li>
             <li><a href="#testimonios" className="hover:text-primary">Testimonios</a></li>
             <li><a href="#por-que" className="hover:text-primary">¿Por qué MemoPsy?</a></li>
-            <li><a href="#contacto" className="hover:text-primary">Agendar</a></li>
-            <li><Link href="/login" className="hover:text-primary">Iniciar Sesión</Link></li>
+            <li><a href="#contacto" className="hover:text-primary">Pedir una demostración</a></li>
+            <li><Link href="/login" className="hover:text-primary">Iniciar sesión</Link></li>
           </ul>
         </div>
 
@@ -58,7 +59,7 @@ export default function PiePagina() {
         <div className="md:text-right">
           <div className="flex items-center gap-3 md:justify-end">
             <Image src="/assets/logopng.png" alt="Logo de MemoPsy" width={36} height={44} />
-            <span className="text-2xl font-bold text-primary">MemoPsy</span>
+            <span className="titulo text-2xl font-semibold text-primary">MemoPsy</span>
           </div>
           <p className="mt-4 text-white/80">
             En MemoPsy impulsamos la psicología moderna con herramientas intuitivas y seguras,

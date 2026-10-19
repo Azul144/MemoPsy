@@ -6,7 +6,7 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Loader2, ShieldCheck } from "lucide-react";
-import MemopsyLogo from "@/app/components/MemopsyLogo";
+import PantallaAcceso from "@/components/PantallaAcceso";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import InputPassword from "@/components/InputPassword";
@@ -69,13 +69,11 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="w-full max-w-md rounded-2xl bg-card p-8 shadow-2xl">
-        <MemopsyLogo />
+    <PantallaAcceso>
 
         {paso === "credenciales" ? (
           <>
-            <h1 className="mt-4 mb-6 text-center text-2xl font-bold text-primary">Iniciar Sesión</h1>
+            <h1 className="mt-4 mb-6 titulo text-3xl text-crema">Iniciar sesión</h1>
             <form onSubmit={ingresar} className="space-y-4">
               <div>
                 <Label htmlFor="email">Email</Label>
@@ -103,7 +101,7 @@ export default function LoginPage() {
                 />
               </div>
 
-              {error && <p role="alert" className="text-center text-sm text-red-300">{error}</p>}
+              {error && <p role="alert" className="text-sm text-red-300">{error}</p>}
 
               <Button type="submit" className="w-full" disabled={cargando}>
                 {cargando && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -111,7 +109,7 @@ export default function LoginPage() {
               </Button>
             </form>
 
-            <p className="mt-6 text-center text-sm">
+            <p className="mt-6 text-sm">
               <Link href="/olvide-password" className="text-primary underline">
                 ¿Olvidaste tu contraseña?
               </Link>
@@ -119,9 +117,9 @@ export default function LoginPage() {
           </>
         ) : (
           <>
-            <div className="mt-4 mb-6 text-center">
-              <ShieldCheck className="mx-auto h-10 w-10 text-primary" aria-hidden="true" />
-              <h1 className="mt-2 text-2xl font-bold text-primary">Verificación en dos pasos</h1>
+            <div className="mt-4 mb-6">
+              <ShieldCheck className="h-10 w-10 text-primary" aria-hidden="true" />
+              <h1 className="mt-2 titulo text-3xl text-crema">Verificación en dos pasos</h1>
               <p className="mt-2 text-sm text-white/80">
                 Abrí tu app de autenticación e ingresá el código de 6 dígitos.
                 También podés usar uno de tus códigos de recuperación.
@@ -143,7 +141,7 @@ export default function LoginPage() {
                 />
               </div>
 
-              {error && <p role="alert" className="text-center text-sm text-red-300">{error}</p>}
+              {error && <p role="alert" className="text-sm text-red-300">{error}</p>}
 
               <Button type="submit" className="w-full" disabled={cargando}>
                 {cargando && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -155,7 +153,6 @@ export default function LoginPage() {
             </form>
           </>
         )}
-      </div>
-    </main>
+    </PantallaAcceso>
   );
 }

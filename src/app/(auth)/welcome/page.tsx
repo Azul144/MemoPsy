@@ -1,13 +1,13 @@
 // app/welcome/page.tsx
-// app/welcome/page.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import MemopsyLogo from "@/app/components/MemopsyLogo";
+import Image from "next/image";
+import FondoAnimado from "@/components/FondoAnimado";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Users, Calendar, FileText, LogOut, Settings, Shield, HomeIcon, KeyRound, Loader2 } from 'lucide-react'; // Added KeyRound, Loader2
+import { Menu, X, Users, Calendar, FileText, LogOut, Shield, HomeIcon, KeyRound, Loader2, ArrowRight, ShieldCheck, ShieldAlert } from 'lucide-react';
 import MfaSetupModal from "@/components/mfa-setup-modal"; // Import the MFA setup modal
 import MfaDesactivarModal from "@/components/mfa-desactivar-modal";
 
@@ -24,7 +24,7 @@ const MODULOS_DISPONIBLES: ModuloConfig[] = [
   {
     id: 'usuarios',
     nombre: 'Usuarios',
-    descripcion: 'Gestión de usuarios del sistema',
+    descripcion: 'Altas, datos y estado de las cuentas del consultorio',
     icon: Users,
     ruta: '/usuarios',
     permisosRequeridos: ['Ver Usuarios', 'Registrar Usuario', 'Editar Usuario', 'Eliminar Usuario']
@@ -32,7 +32,7 @@ const MODULOS_DISPONIBLES: ModuloConfig[] = [
   {
     id: 'sesiones',
     nombre: 'Sesiones',
-    descripcion: 'Administración de sesiones',
+    descripcion: 'Agenda de turnos, presenciales y por videollamada',
     icon: Calendar,
     ruta: '/sesiones',
     permisosRequeridos: ['Ver Sesiones', 'Registrar Sesión', 'Editar Sesión', 'Eliminar Sesión', 'Asignar Profesional']
@@ -40,7 +40,7 @@ const MODULOS_DISPONIBLES: ModuloConfig[] = [
   {
     id: 'perfiles',
     nombre: 'Perfiles',
-    descripcion: 'Administración de perfiles',
+    descripcion: 'Qué puede ver y hacer cada rol',
     icon: Shield,
     ruta: '/perfiles',
     permisosRequeridos: ['Ver Perfiles', 'Registrar Perfil', 'Editar Perfil', 'Eliminar Perfil', 'Asignar Perfil']
@@ -48,7 +48,7 @@ const MODULOS_DISPONIBLES: ModuloConfig[] = [
   {
     id: 'informes',
     nombre: 'Informes',
-    descripcion: 'Generación de reportes',
+    descripcion: 'Notas clínicas e informes de cada paciente',
     icon: FileText,
     ruta: '/informes',
     permisosRequeridos: ['Ver Informes', 'Registrar Informe', 'Editar Informe', 'Eliminar Informe']
@@ -153,9 +153,9 @@ export default function WelcomePage() {
 
   if (status === 'loading' || (status === 'authenticated' && !session?.user)) {
     return (
-      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: '#152A2A' }}>
-        <Loader2 className="w-12 h-12 animate-spin text-[#F1C77A]" />
-        <p className="text-white text-lg ml-4">Cargando...</p>
+      <div className="flex min-h-screen items-center justify-center gap-4 bg-background">
+        <Loader2 className="h-10 w-10 animate-spin text-primary" />
+        <p className="text-lg text-crema">Cargando...</p>
       </div>
     );
   }
@@ -164,263 +164,228 @@ export default function WelcomePage() {
     return null;
   }
 
+  const nombre = session.user.persona?.nombre ?? '';
   const nombreCompleto = session.user.persona ? `${session.user.persona.nombre} ${session.user.persona.apellido}` : session.user.email || 'Usuario';
+  const iniciales = session.user.persona
+    ? `${session.user.persona.nombre?.[0] ?? ''}${session.user.persona.apellido?.[0] ?? ''}`
+    : (session.user.email?.[0] ?? 'U').toUpperCase();
+  const perfiles: string[] = (session.user.perfiles ?? []).map((p: any) => p?.nombre).filter(Boolean);
+  const fecha = new Date().toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' });
+  const hoy = fecha.charAt(0).toUpperCase() + fecha.slice(1); // "Lunes, 19 de octubre"
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#152A2A' }}>
-      {/* Navigation Bar */}
-      <nav className="w-full p-4" style={{ backgroundColor: '#1D3434' }}>
-        <div className="flex items-center justify-between">
-          {/* Logo y título */}
-          <div className="flex items-center space-x-4">
-            <div className="w-10 h-10">
-              <MemopsyLogo />
-            </div>
-            <h1 className="text-xl font-bold" style={{ color: '#F1C77A' }}>
-              MemoPsy
-            </h1>
-          </div>
-
-          {/* Menu hamburguesa */}
-          <button
-            onClick={toggleMenu}
-            className="p-2 rounded-lg hover:bg-opacity-80 transition-colors"
-            style={{ backgroundColor: '#152A2A' }}
-          >
-            {isMenuOpen ? (
-              <X className="w-6 h-6 text-white" />
-            ) : (
-              <Menu className="w-6 h-6 text-white" />
-            )}
+    <div className="min-h-screen bg-background text-crema">
+      {/* Barra superior */}
+      <nav className="sticky top-0 z-40 border-b border-white/10 bg-background/80 backdrop-blur-md">
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
+          <button type="button" onClick={() => router.push('/welcome')} className="flex items-center gap-3">
+            <Image src="/assets/logopng.png" alt="" width={30} height={36} />
+            <span className="titulo text-xl text-primary">MemoPsy</span>
           </button>
-        </div>
 
-        {/* Menu desplegable */}
-        {isMenuOpen && (
-          <div className="absolute top-16 right-4 w-64 rounded-lg shadow-lg z-50" style={{ backgroundColor: '#1D3434' }}>
-            <div className="p-4 border-b border-gray-600">
-              <p className="text-sm text-gray-300">Conectado como:</p>
-              <p className="font-semibold text-white">{session.user.email}</p>
-              <p className="text-sm" style={{ color: '#F1C77A' }}>{nombreCompleto}</p>
-            </div>
-            
-            {/* Módulos disponibles */}
-            <div className="p-2">
-              <h3 className="px-2 py-1 text-sm font-semibold text-gray-300 uppercase tracking-wide">
-                Módulos
-              </h3>
-              {modulosPermitidos.length > 0 ? (
-                modulosPermitidos.map((modulo) => {
+          <div className="relative flex items-center gap-3">
+            <span className="hidden text-sm text-crema/70 sm:block">{nombreCompleto}</span>
+            <button
+              type="button"
+              onClick={toggleMenu}
+              aria-expanded={isMenuOpen}
+              aria-label={isMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
+              className="flex h-10 items-center gap-2 rounded-full border border-white/15 pl-1 pr-3 transition-colors hover:border-primary/60"
+            >
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
+                {iniciales}
+              </span>
+              {isMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+            </button>
+
+            {/* Menú desplegable */}
+            {isMenuOpen && (
+              <div className="absolute right-0 top-12 z-50 w-72 overflow-hidden rounded-2xl border border-white/10 bg-card shadow-2xl shadow-black/40">
+                <div className="border-b border-white/10 p-4">
+                  <p className="font-semibold">{nombreCompleto}</p>
+                  <p className="text-sm text-crema/65">{session.user.email}</p>
+                </div>
+                <div className="p-2">
+                  {modulosPermitidos.length > 0 ? (
+                    modulosPermitidos.map((modulo) => {
+                      const IconComponent = modulo.icon;
+                      return (
+                        <button
+                          key={modulo.id}
+                          type="button"
+                          onClick={() => navigateToModule(modulo.ruta)}
+                          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-white/5"
+                        >
+                          <IconComponent className="h-5 w-5 text-primary" />
+                          {modulo.nombre}
+                        </button>
+                      );
+                    })
+                  ) : (
+                    <p className="px-3 py-2 text-sm text-crema/60">Todavía no tenés módulos asignados.</p>
+                  )}
+                </div>
+                <div className="border-t border-white/10 p-2">
+                  <button
+                    type="button"
+                    onClick={() => navigateToModule('/welcome')}
+                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-white/5"
+                  >
+                    <HomeIcon className="h-5 w-5 text-crema/70" />
+                    Inicio
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-red-300 transition-colors hover:bg-red-500/10"
+                  >
+                    <LogOut className="h-5 w-5" />
+                    Cerrar sesión
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </nav>
+
+      <main className="mx-auto max-w-6xl px-6 py-10">
+        {/* Saludo */}
+        <section className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-card px-8 py-10 sm:px-12">
+          <FondoAnimado />
+          <div className="relative">
+            <p className="entrar text-sm text-crema/60">{hoy}</p>
+            <h1 className="titulo entrar mt-2 text-4xl sm:text-5xl" style={{ animationDelay: '0.1s' }}>
+              Hola{nombre ? `, ${nombre}` : ''}
+            </h1>
+            <p className="entrar mt-3 text-lg text-crema/75" style={{ animationDelay: '0.2s' }}>
+              ¿Qué querés hacer hoy?
+            </p>
+            {perfiles.length > 0 && (
+              <div className="entrar mt-5 flex flex-wrap gap-2" style={{ animationDelay: '0.3s' }}>
+                {perfiles.map((perfil) => (
+                  <span key={perfil} className="rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
+                    {perfil}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+
+        <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_20rem]">
+          {/* Módulos */}
+          <section aria-label="Módulos">
+            {modulosPermitidos.length > 0 ? (
+              <div className="grid gap-4 sm:grid-cols-2">
+                {modulosPermitidos.map((modulo, i) => {
                   const IconComponent = modulo.icon;
                   return (
                     <button
                       key={modulo.id}
+                      type="button"
                       onClick={() => navigateToModule(modulo.ruta)}
-                      className="w-full flex items-center px-2 py-2 text-left text-white hover:bg-opacity-80 rounded-lg transition-colors"
-                      style={{ backgroundColor: 'transparent' }}
-                      onMouseEnter={(e) => ((e.target as HTMLElement).style.backgroundColor = "#152A2A")}
-                      onMouseLeave={(e) => ((e.target as HTMLElement).style.backgroundColor = "transparent")}
+                      className="entrar group flex flex-col rounded-3xl border border-white/10 bg-card p-6 text-left transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-xl hover:shadow-black/30 focus-visible:outline-2 focus-visible:outline-primary"
+                      style={{ animationDelay: `${0.35 + i * 0.08}s` }}
                     >
-                      <IconComponent className="w-5 h-5 mr-3" />
-                      <div>
-                        <div className="font-medium">{modulo.nombre}</div>
-                        <div className="text-xs text-gray-400">{modulo.descripcion}</div>
-                      </div>
+                      <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/15 transition-colors group-hover:bg-primary">
+                        <IconComponent className="h-6 w-6 text-primary transition-colors group-hover:text-primary-foreground" />
+                      </span>
+                      <span className="mt-5 text-xl font-semibold">{modulo.nombre}</span>
+                      <span className="mt-1 flex-1 text-crema/65">{modulo.descripcion}</span>
+                      <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-primary">
+                        Entrar
+                        <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                      </span>
                     </button>
                   );
-                })
-              ) : (
-                <p className="px-2 py-2 text-sm text-gray-400">
-                  No tienes permisos para ningún módulo
+                })}
+              </div>
+            ) : (
+              <div className="rounded-3xl border border-dashed border-white/15 p-10 text-center">
+                <h2 className="text-xl font-semibold">Todavía no tenés módulos asignados</h2>
+                <p className="mt-2 text-crema/65">
+                  Pedile al administrador del consultorio que te asigne un perfil para empezar a trabajar.
                 </p>
-              )}
+              </div>
+            )}
+          </section>
+
+          {/* Cuenta */}
+          <aside className="entrar h-fit rounded-3xl border border-white/10 bg-card p-6" style={{ animationDelay: '0.5s' }}>
+            <div className="flex items-center gap-4">
+              <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-primary text-lg font-bold text-primary-foreground">
+                {iniciales}
+              </span>
+              <div className="min-w-0">
+                <p className="truncate font-semibold">{nombreCompleto}</p>
+                <p className="truncate text-sm text-crema/65">{session.user.email}</p>
+              </div>
             </div>
 
-            {/* Opciones adicionales */}
-            <div className="p-2 border-t border-gray-600">
-              <button
-              onClick={() => {
-                router.push("/welcome");
-              }}
-              className="w-full flex items-center px-2 py-2 text-left text-white hover:bg-opacity-80 rounded-lg transition-colors"
-              style={{ backgroundColor: "transparent" }}
-              onMouseEnter={(e) => ((e.target as HTMLElement).style.backgroundColor = "#152A2A")}
-              onMouseLeave={(e) => ((e.target as HTMLElement).style.backgroundColor = "transparent")}
-              >
-              <HomeIcon className="w-5 h-5 mr-3" />
-              Home
-              </button>
+            <dl className="mt-6 space-y-3 border-t border-white/10 pt-5 text-sm">
+              <div className="flex justify-between">
+                <dt className="text-crema/65">Estado</dt>
+                <dd className={session.user.activo ? 'text-emerald-300' : 'text-red-300'}>
+                  {session.user.activo ? 'Activo' : 'Inactivo'}
+                </dd>
+              </div>
+              <div className="flex justify-between">
+                <dt className="text-crema/65">Permisos</dt>
+                <dd>{session.user.permisos?.length || 0}</dd>
+              </div>
+            </dl>
 
-
-              
-              <button
-                onClick={handleLogout}
-                className="w-full flex items-center px-2 py-2 text-left text-red-400 hover:bg-red-900 hover:bg-opacity-20 rounded-lg transition-colors"
-              >
-                <LogOut className="w-5 h-5 mr-3" />
-                Cerrar Sesión
-              </button>
-            </div>
-          </div>
-        )}
-      </nav>
-
-      {/* Contenido principal */}
-      <main className="container mx-auto px-4 py-8">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-4" style={{ color: '#F1C77A' }}>
-            ¡Bienvenida/o, {nombreCompleto}!
-          </h1>
-          <p className="text-xl text-gray-300">
-            Sistema de Gestión MemoPsy
-          </p>
-        </div>
-
-        {/* Cards de módulos */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-          {modulosPermitidos.map((modulo) => {
-            const IconComponent = modulo.icon;
-            return (
-              <div
-                key={modulo.id}
-                className="p-6 rounded-2xl shadow-lg hover:shadow-xl transition-shadow cursor-pointer"
-                style={{ backgroundColor: '#1D3434' }}
-                onClick={() => navigateToModule(modulo.ruta)}
-              >
-                <div className="flex flex-col items-center text-center">
-                  <div className="p-4 rounded-full mb-4" style={{ backgroundColor: '#152A2A' }}>
-                    <IconComponent className="w-8 h-8" style={{ color: '#F1C77A' }} />
-                  </div>
-                  <h3 className="text-xl font-semibold text-white mb-2">
-                    {modulo.nombre}
-                  </h3>
-                  <p className="text-gray-300 text-sm mb-4">
-                    {modulo.descripcion}
+            {/* Verificación en dos pasos */}
+            <div className={`mt-5 rounded-2xl p-4 ${mfaEnabled ? 'bg-emerald-400/10' : 'bg-primary/10'}`}>
+              <div className="flex items-start gap-3">
+                {loadingMfaStatus ? (
+                  <Loader2 className="mt-0.5 h-5 w-5 animate-spin text-crema/60" />
+                ) : mfaEnabled ? (
+                  <ShieldCheck className="mt-0.5 h-5 w-5 text-emerald-300" />
+                ) : (
+                  <ShieldAlert className="mt-0.5 h-5 w-5 text-primary" />
+                )}
+                <div>
+                  <p className="font-semibold">Verificación en dos pasos</p>
+                  <p className="text-sm text-crema/70">
+                    {loadingMfaStatus ? 'Consultando...' : mfaEnabled ? 'Activada: tu cuenta está protegida.' : 'Desactivada: te recomendamos activarla.'}
                   </p>
-                  <Button
-                    variant="outline"
-                      className="w-full py-3 text-lg"
-                      style={{ 
-                        borderColor: '#F1C77A',
-                        color: '#F1C77A',
-                        backgroundColor: 'transparent'
-                      }}
-                      onMouseEnter={(e) => {
-                        (e.target as HTMLElement).style.backgroundColor = '#F1C77A';
-                        (e.target as HTMLElement).style.color = '#1D3434';
-                      }}
-                      onMouseLeave={(e) => {
-                        (e.target as HTMLElement).style.backgroundColor = 'transparent';
-                        (e.target as HTMLElement).style.color = '#F1C77A';
-                      }}
-                    >
-                    Acceder
-                  </Button>
                 </div>
               </div>
-            );
-          })}
-        </div>
-
-        {/* Mensaje si no hay módulos disponibles */}
-        {modulosPermitidos.length === 0 && (
-          <div className="text-center mt-12">
-            <div className="p-8 rounded-2xl" style={{ backgroundColor: '#1D3434' }}>
-              <h3 className="text-xl font-semibold text-white mb-4">
-                Sin módulos disponibles
-              </h3>
-              <p className="text-gray-300">
-                No tienes permisos para acceder a ningún módulo del sistema.
-                Contacta al administrador para solicitar acceso.
-              </p>
+              {mfaError && <p className="mt-2 text-xs text-red-300">{mfaError}</p>}
+              <Button
+                onClick={handleToggleMfa}
+                disabled={loadingMfaStatus || isTogglingMfa || mfaEnabled === null}
+                className={`mt-4 w-full rounded-full ${mfaEnabled ? 'border border-primary/60 bg-transparent text-primary hover:bg-primary/10' : ''}`}
+              >
+                {isTogglingMfa ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <KeyRound className="mr-2 h-4 w-4" />}
+                {mfaEnabled ? 'Desactivar' : 'Activar ahora'}
+              </Button>
             </div>
-          </div>
-        )}
-
-        {/* Información del usuario */}
-        <div className="mt-12 max-w-md mx-auto">
-          <div className="p-6 rounded-2xl" style={{ backgroundColor: '#1D3434' }}>
-            <h3 className="text-lg font-semibold mb-4" style={{ color: '#F1C77A' }}>
-              Información de tu cuenta
-            </h3>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-300">Email:</span>
-                <span className="text-white">{session.user.email}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-300">Estado:</span>
-                <span className={session.user.activo ? "text-green-400" : "text-red-400"}>
-                  {session.user.activo ? "Activo" : "Inactivo"}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-300">Perfiles:</span>
-                <span className="text-white">
-                  {session.user.perfiles?.length || 0}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-300">Permisos:</span>
-                <span className="text-white">
-                  {session.user.permisos?.length || 0}
-                </span>
-              </div>
-              
-              {/* MFA Section */}
-              <div className="pt-3 mt-3 border-t border-gray-700">
-                <h4 className="text-md font-semibold mb-2" style={{ color: '#F1C77A' }}>Seguridad de Cuenta</h4>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-300">Autenticación en dos pasos (2FA):</span>
-                  {loadingMfaStatus ? (
-                    <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
-                  ) : (
-                    <span className={mfaEnabled ? "text-green-400" : "text-yellow-400"}>
-                      {mfaEnabled ? "Activada" : "Desactivada"}
-                    </span>
-                  )}
-                </div>
-                {mfaError && <p className="text-red-400 text-xs mt-1">{mfaError}</p>}
-                <div className="mt-3">
-                  <Button
-                    onClick={handleToggleMfa}
-                    disabled={loadingMfaStatus || isTogglingMfa || mfaEnabled === null} // Disable if status is unknown
-                    className="w-full flex items-center justify-center text-sm py-2"
-                    style={{
-                      backgroundColor: mfaEnabled ? "transparent" : "#F1C77A",
-                      color: mfaEnabled ? "#F1C77A" : "#1D3434",
-                      border: "1px solid #F1C77A",
-                    }}
-                  >
-                    {isTogglingMfa ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <KeyRound className="w-4 h-4 mr-2" />}
-                    {mfaEnabled ? "Desactivar 2FA" : "Activar 2FA"}
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
+          </aside>
         </div>
       </main>
 
-      {/* Modal de configuración de 2FA */}
-      {session?.user && ( // Only render modal if session is available
+      {/* Ventanas de la verificación en dos pasos */}
+      {session?.user && (
         <>
-        <MfaSetupModal
+          <MfaSetupModal
             isOpen={isMfaModalOpen}
             onClose={() => {
-                setIsMfaModalOpen(false);
-                setMfaError(null); // Clear any errors when closing modal
+              setIsMfaModalOpen(false);
+              setMfaError(null);
             }}
             onSuccess={handleMfaSuccess}
-        />
-        <MfaDesactivarModal
+          />
+          <MfaDesactivarModal
             isOpen={isDesactivarOpen}
             onClose={() => setIsDesactivarOpen(false)}
             onSuccess={() => {
-                setMfaEnabled(false);
-                setIsDesactivarOpen(false);
+              setMfaEnabled(false);
+              setIsDesactivarOpen(false);
             }}
-        />
+          />
         </>
       )}
     </div>

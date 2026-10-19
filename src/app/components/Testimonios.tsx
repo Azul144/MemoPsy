@@ -41,28 +41,45 @@ function iniciales(nombre: string) {
     .join("");
 }
 
+function Tarjeta({ t, oculta = false }: { t: (typeof testimonios)[number]; oculta?: boolean }) {
+  return (
+    <figure
+      aria-hidden={oculta || undefined}
+      className="flex w-[22rem] shrink-0 flex-col rounded-3xl border border-white/10 bg-card p-8 sm:w-[26rem]"
+    >
+      <span aria-hidden className="titulo text-6xl leading-none text-primary/80">“</span>
+      <blockquote className="mt-2 flex-1 leading-relaxed text-crema/90">{t.texto}</blockquote>
+      <figcaption className="mt-6 flex items-center gap-4">
+        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-primary font-bold text-primary-foreground">
+          {iniciales(t.nombre)}
+        </span>
+        <span>
+          <span className="block font-semibold text-crema">{t.nombre}</span>
+          <span className="block text-sm text-crema/65">{t.cargo}</span>
+        </span>
+      </figcaption>
+    </figure>
+  );
+}
+
 export default function Testimonios() {
   return (
-    <section id="testimonios" className="px-4 py-20">
-      <div className="mx-auto max-w-2xl text-center">
-        <p className="text-sm uppercase tracking-widest text-white/70">¿Qué dicen nuestros clientes?</p>
-        <h2 className="mt-3 text-4xl font-bold text-primary">Testimonios de Clientes</h2>
+    <section id="testimonios" className="overflow-hidden py-24">
+      <div className="mx-auto max-w-3xl px-6 text-center">
+        <h2 className="titulo text-4xl text-crema sm:text-5xl">Lo que dicen quienes ya lo usan</h2>
       </div>
 
-      <div className="mx-auto mt-12 flex max-w-7xl flex-wrap justify-center gap-6">
-        {testimonios.map((t) => (
-          <div
-            key={t.nombre}
-            className="flex w-full flex-col items-center rounded-2xl border border-white/10 bg-card p-8 text-center md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)]"
-          >
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary text-lg font-bold text-primary-foreground">
-              {iniciales(t.nombre)}
-            </div>
-            <p className="mt-5 flex-1 text-white/90">“{t.texto}”</p>
-            <p className="mt-5 font-semibold text-white">{t.nombre}</p>
-            <p className="mt-1 text-sm text-white/70">{t.cargo}</p>
-          </div>
-        ))}
+      {/* La lista va dos veces seguidas para que la cinta se deslice sin cortes.
+          Los bordes se desvanecen con una máscara. */}
+      <div className="mt-14 [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
+        <div className="cinta flex w-max gap-6 px-3">
+          {testimonios.map((t) => (
+            <Tarjeta key={t.nombre} t={t} />
+          ))}
+          {testimonios.map((t) => (
+            <Tarjeta key={`${t.nombre}-copia`} t={t} oculta />
+          ))}
+        </div>
       </div>
     </section>
   );

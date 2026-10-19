@@ -5,7 +5,7 @@ import { Suspense, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { CheckCircle2, Loader2 } from "lucide-react";
-import MemopsyLogo from "@/app/components/MemopsyLogo";
+import PantallaAcceso from "@/components/PantallaAcceso";
 import { Button } from "@/components/ui/button";
 import InputPassword from "@/components/InputPassword";
 import { Label } from "@/components/ui/label";
@@ -57,24 +57,22 @@ function FormularioNuevaPassword() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="w-full max-w-md rounded-2xl bg-card p-8 shadow-2xl">
-        <MemopsyLogo />
+    <PantallaAcceso>
 
         {!token ? (
-          <div className="mt-6 text-center">
+          <div className="mt-6">
             <p className="text-white/90">Este enlace no es válido.</p>
             <Link href="/olvide-password" className="mt-4 inline-block text-primary underline">Pedir un enlace nuevo</Link>
           </div>
         ) : listo ? (
-          <div className="mt-6 text-center">
-            <CheckCircle2 className="mx-auto h-10 w-10 text-primary" aria-hidden="true" />
+          <div className="mt-6">
+            <CheckCircle2 className="h-10 w-10 text-primary" aria-hidden="true" />
             <p role="status" className="mt-3 text-white/90">Tu contraseña se actualizó.</p>
             <Link href="/login" className="mt-6 inline-block text-primary underline">Iniciar sesión</Link>
           </div>
         ) : (
           <>
-            <h1 className="mt-4 mb-6 text-center text-2xl font-bold text-primary">Elegí tu contraseña nueva</h1>
+            <h1 className="mt-4 mb-6 titulo text-3xl text-crema">Elegí tu contraseña nueva</h1>
             <form onSubmit={guardar} className="space-y-4">
               <div>
                 <Label htmlFor="password">Contraseña nueva</Label>
@@ -107,7 +105,7 @@ function FormularioNuevaPassword() {
               </div>
 
               {errores.length > 0 && (
-                <ul role="alert" className="space-y-1 text-center text-sm text-red-300">
+                <ul role="alert" className="space-y-1 text-sm text-red-300">
                   {errores.map((error) => <li key={error}>{error}</li>)}
                 </ul>
               )}
@@ -119,7 +117,6 @@ function FormularioNuevaPassword() {
             </form>
           </>
         )}
-      </div>
-    </main>
+    </PantallaAcceso>
   );
 }
