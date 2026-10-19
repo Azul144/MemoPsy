@@ -32,7 +32,7 @@ export default function Contacto() {
   }
 
   return (
-    <section id="contacto" className="px-4 py-20">
+    <section id="contacto" className="px-6 py-24">
       <div className="mx-auto max-w-2xl text-center">
         <h2 className="titulo text-4xl text-crema sm:text-5xl">Pedí una demostración</h2>
         <p className="mt-4 text-lg text-crema/75">

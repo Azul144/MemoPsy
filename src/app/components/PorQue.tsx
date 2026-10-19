@@ -1,9 +1,11 @@
 import Image from "next/image";
+import FondoAnimado from "@/components/FondoAnimado";
 
 export default function PorQue() {
   return (
-    <section id="por-que" className="px-6 py-24">
-      <div className="mx-auto grid max-w-6xl items-center gap-12 overflow-hidden rounded-[2.5rem] border border-white/10 bg-card lg:grid-cols-[1fr_1.2fr]">
+    <section id="por-que" className="relative overflow-hidden bg-[#1E3A39] px-6 py-24">
+      <FondoAnimado intensidad="suave" />
+      <div className="relative mx-auto grid max-w-6xl items-center gap-12 overflow-hidden rounded-[2.5rem] border border-white/10 bg-background/70 lg:grid-cols-[1fr_1.2fr]">
         <div className="relative min-h-80 lg:h-full">
           <Image
             src="/assets/consultorio2.jpg"

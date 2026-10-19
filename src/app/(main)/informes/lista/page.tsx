@@ -1,7 +1,9 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { useSession, signOut } from 'next-auth/react';
+import { Suspense, useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useSession, signOut } from 'next-auth/react';
+import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
+import EncabezadoPagina from "@/components/sistema/EncabezadoPagina";
 import { useRouter, useSearchParams } from 'next/navigation';
 import MemopsyLogo from '@/app/components/MemopsyLogo';
 import { Button } from '@/components/ui/button';
@@ -77,7 +79,16 @@ const MODULOS_DISPONIBLES: ModuloConfig[] = [
     },
 ];
 
+// Next pide envolver en <Suspense> a los componentes que leen la URL con useSearchParams
 export default function ListaInformesPage() {
+  return (
+    <Suspense>
+      <ListaInformes />
+    </Suspense>
+  );
+}
+
+function ListaInformes() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -421,7 +432,7 @@ export default function ListaInformesPage() {
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const navigateToModule = (ruta: string) => { router.push(ruta); setIsMenuOpen(false); };
-  const handleLogout = async () => { await signOut({ redirect: true, callbackUrl: '/login' }); };
+  const handleLogout = async () => { await cerrarSesion(); };
 
   // Render Logic
   if (status === 'loading' || loadingPermissions || hasPermissionToViewPage === null) {
@@ -435,21 +446,8 @@ export default function ListaInformesPage() {
 
   if (hasPermissionToViewPage === false) {
     return (
-      <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#152A2A' }}>
-        <nav className="w-full p-4" style={{ backgroundColor: '#1D3434' }}>
-            <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4"><div className="w-10 h-10"><MemopsyLogo /></div><h1 className="text-xl font-bold" style={{ color: '#F1C77A' }}>MemoPsy</h1></div>
-                <button onClick={toggleMenu} className="p-2 rounded-lg" style={{ backgroundColor: '#152A2A' }}>{isMenuOpen ? <X className="w-6 h-6 text-white" /> : <Menu className="w-6 h-6 text-white" />}</button>
-            </div>
-            {isMenuOpen && (
-                <div className="absolute top-16 right-4 w-64 rounded-lg shadow-lg z-50" style={{ backgroundColor: '#1D3434' }}>
-                    <div className="p-4 border-b border-gray-600"><p className="text-sm text-gray-300">Conectado como:</p><p className="font-semibold text-white">{session?.user?.email}</p><p className="text-sm" style={{ color: '#F1C77A' }}>{nombreCompletoNav}</p></div>
-                    <div className="p-2"><h3 className="px-2 py-1 text-sm font-semibold text-gray-300 uppercase tracking-wide">Módulos</h3>{modulosPermitidos.map(m => <button key={m.id} onClick={() => navigateToModule(m.ruta)} className="w-full flex items-center px-2 py-2 text-left text-white hover:bg-[#152A2A] rounded-lg"><m.icon className="w-5 h-5 mr-3"/>{m.nombre}</button>)}</div>
-                    <div className="p-2 border-t border-gray-600"><button onClick={() => router.push("/welcome")} className="w-full flex items-center px-2 py-2 text-left text-white hover:bg-[#152A2A] rounded-lg"><HomeIcon className="w-5 h-5 mr-3"/>Home</button><button onClick={handleLogout} className="w-full flex items-center px-2 py-2 text-left text-red-400 hover:bg-red-900/20 rounded-lg"><LogOut className="w-5 h-5 mr-3"/>Cerrar Sesión</button></div>
-                </div>
-            )}
-        </nav>
-        <main className="container mx-auto px-4 py-8 flex-grow flex items-center justify-center">
+      <div className="min-h-screen flex flex-col">
+        <main className="mx-auto w-full max-w-6xl px-6 py-10 flex-grow flex items-center justify-center">
             <div className="text-center p-8 rounded-2xl max-w-md mx-auto" style={{ backgroundColor: '#1D3434' }}>
                 <AlertTriangle className="w-16 h-16 mx-auto mb-6 text-red-500" />
                 <TypographyH1 className="mb-4 text-white">Acceso Denegado</TypographyH1>
@@ -492,7 +490,7 @@ export default function ListaInformesPage() {
   const renderInformesTable = (informes: Informe[], isLoading: boolean, error: string | null, userRole: 'psicologo' | 'paciente') => (
     <>
       {isLoading && <div className="flex justify-center items-center py-10"><Loader2 className="h-10 w-10 animate-spin text-[#F1C77A]" /> <TypographyP className="ml-3 text-gray-300">Cargando informes...</TypographyP></div>}
-      {error && <div className="p-4 bg-red-900/30 text-red-300 border border-red-700 rounded-md flex items-center"><AlertTriangle className="h-5 w-5 mr-2 text-red-400" /> <TypographyP>{error}</TypographyP></div>}
+      {error && <div className="p-4 bg-red-500/10 text-red-300 border border-red-400/40 rounded-md flex items-center"><AlertTriangle className="h-5 w-5 mr-2 text-red-400" /> <TypographyP>{error}</TypographyP></div>}
       
       {!isLoading && !error && informes.length === 0 && (
         <Card className="mt-6" style={{ backgroundColor: '#1D3434', borderColor: '#2A4A4A' }}>
@@ -605,7 +603,7 @@ export default function ListaInformesPage() {
                             size="sm"
                             variant="outline"
                             onClick={() => router.push(`/informes/editar/${informe.id}`)}
-                            className="border-green-500 text-green-400 hover:bg-green-500 hover:text-white"
+                            className="border-green-500 text-green-400 hover:bg-primary/90 hover:text-white"
                           >
                             <Edit className="w-4 h-4" />
                           </Button>
@@ -623,86 +621,11 @@ export default function ListaInformesPage() {
   );
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#152A2A' }}>
-      {/* Navbar */}
-      <nav className="w-full p-4" style={{ backgroundColor: '#1D3434' }}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="w-10 h-10">
-              <MemopsyLogo />
-            </div>
-            <h1 className="text-xl font-bold" style={{ color: '#F1C77A' }}>
-              MemoPsy
-            </h1>
-          </div>
-          <button
-            onClick={toggleMenu}
-            className="p-2 rounded-lg"
-            style={{ backgroundColor: '#152A2A' }}
-          >
-            {isMenuOpen ? (
-              <X className="w-6 h-6 text-white" />
-            ) : (
-              <Menu className="w-6 h-6 text-white" />
-            )}
-          </button>
-        </div>
-
-        {isMenuOpen && (
-          <div
-            className="absolute top-16 right-4 w-64 rounded-lg shadow-lg z-50"
-            style={{ backgroundColor: '#1D3434' }}
-          >
-            <div className="p-4 border-b border-gray-600">
-              <p className="text-sm text-gray-300">Conectado como:</p>
-              <p className="font-semibold text-white">{session?.user?.email}</p>
-              <p className="text-sm" style={{ color: '#F1C77A' }}>
-                {nombreCompletoNav}
-              </p>
-            </div>
-            <div className="p-2">
-              <h3 className="px-2 py-1 text-sm font-semibold text-gray-300 uppercase tracking-wide">
-                Módulos
-              </h3>
-              {modulosPermitidos.map((m) => (
-                <button
-                  key={m.id}
-                  onClick={() => navigateToModule(m.ruta)}
-                  className="w-full flex items-center px-2 py-2 text-left text-white hover:bg-[#152A2A] rounded-lg"
-                >
-                  <m.icon className="w-5 h-5 mr-3" />
-                  {m.nombre}
-                </button>
-              ))}
-            </div>
-            <div className="p-2 border-t border-gray-600">
-              <button
-                onClick={() => router.push("/welcome")}
-                className="w-full flex items-center px-2 py-2 text-left text-white hover:bg-[#152A2A] rounded-lg"
-              >
-                <HomeIcon className="w-5 h-5 mr-3" />
-                Home
-              </button>
-              <button
-                onClick={handleLogout}
-                className="w-full flex items-center px-2 py-2 text-left text-red-400 hover:bg-red-900/20 rounded-lg"
-              >
-                <LogOut className="w-5 h-5 mr-3" />
-                Cerrar Sesión
-              </button>
-            </div>
-          </div>
-        )}
-      </nav>
+    <div className="min-h-screen flex flex-col">
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8 flex-grow">
-        <div className="mb-8">
-          <TypographyH1 className="mb-2 text-white">Lista de Informes</TypographyH1>
-          <TypographyP className="text-gray-300">
-            Gestiona y visualiza los informes psicológicos
-          </TypographyP>
-        </div>
+      <main className="mx-auto w-full max-w-6xl px-6 py-10 flex-grow">
+        <EncabezadoPagina titulo="Lista de Informes" descripcion="Gestiona y visualiza los informes psicológicos" volverA="/informes" textoVolver="Volver a Informes" />
 
         {/* Psychologist View */}
         {userRoles.isPsicologo && (
@@ -801,8 +724,8 @@ export default function ListaInformesPage() {
                   </TypographyP>
                   
                   <Button
-                    onClick={() => router.push('/informes/crear')}
-                    className="bg-green-600 text-white hover:bg-green-700"
+                    onClick={() => router.push('/informes/registrar')}
+                    className="bg-primary !text-primary-foreground text-white hover:bg-primary/90"
                   >
                     <PlusCircle className="w-4 h-4 mr-2" />
                     Nuevo Informe

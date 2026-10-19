@@ -178,10 +178,6 @@ footer {
   66%  { transform: translate(-6%, 8%) scale(0.92); }
   100% { transform: translate(0, 0) scale(1); }
 }
-@keyframes deslizar {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
-}
 
 /* Entra con un pequeño retraso: se usa con style={{ animationDelay: "..." }} */
 .entrar {
@@ -197,16 +193,8 @@ footer {
 .foto-lenta {
   animation: acercar 24s ease-out both alternate infinite;
 }
-/* Cinta de testimonios: se desliza sola y se frena con el mouse */
-.cinta {
-  animation: deslizar 60s linear infinite;
-}
 .mancha {
   animation: deriva 22s ease-in-out infinite;
-}
-.cinta:hover,
-.cinta:focus-within {
-  animation-play-state: paused;
 }
 
 /* Quien tiene activado "reducir movimiento" en su compu o celular no ve animaciones */
@@ -214,8 +202,7 @@ footer {
   .entrar,
   .tarjeta-flotante,
   .foto-lenta,
-  .mancha,
-  .cinta {
+  .mancha {
     animation: none;
   }
 }

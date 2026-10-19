@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { useSession, signOut } from 'next-auth/react';
+import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
 import { useRouter } from 'next/navigation';
 import Image from "next/image";
 import FondoAnimado from "@/components/FondoAnimado";
@@ -142,7 +143,7 @@ export default function WelcomePage() {
   };
   
   const handleLogout = async () => {
-    await signOut({ redirect: true, callbackUrl: '/login' });
+    await cerrarSesion();
   };
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);

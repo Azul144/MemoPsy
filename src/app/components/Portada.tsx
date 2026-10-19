@@ -46,7 +46,7 @@ export default function Portada() {
             style={{ animationDelay: "0.15s" }}
           >
             MemoPsy reúne las notas clínicas, la agenda y el seguimiento de cada paciente en un
-            sistema web seguro, pensado para consultorios de psicología de Formosa.
+            sistema web seguro, pensado para consultorios de psicología de la Provincia de Formosa.
           </p>
 
           <div className="entrar mt-10 flex flex-wrap gap-4" style={{ animationDelay: "0.3s" }}>

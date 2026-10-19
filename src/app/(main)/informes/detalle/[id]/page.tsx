@@ -2,7 +2,9 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useSession, signOut } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
+import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
+import EncabezadoPagina from "@/components/sistema/EncabezadoPagina";
 import { useRouter, useParams } from 'next/navigation';
 import MemopsyLogo from '@/app/components/MemopsyLogo';
 import { Button } from '@/components/ui/button';
@@ -140,7 +142,7 @@ export default function DetalleInformePage() {
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const navigateToModule = (ruta: string) => { router.push(ruta); setIsMenuOpen(false); };
-  const handleLogout = async () => { await signOut({ redirect: true, callbackUrl: '/login' }); };
+  const handleLogout = async () => { await cerrarSesion(); };
 
 
   if (loadingPermissions || isLoadingData) {
@@ -155,33 +157,14 @@ export default function DetalleInformePage() {
   // Unauthenticated case is handled by useEffect redirect
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#152A2A' }}>
-      {/* Navbar */}
-      <nav className="w-full p-4" style={{ backgroundColor: '#1D3434' }}>
-        <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4"><div className="w-10 h-10"><MemopsyLogo /></div><h1 className="text-xl font-bold" style={{ color: '#F1C77A' }}>MemoPsy</h1></div>
-            <button onClick={toggleMenu} className="p-2 rounded-lg" style={{ backgroundColor: '#152A2A' }}><Menu className="w-6 h-6 text-white" /></button>
-        </div>
-        {isMenuOpen && (
-            <div className="absolute top-16 right-4 w-64 rounded-lg shadow-lg z-50" style={{ backgroundColor: '#1D3434' }}>
-                <div className="p-4 border-b border-gray-600"><p className="text-sm text-gray-300">Conectado como:</p><p className="font-semibold text-white">{session?.user?.email}</p><p className="text-sm" style={{ color: '#F1C77A' }}>{nombreCompletoNav}</p></div>
-                <div className="p-2"><h3 className="px-2 py-1 text-sm font-semibold text-gray-300 uppercase tracking-wide">Módulos</h3>{modulosPermitidos.map(m => <button key={m.id} onClick={() => navigateToModule(m.ruta)} className="w-full flex items-center px-2 py-2 text-left text-white hover:bg-[#152A2A] rounded-lg"><m.icon className="w-5 h-5 mr-3"/>{m.nombre}</button>)}</div>
-                <div className="p-2 border-t border-gray-600"><button onClick={() => router.push("/welcome")} className="w-full flex items-center px-2 py-2 text-left text-white hover:bg-[#152A2A] rounded-lg"><HomeIcon className="w-5 h-5 mr-3"/>Home</button><button onClick={handleLogout} className="w-full flex items-center px-2 py-2 text-left text-red-400 hover:bg-red-900/20 rounded-lg"><LogOut className="w-5 h-5 mr-3"/>Cerrar Sesión</button></div>
-            </div>
-        )}
-      </nav>
+    <div className="min-h-screen">
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
-        <div className="mb-6 flex justify-start items-center">
-          <Button variant="outline" onClick={() => router.push('/informes/lista')}
-            className="border-[#F1C77A] text-[#F1C77A] hover:bg-[#F1C77A] hover:text-[#1D3434]">
-            <ArrowLeft className="mr-2 h-4 w-4" /> Volver a la lista
-          </Button>
-        </div>
+      <main className="mx-auto w-full max-w-6xl px-6 py-10">
+        <EncabezadoPagina titulo="Detalle del informe" volverA="/informes/lista" textoVolver="Volver a la lista de informes" />
 
         {pageError && (
-            <Card className="border-red-700 bg-red-900/30 text-red-300 max-w-3xl mx-auto">
+            <Card className="border-red-400/40 bg-red-500/10 text-red-300 max-w-3xl mx-auto">
             <CardHeader>
                 <CardTitle className="flex items-center">
                 <AlertTriangle className="mr-2 h-6 w-6 text-red-400" /> Error al Cargar el Informe
@@ -269,7 +252,7 @@ export default function DetalleInformePage() {
                 {informe.pacientes && informe.pacientes.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
                     {informe.pacientes.map(paciente => (
-                      <Badge key={paciente.id} className="text-sm px-3 py-1 bg-teal-600 hover:bg-teal-500 text-white">
+                      <Badge key={paciente.id} className="text-sm px-3 py-1 bg-primary !text-primary-foreground hover:bg-primary/90 text-white">
                         {paciente.nombre} {paciente.apellido} (DNI: {paciente.dni || 'N/A'})
                       </Badge>
                     ))}

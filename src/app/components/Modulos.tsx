@@ -1,4 +1,5 @@
 import Image from "next/image";
+import FondoAnimado from "@/components/FondoAnimado";
 import { Users, Mic, Video, ShieldCheck } from "lucide-react";
 
 const modulos = [
@@ -38,15 +39,16 @@ const modulos = [
 
 export default function Modulos() {
   return (
-    <section id="modulos" className="px-6 py-24">
-      <div className="mx-auto max-w-2xl text-center">
+    <section id="modulos" className="relative overflow-hidden bg-[#1E3A39] px-6 py-24">
+      <FondoAnimado intensidad="suave" />
+      <div className="relative mx-auto max-w-2xl text-center">
         <h2 className="titulo text-4xl text-crema sm:text-5xl">Cuatro módulos, un solo sistema</h2>
         <p className="mt-4 text-lg text-crema/75">
           Cada módulo resuelve una parte de la gestión del consultorio y comparte la misma base segura.
         </p>
       </div>
 
-      <div className="mx-auto mt-20 flex max-w-6xl flex-col gap-20 lg:gap-28">
+      <div className="relative mx-auto mt-20 flex max-w-6xl flex-col gap-20 lg:gap-28">
         {modulos.map((modulo, i) => (
           <article key={modulo.titulo} className="grid items-center gap-10 md:grid-cols-2 md:gap-16">
             {/* En los módulos pares la foto va a la derecha */}

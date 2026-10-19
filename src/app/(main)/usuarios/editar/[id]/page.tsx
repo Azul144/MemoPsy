@@ -1,7 +1,9 @@
 "use client"
 
 import { useState, useEffect, type ChangeEvent, type FormEvent } from "react"
-import { useSession, signOut } from "next-auth/react"
+import { useSession, signOut } from "next-auth/react"
+import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
+import EncabezadoPagina from "@/components/sistema/EncabezadoPagina";
 import { useRouter, useParams } from "next/navigation"
 import MemopsyLogo from "@/app/components/MemopsyLogo"
 import { Button } from "@/components/ui/button"
@@ -463,7 +465,7 @@ export default function EditarUsuarioPage() {
     }
   }
 
-  const handleLogout = async () => await signOut({ redirect: true, callbackUrl: "/login" })
+  const handleLogout = async () => await cerrarSesion()
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen)
   const navigateToModule = (ruta: string) => {
     router.push(ruta)
@@ -485,20 +487,8 @@ export default function EditarUsuarioPage() {
 
   if (!userActionPermissions.canEdit && !isLoadingData) {
     return (
-      <div className="min-h-screen" style={{ backgroundColor: "#152A2A" }}>
-        <nav className="w-full p-4" style={{ backgroundColor: "#1D3434" }}>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="w-10 h-10">
-                <MemopsyLogo />
-              </div>
-              <h1 className="text-xl font-bold" style={{ color: "#F1C77A" }}>
-                MemoPsy
-              </h1>
-            </div>
-          </div>
-        </nav>
-        <main className="container mx-auto px-4 py-8 text-center">
+      <div className="min-h-screen">
+        <main className="mx-auto w-full max-w-6xl px-6 py-10 text-center">
           <AlertCircle className="w-16 h-16 mx-auto mb-6 text-red-500" />
           <h1 className="text-3xl font-bold text-red-500 mb-4">Acceso Denegado</h1>
           <p className="text-gray-300 mb-6">{error || "No tienes permiso para editar este usuario."}</p>
@@ -515,20 +505,8 @@ export default function EditarUsuarioPage() {
 
   if (error && !isLoadingData && !formData.nombre) {
     return (
-      <div className="min-h-screen" style={{ backgroundColor: "#152A2A" }}>
-        <nav className="w-full p-4" style={{ backgroundColor: "#1D3434" }}>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="w-10 h-10">
-                <MemopsyLogo />
-              </div>
-              <h1 className="text-xl font-bold" style={{ color: "#F1C77A" }}>
-                MemoPsy
-              </h1>
-            </div>
-          </div>
-        </nav>
-        <main className="container mx-auto px-4 py-8 text-center">
+      <div className="min-h-screen">
+        <main className="mx-auto w-full max-w-6xl px-6 py-10 text-center">
           <AlertCircle className="w-16 h-16 mx-auto mb-6 text-red-500" />
           <h1 className="text-3xl font-bold text-red-500 mb-4">Error al Cargar Usuario</h1>
           <p className="text-gray-300 mb-6">{error}</p>
@@ -544,82 +522,12 @@ export default function EditarUsuarioPage() {
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#152A2A" }}>
-      {/* Navigation Bar */}
-      <nav className="w-full p-4" style={{ backgroundColor: "#1D3434" }}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="w-10 h-10">
-              <MemopsyLogo />
-            </div>
-            <h1 className="text-xl font-bold" style={{ color: "#F1C77A" }}>
-              MemoPsy
-            </h1>
-          </div>
-          <button onClick={toggleMenu} className="p-2 rounded-lg" style={{ backgroundColor: "#152A2A" }}>
-            {isMenuOpen ? <X className="w-6 h-6 text-white" /> : <Menu className="w-6 h-6 text-white" />}
-          </button>
-        </div>
-        {isMenuOpen && (
-          <div
-            className="absolute top-16 right-4 w-64 rounded-lg shadow-lg z-50"
-            style={{ backgroundColor: "#1D3434" }}
-          >
-            <div className="p-4 border-b border-gray-600">
-              <p className="text-sm text-gray-300">Conectado como:</p>
-              <p className="font-semibold text-white">{session?.user?.email}</p>
-              <p className="text-sm" style={{ color: "#F1C77A" }}>
-                {currentUserName}
-              </p>
-            </div>
-            <div className="p-2">
-              <h3 className="px-2 py-1 text-sm font-semibold text-gray-300 uppercase tracking-wide">Módulos</h3>
-              {modulosPermitidos.map((m) => (
-                <button
-                  key={m.id}
-                  onClick={() => navigateToModule(m.ruta)}
-                  className="w-full flex items-center px-2 py-2 text-left text-white hover:bg-opacity-80 rounded-lg transition-colors"
-                  style={{ backgroundColor: "transparent" }}
-                  onMouseEnter={(e) => ((e.target as HTMLElement).style.backgroundColor = "#152A2A")}
-                  onMouseLeave={(e) => ((e.target as HTMLElement).style.backgroundColor = "transparent")}
-                >
-                  <m.icon className="w-5 h-5 mr-3" /> {m.nombre}
-                </button>
-              ))}
-            </div>
-            <div className="p-2 border-t border-gray-600">
-              <button
-                onClick={() => router.push("/welcome")}
-                className="w-full flex items-center px-2 py-2 text-left text-white hover:bg-opacity-80 rounded-lg transition-colors"
-                style={{ backgroundColor: "transparent" }}
-                onMouseEnter={(e) => ((e.target as HTMLElement).style.backgroundColor = "#152A2A")}
-                onMouseLeave={(e) => ((e.target as HTMLElement).style.backgroundColor = "transparent")}
-              >
-                <HomeIcon className="w-5 h-5 mr-3" />
-                Home
-              </button>
-              <button
-                onClick={handleLogout}
-                className="w-full flex items-center px-2 py-2 text-left text-red-400 hover:bg-red-900 hover:bg-opacity-20 rounded-lg transition-colors"
-              >
-                <LogOut className="w-5 h-5 mr-3" /> Cerrar Sesión
-              </button>
-            </div>
-          </div>
-        )}
-      </nav>
+    <div className="min-h-screen">
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
+      <main className="mx-auto w-full max-w-6xl px-6 py-10">
+        <EncabezadoPagina titulo={<>{pageTitle}</>} descripcion="Actualice los datos del usuario y asigne perfiles según sea necesario." volverA="/usuarios" textoVolver="Volver a Usuarios" />
         <Card className="max-w-2xl mx-auto" style={{ backgroundColor: "#1D3434", borderColor: "#2A4A4A" }}>
-          <CardHeader className="text-center">
-            <CardTitle className="text-3xl font-bold" style={{ color: "#F1C77A" }}>
-              {pageTitle}
-            </CardTitle>
-            <CardDescription className="text-gray-300">
-              Actualice los datos del usuario y asigne perfiles según sea necesario.
-            </CardDescription>
-          </CardHeader>
           <CardContent>
             {isLoadingData && userActionPermissions.canEdit ? (
               <div className="text-center text-gray-300 py-10">Cargando datos del usuario...</div>
@@ -636,7 +544,7 @@ export default function EditarUsuarioPage() {
                       name="nombre"
                       value={formData.nombre}
                       onChange={handleChange}
-                      className="bg-gray-700 mt-1"
+                      className="bg-[#2A4242] mt-1"
                     />
                     {fieldErrors.nombre && <p className="text-red-500 text-xs mt-1">{fieldErrors.nombre}</p>}
                   </div>
@@ -649,7 +557,7 @@ export default function EditarUsuarioPage() {
                       name="apellido"
                       value={formData.apellido}
                       onChange={handleChange}
-                      className="bg-gray-700 mt-1"
+                      className="bg-[#2A4242] mt-1"
                     />
                     {fieldErrors.apellido && <p className="text-red-500 text-xs mt-1">{fieldErrors.apellido}</p>}
                   </div>
@@ -664,7 +572,7 @@ export default function EditarUsuarioPage() {
                       name="dni"
                       value={formData.dni}
                       onChange={handleChange}
-                      className="bg-gray-700 mt-1"
+                      className="bg-[#2A4242] mt-1"
                     />
                     {fieldErrors.dni && <p className="text-red-500 text-xs mt-1">{fieldErrors.dni}</p>}
                   </div>
@@ -678,7 +586,7 @@ export default function EditarUsuarioPage() {
                       type="date"
                       value={formData.fechaNacimiento}
                       onChange={handleChange}
-                      className="bg-gray-700 mt-1"
+                      className="bg-[#2A4242] mt-1"
                       style={{ colorScheme: "dark" }}
                     />
                     {fieldErrors.fechaNacimiento && (
@@ -698,7 +606,7 @@ export default function EditarUsuarioPage() {
                     type="email"
                     value={formData.email}
                     readOnly
-                    className="bg-gray-800 mt-1 text-gray-400"
+                    className="bg-[#152B2B] mt-1 text-gray-400"
                   />
                 </div>
 
@@ -707,7 +615,7 @@ export default function EditarUsuarioPage() {
                     id="activo"
                     checked={formData.activo}
                     onCheckedChange={handleSwitchChange}
-                    className="data-[state=checked]:bg-teal-600 data-[state=unchecked]:bg-gray-600"
+                    className="data-[state=checked]:bg-primary !text-primary-foreground data-[state=unchecked]:bg-[#2B4243]"
                   />
                   <Label htmlFor="activo" className="text-gray-200">
                     Usuario {formData.activo ? "Activo" : "Inactivo"}
@@ -721,7 +629,7 @@ export default function EditarUsuarioPage() {
                       checked={isPsicologo}
                       onCheckedChange={handlePsicologoToggle}
                       disabled={hasExistingPsicologoData}
-                      className="data-[state=checked]:bg-teal-600 data-[state=unchecked]:bg-gray-600 disabled:opacity-50"
+                      className="data-[state=checked]:bg-primary !text-primary-foreground data-[state=unchecked]:bg-[#2B4243] disabled:opacity-50"
                     />
                     <Label htmlFor="isPsicologo" className="text-gray-200 flex items-center">
                       <Brain className="w-5 h-5 mr-2 text-teal-400" /> Psicólogo
@@ -739,7 +647,7 @@ export default function EditarUsuarioPage() {
                       checked={isPaciente}
                       onCheckedChange={handlePacienteToggle}
                       disabled={hasExistingPacienteData}
-                      className="data-[state=checked]:bg-teal-600 data-[state=unchecked]:bg-gray-600 disabled:opacity-50"
+                      className="data-[state=checked]:bg-primary !text-primary-foreground data-[state=unchecked]:bg-[#2B4243] disabled:opacity-50"
                     />
                     <Label htmlFor="isPaciente" className="text-gray-200 flex items-center">
                       <Activity className="w-5 h-5 mr-2 text-lime-400" /> Paciente
@@ -763,7 +671,7 @@ export default function EditarUsuarioPage() {
                         name="numeroLicencia"
                         value={formData.numeroLicencia}
                         onChange={handleChange}
-                        className="bg-gray-700 mt-1"
+                        className="bg-[#2A4242] mt-1"
                       />
                       {fieldErrors.numeroLicencia && (
                         <p className="text-red-500 text-xs mt-1">{fieldErrors.numeroLicencia}</p>
@@ -778,7 +686,7 @@ export default function EditarUsuarioPage() {
                         name="especialidad"
                         value={formData.especialidad}
                         onChange={handleChange}
-                        className="bg-gray-700 mt-1"
+                        className="bg-[#2A4242] mt-1"
                       />
                       {fieldErrors.especialidad && (
                         <p className="text-red-500 text-xs mt-1">{fieldErrors.especialidad}</p>
@@ -798,12 +706,12 @@ export default function EditarUsuarioPage() {
                         value={selectedObraSocialId || ""} 
                         onValueChange={handleObraSocialSelectChange}
                       >
-                        <SelectTrigger className="bg-gray-700 border-gray-600 text-gray-200 mt-1">
+                        <SelectTrigger className="bg-[#2A4242] border-gray-600 text-gray-200 mt-1">
                           <SelectValue 
                             placeholder={isLoadingObrasSociales ? "Cargando..." : "Seleccione Obra Social"}
                           />
                         </SelectTrigger>
-                        <SelectContent className="bg-gray-800 border-gray-600">
+                        <SelectContent className="bg-[#152B2B] border-gray-600">
                           {obrasSocialesList.length === 0 ? (
                             <SelectItem value="no-options" disabled className="text-gray-400">
                               No hay obras sociales disponibles
@@ -813,7 +721,7 @@ export default function EditarUsuarioPage() {
                               <SelectItem
                                 key={obra.id}
                                 value={obra.id}
-                                className="text-gray-200 hover:bg-gray-700 focus:bg-gray-700"
+                                className="text-gray-200 hover:bg-[#2A4242] focus:bg-[#2A4242]"
                               >
                                 {obra.nombre}
                               </SelectItem>
@@ -842,7 +750,7 @@ export default function EditarUsuarioPage() {
                             id={`perfil-${perfil.id}`}
                             checked={selectedProfileIds.includes(perfil.id)}
                             onCheckedChange={(checked) => handleProfileSelectionChange(perfil.id, !!checked)}
-                            className="data-[state=checked]:bg-teal-600 border-gray-600"
+                            className="data-[state=checked]:bg-primary !text-primary-foreground border-gray-600"
                           />
                           <Label htmlFor={`perfil-${perfil.id}`} className="text-gray-300 font-normal">
                             {perfil.nombre}
@@ -857,7 +765,7 @@ export default function EditarUsuarioPage() {
                 </div>
 
                 {error && Object.keys(fieldErrors).length === 0 && (
-                  <p className="text-red-500 text-sm text-center bg-red-900 bg-opacity-30 p-3 rounded-md">{error}</p>
+                  <p className="text-red-500 text-sm text-center bg-red-500/10 bg-opacity-30 p-3 rounded-md">{error}</p>
                 )}
 
                 <CardFooter className="flex justify-end pt-6">
@@ -865,11 +773,11 @@ export default function EditarUsuarioPage() {
                     type="button"
                     variant="outline"
                     onClick={() => router.push("/usuarios/listar")}
-                    className="mr-3 text-gray-300 border-gray-600 hover:bg-gray-700"
+                    className="mr-3 text-gray-300 border-gray-600 hover:bg-[#2A4242]"
                   >
                     Cancelar
                   </Button>
-                  <Button type="submit" disabled={isSubmitting} className="bg-teal-600 hover:bg-teal-700 text-white">
+                  <Button type="submit" disabled={isSubmitting} className="bg-primary !text-primary-foreground hover:bg-primary/90 text-white">
                     {isSubmitting ? "Guardando..." : "Guardar Cambios"}
                   </Button>
                 </CardFooter>
@@ -1316,7 +1224,7 @@ export default function EditarUsuarioPage() {
     }
   }
 
-  const handleLogout = async () => await signOut({ redirect: true, callbackUrl: "/login" })
+  const handleLogout = async () => await cerrarSesion()
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen)
   const navigateToModule = (ruta: string) => {
     router.push(ruta)

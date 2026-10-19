@@ -46,7 +46,7 @@ export default function LoginPage() {
     setCargando(false);
 
     if (resultado?.ok && !resultado.error) {
-      router.push("/welcome");
+      router.replace("/welcome"); // reemplaza el login en el historial
       router.refresh();
       return;
     }

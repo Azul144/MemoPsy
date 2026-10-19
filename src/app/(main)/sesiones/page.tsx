@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import { useSession, signOut } from "next-auth/react"
+import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
 import { useRouter } from "next/navigation"
 import MemopsyLogo from "@/app/components/MemopsyLogo"
 import { Button } from "@/components/ui/button"
@@ -43,6 +44,7 @@ import {
 import { format, parseISO, isSameDay } from "date-fns"
 import { es } from "date-fns/locale"
 import { cn } from "@/lib/utils"
+import EncabezadoPagina from "@/components/sistema/EncabezadoPagina";
 
 interface Sesion {
   id: string
@@ -316,7 +318,7 @@ const handleUpdateSesion = async () => {
             let alertMessage = "Error al actualizar la sesión.";
 
             if (errorData.details && Array.isArray(errorData.details)) {
-                let generalErrorMessages: string[] = [];
+                const generalErrorMessages: string[] = [];
                 errorData.details.forEach((detail: any) => {
                     if (detail.path && detail.path.length > 0) {
                         newErrors[detail.path[0]] = detail.message;
@@ -564,10 +566,7 @@ const handleUpdateSesion = async () => {
   }
 
   const handleLogout = async () => {
-    await signOut({
-      redirect: true,
-      callbackUrl: "/login",
-    })
+    await cerrarSesion()
   }
 
   const toggleMenu = () => {
@@ -830,100 +829,11 @@ const handleUpdateSesion = async () => {
   : undefined;
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#152A2A" }}>
-      {/* Navigation Bar */}
-      <nav className="w-full p-4" style={{ backgroundColor: "#1D3434" }}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="w-10 h-10">
-              <MemopsyLogo />
-            </div>
-            <h1 className="text-xl font-bold" style={{ color: "#F1C77A" }}>
-              MemoPsy
-            </h1>
-          </div>
-          <button
-            onClick={toggleMenu}
-            className="p-2 rounded-lg hover:bg-opacity-80 transition-colors"
-            style={{ backgroundColor: "#152A2A" }}
-          >
-            {isMenuOpen ? <X className="w-6 h-6 text-white" /> : <Menu className="w-6 h-6 text-white" />}
-          </button>
-        </div>
-
-        {/* Dropdown Menu */}
-        {isMenuOpen && (
-          <div
-            className="absolute top-16 right-4 w-64 rounded-lg shadow-lg z-50"
-            style={{ backgroundColor: "#1D3434" }}
-          >
-            <div className="p-4 border-b border-gray-600">
-              <p className="text-sm text-gray-300">Conectado como:</p>
-              <p className="font-semibold text-white">{session.user.email}</p>
-              <p className="text-sm" style={{ color: "#F1C77A" }}>
-                {nombreCompleto}
-              </p>
-            </div>
-
-            <div className="p-2">
-              <h3 className="px-2 py-1 text-sm font-semibold text-gray-300 uppercase tracking-wide">
-                Módulos Principales
-              </h3>
-              {modulosPermitidos.length > 0 ? (
-                modulosPermitidos.map((modulo) => {
-                  const IconComponent = modulo.icon
-                  return (
-                    <button
-                      key={modulo.id}
-                      onClick={() => navigateToModule(modulo.ruta)}
-                      className="w-full flex items-center px-2 py-2 text-left text-white hover:bg-opacity-80 rounded-lg transition-colors"
-                      style={{ backgroundColor: "transparent" }}
-                      onMouseEnter={(e) => ((e.target as HTMLElement).style.backgroundColor = "#152A2A")}
-                      onMouseLeave={(e) => ((e.target as HTMLElement).style.backgroundColor = "transparent")}
-                    >
-                      <IconComponent className="w-5 h-5 mr-3" />
-                      <div>
-                        <div className="font-medium">{modulo.nombre}</div>
-                      </div>
-                    </button>
-                  )
-                })
-              ) : (
-                <p className="px-2 py-2 text-sm text-gray-400">No tienes permisos para otros módulos.</p>
-              )}
-            </div>
-
-            <div className="p-2 border-t border-gray-600">
-              <button
-                onClick={() => router.push("/welcome")}
-                className="w-full flex items-center px-2 py-2 text-left text-white hover:bg-opacity-80 rounded-lg transition-colors"
-                style={{ backgroundColor: "transparent" }}
-                onMouseEnter={(e) => ((e.target as HTMLElement).style.backgroundColor = "#152A2A")}
-                onMouseLeave={(e) => ((e.target as HTMLElement).style.backgroundColor = "transparent")}
-              >
-                <HomeIcon className="w-5 h-5 mr-3" />
-                Home
-              </button>
-              <button
-                onClick={handleLogout}
-                className="w-full flex items-center px-2 py-2 text-left text-red-400 hover:bg-red-900 hover:bg-opacity-20 rounded-lg transition-colors"
-              >
-                <LogOut className="w-5 h-5 mr-3" />
-                Cerrar Sesión
-              </button>
-            </div>
-          </div>
-        )}
-      </nav>
+    <div className="min-h-screen">
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
-        <div className="text-center mb-10">
-          <h1 className="text-4xl font-bold mb-3" style={{ color: "#F1C77A" }}>
-            Gestión de Sesiones
-          </h1>
-          <p className="text-xl text-gray-300">Administra las sesiones de terapia del sistema.</p>
-        </div>
+      <main className="mx-auto w-full max-w-6xl px-6 py-10">
+        <EncabezadoPagina titulo="Gestión de Sesiones" descripcion="Administra las sesiones de terapia del sistema." volverA="/welcome" textoVolver="Volver al inicio" />
 
         {puedeVerSesiones ? (
           <Tabs
@@ -934,11 +844,11 @@ const handleUpdateSesion = async () => {
               // This ensures consistency across different views
             }}
           >
-            <TabsList className="grid w-full grid-cols-3" style={{ backgroundColor: "#1D3434" }}>
+            <TabsList className="mb-2 flex w-full sm:w-fit">
               {puedeRegistrarSesiones && (
                 <TabsTrigger
                   value="registrar"
-                  className="text-white data-[state=active]:bg-[#152A2A] data-[state=active]:text-[#F1C77A]"
+                  className="px-6"
                 >
                   Registrar Sesiones
                 </TabsTrigger>
@@ -946,7 +856,7 @@ const handleUpdateSesion = async () => {
               {session?.user?.psicologoId && (
               <TabsTrigger
                 value="psicologo"
-                className="text-white data-[state=active]:bg-[#152A2A] data-[state=active]:text-[#F1C77A]"
+                className="px-6"
               >
                 Mis Sesiones (Psicólogo)
               </TabsTrigger>
@@ -954,7 +864,7 @@ const handleUpdateSesion = async () => {
               {session?.user?.pacienteId && (
               <TabsTrigger
                 value="paciente"
-                className="text-white data-[state=active]:bg-[#152A2A] data-[state=active]:text-[#F1C77A]"
+                className="px-6"
               >
                 Mis Sesiones (Paciente)
               </TabsTrigger>
@@ -1501,7 +1411,7 @@ const handleUpdateSesion = async () => {
                 {editFormErrors.general && <p className="text-sm text-red-500 py-2 text-center">{editFormErrors.general}</p>}
             </div>
             <div className="flex justify-end space-x-2 pt-4 mt-auto border-t border-gray-700"> 
-                <Button variant="outline" onClick={() => setIsEditDialogOpen(false)} className="border-gray-600 text-gray-300 hover:bg-gray-700" disabled={isEditSubmitting}>Cancelar</Button>
+                <Button variant="outline" onClick={() => setIsEditDialogOpen(false)} className="border-gray-600 text-gray-300 hover:bg-[#2A4242]" disabled={isEditSubmitting}>Cancelar</Button>
                 <Button 
                     onClick={handleUpdateSesion} 
                     style={{ backgroundColor: "#F1C77A", color: "#1D3434" }} 

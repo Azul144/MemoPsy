@@ -1,46 +1,127 @@
-import { Lock, FileText, CalendarDays, Bell } from "lucide-react";
+import { Lock, FileText, CalendarDays, Bell, Check } from "lucide-react";
 
-const funciones = [
-  {
-    icono: Lock,
-    titulo: "Notas cifradas",
-    texto: "Cumple con la Ley 25.326 de protección de datos personales.",
-  },
-  {
-    icono: FileText,
-    titulo: "Informes",
-    texto: "Accedé al historial del paciente en un clic, antes de cada sesión.",
-  },
-  {
-    icono: CalendarDays,
-    titulo: "Agenda terapéutica",
-    texto: "Automatizá la gestión de turnos, sin superposiciones de horario.",
-  },
-  {
-    icono: Bell,
-    titulo: "Recordatorios",
-    texto: "Tus pacientes reciben recordatorios de sus sesiones por WhatsApp.",
-  },
-];
-
+// Mosaico de funciones: cada tarjeta muestra una "mini pantalla" de lo que hace el sistema
 export default function Funciones() {
   return (
-    <section id="funciones" className="border-y border-white/10 bg-card/60 px-6 py-20">
-      <div className="mx-auto max-w-7xl">
+    <section id="funciones" className="px-6 py-24">
+      <div className="mx-auto max-w-6xl">
         <h2 className="titulo max-w-2xl text-4xl text-crema sm:text-5xl">
-          Todo lo que tu consultorio necesita, en una sola plataforma.
+          Todo lo que tu consultorio necesita, en una sola plataforma
         </h2>
 
-        <div className="mt-14 grid gap-x-10 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
-          {funciones.map((funcion) => (
-            <div key={funcion.titulo} className="border-t-2 border-primary/70 pt-6">
-              <funcion.icono className="h-7 w-7 text-primary" />
-              <h3 className="mt-5 text-xl font-semibold text-crema">{funcion.titulo}</h3>
-              <p className="mt-2 leading-relaxed text-crema/75">{funcion.texto}</p>
+        <div className="mt-14 grid gap-5 md:grid-cols-6">
+          {/* Notas cifradas: tarjeta grande */}
+          <article className="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-[#24413F] to-card p-8 md:col-span-4">
+            <Encabezado icono={Lock} titulo="Notas cifradas">
+              Cada nota clínica se guarda cifrada y solo la ve el psicólogo que la escribió. Cumple con la Ley 25.326.
+            </Encabezado>
+
+            {/* Mini nota */}
+            <div className="mt-8 rounded-2xl border border-white/10 bg-background/70 p-5 transition-transform duration-500 group-hover:-translate-y-1">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-semibold text-crema">Sesión 12 · Tomás A.</span>
+                <span className="flex items-center gap-1.5 rounded-full bg-emerald-400/15 px-3 py-1 text-xs font-medium text-emerald-300">
+                  <Lock className="h-3 w-3" /> Cifrada
+                </span>
+              </div>
+              <div className="mt-4 space-y-2.5">
+                <div className="h-2.5 w-11/12 rounded-full bg-white/15" />
+                <div className="h-2.5 w-4/5 rounded-full bg-white/15" />
+                <div className="h-2.5 w-2/3 rounded-full bg-white/10" />
+              </div>
+              <div className="mt-5 flex flex-wrap gap-2">
+                <span className="rounded-full bg-primary/15 px-3 py-1 text-xs text-primary">ansiedad</span>
+                <span className="rounded-full bg-primary/15 px-3 py-1 text-xs text-primary">seguimiento</span>
+              </div>
             </div>
-          ))}
+          </article>
+
+          {/* Agenda */}
+          <article className="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-card p-8 md:col-span-2">
+            <Encabezado icono={CalendarDays} titulo="Agenda terapéutica">
+              Turnos sin superposiciones de horario.
+            </Encabezado>
+
+            {/* Mini calendario */}
+            <div className="mt-8 space-y-2.5">
+              {[
+                { hora: "09:00", nombre: "Sofía R.", libre: false },
+                { hora: "10:00", nombre: "Libre", libre: true },
+                { hora: "11:00", nombre: "Tomás A.", libre: false },
+              ].map((turno) => (
+                <div
+                  key={turno.hora}
+                  className={`flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition-transform duration-500 group-hover:translate-x-1 ${
+                    turno.libre ? "border border-dashed border-white/20 text-crema/50" : "bg-primary/15 text-crema"
+                  }`}
+                >
+                  <span className="font-semibold text-primary">{turno.hora}</span>
+                  {turno.nombre}
+                </div>
+              ))}
+            </div>
+          </article>
+
+          {/* Recordatorios */}
+          <article className="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-card p-8 md:col-span-3">
+            <Encabezado icono={Bell} titulo="Recordatorios">
+              Tus pacientes reciben un aviso por WhatsApp antes de cada sesión.
+            </Encabezado>
+
+            {/* Mini mensaje de WhatsApp */}
+            <div className="mt-8 max-w-xs rounded-2xl rounded-tl-sm bg-[#1F5C4B] p-4 text-sm text-white shadow-lg transition-transform duration-500 group-hover:-translate-y-1">
+              Hola Tomás 👋 Te recordamos tu sesión de mañana a las 11:00 con la Lic. Benítez.
+              <span className="mt-2 flex items-center justify-end gap-1 text-xs text-white/60">
+                10:02 <Check className="h-3 w-3" /><Check className="-ml-2 h-3 w-3" />
+              </span>
+            </div>
+          </article>
+
+          {/* Informes */}
+          <article className="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-card to-[#24413F] p-8 md:col-span-3">
+            <Encabezado icono={FileText} titulo="Informes">
+              El historial del paciente en un clic, antes de cada sesión.
+            </Encabezado>
+
+            {/* Mini lista de informes */}
+            <ul className="mt-8 divide-y divide-white/10 rounded-2xl border border-white/10 bg-background/60">
+              {[
+                ["Informe de evolución", "12 oct"],
+                ["Pautas para la semana", "5 oct"],
+                ["Primera entrevista", "28 sep"],
+              ].map(([titulo, fecha]) => (
+                <li key={titulo} className="flex items-center justify-between px-4 py-3 text-sm">
+                  <span className="flex items-center gap-3 text-crema">
+                    <FileText className="h-4 w-4 text-primary" />
+                    {titulo}
+                  </span>
+                  <span className="text-crema/50">{fecha}</span>
+                </li>
+              ))}
+            </ul>
+          </article>
         </div>
       </div>
     </section>
+  );
+}
+
+function Encabezado({
+  icono: Icono,
+  titulo,
+  children,
+}: {
+  icono: React.ElementType;
+  titulo: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/15">
+        <Icono className="h-6 w-6 text-primary" />
+      </span>
+      <h3 className="mt-5 text-2xl font-semibold text-crema">{titulo}</h3>
+      <p className="mt-2 max-w-md leading-relaxed text-crema/70">{children}</p>
+    </div>
   );
 }

@@ -1,7 +1,9 @@
 "use client"
 
 import { useState, useEffect, useMemo, type ChangeEvent } from "react"
-import { useSession, signOut } from "next-auth/react"
+import { useSession, signOut } from "next-auth/react"
+import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
+import EncabezadoPagina from "@/components/sistema/EncabezadoPagina";
 import { useRouter } from "next/navigation"
 import MemopsyLogo from "@/app/components/MemopsyLogo"
 import { Button } from "@/components/ui/button"
@@ -237,7 +239,7 @@ export default function ListarUsuariosPage() {
     }
   }
 
-  const handleLogout = async () => await signOut({ redirect: true, callbackUrl: "/login" })
+  const handleLogout = async () => await cerrarSesion()
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen)
   const navigateToModule = (ruta: string) => {
     router.push(ruta)
@@ -261,20 +263,8 @@ export default function ListarUsuariosPage() {
   // Access Denied or Error during permission check
   if (!userActionPermissions.canView && !isLoading) {
     return (
-      <div className="min-h-screen" style={{ backgroundColor: "#152A2A" }}>
-        <nav className="w-full p-4" style={{ backgroundColor: "#1D3434" }}>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="w-10 h-10">
-                <MemopsyLogo />
-              </div>
-              <h1 className="text-xl font-bold" style={{ color: "#F1C77A" }}>
-                MemoPsy
-              </h1>
-            </div>
-          </div>
-        </nav>
-        <main className="container mx-auto px-4 py-8 text-center">
+      <div className="min-h-screen">
+        <main className="mx-auto w-full max-w-6xl px-6 py-10 text-center">
           <AlertCircle className="w-16 h-16 mx-auto mb-6 text-red-500" />
           <h1 className="text-3xl font-bold text-red-500 mb-4">Acceso Denegado</h1>
           <p className="text-gray-300 mb-6">{error || "No tienes permiso para ver esta página."}</p>
@@ -287,79 +277,11 @@ export default function ListarUsuariosPage() {
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#152A2A" }}>
-      {/* Navigation Bar */}
-      <nav className="w-full p-4" style={{ backgroundColor: "#1D3434" }}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="w-10 h-10">
-              <MemopsyLogo />
-            </div>
-            <h1 className="text-xl font-bold" style={{ color: "#F1C77A" }}>
-              MemoPsy
-            </h1>
-          </div>
-          <button onClick={toggleMenu} className="p-2 rounded-lg" style={{ backgroundColor: "#152A2A" }}>
-            {isMenuOpen ? <X className="w-6 h-6 text-white" /> : <Menu className="w-6 h-6 text-white" />}
-          </button>
-        </div>
-        {isMenuOpen && (
-          <div
-            className="absolute top-16 right-4 w-64 rounded-lg shadow-lg z-50"
-            style={{ backgroundColor: "#1D3434" }}
-          >
-            <div className="p-4 border-b border-gray-600">
-              <p className="text-sm text-gray-300">Conectado como:</p>
-              <p className="font-semibold text-white">{session?.user?.email}</p>
-              <p className="text-sm" style={{ color: "#F1C77A" }}>
-                {nombreCompleto}
-              </p>
-            </div>
-            <div className="p-2">
-              <h3 className="px-2 py-1 text-sm font-semibold text-gray-300 uppercase tracking-wide">Módulos</h3>
-              {modulosPermitidos.map((m) => (
-                <button
-                  key={m.id}
-                  onClick={() => navigateToModule(m.ruta)}
-                  className="w-full flex items-center px-2 py-2 text-left text-white hover:bg-opacity-80 rounded-lg transition-colors"
-                  style={{ backgroundColor: "transparent" }}
-                  onMouseEnter={(e) => ((e.target as HTMLElement).style.backgroundColor = "#152A2A")}
-                  onMouseLeave={(e) => ((e.target as HTMLElement).style.backgroundColor = "transparent")}
-                >
-                  <m.icon className="w-5 h-5 mr-3" /> {m.nombre}
-                </button>
-              ))}
-            </div>
-            <div className="p-2 border-t border-gray-600">
-              <button
-              onClick={() => {
-                router.push("/welcome");
-              }}
-              className="w-full flex items-center px-2 py-2 text-left text-white hover:bg-opacity-80 rounded-lg transition-colors"
-              style={{ backgroundColor: "transparent" }}
-              onMouseEnter={(e) => ((e.target as HTMLElement).style.backgroundColor = "#152A2A")}
-              onMouseLeave={(e) => ((e.target as HTMLElement).style.backgroundColor = "transparent")}
-              >
-              <HomeIcon className="w-5 h-5 mr-3" />
-              Home
-              </button>
-              <button
-                onClick={handleLogout}
-                className="w-full flex items-center px-2 py-2 text-left text-red-400 hover:bg-red-900 hover:bg-opacity-20 rounded-lg transition-colors"
-              >
-                <LogOut className="w-5 h-5 mr-3" /> Cerrar Sesión
-              </button>
-            </div>
-          </div>
-        )}
-      </nav>
+    <div className="min-h-screen">
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold" style={{ color: "#F1C77A" }}>
-            Lista de Usuarios
-          </h1>
+      <main className="mx-auto w-full max-w-6xl px-6 py-10">
+        <EncabezadoPagina titulo="Lista de Usuarios" volverA="/usuarios" textoVolver="Volver a Usuarios">
           {userActionPermissions.canRegister && (
             <Button
               onClick={navigateToRegister}
@@ -369,9 +291,9 @@ export default function ListarUsuariosPage() {
               <PlusCircle className="w-5 h-5 mr-2" /> Registrar Nuevo Usuario
             </Button>
           )}
-        </div>
+        </EncabezadoPagina>
 
-        <div className="mb-6 flex items-center bg-gray-800 p-3 rounded-lg shadow">
+        <div className="mb-6 flex items-center bg-[#152B2B] p-3 rounded-lg shadow">
           <Search className="text-gray-400 mr-3 w-5 h-5" />
           <Input
             type="text"
@@ -388,11 +310,11 @@ export default function ListarUsuariosPage() {
             <TypographyP className="text-white">Cargando...</TypographyP>
           </div>
         ) : error ? (
-          <div className="text-center text-red-400 py-10 bg-red-900 bg-opacity-30 p-4 rounded-md">
+          <div className="text-center text-red-400 py-10 bg-red-500/10 bg-opacity-30 p-4 rounded-md">
             <AlertCircle className="w-8 h-8 mx-auto mb-2" /> {error}
           </div>
         ) : !filteredUsers.length ? (
-          <div className="text-center text-gray-400 py-10 bg-gray-800 p-6 rounded-md">
+          <div className="text-center text-gray-400 py-10 bg-[#152B2B] p-6 rounded-md">
             No se encontraron usuarios que coincidan con la búsqueda o no hay usuarios registrados.
           </div>
         ) : (
@@ -419,7 +341,7 @@ export default function ListarUsuariosPage() {
                   if (tiposUsuario.length === 0) tiposUsuario.push("Usuario")
 
                   return (
-                    <TableRow key={user.id} className="border-b border-gray-700 hover:bg-gray-800 transition-colors">
+                    <TableRow key={user.id} className="border-b border-gray-700 hover:bg-[#152B2B] transition-colors">
                       <TableCell className="text-gray-200">
                         {user.persona ? `${user.persona.nombre} ${user.persona.apellido}` : "Sin datos personales"}
                       </TableCell>
@@ -455,7 +377,7 @@ export default function ListarUsuariosPage() {
                           <DropdownMenuTrigger asChild>
                             <Button
                               variant="ghost"
-                              className="h-8 w-8 p-0 text-gray-300 hover:text-white hover:bg-gray-700"
+                              className="h-8 w-8 p-0 text-gray-300 hover:text-white hover:bg-[#2A4242]"
                             >
                               <span className="sr-only">Abrir menú</span>
                               <MoreVertical className="h-4 w-4" />
@@ -468,7 +390,7 @@ export default function ListarUsuariosPage() {
                             {userActionPermissions.canEdit && (
                               <DropdownMenuItem
                                 onClick={() => handleEdit(user.id)}
-                                className="text-gray-300 hover:bg-gray-700 focus:bg-gray-700 focus:text-white"
+                                className="text-gray-300 hover:bg-[#2A4242] focus:bg-[#2A4242] focus:text-white"
                               >
                                 <Edit3 className="mr-2 h-4 w-4" /> Editar
                               </DropdownMenuItem>
@@ -476,7 +398,7 @@ export default function ListarUsuariosPage() {
                             {userActionPermissions.canToggleStatus && (
                               <DropdownMenuItem
                                 onClick={() => handleToggleStatus(user.id, user.activo)}
-                                className={`text-gray-300 hover:bg-gray-700 focus:bg-gray-700 focus:text-white ${
+                                className={`text-gray-300 hover:bg-[#2A4242] focus:bg-[#2A4242] focus:text-white ${
                                   user.activo
                                     ? "hover:!bg-red-700 focus:!bg-red-700"
                                     : "hover:!bg-green-700 focus:!bg-green-700"
@@ -930,7 +852,7 @@ export default function ListarUsuariosPage() {
     }
   };
   
-  const handleLogout = async () => await signOut({ redirect: true, callbackUrl: '/login' });
+  const handleLogout = async () => await cerrarSesion();
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const navigateToModule = (ruta: string) => {
     router.push(ruta);

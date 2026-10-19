@@ -2,7 +2,10 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useSession, signOut } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
+import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
+import EncabezadoPagina from "@/components/sistema/EncabezadoPagina";
+import TarjetaAccion from "@/components/sistema/TarjetaAccion";
 import { useRouter } from 'next/navigation';
 import MemopsyLogo from '@/app/components/MemopsyLogo';
 import { Button } from '@/components/ui/button';
@@ -150,7 +153,7 @@ export default function GestionInformesPage() {
   };
 
   const handleLogout = async () => {
-    await signOut({ redirect: true, callbackUrl: '/login' });
+    await cerrarSesion();
   };
 
   // Loading state (identical to perfiles/page.tsx)
@@ -164,63 +167,11 @@ export default function GestionInformesPage() {
   }
   
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#152A2A' }}>
-      {/* Navbar (identical to perfiles/page.tsx) */}
-      <nav className="w-full p-4" style={{ backgroundColor: '#1D3434' }}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="w-10 h-10"> <MemopsyLogo /> </div>
-            <h1 className="text-xl font-bold" style={{ color: '#F1C77A' }}> MemoPsy </h1>
-          </div>
-          <button onClick={toggleMenu} className="p-2 rounded-lg" style={{ backgroundColor: '#152A2A' }}>
-            {isMenuOpen ? <X className="w-6 h-6 text-white" /> : <Menu className="w-6 h-6 text-white" />}
-          </button>
-        </div>
-        {isMenuOpen && (
-          <div className="absolute top-16 right-4 w-64 rounded-lg shadow-lg z-50" style={{ backgroundColor: '#1D3434' }}>
-            <div className="p-4 border-b border-gray-600">
-              <p className="text-sm text-gray-300">Conectado como:</p>
-              <p className="font-semibold text-white">{session?.user?.email}</p>
-              <p className="text-sm" style={{ color: '#F1C77A' }}> {nombreCompleto} </p>
-            </div>
-            <div className="p-2">
-              <h3 className="px-2 py-1 text-sm font-semibold text-gray-300 uppercase tracking-wide"> Módulos Principales </h3>
-              {modulosPermitidos.length > 0 ? (
-                modulosPermitidos.map((modulo) => {
-                  const IconComponent = modulo.icon;
-                  return (
-                    <button key={modulo.id} onClick={() => navigateToModule(modulo.ruta)}
-                      className="w-full flex items-center px-2 py-2 text-left text-white hover:bg-[#152A2A] rounded-lg transition-colors">
-                      <IconComponent className="w-5 h-5 mr-3" /> {modulo.nombre}
-                    </button>
-                  );
-                })
-              ) : ( <p className="px-2 py-2 text-sm text-gray-400">No tienes permisos para otros módulos.</p> )}
-            </div>
-            <div className="p-2 border-t border-gray-600">
-              <button onClick={() => router.push("/welcome")}
-                className="w-full flex items-center px-2 py-2 text-left text-white hover:bg-[#152A2A] rounded-lg transition-colors">
-                <HomeIcon className="w-5 h-5 mr-3" /> Home
-              </button>
-              <button onClick={handleLogout}
-                className="w-full flex items-center px-2 py-2 text-left text-red-400 hover:bg-red-900/20 rounded-lg transition-colors">
-                <LogOut className="w-5 h-5 mr-3" /> Cerrar Sesión
-              </button>
-            </div>
-          </div>
-        )}
-      </nav>
+    <div className="min-h-screen">
 
       {/* Main Content (structure identical to perfiles/page.tsx) */}
-      <main className="container mx-auto px-4 py-8">
-        <div className="text-center mb-12">
-          <TypographyH1 className="text-4xl font-bold mb-3">
-            Gestión de Informes
-          </TypographyH1>
-          <TypographyP className="text-xl text-gray-300">
-            Accede a las funciones de registro y consulta de informes.
-          </TypographyP>
-        </div>
+      <main className="mx-auto w-full max-w-6xl px-6 py-10">
+        <EncabezadoPagina titulo="Gestión de Informes" descripcion="Accede a las funciones de registro y consulta de informes." volverA="/welcome" textoVolver="Volver al inicio" />
 
         {status === 'authenticated' && subModulosInformesPermitidos.length === 0 && (
           <div className="flex flex-col items-center justify-center text-center p-8 rounded-2xl max-w-md mx-auto" style={{ backgroundColor: '#1D3434' }}>
@@ -234,32 +185,10 @@ export default function GestionInformesPage() {
         )}
 
         {status === 'authenticated' && subModulosInformesPermitidos.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8 max-w-4xl mx-auto"> {/* max-w-4xl to match perfiles */}
-            {subModulosInformesPermitidos.map((subModulo) => {
-              const IconComponent = subModulo.icon;
-              return (
-                <div
-                  key={subModulo.id}
-                  className="p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 cursor-pointer"
-                  style={{ backgroundColor: '#1D3434' }}
-                  onClick={() => navigateToSubModulo(subModulo.ruta)}
-                >
-                  <div className="flex flex-col items-center text-center">
-                    <div className="p-4 rounded-full mb-4 inline-block" style={{ backgroundColor: '#152A2A' }}>
-                      <IconComponent className="w-10 h-10" style={{ color: '#F1C77A' }} />
-                    </div>
-                    <h3 className="text-xl font-semibold mb-2 text-white">{subModulo.nombre}</h3>
-                    <p className="text-sm text-gray-300 mb-4 h-12 overflow-hidden">{subModulo.descripcion}</p> {/* Fixed height for description consistency */}
-                    <Button 
-                        variant="outline" 
-                        className="w-full border-[#F1C77A] text-[#F1C77A] hover:bg-[#F1C77A] hover:text-[#1D3434] transition-colors group"
-                    >
-                        Acceder <ChevronRight className="w-4 h-4 ml-2 transform transition-transform duration-300 group-hover:translate-x-1" />
-                    </Button>
-                  </div>
-                </div>
-              );
-            })}
+          <div className="grid gap-4 sm:grid-cols-2">
+            {subModulosInformesPermitidos.map((subModulo, i) => (
+              <TarjetaAccion key={subModulo.id} icono={subModulo.icon} titulo={subModulo.nombre} descripcion={subModulo.descripcion} href={subModulo.ruta} orden={i} />
+            ))}
           </div>
         )}
       </main>

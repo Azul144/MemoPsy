@@ -1,7 +1,9 @@
 "use client"
 
 import { useState, useEffect, type ChangeEvent, type FormEvent } from "react"
-import { useSession, signOut } from "next-auth/react"
+import { useSession, signOut } from "next-auth/react"
+import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
+import EncabezadoPagina from "@/components/sistema/EncabezadoPagina";
 import { useRouter } from "next/navigation"
 import MemopsyLogo from "@/app/components/MemopsyLogo"
 import { Button } from "@/components/ui/button"
@@ -274,7 +276,7 @@ export default function RegistrarPerfilPage() {
     setSuccess(null)
   }
 
-  const handleLogout = async () => await signOut({ redirect: true, callbackUrl: "/login" })
+  const handleLogout = async () => await cerrarSesion()
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen)
   const navigateToModule = (ruta: string) => {
     router.push(ruta)
@@ -291,20 +293,8 @@ export default function RegistrarPerfilPage() {
 
   if (hasPermissionPage === false) {
     return (
-      <div className="min-h-screen" style={{ backgroundColor: "#152A2A" }}>
-        <nav className="w-full p-4" style={{ backgroundColor: "#1D3434" }}>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="w-10 h-10">
-                <MemopsyLogo />
-              </div>
-              <h1 className="text-xl font-bold" style={{ color: "#F1C77A" }}>
-                MemoPsy
-              </h1>
-            </div>
-          </div>
-        </nav>
-        <main className="container mx-auto px-4 py-8 text-center">
+      <div className="min-h-screen">
+        <main className="mx-auto w-full max-w-6xl px-6 py-10 text-center">
           <AlertCircle className="w-16 h-16 mx-auto mb-6 text-red-500" />
           <h1 className="text-3xl font-bold text-red-500 mb-4">Acceso Denegado</h1>
           <p className="text-gray-300 mb-6">{error || "No tienes permiso para registrar nuevos perfiles."}</p>
@@ -321,85 +311,11 @@ export default function RegistrarPerfilPage() {
     : session?.user?.email || "Usuario"
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#152A2A" }}>
-      <nav className="w-full p-4" style={{ backgroundColor: "#1D3434" }}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="w-10 h-10">
-              <MemopsyLogo />
-            </div>
-            <h1 className="text-xl font-bold" style={{ color: "#F1C77A" }}>
-              MemoPsy
-            </h1>
-          </div>
-          <button onClick={toggleMenu} className="p-2 rounded-lg" style={{ backgroundColor: "#152A2A" }}>
-            {isMenuOpen ? <X className="w-6 h-6 text-white" /> : <Menu className="w-6 h-6 text-white" />}
-          </button>
-        </div>
-        {isMenuOpen && (
-          <div
-            className="absolute top-16 right-4 w-64 rounded-lg shadow-lg z-50"
-            style={{ backgroundColor: "#1D3434" }}
-          >
-            <div className="p-4 border-b border-gray-600">
-              <p className="text-sm text-gray-300">Conectado como:</p>
-              <p className="font-semibold text-white">{session?.user?.email}</p>
-              <p className="text-sm" style={{ color: "#F1C77A" }}>
-                {nombreCompleto}
-              </p>
-            </div>
-            <div className="p-2">
-              <h3 className="px-2 py-1 text-sm font-semibold text-gray-300 uppercase tracking-wide">Módulos</h3>
-              {modulosPermitidosNav.map((m) => (
-                <button
-                  key={m.id}
-                  onClick={() => navigateToModule(m.ruta)}
-                  className="w-full flex items-center px-2 py-2 text-left text-white hover:bg-opacity-80 rounded-lg transition-colors"
-                  style={{ backgroundColor: "transparent" }}
-                  onMouseEnter={(e) => ((e.target as HTMLElement).style.backgroundColor = "#152A2A")}
-                  onMouseLeave={(e) => ((e.target as HTMLElement).style.backgroundColor = "transparent")}
-                >
-                  <m.icon className="w-5 h-5 mr-3" /> {m.nombre}
-                </button>
-              ))}
-            </div>
-            <div className="p-2 border-t border-gray-600">
-              <button
-              onClick={() => {
-                router.push("/welcome");
-              }}
-              className="w-full flex items-center px-2 py-2 text-left text-white hover:bg-opacity-80 rounded-lg transition-colors"
-              style={{ backgroundColor: "transparent" }}
-              onMouseEnter={(e) => ((e.target as HTMLElement).style.backgroundColor = "#152A2A")}
-              onMouseLeave={(e) => ((e.target as HTMLElement).style.backgroundColor = "transparent")}
-              >
-              <HomeIcon className="w-5 h-5 mr-3" />
-              Home
-              </button>
-              <button
-                onClick={handleLogout}
-                className="w-full flex items-center px-2 py-2 text-left text-red-400 hover:bg-red-900 hover:bg-opacity-20 rounded-lg transition-colors"
-              >
-                <LogOut className="w-5 h-5 mr-3" /> Cerrar Sesión
-              </button>
-            </div>
-          </div>
-        )}
-      </nav>
+    <div className="min-h-screen">
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="mx-auto w-full max-w-6xl px-6 py-10">
+        <EncabezadoPagina titulo="Registrar Nuevo Perfil" descripcion="Crea un nuevo perfil definiendo su nombre, descripción y permisos asociados" volverA="/perfiles" textoVolver="Volver a Perfiles" />
         <Card className="max-w-4xl mx-auto" style={{ backgroundColor: "#1D3434", borderColor: "#2A4A4A" }}>
-          <CardHeader className="text-center">
-            <div className="mx-auto bg-teal-600 rounded-full p-3 w-fit mb-4">
-              <ShieldPlus className="w-8 h-8 text-white" />
-            </div>
-            <CardTitle className="text-3xl font-bold" style={{ color: "#F1C77A" }}>
-              Registrar Nuevo Perfil
-            </CardTitle>
-            <CardDescription className="text-gray-300">
-              Crea un nuevo perfil definiendo su nombre, descripción y permisos asociados
-            </CardDescription>
-          </CardHeader>
 
           <CardContent>
             {success && (
@@ -410,7 +326,7 @@ export default function RegistrarPerfilPage() {
             )}
 
             {error && (
-              <Alert className="mb-6 border-red-500 bg-red-900 bg-opacity-30">
+              <Alert className="mb-6 border-red-500 bg-red-500/10 bg-opacity-30">
                 <AlertCircle className="h-4 w-4 text-red-400" />
                 <AlertDescription className="text-red-300">{error}</AlertDescription>
               </Alert>
@@ -428,7 +344,7 @@ export default function RegistrarPerfilPage() {
                     value={formData.nombre}
                     onChange={handleChange}
                     required
-                    className="bg-gray-700 text-white border-gray-600 focus:ring-teal-500 focus:border-teal-500 mt-2"
+                    className="bg-[#2A4242] text-white border-gray-600 focus:ring-teal-500 focus:border-teal-500 mt-2"
                     placeholder="Ej: Administrador, Paciente, Supervisor"
                   />
                   {fieldErrors.nombre && <p className="text-red-400 text-sm mt-1">{fieldErrors.nombre}</p>}
@@ -444,7 +360,7 @@ export default function RegistrarPerfilPage() {
                     value={formData.descripcion}
                     onChange={handleChange}
                     required
-                    className="bg-gray-700 text-white border-gray-600 focus:ring-teal-500 focus:border-teal-500 mt-2 h-24"
+                    className="bg-[#2A4242] text-white border-gray-600 focus:ring-teal-500 focus:border-teal-500 mt-2 h-24"
                     placeholder="Describe las responsabilidades y alcance de este perfil..."
                   />
                   {fieldErrors.descripcion && <p className="text-red-400 text-sm mt-1">{fieldErrors.descripcion}</p>}
@@ -467,7 +383,7 @@ export default function RegistrarPerfilPage() {
                 )}
 
                 {errorPermisos && (
-                  <Alert className="border-red-500 bg-red-900 bg-opacity-30">
+                  <Alert className="border-red-500 bg-red-500/10 bg-opacity-30">
                     <AlertCircle className="h-4 w-4 text-red-400" />
                     <AlertDescription className="text-red-300">{errorPermisos}</AlertDescription>
                   </Alert>
@@ -478,7 +394,7 @@ export default function RegistrarPerfilPage() {
                 )}
 
                 {Object.entries(groupedPermisos).map(([modulo, permisosDelModulo]) => (
-                  <Card key={modulo} className="bg-gray-800 border-gray-700 shadow-sm">
+                  <Card key={modulo} className="bg-[#152B2B] border-gray-700 shadow-sm">
                     <CardHeader className="pb-3 pt-4 px-4">
                       <CardTitle className="text-lg font-medium flex items-center" style={{ color: "#F1C77A" }}>
                         Módulo - {modulo}
@@ -492,13 +408,13 @@ export default function RegistrarPerfilPage() {
                       {permisosDelModulo.map((permiso) => (
                         <div
                           key={permiso.id}
-                          className="flex items-start space-x-3 p-2 rounded-md hover:bg-gray-700 transition-colors"
+                          className="flex items-start space-x-3 p-2 rounded-md hover:bg-[#2A4242] transition-colors"
                         >
                           <Checkbox
                             id={`permiso-${permiso.id}`}
                             checked={selectedPermisoIds.has(permiso.id)}
                             onCheckedChange={(checked) => handlePermisoChange(permiso.id, Boolean(checked))}
-                            className="border-gray-500 data-[state=checked]:bg-teal-500 data-[state=checked]:border-teal-600 mt-1"
+                            className="border-gray-500 data-[state=checked]:bg-primary !text-primary-foreground data-[state=checked]:border-teal-600 mt-1"
                           />
                           <div className="flex-1">
                             <Label
@@ -519,7 +435,7 @@ export default function RegistrarPerfilPage() {
               </div>
 
               {fieldErrors.general && (
-                <Alert className="border-red-500 bg-red-900 bg-opacity-30">
+                <Alert className="border-red-500 bg-red-500/10 bg-opacity-30">
                   <AlertCircle className="h-4 w-4 text-red-400" />
                   <AlertDescription className="text-red-300">{fieldErrors.general}</AlertDescription>
                 </Alert>
@@ -531,7 +447,7 @@ export default function RegistrarPerfilPage() {
                     type="button"
                     variant="outline"
                     onClick={() => router.push("/perfiles")}
-                    className="text-gray-300 border-gray-600 hover:bg-gray-700"
+                    className="text-gray-300 border-gray-600 hover:bg-[#2A4242]"
                   >
                     Cancelar
                   </Button>
@@ -539,7 +455,7 @@ export default function RegistrarPerfilPage() {
                     type="button"
                     variant="outline"
                     onClick={resetForm}
-                    className="text-gray-300 border-gray-600 hover:bg-gray-700"
+                    className="text-gray-300 border-gray-600 hover:bg-[#2A4242]"
                     disabled={isLoading}
                   >
                     Limpiar
