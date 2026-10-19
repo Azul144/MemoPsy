@@ -32,7 +32,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     action = typeof body?.action === "string" ? body.action : "";
-    code = typeof body?.code === "string" ? body.code.trim() : "";
+    code = typeof body?.code === "string" ? body.code.replace(/\s/g, "") : "";
   } catch {
     return error("Solicitud inválida.");
   }

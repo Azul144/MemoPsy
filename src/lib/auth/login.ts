@@ -56,7 +56,8 @@ export async function verificarLogin(
       throw new Error("MFA_REQUERIDO");
     }
 
-    const codigoLimpio = codigo.trim();
+    // Se sacan los espacios: muchas apps muestran el código como "123 456"
+    const codigoLimpio = codigo.replace(/\s/g, "");
     let codigoValido = false;
 
     if (esCodigoTotp(codigoLimpio) && usuario.mfaSecreto) {

@@ -115,6 +115,16 @@ body {
   --sidebar-border: #2B4243; /* Color de input para bordes de sidebar */
   --sidebar-ring: #F1C77A; /* Dorado para anillos de enfoque de sidebar */
 }
+/* Cuando el navegador autocompleta un campo le pone su propio fondo claro;
+   esto mantiene el fondo oscuro y la letra blanca de MemoPsy */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #2A4242 inset !important;
+  -webkit-text-fill-color: #ffffff !important;
+  caret-color: #ffffff;
+  transition: background-color 9999s ease-in-out 0s;
+}
 .input-password-toggle {
   color: var(--foreground) !important; /* Forzar color blanco para íconos dentro de inputs */
 }

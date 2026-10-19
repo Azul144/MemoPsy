@@ -7,7 +7,7 @@ import { useSearchParams } from "next/navigation";
 import { CheckCircle2, Loader2 } from "lucide-react";
 import MemopsyLogo from "@/app/components/MemopsyLogo";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import InputPassword from "@/components/InputPassword";
 import { Label } from "@/components/ui/label";
 import RequisitosPassword from "@/components/RequisitosPassword";
 import { validarPassword } from "@/lib/validaciones/password";
@@ -78,9 +78,8 @@ function FormularioNuevaPassword() {
             <form onSubmit={guardar} className="space-y-4">
               <div>
                 <Label htmlFor="password">Contraseña nueva</Label>
-                <Input
+                <InputPassword
                   id="password"
-                  type="password"
                   autoComplete="new-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -94,9 +93,8 @@ function FormularioNuevaPassword() {
               </div>
               <div>
                 <Label htmlFor="confirmacion">Repetí la contraseña</Label>
-                <Input
+                <InputPassword
                   id="confirmacion"
-                  type="password"
                   autoComplete="new-password"
                   value={confirmacion}
                   onChange={(e) => setConfirmacion(e.target.value)}

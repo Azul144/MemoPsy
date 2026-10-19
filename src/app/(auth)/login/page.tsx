@@ -9,6 +9,7 @@ import { Loader2, ShieldCheck } from "lucide-react";
 import MemopsyLogo from "@/app/components/MemopsyLogo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import InputPassword from "@/components/InputPassword";
 import { Label } from "@/components/ui/label";
 
 // Traduce los códigos de error del servidor a mensajes para el usuario
@@ -91,9 +92,8 @@ export default function LoginPage() {
               </div>
               <div>
                 <Label htmlFor="password">Contraseña</Label>
-                <Input
+                <InputPassword
                   id="password"
-                  type="password"
                   autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
