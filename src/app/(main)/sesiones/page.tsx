@@ -29,7 +29,7 @@ import { format, parseISO, isSameDay } from "date-fns"
 import { es } from "date-fns/locale"
 import { cn } from "@/lib/utils"
 import EncabezadoPagina from "@/components/sistema/EncabezadoPagina";
-import { avisoExito, avisoError } from "@/lib/avisos";
+import { avisoExito, avisoError, confirmar } from "@/lib/avisos";
 import DialogoPago, { type PagoSesion, type MedioDePago } from "@/components/sesiones/DialogoPago";
 
 interface Sesion {
@@ -165,6 +165,46 @@ export default function SesionesPage() {
   const esModalidadRemota = (modalidadId: string) =>
     modalidades.find((m) => String(m.id) === String(modalidadId))?.nombre?.toLowerCase() === "remota";
 
+  // Estados del turno: color del badge e id a partir del nombre.
+  const colorEstado = (nombre?: string) => {
+    switch (nombre) {
+      case "Confirmada": return "border-emerald-500 text-emerald-300";
+      case "Cancelada": return "border-red-500 text-red-300";
+      case "Finalizada": return "border-sky-500 text-sky-300";
+      case "Reprogramada": return "border-orange-400 text-orange-300";
+      default: return "border-amber-400 text-amber-300"; // Pendiente u otros
+    }
+  };
+  const estadoIdPorNombre = (nombre: string) =>
+    estados.find((e) => e.nombre === nombre)?.id as string | undefined;
+
+  // Acción rápida: cambiar el estado de un turno (confirmar / cancelar).
+  const cambiarEstadoSesion = async (sesion: Sesion, nombreEstado: string) => {
+    const estadoId = estadoIdPorNombre(nombreEstado);
+    if (!estadoId) return;
+    if (nombreEstado === "Cancelada") {
+      const ok = await confirmar("¿Seguro que querés cancelar este turno?", "Sí, cancelar");
+      if (!ok) return;
+    }
+    try {
+      const res = await fetch(`/api/sesiones/${sesion.id}/estado`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ estadoId: Number(estadoId) }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        avisoError(data.error || "No se pudo cambiar el estado del turno.");
+        return;
+      }
+      await loadInitialData();
+      avisoExito(nombreEstado === "Confirmada" ? "Turno confirmado." : "Turno cancelado.");
+    } catch (error) {
+      console.error("Error cambiando el estado:", error);
+      avisoError("No se pudo cambiar el estado. Verificá tu conexión.");
+    }
+  };
+
   const handleOpenEditDialog = (sesion: Sesion) => {
     setEditingSesion(sesion); // Keep a reference to the original session object
     setEditFormData({
@@ -256,12 +296,24 @@ const handleUpdateSesion = async () => {
         const fechaHoraInicio = new Date(`${editFormData.fechaInicio}T${editFormData.horaInicio}`);
         const fechaHoraFin = new Date(`${editFormData.fechaFin}T${editFormData.horaFin}`);
 
+        // Reprogramado automático: si se cambió la fecha/hora y el usuario NO eligió otro estado
+        // a mano, el turno pasa a "Reprogramada".
+        const cambioFechaHora =
+            fechaHoraInicio.toISOString() !== editingSesion.fechaHoraInicio ||
+            fechaHoraFin.toISOString() !== editingSesion.fechaHoraFin;
+        const estadoSinCambiarAMano = editFormData.estadoId === (editingSesion.estado?.id ?? "");
+        const idReprogramada = estadoIdPorNombre("Reprogramada");
+        let estadoIdFinal = parseInt(editFormData.estadoId);
+        if (cambioFechaHora && estadoSinCambiarAMano && idReprogramada) {
+            estadoIdFinal = parseInt(idReprogramada);
+        }
+
         const payload = {
             fechaHoraInicio: fechaHoraInicio.toISOString(),
             fechaHoraFin: fechaHoraFin.toISOString(),
             psicologoId: parseInt(editFormData.psicologoId),
             modalidadId: parseInt(editFormData.modalidadId),
-            estadoId: parseInt(editFormData.estadoId),
+            estadoId: estadoIdFinal,
             enlaceVideollamada: esModalidadRemota(editFormData.modalidadId) ? editFormData.enlaceVideollamada.trim() || null : null,
             pacientesIds: editFormData.pacientesIds,
         };
@@ -711,7 +763,7 @@ const handleUpdateSesion = async () => {
           <h4 className="font-semibold text-white">
             Sesiones para {format(selectedDate, "dd/MM/yyyy", { locale: es })}
           </h4>
-          <div className="space-y-2 max-h-60 overflow-y-auto">
+          <div className="space-y-3">
             {getSesionesForDate(selectedDate, filterType).map((sesion) => (
               <Card key={sesion.id} className="p-3" style={{ backgroundColor: "#142B2A" }}>
                 <div className="flex items-start justify-between"> {/* items-start for alignment */}
@@ -753,7 +805,9 @@ const handleUpdateSesion = async () => {
                         {sesion.estado && (
                             <div className="flex items-center space-x-2">
                                 <Activity className="w-4 h-4 text-orange-400" />
-                                <span className="text-sm text-gray-300">{sesion.estado.nombre}</span>
+                                <Badge variant="outline" className={cn("text-xs", colorEstado(sesion.estado.nombre))}>
+                                    {sesion.estado.nombre}
+                                </Badge>
                             </div>
                         )}
                         {sesion.pacientes && sesion.pacientes.length > 0 && (
@@ -788,36 +842,60 @@ const handleUpdateSesion = async () => {
                             </div>
                         )}
                     </div>
-                    <div className="ml-2 flex flex-shrink-0 flex-col items-end gap-1">
-                    {sesion.pago && sesion.estado?.nombre !== "Cancelada" && (
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => setSesionPago(sesion)}
-                            title="Registrar pago"
-                            className="text-white hover:text-amber-300 p-1"
-                        >
-                            <Wallet className="w-4 h-4" />
-                        </Button>
-                    )}
-                    {permisos.includes("Editar Sesión") && (
-                        <Button
-                            variant="ghost"
-                            size="icon" 
-                            onClick={() => handleOpenEditDialog(sesion)}
-                            disabled={sesion.estado?.nombre === "Finalizada" || sesion.estado?.nombre === "Cancelada"}
-                            title={
-                                sesion.estado?.nombre === "Finalizada" || sesion.estado?.nombre === "Cancelada"
-                                    ? "No se puede editar una sesión finalizada o cancelada"
-                                    : "Editar Sesión"
-                            }
-                            className="text-white hover:text-yellow-400 disabled:text-gray-500 disabled:cursor-not-allowed p-1"
-                        >
-                            <Pencil className="w-4 h-4" />
-                        </Button>
-                    )}
-                    </div>
                 </div>
+
+                {/* Acciones del turno: fila con texto, debajo de los datos */}
+                {(() => {
+                    const cerrada = sesion.estado?.nombre === "Finalizada" || sesion.estado?.nombre === "Cancelada"
+                    const puedeEditar = permisos.includes("Editar Sesión") && !cerrada
+                    const verPago = !!sesion.pago && sesion.estado?.nombre !== "Cancelada"
+                    if (!puedeEditar && !verPago) return null
+                    const claseBoton = "h-8 gap-1.5 rounded-full border bg-transparent px-3 text-xs font-medium"
+                    return (
+                        <div className="mt-3 flex flex-wrap gap-2 border-t border-gray-700/60 pt-3">
+                            {puedeEditar && sesion.estado?.nombre !== "Confirmada" && (
+                                <Button
+                                    variant="outline"
+                                    onClick={() => cambiarEstadoSesion(sesion, "Confirmada")}
+                                    className={cn(claseBoton, "border-emerald-500/60 text-emerald-300 hover:bg-emerald-500/15 hover:text-emerald-200")}
+                                >
+                                    <Check className="h-3.5 w-3.5" />
+                                    Confirmar
+                                </Button>
+                            )}
+                            {puedeEditar && (
+                                <Button
+                                    variant="outline"
+                                    onClick={() => cambiarEstadoSesion(sesion, "Cancelada")}
+                                    className={cn(claseBoton, "border-red-500/60 text-red-300 hover:bg-red-500/15 hover:text-red-200")}
+                                >
+                                    <X className="h-3.5 w-3.5" />
+                                    Cancelar
+                                </Button>
+                            )}
+                            {verPago && (
+                                <Button
+                                    variant="outline"
+                                    onClick={() => setSesionPago(sesion)}
+                                    className={cn(claseBoton, "border-amber-400/60 text-amber-300 hover:bg-amber-400/15 hover:text-amber-200")}
+                                >
+                                    <Wallet className="h-3.5 w-3.5" />
+                                    Pago
+                                </Button>
+                            )}
+                            {puedeEditar && (
+                                <Button
+                                    variant="outline"
+                                    onClick={() => handleOpenEditDialog(sesion)}
+                                    className={cn(claseBoton, "border-gray-500/60 text-gray-200 hover:bg-white/10 hover:text-white")}
+                                >
+                                    <Pencil className="h-3.5 w-3.5" />
+                                    Editar
+                                </Button>
+                            )}
+                        </div>
+                    )
+                })()}
               </Card>
             ))}
             {getSesionesForDate(selectedDate, filterType).length === 0 && (

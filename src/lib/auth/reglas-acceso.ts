@@ -106,6 +106,8 @@ export const REGLAS_API: Regla[] = [
   { ruta: "/api/sesiones/[id]", metodos: ["DELETE"], permisos: ["Eliminar Sesión"] },
   // Pagos de la sesión (RF 3.5): solo quien tiene "Registrar Pago" (psicólogo / recepcionista).
   { ruta: "/api/sesiones/[id]/pago", metodos: ["PATCH"], permisos: ["Registrar Pago"] },
+  // Cambiar el estado del turno (confirmar / cancelar / reprogramar).
+  { ruta: "/api/sesiones/[id]/estado", metodos: ["PATCH"], permisos: ["Editar Sesión"] },
   { ruta: "/api/medios-de-pago", metodos: ["GET"], permisos: ["Registrar Pago"] },
   { ruta: "/api/estados", metodos: ["GET"], permisos: AGENDA },
   { ruta: "/api/estados/[id]", metodos: ["GET"], permisos: AGENDA },
