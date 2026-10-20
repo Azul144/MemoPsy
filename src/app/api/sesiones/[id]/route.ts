@@ -6,6 +6,7 @@ import { alcanceSesiones, puedeVerSesion } from "@/lib/auth/alcance-sesiones";
 import { initializeDatabase } from "@/lib/database";
 import { SesionEntity, PacienteTieneSesionEntity, PsicologoEntity, ModalidadEntity, EstadoEntity } from "@/entities";
 import { ZodError, z } from "zod";
+import { esDiaHabilEnConsultorio, MENSAJE_DIA_NO_HABIL } from "@/lib/validaciones/dias-habiles";
 
 // Zod schema for validation
 const updateSesionSchema = z.object({
@@ -133,6 +134,15 @@ export async function PUT(request: NextRequest, { params: paramsPromise }: { par
     }
 
     const { fechaHoraInicio, fechaHoraFin, psicologoId, modalidadId, estadoId, pacientesIds } = validationResult.data;
+
+    // Solo de lunes a viernes
+    const erroresDia = [
+      ...(esDiaHabilEnConsultorio(new Date(fechaHoraInicio)) ? [] : [{ path: ["fechaInicio"], message: MENSAJE_DIA_NO_HABIL }]),
+      ...(esDiaHabilEnConsultorio(new Date(fechaHoraFin)) ? [] : [{ path: ["fechaFin"], message: MENSAJE_DIA_NO_HABIL }]),
+    ];
+    if (erroresDia.length > 0) {
+      return NextResponse.json({ error: MENSAJE_DIA_NO_HABIL, details: erroresDia }, { status: 400 });
+    }
 
     const dataSource = await initializeDatabase();
     const sesionRepository = dataSource.getRepository(SesionEntity);

@@ -1,6 +1,7 @@
 // src/app/api/sesiones/route.ts
 // src/app/api/sesiones/route.ts
 import { type NextRequest, NextResponse } from "next/server"
+import { esDiaHabilEnConsultorio, MENSAJE_DIA_NO_HABIL } from "@/lib/validaciones/dias-habiles"
 import { alcanceSesiones, puedeVerSesion } from "@/lib/auth/alcance-sesiones"
 import { getServerSession } from "next-auth/next"
 import { authConfig } from "@/lib/auth/auth-config"
@@ -146,6 +147,22 @@ export async function POST(request: NextRequest) {
             psicologoId: psicologoId ? null : "El psicólogo es requerido",
             modalidadId: modalidadId ? null : "La modalidad es requerida",
             estadoId: estadoId ? null : "El estado es requerido",
+          },
+        },
+        { status: 400 },
+      )
+    }
+
+    // Solo de lunes a viernes
+    const diaInicioHabil = esDiaHabilEnConsultorio(new Date(fechaHoraInicio))
+    const diaFinHabil = esDiaHabilEnConsultorio(new Date(fechaHoraFin))
+    if (!diaInicioHabil || !diaFinHabil) {
+      return NextResponse.json(
+        {
+          error: MENSAJE_DIA_NO_HABIL,
+          details: {
+            fechaInicio: diaInicioHabil ? null : MENSAJE_DIA_NO_HABIL,
+            fechaFin: diaFinHabil ? null : MENSAJE_DIA_NO_HABIL,
           },
         },
         { status: 400 },

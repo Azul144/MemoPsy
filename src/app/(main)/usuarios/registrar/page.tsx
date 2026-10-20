@@ -1,7 +1,8 @@
 "use client"
 
 import { useState, useEffect, type ChangeEvent, type FormEvent } from "react"
-import { useSession, signOut } from "next-auth/react"
+import { useSession, signOut } from "next-auth/react"
+
 import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
 import EncabezadoPagina from "@/components/sistema/EncabezadoPagina";
 import { useRouter } from "next/navigation"
@@ -18,8 +19,12 @@ import { Switch } from "@/components/ui/switch"
 import { Usuario } from "@/models/usuario.model"
 import { Persona } from "@/models/persona.model"
 import { Psicologo } from "@/models/psicologo.model"
-import { ObraSocial } from "@/models/obra-social.model"
+import { ObraSocial } from "@/models/obra-social.model"
+
 import { avisoExito } from "@/lib/avisos";
+import InputPassword from "@/components/InputPassword"
+import RequisitosPassword from "@/components/RequisitosPassword"
+import { validarPassword } from "@/lib/validaciones/password"
 
 interface ModuloConfig {
   id: string
@@ -195,7 +200,12 @@ export default function RegistrarUsuarioPage() {
     }
   }
 
+  // Psicólogo y Paciente son excluyentes: activar uno apaga el otro
   const handlePsicologoToggle = (checked: boolean) => {
+    if (checked) {
+      setFieldErrors((prev) => ({ ...prev, roleSelection: undefined }))
+      handlePacienteToggle(false)
+    }
     setIsPsicologo(checked)
     if (!checked) {
       setFormData((prev) => ({ ...prev, numeroLicencia: "", especialidad: "" }))
@@ -204,6 +214,10 @@ export default function RegistrarUsuarioPage() {
   }
 
   const handlePacienteToggle = (checked: boolean) => {
+    if (checked) {
+      setFieldErrors((prev) => ({ ...prev, roleSelection: undefined }))
+      handlePsicologoToggle(false)
+    }
     setIsPaciente(checked)
     if (!checked) {
       setSelectedObraSocialId("")
@@ -229,13 +243,12 @@ export default function RegistrarUsuarioPage() {
     }
 
     if (!formData.password) {
-      newErrors.password = "La contraseña es requerida.";
-    } else if (formData.password.length < 8) {
-      newErrors.password = "La contraseña debe tener al menos 8 caracteres.";
-    } else if (!/[A-Z]/.test(formData.password)) {
-      newErrors.password = "La contraseña debe contener al menos una letra mayúscula.";
-    } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(formData.password)) {
-      newErrors.password = "La contraseña debe contener al menos un carácter especial.";
+      newErrors.password = "La contraseña es requerida."
+    } else {
+      const problemas = validarPassword(formData.password, formData.email)
+      if (problemas.length > 0) {
+        newErrors.password = `Falta: ${problemas.join(", ").toLowerCase()}.`
+      }
     }
 
     if (formData.password !== formData.confirmPassword) {
@@ -253,6 +266,10 @@ export default function RegistrarUsuarioPage() {
 
     if (!formData.fecha_nacimiento) {
       newErrors.fecha_nacimiento = "La fecha de nacimiento es requerida."
+    }
+
+    if (isPsicologo === isPaciente) {
+      newErrors.roleSelection = "Debe seleccionar si el usuario es Psicólogo o Paciente."
     }
 
     // Validaciones específicas para psicólogo
@@ -349,11 +366,7 @@ export default function RegistrarUsuarioPage() {
       }
 
       // Mostrar mensaje de éxito con los datos guardados
-      const rolesText = []
-      if (isPsicologo) rolesText.push("Psicólogo")
-      if (isPaciente) rolesText.push("Paciente")
-
-      avisoExito(`Usuario registrado correctamente como ${rolesText.join(" y ")}.`)
+      avisoExito(`Usuario registrado correctamente como ${isPsicologo ? "Psicólogo" : "Paciente"}.`)
 
       resetForm()
       router.push("/usuarios")
@@ -432,8 +445,8 @@ export default function RegistrarUsuarioPage() {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Personal Info */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6">
+                <div className="space-y-2">
                   <Label htmlFor="nombre" className="text-gray-200">
                     Nombre *
                   </Label>
@@ -445,9 +458,9 @@ export default function RegistrarUsuarioPage() {
                     required
                     className="bg-[#2A4242] text-white border-gray-600 focus:ring-teal-500 focus:border-teal-500"
                   />
-                  {fieldErrors.nombre && <p className="text-red-500 text-xs mt-1">{fieldErrors.nombre}</p>}
+                  {fieldErrors.nombre && <p className="text-red-500 text-xs">{fieldErrors.nombre}</p>}
                 </div>
-                <div>
+                <div className="space-y-2">
                   <Label htmlFor="apellido" className="text-gray-200">
                     Apellido *
                   </Label>
@@ -459,11 +472,11 @@ export default function RegistrarUsuarioPage() {
                     required
                     className="bg-[#2A4242] text-white border-gray-600 focus:ring-teal-500 focus:border-teal-500"
                   />
-                  {fieldErrors.apellido && <p className="text-red-500 text-xs mt-1">{fieldErrors.apellido}</p>}
+                  {fieldErrors.apellido && <p className="text-red-500 text-xs">{fieldErrors.apellido}</p>}
                 </div>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6">
+                <div className="space-y-2">
                   <Label htmlFor="dni" className="text-gray-200">
                     DNI *
                   </Label>
@@ -474,11 +487,11 @@ export default function RegistrarUsuarioPage() {
                     value={formData.dni}
                     onChange={handleChange}
                     required
-                    className="bg-[#2A4242] text-white border-gray-600 focus:ring-teal-500 focus:border-teal-500 mt-1"
+                    className="bg-[#2A4242] text-white border-gray-600 focus:ring-teal-500 focus:border-teal-500"
                   />
-                  {fieldErrors.dni && <p className="text-red-500 text-xs mt-1">{fieldErrors.dni}</p>}
+                  {fieldErrors.dni && <p className="text-red-500 text-xs">{fieldErrors.dni}</p>}
                 </div>
-                <div>
+                <div className="space-y-2">
                   <Label htmlFor="fecha_nacimiento" className="text-gray-200">
                     Fecha de Nacimiento *
                   </Label>
@@ -489,17 +502,17 @@ export default function RegistrarUsuarioPage() {
                     value={formData.fecha_nacimiento}
                     onChange={handleChange}
                     required
-                    className="bg-[#2A4242] text-white border-gray-600 focus:ring-teal-500 focus:border-teal-500 mt-1"
+                    className="bg-[#2A4242] text-white border-gray-600 focus:ring-teal-500 focus:border-teal-500"
                     style={{ colorScheme: "dark" }}
                   />
                   {fieldErrors.fecha_nacimiento && (
-                    <p className="text-red-500 text-xs mt-1">{fieldErrors.fecha_nacimiento}</p>
+                    <p className="text-red-500 text-xs">{fieldErrors.fecha_nacimiento}</p>
                   )}
                 </div>
               </div>
 
               {/* Account Info */}
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="email" className="text-gray-200">
                   Email *
                 </Label>
@@ -510,42 +523,52 @@ export default function RegistrarUsuarioPage() {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="bg-[#2A4242] text-white border-gray-600 focus:ring-teal-500 focus:border-teal-500 mt-1"
+                  className="bg-[#2A4242] text-white border-gray-600 focus:ring-teal-500 focus:border-teal-500"
                 />
-                {fieldErrors.email && <p className="text-red-500 text-xs mt-1">{fieldErrors.email}</p>}
+                {fieldErrors.email && <p className="text-red-500 text-xs">{fieldErrors.email}</p>}
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="password" className="text-gray-200">
-                    Contraseña *
-                  </Label>
-                  <Input
-                    id="password"
-                    name="password"
-                    type="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    required
-                    className="bg-[#2A4242] text-white border-gray-600 focus:ring-teal-500 focus:border-teal-500 mt-1"
-                  />
-                  {fieldErrors.password && <p className="text-red-500 text-xs mt-1">{fieldErrors.password}</p>}
+              <div className="space-y-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="password" className="text-gray-200">
+                      Contraseña *
+                    </Label>
+                    <InputPassword
+                      id="password"
+                      name="password"
+                      autoComplete="new-password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      aria-describedby="requisitos-password"
+                      required
+                    />
+                    {fieldErrors.password && <p className="text-red-500 text-xs">{fieldErrors.password}</p>}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="confirmPassword" className="text-gray-200">
+                      Confirmar Contraseña *
+                    </Label>
+                    <InputPassword
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      autoComplete="new-password"
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      required
+                    />
+                    {fieldErrors.confirmPassword ? (
+                      <p className="text-red-500 text-xs">{fieldErrors.confirmPassword}</p>
+                    ) : (
+                      formData.confirmPassword.length > 0 &&
+                      formData.password !== formData.confirmPassword && (
+                        <p className="text-red-300 text-xs">Las contraseñas no coinciden.</p>
+                      )
+                    )}
+                  </div>
                 </div>
-                <div>
-                  <Label htmlFor="confirmPassword" className="text-gray-200">
-                    Confirmar Contraseña *
-                  </Label>
-                  <Input
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    type="password"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    required
-                    className="bg-[#2A4242] text-white border-gray-600 focus:ring-teal-500 focus:border-teal-500 mt-1"
-                  />
-                  {fieldErrors.confirmPassword && (
-                    <p className="text-red-500 text-xs mt-1">{fieldErrors.confirmPassword}</p>
-                  )}
+                <div id="requisitos-password" className="rounded-md border border-[#2A4A4A] bg-[#152A2A]/60 px-4 py-3">
+                  <p className="text-xs font-medium uppercase tracking-wide text-gray-400">La contraseña debe tener</p>
+                  <RequisitosPassword password={formData.password} />
                 </div>
               </div>
 
@@ -560,7 +583,7 @@ export default function RegistrarUsuarioPage() {
 
                 {isPsicologo && (
                   <div className="pl-8 space-y-4 transition-all duration-300 ease-in-out">
-                    <div>
+                    <div className="space-y-2">
                       <Label htmlFor="numeroLicencia" className="text-gray-300">
                         Número de Licencia *
                       </Label>
@@ -570,13 +593,13 @@ export default function RegistrarUsuarioPage() {
                         value={formData.numeroLicencia}
                         onChange={handleChange}
                         required={isPsicologo}
-                        className="bg-[#2A4242] text-white border-gray-600 focus:ring-teal-500 focus:border-teal-500 mt-1"
+                        className="bg-[#2A4242] text-white border-gray-600 focus:ring-teal-500 focus:border-teal-500"
                       />
                       {fieldErrors.numeroLicencia && (
-                        <p className="text-red-500 text-xs mt-1">{fieldErrors.numeroLicencia}</p>
+                        <p className="text-red-500 text-xs">{fieldErrors.numeroLicencia}</p>
                       )}
                     </div>
-                    <div>
+                    <div className="space-y-2">
                       <Label htmlFor="especialidad" className="text-gray-300">
                         Especialidad *
                       </Label>
@@ -586,10 +609,10 @@ export default function RegistrarUsuarioPage() {
                         value={formData.especialidad}
                         onChange={handleChange}
                         required={isPsicologo}
-                        className="bg-[#2A4242] text-white border-gray-600 focus:ring-teal-500 focus:border-teal-500 mt-1"
+                        className="bg-[#2A4242] text-white border-gray-600 focus:ring-teal-500 focus:border-teal-500"
                       />
                       {fieldErrors.especialidad && (
-                        <p className="text-red-500 text-xs mt-1">{fieldErrors.especialidad}</p>
+                        <p className="text-red-500 text-xs">{fieldErrors.especialidad}</p>
                       )}
                     </div>
                   </div>
@@ -604,7 +627,7 @@ export default function RegistrarUsuarioPage() {
 
                 {isPaciente && (
                   <div className="pl-8 space-y-4 transition-all duration-300 ease-in-out">
-                    <div>
+                    <div className="space-y-2">
                       <Label htmlFor="selectedObraSocialId" className="text-gray-300">
                         Obra Social *
                       </Label>
@@ -613,9 +636,15 @@ export default function RegistrarUsuarioPage() {
                         value={selectedObraSocialId}
                         onValueChange={handleObraSocialSelectChange}
                         required={isPaciente}
+                        disabled={isLoadingObrasSociales}
                       >
-                        <SelectTrigger className="bg-[#2A4242] text-white border-gray-600 focus:ring-teal-500 focus:border-teal-500 mt-1">
-                          <SelectValue placeholder="Seleccione Obra Social..." />
+                        <SelectTrigger
+                          id="selectedObraSocialId"
+                          className="w-full bg-[#2A4242] text-white border-gray-600 focus:ring-teal-500 focus:border-teal-500 data-[placeholder]:text-gray-400"
+                        >
+                          <SelectValue
+                            placeholder={isLoadingObrasSociales ? "Cargando obras sociales..." : "Seleccione una obra social"}
+                          />
                         </SelectTrigger>
                         <SelectContent style={{ backgroundColor: "#1D3434", borderColor: "#2A4A4A" }}>
                           {obrasSocialesList.length === 0 ? (
@@ -635,13 +664,14 @@ export default function RegistrarUsuarioPage() {
                           )}
                         </SelectContent>
                       </Select>
+                      {errorObrasSociales && <p className="text-red-500 text-xs">{errorObrasSociales}</p>}
                       {fieldErrors.selectedObraSocialId && (
-                        <p className="text-red-500 text-xs mt-1">{fieldErrors.selectedObraSocialId}</p>
+                        <p className="text-red-500 text-xs">{fieldErrors.selectedObraSocialId}</p>
                       )}
                     </div>
                   </div>
                 )}
-                {fieldErrors.roleSelection && <p className="text-red-500 text-xs mt-1">{fieldErrors.roleSelection}</p>}
+                {fieldErrors.roleSelection && <p role="alert" className="text-red-500 text-xs">{fieldErrors.roleSelection}</p>}
               </div>
 
               {error && (

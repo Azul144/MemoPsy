@@ -20,6 +20,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Calendar } from "@/components/ui/calendar"
+import { DIAS_NO_HABILES, MENSAJE_DIA_NO_HABIL, esDiaHabil, esFechaHabil, proximoDiaHabil } from "@/lib/validaciones/dias-habiles"
 import { Badge } from "@/components/ui/badge"
 import { TypographyP } from '@/components/ui/typography';
 import {
@@ -77,6 +78,7 @@ interface Sesion {
 
 interface Psicologo {
   id: string
+  especialidad?: string
   persona: {
     nombre: string
     apellido: string
@@ -86,6 +88,8 @@ interface Psicologo {
 
 interface Paciente {
   id: string
+  // true si ya tuvo sesiones con el psicólogo elegido en el formulario
+  esDelPsicologo?: boolean
   persona: {
     nombre: string
     apellido: string
@@ -167,9 +171,9 @@ export default function SesionesPage() {
 
   // Form state
   const [formData, setFormData] = useState({
-    fechaInicio: format(new Date(), "yyyy-MM-dd"),
+    fechaInicio: format(proximoDiaHabil(new Date()), "yyyy-MM-dd"),
     horaInicio: "09:00",
-    fechaFin: format(new Date(), "yyyy-MM-dd"),
+    fechaFin: format(proximoDiaHabil(new Date()), "yyyy-MM-dd"),
     horaFin: "10:00",
     psicologoId: "",
     modalidadId: "",
@@ -249,9 +253,8 @@ const handleSelectEditPaciente = (paciente: Paciente) => {
         setEditSelectedPacientes(newSelectedPacientes);
         setEditFormData({ ...editFormData, pacientesIds: newSelectedPacientes.map(p => p.id) });
     }
-    setEditPacienteSearch(""); 
-    setIsEditPacientePopoverOpen(false); 
-    setEditPacienteSearchResults([]); 
+    setEditPacienteSearch("");
+    setIsEditPacientePopoverOpen(false);
 };
 
 const handleRemoveEditPaciente = (pacienteId: string) => {
@@ -270,11 +273,13 @@ const validateEditForm = () => {
     if (!editFormData.modalidadId) errors.modalidadId = "La modalidad es requerida";
     if (!editFormData.estadoId) errors.estadoId = "El estado es requerido";
     if (!editFormData.pacientesIds || editFormData.pacientesIds.length === 0) errors.pacientesIds = "Debe seleccionar al menos un paciente";
+    if (editFormData.fechaInicio && !esFechaHabil(editFormData.fechaInicio)) errors.fechaInicio = MENSAJE_DIA_NO_HABIL;
+    if (editFormData.fechaFin && !esFechaHabil(editFormData.fechaFin)) errors.fechaFin = MENSAJE_DIA_NO_HABIL;
     
     const startDateTimeStr = `${editFormData.fechaInicio}T${editFormData.horaInicio}`;
     const endDateTimeStr = `${editFormData.fechaFin}T${editFormData.horaFin}`;
     if (editFormData.fechaInicio && editFormData.horaInicio && editFormData.fechaFin && editFormData.horaFin) {
-        if (new Date(startDateTimeStr) >= new Date(endDateTimeStr)) {
+        if (!errors.fechaFin && new Date(startDateTimeStr) >= new Date(endDateTimeStr)) {
             errors.fechaFin = "La fecha/hora de fin debe ser posterior"; 
             errors.horaFin = "a la fecha/hora de inicio"; 
         }
@@ -379,13 +384,10 @@ const handleUpdateSesion = async () => {
       clearTimeout(psicologoSearchTimeout.current)
     }
 
-    if (psicologoSearch.trim().length > 1) {
-      psicologoSearchTimeout.current = setTimeout(() => {
-        searchPsicologos(psicologoSearch, setPsicologoSearchResults); 
-      }, 300)
-    } else {
-        setPsicologoSearchResults([]); 
-    }
+    // Con el campo vacío trae a todos, así la lista aparece apenas se hace clic
+    psicologoSearchTimeout.current = setTimeout(() => {
+      searchPsicologos(psicologoSearch, setPsicologoSearchResults)
+    }, 300)
 
     return () => {
       if (psicologoSearchTimeout.current) {
@@ -400,12 +402,13 @@ const handleUpdateSesion = async () => {
       clearTimeout(pacienteSearchTimeout.current)
     }
 
-    if (pacienteSearch.trim().length > 1) {
+    // Sin texto muestra los pacientes del psicólogo elegido; con texto busca entre todos
+    if (pacienteSearch.trim().length > 1 || formData.psicologoId) {
       pacienteSearchTimeout.current = setTimeout(() => {
-        searchPacientes(pacienteSearch, setPacienteSearchResults); 
+        searchPacientes(pacienteSearch, setPacienteSearchResults, formData.psicologoId)
       }, 300)
     } else {
-        setPacienteSearchResults([]); 
+      setPacienteSearchResults([])
     }
 
     return () => {
@@ -413,7 +416,7 @@ const handleUpdateSesion = async () => {
         clearTimeout(pacienteSearchTimeout.current)
       }
     }
-  }, [pacienteSearch])
+  }, [pacienteSearch, formData.psicologoId])
 
   const editPsicologoSearchTimeout = useRef<NodeJS.Timeout | null>(null);
   const editPacienteSearchTimeout = useRef<NodeJS.Timeout | null>(null);
@@ -422,12 +425,11 @@ const handleUpdateSesion = async () => {
       if (editPsicologoSearchTimeout.current) {
           clearTimeout(editPsicologoSearchTimeout.current);
       }
-      if (editPsicologoSearch.trim().length > 1 && isEditDialogOpen) {
+      // Con el campo vacío trae a todos, así la lista aparece apenas se hace clic
+      if (isEditDialogOpen) {
           editPsicologoSearchTimeout.current = setTimeout(() => {
               searchPsicologos(editPsicologoSearch, setEditPsicologoSearchResults);
           }, 300);
-      } else if (isEditDialogOpen) { // Important: only clear if dialog is open
-          setEditPsicologoSearchResults([]);
       }
       return () => {
           if (editPsicologoSearchTimeout.current) {
@@ -440,9 +442,10 @@ const handleUpdateSesion = async () => {
       if (editPacienteSearchTimeout.current) {
           clearTimeout(editPacienteSearchTimeout.current);
       }
-      if (editPacienteSearch.trim().length > 1 && isEditDialogOpen) {
+      // Sin texto muestra los pacientes del psicólogo elegido; con texto busca entre todos
+      if (isEditDialogOpen && (editPacienteSearch.trim().length > 1 || editFormData.psicologoId)) {
           editPacienteSearchTimeout.current = setTimeout(() => {
-              searchPacientes(editPacienteSearch, setEditPacienteSearchResults);
+              searchPacientes(editPacienteSearch, setEditPacienteSearchResults, editFormData.psicologoId);
           }, 300);
       } else if (isEditDialogOpen) { // Important: only clear if dialog is open
           setEditPacienteSearchResults([]);
@@ -452,7 +455,7 @@ const handleUpdateSesion = async () => {
               clearTimeout(editPacienteSearchTimeout.current);
           }
       };
-  }, [editPacienteSearch, isEditDialogOpen]);
+  }, [editPacienteSearch, isEditDialogOpen, editFormData.psicologoId]);
   
   // Agregar este useEffect después de los otros useEffect existentes
   useEffect(() => {
@@ -528,11 +531,6 @@ const handleUpdateSesion = async () => {
 
   const searchPsicologos = async (query: string, setSearchResults: React.Dispatch<React.SetStateAction<Psicologo[]>>) => {
     try {
-      if (query.trim().length < 2) {
-        setSearchResults([])
-        return
-      }
-
       const response = await fetch(`/api/psicologos/buscar?q=${encodeURIComponent(query)}`)
       if (response.ok) {
         const data = await response.json()
@@ -546,14 +544,20 @@ const handleUpdateSesion = async () => {
     }
   }
 
-  const searchPacientes = async (query: string, setSearchResults: React.Dispatch<React.SetStateAction<Paciente[]>>) => {
+  const searchPacientes = async (
+    query: string,
+    setSearchResults: React.Dispatch<React.SetStateAction<Paciente[]>>,
+    psicologoId?: string,
+  ) => {
     try {
-      if (query.trim().length < 2) {
+      if (query.trim().length < 2 && !psicologoId) {
         setSearchResults([])
         return
       }
 
-      const response = await fetch(`/api/pacientes/buscar?q=${encodeURIComponent(query)}`)
+      const params = new URLSearchParams({ q: query.trim() })
+      if (psicologoId) params.set("psicologoId", psicologoId)
+      const response = await fetch(`/api/pacientes/buscar?${params}`)
       if (response.ok) {
         const data = await response.json()
         setSearchResults(data)
@@ -621,6 +625,8 @@ const handleUpdateSesion = async () => {
     if (!formData.modalidadId) errors.modalidadId = "La modalidad es requerida"
     if (!formData.estadoId) errors.estadoId = "El estado es requerido"
     if (formData.pacientesIds.length === 0) errors.pacientesIds = "Debe seleccionar al menos un paciente"
+    if (formData.fechaInicio && !esFechaHabil(formData.fechaInicio)) errors.fechaInicio = MENSAJE_DIA_NO_HABIL
+    if (formData.fechaFin && !esFechaHabil(formData.fechaFin)) errors.fechaFin = MENSAJE_DIA_NO_HABIL
 
     setFormErrors(errors)
     return Object.keys(errors).length === 0
@@ -660,9 +666,9 @@ const handleUpdateSesion = async () => {
 
         // Reset form
         setFormData({
-          fechaInicio: format(new Date(), "yyyy-MM-dd"),
+          fechaInicio: format(proximoDiaHabil(new Date()), "yyyy-MM-dd"),
           horaInicio: "09:00",
-          fechaFin: format(new Date(), "yyyy-MM-dd"),
+          fechaFin: format(proximoDiaHabil(new Date()), "yyyy-MM-dd"),
           horaFin: "10:00",
           psicologoId: "",
           modalidadId: "",
@@ -711,10 +717,12 @@ const handleUpdateSesion = async () => {
 
   const renderCalendarWithSessions = (filterType: "all" | "psicologo" | "paciente") => {
     return (
-      <div className="flex flex-col lg:flex-row lg:space-x-6 w-full">
+      <div className="flex w-full flex-col gap-4 lg:flex-row lg:gap-6">
         <Calendar
           mode="single"
           selected={selectedDate}
+          // En "Registrar Sesiones" no se pueden elegir sábados ni domingos
+          disabled={filterType === "all" ? { dayOfWeek: DIAS_NO_HABILES } : undefined}
           onSelect={(date) => {
             if (date) {
               setSelectedDate(date)
@@ -722,12 +730,12 @@ const handleUpdateSesion = async () => {
               // as the UI will re-render with the filtered sessions for the selected date
             }
           }}
-          className="rounded-md border"
+          className="self-center rounded-md border lg:self-start"
           style={{ backgroundColor: "#142B2A", borderRadius: "8px", padding: "10px" }}
           locale={es}
         />
 
-        <div className="w-full mt-4 lg:mt-0 space-y-2 max-h-[500px] overflow-y-auto">
+        <div className="w-full min-w-0 space-y-2 max-h-[500px] overflow-y-auto">
           <h4 className="font-semibold text-white">
             Sesiones para {format(selectedDate, "dd/MM/yyyy", { locale: es })}
           </h4>
@@ -833,7 +841,7 @@ const handleUpdateSesion = async () => {
     <div className="min-h-screen">
 
       {/* Main Content */}
-      <main className="mx-auto w-full max-w-6xl px-6 py-10">
+      <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-10">
         <EncabezadoPagina titulo="Gestión de Sesiones" descripcion="Administra las sesiones de terapia del sistema." volverA="/welcome" textoVolver="Volver al inicio" />
 
         {puedeVerSesiones ? (
@@ -845,11 +853,11 @@ const handleUpdateSesion = async () => {
               // This ensures consistency across different views
             }}
           >
-            <TabsList className="mb-2 flex w-full sm:w-fit">
+            <TabsList className="mb-2 flex w-full max-w-full justify-start overflow-x-auto sm:w-fit">
               {puedeRegistrarSesiones && (
                 <TabsTrigger
                   value="registrar"
-                  className="px-6"
+                  className="shrink-0 px-4 sm:px-6"
                 >
                   Registrar Sesiones
                 </TabsTrigger>
@@ -857,7 +865,7 @@ const handleUpdateSesion = async () => {
               {session?.user?.psicologoId && (
               <TabsTrigger
                 value="psicologo"
-                className="px-6"
+                className="shrink-0 px-4 sm:px-6"
               >
                 Mis Sesiones (Psicólogo)
               </TabsTrigger>
@@ -865,7 +873,7 @@ const handleUpdateSesion = async () => {
               {session?.user?.pacienteId && (
               <TabsTrigger
                 value="paciente"
-                className="px-6"
+                className="shrink-0 px-4 sm:px-6"
               >
                 Mis Sesiones (Paciente)
               </TabsTrigger>
@@ -885,10 +893,20 @@ const handleUpdateSesion = async () => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex justify-between items-start space-x-6">
-                      <div className="flex-1">{renderCalendarWithSessions("all")}</div>
-                      <div className="flex-shrink-0">
-                        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+                    <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-6">
+                      <div className="min-w-0 flex-1">{renderCalendarWithSessions("all")}</div>
+                      <div className="order-first lg:order-last lg:flex-shrink-0">
+                        <Dialog
+                          open={isCreateDialogOpen}
+                          onOpenChange={(abierto) => {
+                            if (abierto && esDiaHabil(selectedDate)) {
+                              const dia = format(selectedDate, "yyyy-MM-dd")
+                              setFormData((prev) => ({ ...prev, fechaInicio: dia, fechaFin: dia }))
+                              setFormErrors({})
+                            }
+                            setIsCreateDialogOpen(abierto)
+                          }}
+                        >
                           <DialogTrigger asChild>
                             <Button className="w-full" style={{ backgroundColor: "#F1C77A", color: "#1D3434" }}>
                               <Plus className="w-4 h-4 mr-2" />
@@ -896,7 +914,7 @@ const handleUpdateSesion = async () => {
                             </Button>
                           </DialogTrigger>
                           <DialogContent
-                            className="sm:max-w-[500px]"
+                            className="max-h-[90dvh] overflow-y-auto p-4 sm:max-w-[500px] sm:p-6"
                             style={{ backgroundColor: "#1D3434", border: "1px solid #F1C77A" }}
                           >
                             <DialogHeader>
@@ -906,7 +924,7 @@ const handleUpdateSesion = async () => {
                               </DialogDescription>
                             </DialogHeader>
                             <div className="grid gap-4 py-4">
-                              <div className="grid grid-cols-2 gap-4">
+                              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <div className="space-y-2">
                                   <Label htmlFor="fechaInicio" className="text-white">
                                     Fecha Inicio
@@ -944,7 +962,7 @@ const handleUpdateSesion = async () => {
                                   )}
                                 </div>
                               </div>
-                              <div className="grid grid-cols-2 gap-4">
+                              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <div className="space-y-2">
                                   <Label htmlFor="fechaFin" className="text-white">
                                     Fecha Fin
@@ -991,7 +1009,10 @@ const handleUpdateSesion = async () => {
                                     placeholder="Buscar psicólogo..."
                                     value={psicologoSearch}
                                     onChange={(e) => setPsicologoSearch(e.target.value)}
-                                    onFocus={() => setIsPsicologoPopoverOpen(true)}
+                                    onFocus={() => {
+                                      setIsPsicologoPopoverOpen(true)
+                                      if (formData.psicologoId) searchPsicologos("", setPsicologoSearchResults)
+                                    }}
                                     className={cn(
                                       "bg-[#152A2A] text-white border-gray-600",
                                       formErrors.psicologoId && "border-red-500",
@@ -1008,18 +1029,21 @@ const handleUpdateSesion = async () => {
                                           >
                                             <Check
                                               className={cn(
-                                                "h-4 w-4",
+                                                "h-4 w-4 shrink-0",
                                                 formData.psicologoId === psicologo.id ? "opacity-100" : "opacity-0",
                                               )}
                                             />
-                                            <span>{psicologo.persona.nombreCompleto}</span>
+                                            <div className="flex min-w-0 flex-col">
+                                              <span>{psicologo.persona.nombreCompleto}</span>
+                                              {psicologo.especialidad && (
+                                                <span className="text-xs text-teal-300">{psicologo.especialidad}</span>
+                                              )}
+                                            </div>
                                           </div>
                                         ))
                                       ) : (
                                         <div className="px-3 py-6 text-center text-sm text-gray-400">
-                                          {psicologoSearch.length > 1
-                                            ? "No se encontraron psicólogos"
-                                            : "Escribe para buscar psicólogos"}
+                                          No se encontraron psicólogos
                                         </div>
                                       )}
                                     </div>
@@ -1129,6 +1153,11 @@ const handleUpdateSesion = async () => {
                                     />
                                     {isPacientePopoverOpen && (
                                       <div className="absolute z-50 w-full mt-1 bg-[#1D3434] border border-gray-600 rounded-md shadow-lg max-h-60 overflow-auto">
+                                        {pacienteSearchResults.length > 0 && pacienteSearch.trim().length < 2 && (
+                                          <div className="px-3 pt-2 pb-1 text-xs font-medium uppercase tracking-wide text-gray-400">
+                                            Pacientes de este psicólogo
+                                          </div>
+                                        )}
                                         {pacienteSearchResults.length > 0 ? (
                                           pacienteSearchResults.map((paciente) => (
                                             <div
@@ -1145,13 +1174,18 @@ const handleUpdateSesion = async () => {
                                                 )}
                                               />
                                               <span>{paciente.persona.nombreCompleto}</span>
+                                              {paciente.esDelPsicologo && pacienteSearch.trim().length > 1 && (
+                                                <span className="ml-auto text-xs text-teal-300">Su paciente</span>
+                                              )}
                                             </div>
                                           ))
                                         ) : (
                                           <div className="px-3 py-6 text-center text-sm text-gray-400">
-                                            {pacienteSearch.length > 1
+                                            {pacienteSearch.trim().length > 1
                                               ? "No se encontraron pacientes"
-                                              : "Escribe para buscar pacientes"}
+                                              : formData.psicologoId
+                                                ? "Este psicólogo todavía no tiene pacientes. Escribe para buscar."
+                                                : "Elige un psicólogo para ver sus pacientes, o escribe para buscar"}
                                           </div>
                                         )}
                                       </div>
@@ -1163,17 +1197,18 @@ const handleUpdateSesion = async () => {
                                 )}
                               </div>
                             </div>
-                            <div className="flex justify-end space-x-2">
+                            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
                               <Button
                                 variant="outline"
                                 onClick={() => setIsCreateDialogOpen(false)}
-                                className="border-gray-600 text-gray-300"
+                                className="w-full border-gray-600 text-gray-300 sm:w-auto"
                                 disabled={isSubmitting}
                               >
                                 Cancelar
                               </Button>
                               <Button
                                 onClick={handleCreateSesion}
+                                className="w-full sm:w-auto"
                                 style={{ backgroundColor: "#F1C77A", color: "#1D3434" }}
                                 disabled={isSubmitting}
                               >
@@ -1267,7 +1302,7 @@ const handleUpdateSesion = async () => {
         }
         setIsEditDialogOpen(isOpen);
     }}>
-        <DialogContent className="sm:max-w-[500px]" style={{ backgroundColor: "#1D3434", border: "1px solid #F1C77A" }}>
+        <DialogContent className="max-h-[90dvh] p-4 sm:max-w-[500px] sm:p-6" style={{ backgroundColor: "#1D3434", border: "1px solid #F1C77A" }}>
             <DialogHeader>
                 <DialogTitle className="text-white">Editar Sesión</DialogTitle>
                 <DialogDescription className="text-gray-300">
@@ -1276,7 +1311,7 @@ const handleUpdateSesion = async () => {
             </DialogHeader>
             <div className="grid gap-4 py-4 max-h-[65vh] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
                 {/* Fecha Inicio y Hora Inicio */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div className="space-y-2">
                         <Label htmlFor="edit_fechaInicio" className="text-white">Fecha Inicio</Label>
                         <Input id="edit_fechaInicio" type="date" value={editFormData.fechaInicio} onChange={(e) => setEditFormData({ ...editFormData, fechaInicio: e.target.value })} className={cn("bg-[#152A2A] text-white border-gray-600 w-full", editFormErrors.fechaInicio && "border-red-500")} />
@@ -1289,7 +1324,7 @@ const handleUpdateSesion = async () => {
                     </div>
                 </div>
                 {/* Fecha Fin y Hora Fin */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div className="space-y-2">
                         <Label htmlFor="edit_fechaFin" className="text-white">Fecha Fin</Label>
                         <Input id="edit_fechaFin" type="date" value={editFormData.fechaFin} onChange={(e) => setEditFormData({ ...editFormData, fechaFin: e.target.value })} className={cn("bg-[#152A2A] text-white border-gray-600 w-full", editFormErrors.fechaFin && "border-red-500")} />
@@ -1311,24 +1346,27 @@ const handleUpdateSesion = async () => {
                             type="text" placeholder="Buscar psicólogo..."
                             value={editPsicologoSearch}
                             onChange={(e) => setEditPsicologoSearch(e.target.value)}
-                            onFocus={() => setIsEditPsicologoPopoverOpen(true)}
+                            onFocus={() => {
+                                setIsEditPsicologoPopoverOpen(true);
+                                if (editFormData.psicologoId) searchPsicologos("", setEditPsicologoSearchResults);
+                            }}
                             className={cn("bg-[#152A2A] text-white border-gray-600 w-full", editFormErrors.psicologoId && "border-red-500")}
                         />
-                        {isEditPsicologoPopoverOpen && editPsicologoSearch.trim().length > 1 && (
+                        {isEditPsicologoPopoverOpen && (
                             <div className="absolute z-[60] w-full mt-1 bg-[#1D3434] border border-gray-600 rounded-md shadow-lg max-h-60 overflow-auto">
                                 {editPsicologoSearchResults.length > 0 ? (
                                     editPsicologoSearchResults.map((psicologo) => (
                                         <div key={psicologo.id} className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-[#152A2A] text-white border-b border-gray-700 last:border-b-0" onClick={() => handleSelectEditPsicologo(psicologo)}>
-                                            <Check className={cn("h-4 w-4", editFormData.psicologoId === psicologo.id ? "opacity-100" : "opacity-0")} />
-                                            <span>{psicologo.persona.nombreCompleto}</span>
+                                            <Check className={cn("h-4 w-4 shrink-0", editFormData.psicologoId === psicologo.id ? "opacity-100" : "opacity-0")} />
+                                            <div className="flex min-w-0 flex-col">
+                                                <span>{psicologo.persona.nombreCompleto}</span>
+                                                {psicologo.especialidad && (
+                                                    <span className="text-xs text-teal-300">{psicologo.especialidad}</span>
+                                                )}
+                                            </div>
                                         </div>
                                     ))
                                 ) : ( <div className="px-3 py-6 text-center text-sm text-gray-400">No se encontraron psicólogos.</div> )}
-                            </div>
-                        )}
-                         {isEditPsicologoPopoverOpen && editPsicologoSearch.trim().length <= 1 && (
-                            <div className="absolute z-[60] w-full mt-1 bg-[#1D3434] border border-gray-600 rounded-md shadow-lg max-h-60 overflow-auto">
-                                <div className="px-3 py-6 text-center text-sm text-gray-400">Escribe al menos 2 caracteres para buscar.</div>
                             </div>
                         )}
                     </div>
@@ -1388,21 +1426,32 @@ const handleUpdateSesion = async () => {
                                 onFocus={() => setIsEditPacientePopoverOpen(true)}
                                 className="bg-transparent border-0 text-white placeholder:text-gray-400 focus:ring-0 focus:outline-none p-0 w-full"
                             />
-                            {isEditPacientePopoverOpen && editPacienteSearch.trim().length > 1 && (
+                            {isEditPacientePopoverOpen && (
                                 <div className="absolute z-[60] w-full mt-1 bg-[#1D3434] border border-gray-600 rounded-md shadow-lg max-h-60 overflow-auto">
+                                    {editPacienteSearchResults.length > 0 && editPacienteSearch.trim().length < 2 && (
+                                        <div className="px-3 pt-2 pb-1 text-xs font-medium uppercase tracking-wide text-gray-400">
+                                            Pacientes de este psicólogo
+                                        </div>
+                                    )}
                                     {editPacienteSearchResults.length > 0 ? (
                                         editPacienteSearchResults.map((paciente) => (
                                             <div key={paciente.id} className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-[#152A2A] text-white border-b border-gray-700 last:border-b-0" onClick={() => handleSelectEditPaciente(paciente)}>
                                                 <Check className={cn("h-4 w-4", editSelectedPacientes.some(p => p.id === paciente.id) ? "opacity-100" : "opacity-0")} />
                                                 <span>{paciente.persona.nombreCompleto}</span>
+                                                {paciente.esDelPsicologo && editPacienteSearch.trim().length > 1 && (
+                                                    <span className="ml-auto text-xs text-teal-300">Su paciente</span>
+                                                )}
                                             </div>
                                         ))
-                                    ) : ( <div className="px-3 py-6 text-center text-sm text-gray-400">No se encontraron pacientes.</div> )}
-                                </div>
-                            )}
-                            {isEditPacientePopoverOpen && editPacienteSearch.trim().length <= 1 && (
-                                <div className="absolute z-[60] w-full mt-1 bg-[#1D3434] border border-gray-600 rounded-md shadow-lg max-h-60 overflow-auto">
-                                    <div className="px-3 py-6 text-center text-sm text-gray-400">Escribe al menos 2 caracteres para buscar.</div>
+                                    ) : (
+                                        <div className="px-3 py-6 text-center text-sm text-gray-400">
+                                            {editPacienteSearch.trim().length > 1
+                                                ? "No se encontraron pacientes."
+                                                : editFormData.psicologoId
+                                                    ? "Este psicólogo todavía no tiene pacientes. Escribe para buscar."
+                                                    : "Elige un psicólogo para ver sus pacientes, o escribe para buscar"}
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </div>
@@ -1411,10 +1460,11 @@ const handleUpdateSesion = async () => {
                 </div>
                 {editFormErrors.general && <p className="text-sm text-red-500 py-2 text-center">{editFormErrors.general}</p>}
             </div>
-            <div className="flex justify-end space-x-2 pt-4 mt-auto border-t border-gray-700"> 
-                <Button variant="outline" onClick={() => setIsEditDialogOpen(false)} className="border-gray-600 text-gray-300 hover:bg-[#2A4242]" disabled={isEditSubmitting}>Cancelar</Button>
-                <Button 
-                    onClick={handleUpdateSesion} 
+            <div className="flex flex-col-reverse gap-2 pt-4 mt-auto border-t border-gray-700 sm:flex-row sm:justify-end">
+                <Button variant="outline" onClick={() => setIsEditDialogOpen(false)} className="w-full border-gray-600 text-gray-300 hover:bg-[#2A4242] sm:w-auto" disabled={isEditSubmitting}>Cancelar</Button>
+                <Button
+                    onClick={handleUpdateSesion}
+                    className="w-full sm:w-auto" 
                     style={{ backgroundColor: "#F1C77A", color: "#1D3434" }} 
                     disabled={isEditSubmitting || editingSesion?.estado?.nombre === "Finalizada" || editingSesion?.estado?.nombre === "Cancelada"}
                     title={editingSesion?.estado?.nombre === "Finalizada" || editingSesion?.estado?.nombre === "Cancelada" ? "No se puede guardar una sesión finalizada o cancelada" : ""}

@@ -19,15 +19,20 @@ export async function GET(request: NextRequest) {
     const dataSource = await initializeDatabase()
     const psicologoRepository = dataSource.getRepository(PsicologoEntity)
 
+    // Sin texto devuelve todos (para mostrar la lista al hacer clic); con texto busca por nombre, apellido o especialidad
     const psicologos = await psicologoRepository.find({
       relations: ["persona"],
-      where: [{ persona: { nombre: Like(`%${query}%`) } }, { persona: { apellido: Like(`%${query}%`) } }],
+      where: [
+        { persona: { nombre: Like(`%${query}%`) } },
+        { persona: { apellido: Like(`%${query}%`) } },
+        { especialidad: Like(`%${query}%`) },
+      ],
       order: {
         persona: {
           apellido: "ASC",
         },
       },
-      take: 10, // Limitar resultados
+      take: 50,
     })
 
     const psicologosTransformados = psicologos.map((psicologo) => ({

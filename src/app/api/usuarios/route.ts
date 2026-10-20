@@ -124,6 +124,18 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Todo usuario nuevo es psicólogo o paciente, nunca ambos ni ninguno
+    if (Boolean(roles?.isPsicologo) === Boolean(roles?.isPaciente)) {
+      await queryRunner.rollbackTransaction();
+      return NextResponse.json(
+        {
+          message: "Debe seleccionar un rol",
+          errors: { roleSelection: "Debe seleccionar si el usuario es Psicólogo o Paciente." },
+        },
+        { status: 400 },
+      )
+    }
+
     // Obtener repositorios
     const personaRepo = queryRunner.manager.getRepository(PersonaEntity)
     const usuarioRepo = queryRunner.manager.getRepository(UsuarioEntity)
