@@ -30,7 +30,8 @@ import {
   Eye,
   User,
   Loader2,
-} from "lucide-react"
+} from "lucide-react"
+import { avisoExito, avisoError, confirmar } from "@/lib/avisos";
 
 interface ModuloConfig {
   id: string
@@ -211,7 +212,7 @@ export default function ListarPerfilesPage() {
 
   const handleDelete = async (perfilId: string, perfilNombre: string) => {
     if (
-      !confirm(`¿Estás seguro de que quieres eliminar el perfil "${perfilNombre}"? Esta acción no se puede deshacer.`)
+      !await confirmar(`¿Estás seguro de que quieres eliminar el perfil "${perfilNombre}"? Esta acción no se puede deshacer.`)
     )
       return
 
@@ -226,9 +227,9 @@ export default function ListarPerfilesPage() {
       }
 
       setPerfiles((prevPerfiles) => prevPerfiles.filter((p) => p.id !== perfilId))
-      alert(`Perfil "${perfilNombre}" eliminado correctamente.`)
+      avisoExito(`Perfil "${perfilNombre}" eliminado correctamente.`)
     } catch (err: any) {
-      alert(err.message || "No se pudo eliminar el perfil.")
+      avisoError(err.message || "No se pudo eliminar el perfil.")
     }
   }
 

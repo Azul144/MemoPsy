@@ -23,7 +23,21 @@ export default function RootLayout({
         {/* Envuelve todo con el Provider de NextAuth */}
         <NextAuthProvider>
           {children}
-          <Toaster position="top-center" toastOptions={{ duration: 5000 }} />
+          <Toaster
+            position="top-center"
+            toastOptions={{
+              duration: 4000,
+              style: {
+                background: "#1D3434",
+                color: "#F6EFE2",
+                border: "1px solid rgba(255,255,255,0.12)",
+                borderRadius: "1rem",
+                padding: "12px 16px",
+              },
+              success: { iconTheme: { primary: "#6EE7B7", secondary: "#1D3434" } },
+              error: { iconTheme: { primary: "#F87171", secondary: "#1D3434" } },
+            }}
+          />
         </NextAuthProvider>
       </body>
     </html>

@@ -29,7 +29,8 @@ import {
   Search,
   AlertCircle,
   PlusCircle,
-} from "lucide-react"
+} from "lucide-react"
+import { avisoExito, avisoError, confirmar } from "@/lib/avisos";
 
 interface ModuloConfig {
   id: string
@@ -216,7 +217,7 @@ export default function ListarUsuariosPage() {
   }
 
   const handleToggleStatus = async (userId: string, currentStatus: boolean) => {
-    if (!confirm(`¿Estás seguro de que quieres ${currentStatus ? "desactivar" : "activar"} este usuario?`)) return
+    if (!await confirmar(`¿Estás seguro de que quieres ${currentStatus ? "desactivar" : "activar"} este usuario?`)) return
 
     try {
       const response = await fetch(`/api/usuarios/${userId}/estado`, {
@@ -233,9 +234,9 @@ export default function ListarUsuariosPage() {
       // Update local state to reflect change immediately
       setUsuarios((prevUsers) => prevUsers.map((u) => (u.id === userId ? { ...u, activo: !currentStatus } : u)))
 
-      alert(`Usuario ${!currentStatus ? "activado" : "desactivado"} correctamente.`)
+      avisoExito(`Usuario ${!currentStatus ? "activado" : "desactivado"} correctamente.`)
     } catch (err: any) {
-      alert(err.message || "No se pudo cambiar el estado del usuario.")
+      avisoError(err.message || "No se pudo cambiar el estado del usuario.")
     }
   }
 

@@ -26,7 +26,8 @@ import {
   Activity,
   AlertCircle,
 } from "lucide-react"
-import { ObraSocial } from "@/models/obra-social.model"
+import { ObraSocial } from "@/models/obra-social.model"
+import { avisoExito } from "@/lib/avisos";
 
 // Interfaces
 interface Perfil {
@@ -455,7 +456,7 @@ export default function EditarUsuarioPage() {
         throw new Error(errorData.message || "Error al actualizar el usuario.")
       }
 
-      alert("Usuario actualizado exitosamente!")
+      avisoExito("Usuario actualizado correctamente.")
       router.push("/usuarios/listar")
     } catch (err: any) {
       console.error("Error during user update:", err)

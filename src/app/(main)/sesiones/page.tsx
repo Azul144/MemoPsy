@@ -45,6 +45,7 @@ import { format, parseISO, isSameDay } from "date-fns"
 import { es } from "date-fns/locale"
 import { cn } from "@/lib/utils"
 import EncabezadoPagina from "@/components/sistema/EncabezadoPagina";
+import { avisoExito, avisoError } from "@/lib/avisos";
 
 interface Sesion {
   id: string
@@ -311,7 +312,7 @@ const handleUpdateSesion = async () => {
             setIsEditDialogOpen(false);
             await loadInitialData(); 
             setEditingSesion(null); 
-            alert("Sesión actualizada exitosamente."); 
+            avisoExito("Sesión actualizada correctamente.");
         } else {
             const errorData = await response.json();
             const newErrors: Record<string, string> = {};
@@ -337,12 +338,12 @@ const handleUpdateSesion = async () => {
                 newErrors.general = "Ocurrió un error desconocido.";
             }
             setEditFormErrors(newErrors);
-            alert(alertMessage);
+            avisoError(alertMessage);
         }
     } catch (error) {
         console.error("Error updating session:", error);
         setEditFormErrors({ general: "Error de conexión o del cliente." });
-        alert("Error al actualizar la sesión. Verifique su conexión e intente nuevamente.");
+        avisoError("Error al actualizar la sesión. Verifique su conexión e intente nuevamente.");
     } finally {
         setIsEditSubmitting(false);
     }
@@ -489,7 +490,7 @@ const handleUpdateSesion = async () => {
         // Si hay sesiones para hoy, mantener la fecha actual seleccionada
         // Si no, buscar la primera sesión disponible y seleccionar esa fecha
         const today = new Date()
-        const sesionesHoy = sesionesData.filter((sesion) => isSameDay(parseISO(sesion.fechaHoraInicio), today))
+        const sesionesHoy = sesionesData.filter((sesion: { fechaHoraInicio: string }) => isSameDay(parseISO(sesion.fechaHoraInicio), today))
 
         if (sesionesHoy.length === 0 && sesionesData.length > 0) {
           // Ordenar sesiones por fecha
@@ -676,12 +677,12 @@ const handleUpdateSesion = async () => {
         if (errorData.details) {
           setFormErrors(errorData.details)
         } else {
-          alert("Error al crear la sesión: " + errorData.error)
+          avisoError("Error al crear la sesión: " + errorData.error)
         }
       }
     } catch (error) {
       console.error("Error creating session:", error)
-      alert("Error al crear la sesión. Por favor, intente nuevamente.")
+      avisoError("Error al crear la sesión. Por favor, intente nuevamente.")
     } finally {
       setIsSubmitting(false)
     }

@@ -18,7 +18,8 @@ import { Switch } from "@/components/ui/switch"
 import { Usuario } from "@/models/usuario.model"
 import { Persona } from "@/models/persona.model"
 import { Psicologo } from "@/models/psicologo.model"
-import { ObraSocial } from "@/models/obra-social.model"
+import { ObraSocial } from "@/models/obra-social.model"
+import { avisoExito } from "@/lib/avisos";
 
 interface ModuloConfig {
   id: string
@@ -352,9 +353,7 @@ export default function RegistrarUsuarioPage() {
       if (isPsicologo) rolesText.push("Psicólogo")
       if (isPaciente) rolesText.push("Paciente")
 
-      alert(
-        `Usuario registrado exitosamente en la base de datos como: ${rolesText.join(" y ")}\n\nID de usuario: ${result.data.usuario.id}\nEmail: ${result.data.usuario.email}`,
-      )
+      avisoExito(`Usuario registrado correctamente como ${rolesText.join(" y ")}.`)
 
       resetForm()
       router.push("/usuarios")
