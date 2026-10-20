@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation';
 import Image from "next/image";
 import FondoAnimado from "@/components/FondoAnimado";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Users, Calendar, FileText, LogOut, Shield, HomeIcon, KeyRound, Loader2, ArrowRight, ShieldCheck, ShieldAlert } from 'lucide-react';
+import { Menu, X, LogOut, HomeIcon, KeyRound, Loader2, ArrowRight, ShieldCheck, ShieldAlert } from "lucide-react"
 import MfaSetupModal from "@/components/mfa-setup-modal"; // Import the MFA setup modal
 import MfaDesactivarModal from "@/components/mfa-desactivar-modal";
 import toast from "react-hot-toast";

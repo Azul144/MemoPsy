@@ -18,10 +18,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { TypographyH1, TypographyP, TypographySmall } from '@/components/ui/typography';
-import { 
-    FilePlus, Users, Search, X, Check, Loader2, AlertCircle, 
-    Menu, LogOut, HomeIcon, Shield, CalendarIcon, FileText as MainModuleIcon // Renamed to avoid conflict
-} from 'lucide-react';
+import { FilePlus, Search, X, Check, Loader2, AlertCircle } from "lucide-react"
 import { cn } from "@/lib/utils";
 
 // Interfaces

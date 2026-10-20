@@ -24,26 +24,7 @@ import { Calendar } from "@/components/ui/calendar"
 import { DIAS_NO_HABILES, MENSAJE_DIA_NO_HABIL, esDiaHabil, esFechaHabil, proximoDiaHabil } from "@/lib/validaciones/dias-habiles"
 import { Badge } from "@/components/ui/badge"
 import { TypographyP } from '@/components/ui/typography';
-import {
-  Menu,
-  Loader2,
-  X,
-  CalendarIcon,
-  Plus,
-  Users,
-  User,
-  Brain,
-  HomeIcon,
-  Shield,
-  LogOut,
-  Clock,
-  MapPin,
-  Activity,
-  Check,
-    FileText, // Existing
-    Pencil, // Add this
-    Wallet,
-} from "lucide-react"
+import { Loader2, X, CalendarIcon, Plus, Users, User, Brain, Clock, MapPin, Activity, Check, Pencil, Wallet } from "lucide-react"
 import { format, parseISO, isSameDay } from "date-fns"
 import { es } from "date-fns/locale"
 import { cn } from "@/lib/utils"

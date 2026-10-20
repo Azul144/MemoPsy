@@ -13,25 +13,7 @@ import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@
 import { Badge } from "@/components/ui/badge"
 import { TypographyP } from '@/components/ui/typography';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
-import {
-  Menu,
-  X,
-  Users,
-  Calendar,
-  FileText,
-  LogOut,
-  HomeIcon,
-  Shield,
-  Edit3,
-  Trash2,
-  MoreVertical,
-  Search,
-  AlertCircle,
-  PlusCircle,
-  Eye,
-  User,
-  Loader2,
-} from "lucide-react"
+import { Users, Shield, Edit3, Trash2, MoreVertical, Search, AlertCircle, PlusCircle, Eye, Loader2 } from "lucide-react"
 import { avisoExito, avisoError, confirmar } from "@/lib/avisos";
 
 

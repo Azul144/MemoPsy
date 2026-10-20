@@ -11,20 +11,7 @@ import { useRouter } from 'next/navigation';
 import MemopsyLogo from '@/app/components/MemopsyLogo';
 import { Button } from '@/components/ui/button';
 import { TypographyH1, TypographyP } from '@/components/ui/typography';
-import { 
-    FileText, // Main icon for "Informes" in MODULOS_DISPONIBLES
-    PlusSquare, // Icon for "Registrar Nuevo Informe"
-    ListChecks, // Icon for "Ver Lista de Informes"
-    Loader2, 
-    Menu, 
-    X, 
-    LogOut, 
-    HomeIcon, 
-    Users,    // For MODULOS_DISPONIBLES
-    Shield,   // For MODULOS_DISPONIBLES & "No actions" message icon
-    CalendarIcon, // For MODULOS_DISPONIBLES
-    ChevronRight
-} from 'lucide-react';
+import { FileText, PlusSquare, ListChecks, Loader2 } from "lucide-react"
 
 // Interfaces (identical to perfiles/page.tsx)
 

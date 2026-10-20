@@ -10,7 +10,7 @@ import { useRouter } from 'next/navigation';
 import MemopsyLogo from "@/app/components/MemopsyLogo";
 import { Button } from "@/components/ui/button";
 import { TypographyP } from '@/components/ui/typography';
-import { Menu, Loader2, X, Users, UserPlus, List, Edit3, Shield, LogOut, FileText, Calendar, HomeIcon } from 'lucide-react'; // Added ShieldPlus, Settings2
+import { Loader2, UserPlus, List, Edit3, Shield } from "lucide-react" // Added ShieldPlus, Settings2
 
 interface SubModuloConfig {
   id: string;

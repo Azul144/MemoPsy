@@ -16,10 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { TypographyH1, TypographyH2, TypographyP, TypographySmall } from '@/components/ui/typography';
-import { 
-    ListChecks, Brain, Search, Filter, Edit, Eye, FileText as MainModuleIcon, Users, User, Loader2, AlertTriangle, XCircle,
-    Menu, X, LogOut, HomeIcon, Shield, CalendarIcon, Lock, Unlock, PlusCircle, UserCheck, Stethoscope
-} from 'lucide-react';
+import { Brain, Search, Filter, Edit, Eye, FileText as MainModuleIcon, User, Loader2, AlertTriangle, XCircle, Lock, Unlock, PlusCircle, UserCheck } from "lucide-react"
 import { cn } from "@/lib/utils";
 
 // Interfaces

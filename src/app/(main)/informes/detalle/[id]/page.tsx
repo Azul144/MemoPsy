@@ -13,12 +13,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { TypographyH1, TypographyH2, TypographyP, TypographySmall, TypographyMuted } from '@/components/ui/typography';
-import { 
-    FileText as MainModuleIcon, // For navbar
-    FileText as PageIcon, // For page content icon
-    User, Users, CalendarDays, Lock, Unlock, ArrowLeft, Loader2, AlertTriangle, Edit,
-    Menu, X, LogOut, HomeIcon, Shield, CalendarIcon 
-} from 'lucide-react';
+import { FileText as PageIcon, User, Users, CalendarDays, Lock, Unlock, Loader2, AlertTriangle, Edit } from "lucide-react"
 
 // Interfaces
 interface PsicologoDetalle {

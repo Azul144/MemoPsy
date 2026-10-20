@@ -9,7 +9,7 @@ import TarjetaAccion from "@/components/sistema/TarjetaAccion";
 import { useRouter } from 'next/navigation';
 import MemopsyLogo from "@/app/components/MemopsyLogo";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Users, UserPlus, List, Edit3, UserCog, Calendar, FileText, HomeIcon, Shield, LogOut } from 'lucide-react';
+import { Users, UserPlus, List, Edit3, UserCog } from "lucide-react"
 
 interface SubModuloConfig {
   id: string;

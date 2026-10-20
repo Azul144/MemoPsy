@@ -14,20 +14,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import {
-  Menu,
-  X,
-  Users,
-  Calendar,
-  FileText,
-  LogOut,
-  HomeIcon,
-  Shield,
-  ShieldPlus,
-  AlertCircle,
-  KeyRound,
-  CheckCircle,
-} from "lucide-react"
+import { ShieldPlus, AlertCircle, KeyRound, CheckCircle } from "lucide-react"
 
 
 
