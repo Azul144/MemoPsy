@@ -3,6 +3,8 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { esDiaHabilEnConsultorio, MENSAJE_DIA_NO_HABIL } from "@/lib/validaciones/dias-habiles"
 import { alcanceSesiones, puedeVerSesion } from "@/lib/auth/alcance-sesiones"
+import { buscarSesionSuperpuesta, mensajeSuperposicion, MENSAJE_FIN_ANTES_DE_INICIO } from "@/lib/validaciones/superposicion-sesiones"
+import { datosPago, puedeVerPagos } from "@/lib/sesiones/pagos"
 import { getServerSession } from "next-auth/next"
 import { authConfig } from "@/lib/auth/auth-config"
 import { initializeDatabase } from "@/lib/database"
@@ -28,9 +30,12 @@ export async function GET(request: NextRequest) {
     const sesionRepository = dataSource.getRepository(SesionEntity)
     const pacienteTieneSesionRepository = dataSource.getRepository(PacienteTieneSesionEntity)
 
+    // RF 3.5 - Pago y obra social solo para quien tiene permiso
+    const verPagos = puedeVerPagos(session.user)
+
     // Obtener todas las sesiones
     const sesiones = await sesionRepository.find({
-      relations: ["psicologo", "psicologo.persona", "modalidad", "estado"],
+      relations: ["psicologo", "psicologo.persona", "modalidad", "estado", "medioDePago"],
       order: {
         fechaHoraInicio: "ASC",
       },
@@ -69,6 +74,11 @@ export async function GET(request: NextRequest) {
                   nombre: ptsEntity.paciente.persona?.nombre || 'N/A',
                   apellido: ptsEntity.paciente.persona?.apellido || 'N/A',
                 },
+                ...(verPagos && {
+                  obraSocial: ptsEntity.paciente.obraSocial
+                    ? { id: ptsEntity.paciente.obraSocial.id, nombre: ptsEntity.paciente.obraSocial.nombre }
+                    : null,
+                }),
               }
             } catch (error) {
               console.error("Error transformando paciente:", error, ptsEntity)
@@ -103,6 +113,7 @@ export async function GET(request: NextRequest) {
               }
             : null,
           pacientes: pacientesAsociados,
+          ...(verPagos && { pago: datosPago(sesionEntity) }),
         }
       }),
     )
@@ -169,9 +180,25 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    const inicio = new Date(fechaHoraInicio)
+    const fin = new Date(fechaHoraFin)
+    if (!(fin > inicio)) {
+      return NextResponse.json(
+        { error: MENSAJE_FIN_ANTES_DE_INICIO, details: { horaFin: MENSAJE_FIN_ANTES_DE_INICIO } },
+        { status: 400 },
+      )
+    }
+
     const dataSource = await initializeDatabase()
     const sesionRepository = dataSource.getRepository(SesionEntity)
     const pacienteTieneSesionRepository = dataSource.getRepository(PacienteTieneSesionEntity)
+
+    // RF 3.1 - El psicólogo no puede tener otro turno en ese horario
+    const superpuesta = await buscarSesionSuperpuesta(dataSource, psicologoId, inicio, fin)
+    if (superpuesta) {
+      const mensaje = mensajeSuperposicion(superpuesta)
+      return NextResponse.json({ error: mensaje, details: { horaInicio: mensaje } }, { status: 409 })
+    }
 
     // Crear la sesión con valores explícitos (no DEFAULT)
     const nuevaSesion = sesionRepository.create({

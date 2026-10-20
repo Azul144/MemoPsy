@@ -7,6 +7,10 @@ import { initializeDatabase } from "@/lib/database";
 import { SesionEntity, PacienteTieneSesionEntity, PsicologoEntity, ModalidadEntity, EstadoEntity } from "@/entities";
 import { ZodError, z } from "zod";
 import { esDiaHabilEnConsultorio, MENSAJE_DIA_NO_HABIL } from "@/lib/validaciones/dias-habiles";
+import { buscarSesionSuperpuesta, mensajeSuperposicion, MENSAJE_FIN_ANTES_DE_INICIO } from "@/lib/validaciones/superposicion-sesiones";
+
+// Se lanza dentro de la transacción para cortarla cuando el horario está ocupado
+class ErrorSuperposicion extends Error {}
 
 // Zod schema for validation
 const updateSesionSchema = z.object({
@@ -143,6 +147,12 @@ export async function PUT(request: NextRequest, { params: paramsPromise }: { par
     if (erroresDia.length > 0) {
       return NextResponse.json({ error: MENSAJE_DIA_NO_HABIL, details: erroresDia }, { status: 400 });
     }
+    if (!(new Date(fechaHoraFin) > new Date(fechaHoraInicio))) {
+      return NextResponse.json(
+        { error: MENSAJE_FIN_ANTES_DE_INICIO, details: [{ path: ["horaFin"], message: MENSAJE_FIN_ANTES_DE_INICIO }] },
+        { status: 400 },
+      );
+    }
 
     const dataSource = await initializeDatabase();
     const sesionRepository = dataSource.getRepository(SesionEntity);
@@ -178,6 +188,14 @@ export async function PUT(request: NextRequest, { params: paramsPromise }: { par
         if (sesionEntity.estado?.nombre === "Finalizada" || sesionEntity.estado?.nombre === "Cancelada") {
             // This throw will be caught by the outer try-catch and result in a 403
             throw new Error("Sesión no modificable_TRANSACTIONAL");
+        }
+
+        // RF 3.1 - El psicólogo no puede tener otro turno en ese horario (sin contar esta misma sesión)
+        const superpuesta = await buscarSesionSuperpuesta(
+            transactionalEntityManager, psicologoId, new Date(fechaHoraInicio), new Date(fechaHoraFin), id,
+        );
+        if (superpuesta) {
+            throw new ErrorSuperposicion(mensajeSuperposicion(superpuesta));
         }
 
         // Update session fields
@@ -280,6 +298,12 @@ export async function PUT(request: NextRequest, { params: paramsPromise }: { par
     }
     if (error.message === "Sesión no modificable_TRANSACTIONAL") {
         return NextResponse.json({ error: "La sesión está Finalizada o Cancelada y no puede ser modificada." }, { status: 403 });
+    }
+    if (error instanceof ErrorSuperposicion) {
+        return NextResponse.json(
+            { error: error.message, details: [{ path: ["horaInicio"], message: error.message }] },
+            { status: 409 },
+        );
     }
     return NextResponse.json({ error: "Error interno del servidor", details: error.message }, { status: 500 });
   }

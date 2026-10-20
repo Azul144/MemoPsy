@@ -41,12 +41,14 @@ import {
   Check,
     FileText, // Existing
     Pencil, // Add this
+    Wallet,
 } from "lucide-react"
 import { format, parseISO, isSameDay } from "date-fns"
 import { es } from "date-fns/locale"
 import { cn } from "@/lib/utils"
 import EncabezadoPagina from "@/components/sistema/EncabezadoPagina";
 import { avisoExito, avisoError } from "@/lib/avisos";
+import DialogoPago, { type PagoSesion, type MedioDePago } from "@/components/sesiones/DialogoPago";
 
 interface Sesion {
   id: string
@@ -73,7 +75,11 @@ interface Sesion {
       nombre: string
       apellido: string
     }
+    // Solo llega a quien tiene el permiso "Registrar Pago"
+    obraSocial?: { id: string; nombre: string } | null
   }>
+  // RF 3.5 - Solo llega a quien tiene el permiso "Registrar Pago"
+  pago?: PagoSesion
 }
 
 interface Psicologo {
@@ -204,6 +210,10 @@ export default function SesionesPage() {
   const [editFormErrors, setEditFormErrors] = useState<Record<string, string>>({});
   const [isEditSubmitting, setIsEditSubmitting] = useState(false);
 
+  // RF 3.5 - Pago de sesiones
+  const [mediosDePago, setMediosDePago] = useState<MedioDePago[]>([])
+  const [sesionPago, setSesionPago] = useState<Sesion | null>(null)
+
   // Refs para debounce
   const psicologoSearchTimeout = useRef<NodeJS.Timeout | null>(null)
   const pacienteSearchTimeout = useRef<NodeJS.Timeout | null>(null)
@@ -321,7 +331,8 @@ const handleUpdateSesion = async () => {
         } else {
             const errorData = await response.json();
             const newErrors: Record<string, string> = {};
-            let alertMessage = "Error al actualizar la sesión.";
+            // Horario ocupado (RF 3.1): se muestra el motivo concreto
+            let alertMessage = response.status === 409 && errorData.error ? errorData.error : "Error al actualizar la sesión.";
 
             if (errorData.details && Array.isArray(errorData.details)) {
                 const generalErrorMessages: string[] = [];
@@ -511,7 +522,15 @@ const handleUpdateSesion = async () => {
       }
 
       // Cargar datos para formularios
-      const [modalidadesRes, estadosRes] = await Promise.all([fetch("/api/modalidades"), fetch("/api/estados")])
+      const [modalidadesRes, estadosRes, mediosRes] = await Promise.all([
+        fetch("/api/modalidades"),
+        fetch("/api/estados"),
+        fetch("/api/medios-de-pago"),
+      ])
+
+      if (mediosRes.ok) {
+        setMediosDePago(await mediosRes.json())
+      }
 
       if (modalidadesRes.ok) {
         const modalidadesData = await modalidadesRes.json()
@@ -682,6 +701,8 @@ const handleUpdateSesion = async () => {
         const errorData = await response.json()
         if (errorData.details) {
           setFormErrors(errorData.details)
+          // Horario ocupado (RF 3.1): además del error en el campo, se avisa arriba
+          if (response.status === 409) avisoError(errorData.error)
         } else {
           avisoError("Error al crear la sesión: " + errorData.error)
         }
@@ -779,7 +800,42 @@ const handleUpdateSesion = async () => {
                                 </span>
                             </div>
                         )}
+                        {sesion.pago && (
+                            <div className="flex flex-wrap items-center gap-2">
+                                <Wallet className="w-4 h-4 text-amber-300" />
+                                <Badge
+                                    variant="outline"
+                                    className={cn(
+                                        "text-xs",
+                                        sesion.pago.estado === "Pagado"
+                                            ? "border-emerald-500 text-emerald-300"
+                                            : "border-amber-400 text-amber-300",
+                                    )}
+                                >
+                                    {sesion.pago.estado}
+                                </Badge>
+                                {sesion.pago.estado === "Pagado" && (
+                                    <span className="text-xs text-gray-300">
+                                        {sesion.pago.medio?.descripcion}
+                                        {sesion.pago.monto != null &&
+                                            ` · $ ${sesion.pago.monto.toLocaleString("es-AR", { minimumFractionDigits: 2 })}`}
+                                    </span>
+                                )}
+                            </div>
+                        )}
                     </div>
+                    <div className="ml-2 flex flex-shrink-0 flex-col items-end gap-1">
+                    {sesion.pago && sesion.estado?.nombre !== "Cancelada" && (
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setSesionPago(sesion)}
+                            title="Registrar pago"
+                            className="text-white hover:text-amber-300 p-1"
+                        >
+                            <Wallet className="w-4 h-4" />
+                        </Button>
+                    )}
                     {permisos.includes("Editar Sesión") && (
                         <Button
                             variant="ghost"
@@ -791,11 +847,12 @@ const handleUpdateSesion = async () => {
                                     ? "No se puede editar una sesión finalizada o cancelada"
                                     : "Editar Sesión"
                             }
-                            className="text-white hover:text-yellow-400 disabled:text-gray-500 disabled:cursor-not-allowed p-1 flex-shrink-0 ml-2"
+                            className="text-white hover:text-yellow-400 disabled:text-gray-500 disabled:cursor-not-allowed p-1"
                         >
                             <Pencil className="w-4 h-4" />
                         </Button>
                     )}
+                    </div>
                 </div>
               </Card>
             ))}
@@ -1474,6 +1531,16 @@ const handleUpdateSesion = async () => {
             </div>
         </DialogContent>
     </Dialog>
+
+    {/* RF 3.5 - Pago de la sesión */}
+    <DialogoPago
+      sesion={sesionPago}
+      mediosDePago={mediosDePago}
+      onClose={() => setSesionPago(null)}
+      onGuardado={(sesionId, pago) =>
+        setSesiones((prev) => prev.map((s) => (s.id === sesionId ? { ...s, pago } : s)))
+      }
+    />
 
     </div>
   )

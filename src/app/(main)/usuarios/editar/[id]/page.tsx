@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, type ChangeEvent, type FormEvent } from "react"
-import { useSession, signOut } from "next-auth/react"
+import { useSession, signOut } from "next-auth/react"
 import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
 import EncabezadoPagina from "@/components/sistema/EncabezadoPagina";
 import { useRouter, useParams } from "next/navigation"
@@ -26,7 +26,8 @@ import {
   Activity,
   AlertCircle,
 } from "lucide-react"
-import { ObraSocial } from "@/models/obra-social.model"
+import { ObraSocial } from "@/models/obra-social.model"
+import { ESPECIALIDADES_PSICOLOGIA } from "@/lib/especialidades"
 import { avisoExito } from "@/lib/avisos";
 
 // Interfaces
@@ -345,6 +346,13 @@ export default function EditarUsuarioPage() {
 
   const handleSwitchChange = (checked: boolean) => {
     setFormData((prev) => ({ ...prev, activo: checked }))
+  }
+
+  const handleEspecialidadChange = (value: string) => {
+    setFormData((prev) => ({ ...prev, especialidad: value }))
+    if (fieldErrors.especialidad) {
+      setFieldErrors((prev) => ({ ...prev, especialidad: undefined }))
+    }
   }
 
   const handleObraSocialSelectChange = (value: string) => {
@@ -682,13 +690,33 @@ export default function EditarUsuarioPage() {
                       <Label htmlFor="especialidad" className="text-gray-200">
                         Especialidad
                       </Label>
-                      <Input
-                        id="especialidad"
+                      <Select
                         name="especialidad"
                         value={formData.especialidad}
-                        onChange={handleChange}
-                        className="bg-[#2A4242] mt-1"
-                      />
+                        onValueChange={handleEspecialidadChange}
+                      >
+                        <SelectTrigger id="especialidad" className="bg-[#2A4242] border-gray-600 text-gray-200 mt-1">
+                          <SelectValue placeholder="Seleccione una especialidad" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-[#152B2B] border-gray-600">
+                          {/* Si el psicólogo tiene cargada una especialidad que no está en la lista, se conserva */}
+                          {[
+                            ...(formData.especialidad &&
+                            !(ESPECIALIDADES_PSICOLOGIA as readonly string[]).includes(formData.especialidad)
+                              ? [formData.especialidad]
+                              : []),
+                            ...ESPECIALIDADES_PSICOLOGIA,
+                          ].map((esp) => (
+                            <SelectItem
+                              key={esp}
+                              value={esp}
+                              className="text-gray-200 cursor-pointer hover:!bg-teal-700/60 hover:!text-amber-200 focus:!bg-teal-700/60 focus:!text-amber-200 data-[state=checked]:!text-amber-300"
+                            >
+                              {esp}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       {fieldErrors.especialidad && (
                         <p className="text-red-500 text-xs mt-1">{fieldErrors.especialidad}</p>
                       )}
@@ -722,14 +750,21 @@ export default function EditarUsuarioPage() {
                               <SelectItem
                                 key={obra.id}
                                 value={obra.id}
-                                className="text-gray-200 hover:bg-[#2A4242] focus:bg-[#2A4242]"
+                                className="text-gray-200 cursor-pointer hover:!bg-teal-700/60 hover:!text-amber-200 focus:!bg-teal-700/60 focus:!text-amber-200 data-[state=checked]:!text-amber-300"
                               >
-                                {obra.nombre}
+                                {obra.nombre.trim().toLowerCase() === "particular"
+                                  ? "Particular (sin obra social)"
+                                  : obra.nombre}
                               </SelectItem>
                             ))
                           )}
                         </SelectContent>
                       </Select>
+                      {obrasSocialesList.find((o) => o.id === selectedObraSocialId)?.nombre.trim().toLowerCase() === "particular" && (
+                        <p className="text-amber-300 text-xs mt-1">
+                          Paciente particular: abona la sesión en efectivo o por QR del psicólogo.
+                        </p>
+                      )}
                       {fieldErrors.selectedObraSocialId && (
                         <p className="text-red-500 text-xs mt-1">{fieldErrors.selectedObraSocialId}</p>
                       )}
@@ -1104,6 +1139,13 @@ export default function EditarUsuarioPage() {
 
   const handleSwitchChange = (checked: boolean) => {
     setFormData((prev) => ({ ...prev, activo: checked }))
+  }
+
+  const handleEspecialidadChange = (value: string) => {
+    setFormData((prev) => ({ ...prev, especialidad: value }))
+    if (fieldErrors.especialidad) {
+      setFieldErrors((prev) => ({ ...prev, especialidad: undefined }))
+    }
   }
 
   const handleObraSocialSelectChange = (value: string) => {

@@ -20,6 +20,7 @@ import { Usuario } from "@/models/usuario.model"
 import { Persona } from "@/models/persona.model"
 import { Psicologo } from "@/models/psicologo.model"
 import { ObraSocial } from "@/models/obra-social.model"
+import { ESPECIALIDADES_PSICOLOGIA } from "@/lib/especialidades"
 
 import { avisoExito } from "@/lib/avisos";
 import InputPassword from "@/components/InputPassword"
@@ -222,6 +223,13 @@ export default function RegistrarUsuarioPage() {
     if (!checked) {
       setSelectedObraSocialId("")
       setFieldErrors((prev) => ({ ...prev, selectedObraSocialId: undefined }))
+    }
+  }
+
+  const handleEspecialidadChange = (value: string) => {
+    setFormData((prev) => ({ ...prev, especialidad: value }))
+    if (fieldErrors.especialidad) {
+      setFieldErrors((prev) => ({ ...prev, especialidad: undefined }))
     }
   }
 
@@ -603,14 +611,30 @@ export default function RegistrarUsuarioPage() {
                       <Label htmlFor="especialidad" className="text-gray-300">
                         Especialidad *
                       </Label>
-                      <Input
-                        id="especialidad"
+                      <Select
                         name="especialidad"
                         value={formData.especialidad}
-                        onChange={handleChange}
+                        onValueChange={handleEspecialidadChange}
                         required={isPsicologo}
-                        className="bg-[#2A4242] text-white border-gray-600 focus:ring-teal-500 focus:border-teal-500"
-                      />
+                      >
+                        <SelectTrigger
+                          id="especialidad"
+                          className="w-full bg-[#2A4242] text-white border-gray-600 focus:ring-teal-500 focus:border-teal-500 data-[placeholder]:text-gray-400"
+                        >
+                          <SelectValue placeholder="Seleccione una especialidad" />
+                        </SelectTrigger>
+                        <SelectContent style={{ backgroundColor: "#1D3434", borderColor: "#2A4A4A" }}>
+                          {ESPECIALIDADES_PSICOLOGIA.map((esp) => (
+                            <SelectItem
+                              key={esp}
+                              value={esp}
+                              className="text-gray-200 cursor-pointer hover:!bg-teal-700/60 hover:!text-amber-200 focus:!bg-teal-700/60 focus:!text-amber-200 data-[state=checked]:!text-amber-300"
+                            >
+                              {esp}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       {fieldErrors.especialidad && (
                         <p className="text-red-500 text-xs">{fieldErrors.especialidad}</p>
                       )}
@@ -656,14 +680,21 @@ export default function RegistrarUsuarioPage() {
                               <SelectItem
                                 key={obra.id}
                                 value={obra.id}
-                                className="text-gray-200 hover:!bg-[#2B4243] focus:!bg-[#2B4243]"
+                                className="text-gray-200 cursor-pointer hover:!bg-teal-700/60 hover:!text-amber-200 focus:!bg-teal-700/60 focus:!text-amber-200 data-[state=checked]:!text-amber-300"
                               >
-                                {obra.nombre}
+                                {obra.nombre.trim().toLowerCase() === "particular"
+                                  ? "Particular (sin obra social)"
+                                  : obra.nombre}
                               </SelectItem>
                             ))
                           )}
                         </SelectContent>
                       </Select>
+                      {obrasSocialesList.find((o) => o.id === selectedObraSocialId)?.nombre.trim().toLowerCase() === "particular" && (
+                        <p className="text-amber-300 text-xs">
+                          Paciente particular: abona la sesión en efectivo o por QR del psicólogo.
+                        </p>
+                      )}
                       {errorObrasSociales && <p className="text-red-500 text-xs">{errorObrasSociales}</p>}
                       {fieldErrors.selectedObraSocialId && (
                         <p className="text-red-500 text-xs">{fieldErrors.selectedObraSocialId}</p>

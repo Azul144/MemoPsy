@@ -12,6 +12,10 @@ export async function GET() {
       order: { nombre: "ASC" },
     })
 
+    // "Particular" (sin obra social, paga en efectivo o QR) siempre primero
+    const esParticular = (nombre: string) => nombre.trim().toLowerCase() === "particular"
+    obrasSociales.sort((a, b) => Number(esParticular(b.nombre)) - Number(esParticular(a.nombre)))
+
     return NextResponse.json(obrasSociales)
   } catch (error) {
     console.error("Error al obtener obras sociales:", error)

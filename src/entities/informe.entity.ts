@@ -14,6 +14,10 @@ export class InformeEntity extends BaseEntity {
   @Column({ name: "contenido", type: "text" })
   contenido: string;
 
+  // RF 2.1 - Etiquetas separadas por coma para categorizar y buscar
+  @Column({ name: "etiquetas", type: "varchar", length: 255, nullable: true })
+  etiquetas: string | null;
+
   @Column({ name: "fecha_creacion", type: "datetime" })
   fechaCreacion: Date;
 
