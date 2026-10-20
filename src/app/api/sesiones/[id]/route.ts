@@ -20,6 +20,7 @@ const updateSesionSchema = z.object({
   modalidadId: z.number().int().positive({ message: "Invalid modalidadId" }), // ✅ Acepta enteros positivos
   estadoId: z.number().int().positive({ message: "Invalid estadoId" }), // ✅ Acepta enteros positivos
   pacientesIds: z.array(z.number().int().positive({ message: "Invalid pacienteId" })).optional(), // ✅ Array de enteros positivos
+  enlaceVideollamada: z.string().trim().max(255).nullish(), // RF 3.4 - enlace de videollamada (opcional)
 });
 
 export async function GET(request: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
@@ -77,6 +78,7 @@ export async function GET(request: NextRequest, { params: paramsPromise }: { par
         id: sesionEntity.id,
         fechaHoraInicio: sesionEntity.fechaHoraInicio?.toISOString() || null,
         fechaHoraFin: sesionEntity.fechaHoraFin?.toISOString() || null,
+        enlaceVideollamada: sesionEntity.enlaceVideollamada ?? null,
         psicologo: sesionEntity.psicologo
             ? {
                 id: sesionEntity.psicologo.id,
@@ -137,7 +139,7 @@ export async function PUT(request: NextRequest, { params: paramsPromise }: { par
       return NextResponse.json({ error: "Datos inválidos", details: validationResult.error.issues }, { status: 400 });
     }
 
-    const { fechaHoraInicio, fechaHoraFin, psicologoId, modalidadId, estadoId, pacientesIds } = validationResult.data;
+    const { fechaHoraInicio, fechaHoraFin, psicologoId, modalidadId, estadoId, pacientesIds, enlaceVideollamada } = validationResult.data;
 
     // Solo de lunes a viernes
     const erroresDia = [
@@ -204,7 +206,8 @@ export async function PUT(request: NextRequest, { params: paramsPromise }: { par
         sesionEntity.psicologo = { id: String(psicologoId) } as PsicologoEntity;
         sesionEntity.modalidad = { id: String(modalidadId) } as ModalidadEntity;
         sesionEntity.estado = { id: String(estadoId) } as EstadoEntity;
-        
+        sesionEntity.enlaceVideollamada = enlaceVideollamada && enlaceVideollamada.trim() ? enlaceVideollamada.trim() : null;
+
         await transactionalEntityManager.save(SesionEntity, sesionEntity);
 
         // Update associated patients
@@ -268,6 +271,7 @@ export async function PUT(request: NextRequest, { params: paramsPromise }: { par
         id: finalSesionConRelaciones.id,
         fechaHoraInicio: finalSesionConRelaciones.fechaHoraInicio.toISOString(),
         fechaHoraFin: finalSesionConRelaciones.fechaHoraFin.toISOString(),
+        enlaceVideollamada: finalSesionConRelaciones.enlaceVideollamada ?? null,
         psicologo: finalSesionConRelaciones.psicologo
             ? {
                 id: finalSesionConRelaciones.psicologo.id,

@@ -112,6 +112,7 @@ export async function GET(request: NextRequest) {
                 nombre: sesionEntity.estado.nombre,
               }
             : null,
+          enlaceVideollamada: sesionEntity.enlaceVideollamada ?? null,
           pacientes: pacientesAsociados,
           ...(verPagos && { pago: datosPago(sesionEntity) }),
         }
@@ -147,7 +148,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { fechaHoraInicio, fechaHoraFin, psicologoId, modalidadId, estadoId, pacientesIds } = body
+    const { fechaHoraInicio, fechaHoraFin, psicologoId, modalidadId, estadoId, pacientesIds, enlaceVideollamada } = body
 
     // Validar que los campos requeridos estén presentes
     if (!psicologoId || !modalidadId || !estadoId) {
@@ -207,6 +208,7 @@ export async function POST(request: NextRequest) {
       psicologo: { id: psicologoId } as PsicologoEntity,
       modalidad: { id: modalidadId } as ModalidadEntity,
       estado: { id: estadoId } as EstadoEntity,
+      enlaceVideollamada: typeof enlaceVideollamada === "string" && enlaceVideollamada.trim() ? enlaceVideollamada.trim() : null,
     })
 
     const sesionGuardada = await sesionRepository.save(nuevaSesion)
@@ -351,7 +353,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { fechaHoraInicio, fechaHoraFin, psicologoId, modalidadId, estadoId, pacientesIds } = body
+    const { fechaHoraInicio, fechaHoraFin, psicologoId, modalidadId, estadoId, pacientesIds, enlaceVideollamada } = body
 
     // Validar que los campos requeridos estén presentes
     if (!psicologoId || !modalidadId || !estadoId) {

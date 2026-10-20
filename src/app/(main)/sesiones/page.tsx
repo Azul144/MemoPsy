@@ -24,7 +24,7 @@ import { Calendar } from "@/components/ui/calendar"
 import { DIAS_NO_HABILES, MENSAJE_DIA_NO_HABIL, esDiaHabil, esFechaHabil, proximoDiaHabil } from "@/lib/validaciones/dias-habiles"
 import { Badge } from "@/components/ui/badge"
 import { TypographyP } from '@/components/ui/typography';
-import { Loader2, X, CalendarIcon, Plus, Users, User, Brain, Clock, MapPin, Activity, Check, Pencil, Wallet } from "lucide-react"
+import { Loader2, X, CalendarIcon, Plus, Users, User, Brain, Clock, MapPin, Activity, Check, Pencil, Wallet, Video } from "lucide-react"
 import { format, parseISO, isSameDay } from "date-fns"
 import { es } from "date-fns/locale"
 import { cn } from "@/lib/utils"
@@ -47,6 +47,7 @@ interface Sesion {
     id: string
     nombre: string
   }
+  enlaceVideollamada?: string | null
   estado?: {
     id: string
     nombre: string
@@ -124,6 +125,7 @@ export default function SesionesPage() {
     psicologoId: "",
     modalidadId: "",
     estadoId: "",
+    enlaceVideollamada: "",
     pacientesIds: [] as string[],
   })
 
@@ -138,6 +140,7 @@ export default function SesionesPage() {
       psicologoId: "",
       modalidadId: "",
       estadoId: "",
+      enlaceVideollamada: "",
       pacientesIds: [] as string[],
   });
   const [editPsicologoSearchResults, setEditPsicologoSearchResults] = useState<Psicologo[]>([]);
@@ -158,6 +161,10 @@ export default function SesionesPage() {
   const psicologoSearchTimeout = useRef<NodeJS.Timeout | null>(null)
   const pacienteSearchTimeout = useRef<NodeJS.Timeout | null>(null)
 
+  // RF 3.4 - ¿la modalidad elegida es remota? (para mostrar/pedir el enlace de videollamada)
+  const esModalidadRemota = (modalidadId: string) =>
+    modalidades.find((m) => String(m.id) === String(modalidadId))?.nombre?.toLowerCase() === "remota";
+
   const handleOpenEditDialog = (sesion: Sesion) => {
     setEditingSesion(sesion); // Keep a reference to the original session object
     setEditFormData({
@@ -169,6 +176,7 @@ export default function SesionesPage() {
         psicologoId: sesion.psicologo?.id || "",
         modalidadId: sesion.modalidad?.id || "",
         estadoId: sesion.estado?.id || "",
+        enlaceVideollamada: sesion.enlaceVideollamada || "",
         pacientesIds: sesion.pacientes?.map(p => p.id) || [],
     });
     setEditPsicologoSearch(sesion.psicologo ? `${sesion.psicologo.persona.nombre} ${sesion.psicologo.persona.apellido}` : "");
@@ -254,6 +262,7 @@ const handleUpdateSesion = async () => {
             psicologoId: parseInt(editFormData.psicologoId),
             modalidadId: parseInt(editFormData.modalidadId),
             estadoId: parseInt(editFormData.estadoId),
+            enlaceVideollamada: esModalidadRemota(editFormData.modalidadId) ? editFormData.enlaceVideollamada.trim() || null : null,
             pacientesIds: editFormData.pacientesIds,
         };
         
@@ -610,6 +619,7 @@ const handleUpdateSesion = async () => {
           psicologoId: formData.psicologoId,
           modalidadId: formData.modalidadId,
           estadoId: formData.estadoId,
+          enlaceVideollamada: esModalidadRemota(formData.modalidadId) ? formData.enlaceVideollamada.trim() || null : null,
           pacientesIds: formData.pacientesIds,
         }),
       })
@@ -632,6 +642,7 @@ const handleUpdateSesion = async () => {
           psicologoId: "",
           modalidadId: "",
           estadoId: "",
+          enlaceVideollamada: "",
           pacientesIds: [],
         })
         setSelectedPacientes([])
@@ -724,6 +735,19 @@ const handleUpdateSesion = async () => {
                             <div className="flex items-center space-x-2">
                                 <MapPin className="w-4 h-4 text-green-400" />
                                 <span className="text-sm text-gray-300">{sesion.modalidad.nombre}</span>
+                            </div>
+                        )}
+                        {sesion.enlaceVideollamada && (
+                            <div className="flex items-center space-x-2">
+                                <Video className="w-4 h-4 text-sky-400" />
+                                <a
+                                    href={sesion.enlaceVideollamada}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-sm text-sky-400 underline hover:text-sky-300"
+                                >
+                                    Unirse a la videollamada
+                                </a>
                             </div>
                         )}
                         {sesion.estado && (
@@ -1081,6 +1105,24 @@ const handleUpdateSesion = async () => {
                                 )}
                               </div>
 
+                              {/* Enlace de videollamada (RF 3.4): solo para sesiones remotas */}
+                              {esModalidadRemota(formData.modalidadId) && (
+                                <div className="space-y-2">
+                                  <Label htmlFor="enlaceVideollamada" className="text-white">
+                                    Enlace de videollamada
+                                  </Label>
+                                  <Input
+                                    id="enlaceVideollamada"
+                                    type="url"
+                                    placeholder="https://meet.google.com/..."
+                                    value={formData.enlaceVideollamada}
+                                    onChange={(e) => setFormData({ ...formData, enlaceVideollamada: e.target.value })}
+                                    className="bg-[#152A2A] text-white border-gray-600"
+                                  />
+                                  <p className="text-xs text-gray-400">Pegá el enlace de Google Meet (opcional).</p>
+                                </div>
+                              )}
+
                               {/* Estado */}
                               <div className="space-y-2">
                                 <Label htmlFor="estado" className="text-white">
@@ -1292,6 +1334,7 @@ const handleUpdateSesion = async () => {
                     psicologoId: editingSesion.psicologo?.id || "",
                     modalidadId: editingSesion.modalidad?.id || "",
                     estadoId: editingSesion.estado?.id || "",
+                    enlaceVideollamada: editingSesion.enlaceVideollamada || "",
                     pacientesIds: originalPacientes.map(p => p.id),
                 });
             }
@@ -1385,6 +1428,22 @@ const handleUpdateSesion = async () => {
                     </Select>
                     {editFormErrors.modalidadId && <p className="text-xs text-red-500">{editFormErrors.modalidadId}</p>}
                 </div>
+
+                {/* Enlace de videollamada (RF 3.4): solo para sesiones remotas */}
+                {esModalidadRemota(editFormData.modalidadId) && (
+                  <div className="space-y-2">
+                    <Label htmlFor="edit_enlaceVideollamada" className="text-white">Enlace de videollamada</Label>
+                    <Input
+                      id="edit_enlaceVideollamada"
+                      type="url"
+                      placeholder="https://meet.google.com/..."
+                      value={editFormData.enlaceVideollamada}
+                      onChange={(e) => setEditFormData({ ...editFormData, enlaceVideollamada: e.target.value })}
+                      className="bg-[#152A2A] text-white border-gray-600"
+                    />
+                    <p className="text-xs text-gray-400">Pegá el enlace de Google Meet (opcional).</p>
+                  </div>
+                )}
 
                 {/* Estado (Edit) */}
                 <div className="space-y-2">
