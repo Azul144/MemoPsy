@@ -3,7 +3,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useSession, signOut } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
 import EncabezadoPagina from "@/components/sistema/EncabezadoPagina";
 import { useRouter, useParams } from 'next/navigation';
@@ -37,6 +37,7 @@ interface InformeData {
   id: string;
   titulo: string;
   contenido: string;
+  etiquetas?: string | null;
   esPrivado: boolean;
   psicologo?: { id: string; nombre?: string };
   pacientes: Paciente[];
@@ -93,6 +94,7 @@ export default function EditarInformePage() {
   const [formData, setFormData] = useState({
     titulo: '',
     contenido: '',
+    etiquetas: '',
     esPrivado: false,
     pacientesIds: [] as string[],
   });
@@ -119,10 +121,14 @@ export default function EditarInformePage() {
   };
 
   const fetchPacienteSuggestions = async (query: string) => {
-    if (query.length < 2) { setPacienteSearchResults([]); return; }
+    if (query.length === 1) { setPacienteSearchResults([]); return; }
+    const psicologoId = session?.user?.psicologoId;
     setIsPacienteSearchLoading(true);
     try {
-      const response = await fetch(`/api/pacientes/buscar?q=${encodeURIComponent(query)}&limit=5`);
+      const params = new URLSearchParams();
+      if (query) params.set('q', query);
+      if (psicologoId) params.set('psicologoId', String(psicologoId));
+      const response = await fetch(`/api/pacientes/buscar?${params.toString()}`);
       if (!response.ok) throw new Error('Error buscando pacientes');
       const data = await response.json();
       const results = (data.data || data).map((p: any) => ({ // Use 'any' if structure is not strictly Paciente yet
@@ -137,7 +143,7 @@ export default function EditarInformePage() {
     finally { setIsPacienteSearchLoading(false); }
   };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const debouncedFetchPacientes = useCallback(debounce(fetchPacienteSuggestions, 300), []);
+  const debouncedFetchPacientes = useCallback(debounce(fetchPacienteSuggestions, 300), [session?.user?.psicologoId]);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -172,6 +178,7 @@ export default function EditarInformePage() {
                 setFormData({
                     titulo: data.titulo,
                     contenido: data.contenido,
+                    etiquetas: data.etiquetas ?? '',
                     esPrivado: data.esPrivado,
                     //pacientesIds: data.pacientes.map(p => p.id),
                     pacientesIds: data.pacientes.map(p => String(p.id)) // Ensure p.id is a string
@@ -198,7 +205,7 @@ export default function EditarInformePage() {
   }, [informeId, status, session, router]);
 
   useEffect(() => {
-    if (pacienteSearchQuery.length > 1) debouncedFetchPacientes(pacienteSearchQuery);
+    if (pacienteSearchQuery.length > 1 || pacienteSearchQuery.length === 0) debouncedFetchPacientes(pacienteSearchQuery);
     else setPacienteSearchResults([]);
   }, [pacienteSearchQuery, debouncedFetchPacientes]);
 
@@ -312,6 +319,12 @@ export default function EditarInformePage() {
                     {formErrors.contenido && <TypographySmall className="text-red-400">{formErrors.contenido}</TypographySmall>}
                 </div>
 
+                <div className="space-y-2">
+                    <Label htmlFor="etiquetas" className="text-gray-200">Etiquetas</Label>
+                    <Input id="etiquetas" name="etiquetas" value={formData.etiquetas} onChange={handleInputChange} placeholder="Ej: ansiedad, seguimiento, primera consulta" className="bg-[#152A2A] text-white border-gray-600 focus:border-[#F1C77A]" />
+                    <TypographySmall className="text-gray-400">Separá las etiquetas con comas.</TypographySmall>
+                </div>
+
                 <div className="flex items-center space-x-3">
                     <Checkbox id="esPrivado" checked={formData.esPrivado} onCheckedChange={handleCheckboxChange} className="data-[state=checked]:bg-[#F1C77A] data-[state=checked]:text-[#1D3434] border-gray-600"/>
                     <Label htmlFor="esPrivado" className="font-normal text-gray-300">Marcar como privado</Label>
@@ -324,8 +337,8 @@ export default function EditarInformePage() {
                         <PopoverTrigger asChild>
                         <div className="relative">
                             <Input id="pacienteSearch" type="text" placeholder="Buscar paciente..." value={pacienteSearchQuery}
-                                onChange={(e) => {setPacienteSearchQuery(e.target.value); if(!isPacientePopoverOpen && e.target.value.length > 1) setIsPacientePopoverOpen(true);}}
-                                onFocus={() => {if(pacienteSearchQuery.length > 1 && pacienteSearchResults.length > 0) setIsPacientePopoverOpen(true)}}
+                                onChange={(e) => {setPacienteSearchQuery(e.target.value); setIsPacientePopoverOpen(true);}}
+                                onFocus={() => {setIsPacientePopoverOpen(true); debouncedFetchPacientes(pacienteSearchQuery);}}
                                 className={cn("bg-[#152A2A] text-white border-gray-600 focus:border-[#F1C77A] pr-10", formErrors.pacientesIds && "border-red-500")}
                             />
                             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -338,7 +351,7 @@ export default function EditarInformePage() {
                             {!isPacienteSearchLoading && pacienteSearchResults.length > 0 && (
                             <ul className="max-h-60 overflow-y-auto">
                                 {pacienteSearchResults.map(paciente => (
-                                <li key={paciente.id} onClick={() => handleSelectPaciente(paciente)} className="p-3 hover:bg-[#152A2A] cursor-pointer text-sm border-b border-gray-700 last:border-b-0">
+                                <li key={paciente.id} onMouseDown={(e) => { e.preventDefault(); handleSelectPaciente(paciente); }} className="p-3 hover:bg-[#152A2A] cursor-pointer text-sm border-b border-gray-700 last:border-b-0">
                                     {paciente.nombreCompleto} (DNI: {paciente.dni || 'N/A'})
                                 </li>))}
                             </ul>)}

@@ -6,8 +6,8 @@ import { PacienteEntity, PacienteTieneSesionEntity } from "@/entities"
 import { Like } from "typeorm"
 
 // Si llega psicologoId, los pacientes de ese psicólogo (los que ya tuvieron sesiones con él)
-// vienen marcados con esDelPsicologo y primeros en la lista. Sin texto de búsqueda, se
-// devuelven solo esos; con texto, se busca entre todos para poder sumar un paciente nuevo.
+// vienen marcados con esDelPsicologo y primeros en la lista. Sin texto de búsqueda se
+// devuelven TODOS los pacientes (con los del psicólogo arriba); con texto se busca entre todos.
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authConfig)
@@ -35,8 +35,13 @@ export async function GET(request: NextRequest) {
     }
 
     let pacientes: PacienteEntity[]
-    if (!query && psicologoId) {
-      pacientes = [...pacientesDelPsicologo.values()]
+    if (!query) {
+      // Sin texto: todos los pacientes (los que ya tuvieron cita y los nuevos).
+      // El .sort() de abajo deja primero a los del psicólogo.
+      pacientes = await pacienteRepository.find({
+        relations: ["persona", "obraSocial"],
+        take: 100,
+      })
     } else if (query.length < 2) {
       pacientes = []
     } else {

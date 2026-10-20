@@ -3,7 +3,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useSession, signOut } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
 import EncabezadoPagina from "@/components/sistema/EncabezadoPagina";
 import { useRouter } from 'next/navigation';
@@ -84,6 +84,7 @@ export default function RegistrarInformePage() {
   const [formData, setFormData] = useState({
     titulo: '',
     contenido: '',
+    etiquetas: '',
     esPrivado: false,
     pacientesIds: [] as string[],
   });
@@ -111,14 +112,20 @@ export default function RegistrarInformePage() {
   };
 
   const fetchPacientes = async (query: string) => {
-    if (query.length < 2) {
+    const psicologoId = session?.user?.psicologoId;
+    // Vacío: todos los pacientes (los del psicólogo primero). 2+ letras: busca entre todos.
+    // 1 sola letra: no vale la pena, no buscamos.
+    if (query.length === 1) {
       setPacienteSearchResults([]);
       setIsPacienteSearchLoading(false);
       return;
     }
     setIsPacienteSearchLoading(true);
     try {
-      const response = await fetch(`/api/pacientes/buscar?q=${encodeURIComponent(query)}&limit=5`);
+      const params = new URLSearchParams();
+      if (query) params.set('q', query);
+      if (psicologoId) params.set('psicologoId', String(psicologoId));
+      const response = await fetch(`/api/pacientes/buscar?${params.toString()}`);
       if (!response.ok) throw new Error('Error buscando pacientes');
       const data = await response.json();
       const results = (data.data || data).map((p: any) => ({ // Use 'any' if structure is not strictly Paciente yet
@@ -135,7 +142,8 @@ export default function RegistrarInformePage() {
   };
   
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const debouncedFetchPacientes = useCallback(debounce(fetchPacientes, 300), []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const debouncedFetchPacientes = useCallback(debounce(fetchPacientes, 300), [session?.user?.psicologoId]);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -161,10 +169,9 @@ export default function RegistrarInformePage() {
   }, [session, status, router]);
 
   useEffect(() => {
-    if (pacienteSearchQuery.length > 1) {
+    // Con 2+ letras busca entre todos; vacío/1 letra muestra los pacientes del psicólogo.
+    if (pacienteSearchQuery.length > 1 || pacienteSearchQuery.length === 0) {
       debouncedFetchPacientes(pacienteSearchQuery);
-    } else {
-      setPacienteSearchResults([]);
     }
   }, [pacienteSearchQuery, debouncedFetchPacientes]);
 
@@ -327,6 +334,16 @@ export default function RegistrarInformePage() {
                 {formErrors.contenido && <TypographySmall className="text-red-400">{formErrors.contenido}</TypographySmall>}
               </div>
 
+              <div className="space-y-2">
+                <Label htmlFor="etiquetas" className="text-gray-200">Etiquetas</Label>
+                <Input
+                  id="etiquetas" name="etiquetas" value={formData.etiquetas} onChange={handleInputChange}
+                  placeholder="Ej: ansiedad, seguimiento, primera consulta"
+                  className="bg-[#152A2A] text-white border-gray-600 focus:border-[#F1C77A]"
+                />
+                <TypographySmall className="text-gray-400">Separá las etiquetas con comas. Sirven para categorizar y buscar el informe.</TypographySmall>
+              </div>
+
               <div className="flex items-center space-x-3">
                 <Checkbox
                   id="esPrivado" checked={formData.esPrivado} onCheckedChange={handleCheckboxChange}
@@ -375,16 +392,11 @@ export default function RegistrarInformePage() {
                       //}}
                       onChange={(e) => {
                         setPacienteSearchQuery(e.target.value);
-                        if (e.target.value.length > 1) {
-                          setIsPacientePopoverOpen(true);
-                        } else {
-                          setIsPacientePopoverOpen(false);
-                        }
+                        setIsPacientePopoverOpen(true);
                         }}
                         onFocus={() => {
-                          if (pacienteSearchQuery.length > 1) {
-                            setIsPacientePopoverOpen(true);
-                          }
+                          setIsPacientePopoverOpen(true);
+                          debouncedFetchPacientes(pacienteSearchQuery);
                         }}
                         onBlur={() => {
                           setTimeout(() => {
@@ -406,7 +418,7 @@ export default function RegistrarInformePage() {
                             <div
                               key={paciente.id}
                               className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-[#152A2A] text-white border-b border-gray-700 last:border-b-0"
-                              onClick={() => handleSelectPaciente(paciente)}
+                              onMouseDown={(e) => { e.preventDefault(); handleSelectPaciente(paciente); }}
                             >
                               <Check
                                 className={cn(
@@ -421,7 +433,7 @@ export default function RegistrarInformePage() {
                           <div className="p-4 text-center text-sm text-gray-400">
                             {pacienteSearchQuery.length > 1
                               ? "No se encontraron pacientes."
-                              : "Escribe para buscar pacientes"}
+                              : "No tenés pacientes con sesiones aún. Escribí un nombre, apellido o DNI para buscar."}
                           </div>
                         )}
                       </div>

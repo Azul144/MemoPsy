@@ -192,7 +192,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { titulo, contenido, esPrivado, pacientesIds } = body;
+    const { titulo, contenido, esPrivado, pacientesIds, etiquetas } = body;
 
     if (!titulo || !contenido || typeof esPrivado !== 'boolean') {
       return NextResponse.json({ message: 'Datos incompletos o inválidos: titulo, contenido y esPrivado son requeridos.' }, { status: 400 });
@@ -222,9 +222,12 @@ export async function POST(request: NextRequest) {
     //  fechaCreacion = new Date();
     //}
 
+    const etiquetasNormalizadas = typeof etiquetas === 'string' && etiquetas.trim() ? etiquetas.trim() : null;
+
     const nuevoInforme = informeRepository.create({
       titulo,
       contenido,
+      etiquetas: etiquetasNormalizadas,
       esPrivado,
       fechaCreacion: fechaCreacion,
       psicologo: psicologo,

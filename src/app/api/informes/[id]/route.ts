@@ -128,7 +128,7 @@ export async function PUT(request: NextRequest, { params: paramsPromise }: { par
     }
 
     const body = await request.json();
-    const { titulo, contenido, esPrivado, pacientesIds } = body;
+    const { titulo, contenido, esPrivado, pacientesIds, etiquetas } = body;
 
     if (!titulo || !contenido || typeof esPrivado !== 'boolean') {
       return NextResponse.json({ message: 'Datos incompletos o inválidos: titulo, contenido y esPrivado son requeridos.' }, { status: 400 });
@@ -159,6 +159,7 @@ export async function PUT(request: NextRequest, { params: paramsPromise }: { par
 
     informeExistente.titulo = titulo;
     informeExistente.contenido = contenido;
+    informeExistente.etiquetas = typeof etiquetas === 'string' && etiquetas.trim() ? etiquetas.trim() : null;
     informeExistente.esPrivado = esPrivado;
     // Add a fechaModificacion if your BaseEntity or InformeEntity supports it
     // informeExistente.fechaModificacion = new Date();

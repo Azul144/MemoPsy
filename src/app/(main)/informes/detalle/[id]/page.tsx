@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useSession, signOut } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
 import EncabezadoPagina from "@/components/sistema/EncabezadoPagina";
 import { useRouter, useParams } from 'next/navigation';
@@ -36,6 +36,7 @@ interface InformeDetalle {
   id: string;
   titulo: string;
   contenido: string;
+  etiquetas?: string | null;
   fechaCreacion: string;
   esPrivado: boolean;
   psicologo: PsicologoDetalle | null;
@@ -217,6 +218,19 @@ export default function DetalleInformePage() {
                   {informe.contenido}
                 </div>
               </div>
+
+              {informe.etiquetas && informe.etiquetas.trim() && (
+                <div>
+                  <Label className="text-lg font-medium text-gray-200">Etiquetas</Label>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {informe.etiquetas.split(',').map((e) => e.trim()).filter(Boolean).map((etiqueta, i) => (
+                      <Badge key={i} className="text-sm px-3 py-1 bg-[#F1C77A] !text-[#1D3434] hover:bg-[#F1C77A]/90">
+                        {etiqueta}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-1">
