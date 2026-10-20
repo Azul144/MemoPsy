@@ -740,11 +740,25 @@ const handleUpdateSesion = async () => {
   }
 
   const renderCalendarWithSessions = (filterType: "all" | "psicologo" | "paciente") => {
+    // Días que tienen al menos un turno visible para esta vista: se marcan con un punto en el calendario
+    const diasConTurno = sesiones
+      .filter((sesion) => {
+        if (filterType === "psicologo") return sesion.psicologo?.id === session?.user?.psicologoId
+        if (filterType === "paciente") return sesion.pacientes?.some((p) => p.id === session?.user?.pacienteId)
+        return true
+      })
+      .map((sesion) => parseISO(sesion.fechaHoraInicio))
+
     return (
       <div className="flex w-full flex-col gap-4 lg:flex-row lg:gap-6">
         <Calendar
           mode="single"
           selected={selectedDate}
+          modifiers={{ conTurno: diasConTurno }}
+          modifiersClassNames={{
+            conTurno:
+              "relative after:pointer-events-none after:absolute after:bottom-0.5 after:left-1/2 after:h-1.5 after:w-1.5 after:-translate-x-1/2 after:rounded-full after:bg-[#F1C77A]",
+          }}
           // En "Registrar Sesiones" no se pueden elegir sábados ni domingos
           disabled={filterType === "all" ? { dayOfWeek: DIAS_NO_HABILES } : undefined}
           onSelect={(date) => {
@@ -759,7 +773,7 @@ const handleUpdateSesion = async () => {
           locale={es}
         />
 
-        <div className="w-full min-w-0 space-y-2 max-h-[500px] overflow-y-auto">
+        <div className="w-full min-w-0 space-y-2">
           <h4 className="font-semibold text-white">
             Sesiones para {format(selectedDate, "dd/MM/yyyy", { locale: es })}
           </h4>
@@ -899,7 +913,9 @@ const handleUpdateSesion = async () => {
               </Card>
             ))}
             {getSesionesForDate(selectedDate, filterType).length === 0 && (
-              <p className="text-gray-400 text-sm text-center py-4">No hay sesiones programadas para esta fecha</p>
+              <p className="text-gray-400 text-sm text-center py-4">
+                No hay sesiones programadas para esta fecha. Los días con turnos están marcados con un punto en el calendario.
+              </p>
             )}
           </div>
         </div>
