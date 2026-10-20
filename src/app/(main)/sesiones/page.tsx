@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
+import { MODULOS_DISPONIBLES, type ModuloConfig } from "@/config/modulos";
 import { useSession, signOut } from "next-auth/react"
 import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
 import { useRouter } from "next/navigation"
@@ -103,49 +104,7 @@ interface Paciente {
   }
 }
 
-interface ModuloConfig {
-  id: string
-  nombre: string
-  descripcion: string
-  icon: any
-  ruta: string
-  permisosRequeridos: string[]
-}
 
-const MODULOS_DISPONIBLES: ModuloConfig[] = [
-  {
-    id: "usuarios",
-    nombre: "Usuarios",
-    descripcion: "Gestión de usuarios del sistema",
-    icon: Users,
-    ruta: "/usuarios",
-    permisosRequeridos: ["Ver Usuarios", "Registrar Usuario", "Editar Usuario", "Eliminar Usuario"],
-  },
-  {
-    id: "sesiones",
-    nombre: "Sesiones",
-    descripcion: "Administración de sesiones",
-    icon: CalendarIcon,
-    ruta: "/sesiones",
-    permisosRequeridos: ["Ver Sesiones", "Registrar Sesión", "Editar Sesión", "Eliminar Sesión", "Asignar Profesional"],
-  },
-  {
-    id: "perfiles",
-    nombre: "Perfiles",
-    descripcion: "Administración de perfiles y roles",
-    icon: Shield,
-    ruta: "/perfiles",
-    permisosRequeridos: ["Ver Perfiles", "Registrar Perfil", "Editar Perfil", "Eliminar Perfil", "Asignar Perfil"],
-  },
-  {
-    id: "informes",
-    nombre: "Informes",
-    descripcion: "Generación de reportes",
-    icon: FileText,
-    ruta: "/informes",
-    permisosRequeridos: ["Ver Informes", "Registrar Informe", "Editar Informe", "Eliminar Informe"],
-  },
-]
 
 export default function SesionesPage() {
   const { data: session, status } = useSession()

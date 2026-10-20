@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { MODULOS_DISPONIBLES, type ModuloConfig } from "@/config/modulos";
 import { useSession, signOut } from 'next-auth/react';
 import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
 import EncabezadoPagina from "@/components/sistema/EncabezadoPagina";
@@ -51,33 +52,7 @@ interface SortingState {
   sortOrder: 'asc' | 'desc';
 }
 
-interface ModuloConfig {
-  id: string;
-  nombre: string;
-  descripcion?: string;
-  icon: React.ElementType;
-  ruta: string;
-  permisosRequeridos: string[];
-}
 
-const MODULOS_DISPONIBLES: ModuloConfig[] = [
-    {
-        id: "usuarios", nombre: "Usuarios", icon: Users, ruta: "/usuarios",
-        permisosRequeridos: ["Ver Usuarios", "Registrar Usuario", "Editar Usuario", "Eliminar Usuario"],
-    },
-    {
-        id: "sesiones", nombre: "Sesiones", icon: CalendarIcon, ruta: "/sesiones",
-        permisosRequeridos: ["Ver Sesiones", "Registrar Sesión", "Editar Sesión", "Eliminar Sesión", "Asignar Profesional"],
-    },
-    {
-        id: "perfiles", nombre: "Perfiles", icon: Shield, ruta: "/perfiles",
-        permisosRequeridos: ["Ver Perfiles", "Registrar Perfil", "Editar Perfil", "Eliminar Perfil", "Asignar Perfil"],
-    },
-    {
-        id: "informes", nombre: "Informes", icon: MainModuleIcon, ruta: "/informes",
-        permisosRequeridos: ["Ver Informes", "Registrar Informe", "Editar Informe", "Eliminar Informe"],
-    },
-];
 
 // Next pide envolver en <Suspense> a los componentes que leen la URL con useSearchParams
 export default function ListaInformesPage() {

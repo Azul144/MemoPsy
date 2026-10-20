@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, type ChangeEvent, type FormEvent } from "react"
+import { MODULOS_DISPONIBLES, type ModuloConfig } from "@/config/modulos";
 import { useSession, signOut } from "next-auth/react"
 import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
 import EncabezadoPagina from "@/components/sistema/EncabezadoPagina";
@@ -29,49 +30,7 @@ import {
   // Edit3, // Alternative icon for future consideration
 } from "lucide-react"
 
-interface ModuloConfig {
-  id: string
-  nombre: string
-  descripcion: string
-  icon: any
-  ruta: string
-  permisosRequeridos: string[]
-}
 
-const MODULOS_DISPONIBLES: ModuloConfig[] = [
-  {
-    id: "usuarios",
-    nombre: "Usuarios",
-    descripcion: "Gestión de usuarios",
-    icon: Users,
-    ruta: "/usuarios",
-    permisosRequeridos: ["Ver Usuarios", "Registrar Usuario"],
-  },
-  {
-    id: "perfiles",
-    nombre: "Perfiles",
-    descripcion: "Gestión de perfiles",
-    icon: Shield,
-    ruta: "/perfiles",
-    permisosRequeridos: ["Ver Perfiles", "Registrar Perfil", "Asignar Perfil"],
-  },
-  {
-    id: "sesiones",
-    nombre: "Sesiones",
-    descripcion: "Gestión de sesiones",
-    icon: Calendar,
-    ruta: "/sesiones",
-    permisosRequeridos: ["Ver Sesiones"],
-  },
-  {
-    id: "informes",
-    nombre: "Informes",
-    descripcion: "Gestión de informes",
-    icon: FileText,
-    ruta: "/informes",
-    permisosRequeridos: ["Ver Informes"],
-  },
-]
 
 interface PerfilFormData {
   nombre: string
