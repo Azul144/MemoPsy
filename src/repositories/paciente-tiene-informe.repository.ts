@@ -213,7 +213,7 @@ export class PacienteTieneInformeRepository {
         pacienteId,
         informeId
       });
-      return result.affected !== null && result.affected > 0;
+      return (result.affected ?? 0) > 0;
     } catch (error) {
       return false;
     }

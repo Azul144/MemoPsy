@@ -176,7 +176,7 @@ export default function EditarPerfilPage() { // Renamed component
         .then((data) => {
           if(data && data.nombre && data.descripcion) {
             setFormData({ nombre: data.nombre, descripcion: data.descripcion });
-            const currentPermisoIds = new Set(data.permisos?.map((p: { id: string }) => p.id) || []);
+            const currentPermisoIds = new Set<string>(data.permisos?.map((p: { id: string }) => p.id) || []);
             setSelectedPermisoIds(currentPermisoIds);
           } else {
             throw new Error("Datos del perfil incompletos o inválidos.");

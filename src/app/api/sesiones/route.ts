@@ -169,10 +169,10 @@ export async function POST(request: NextRequest) {
 
     // Asociar pacientes si se proporcionaron
     if (pacientesIds && pacientesIds.length > 0) {
-      const pacienteRelaciones = pacientesIds.map((pacienteId) => {
+      const pacienteRelaciones = pacientesIds.map((pacienteId: string | number) => {
         return pacienteTieneSesionRepository.create({
           sesionId: sesionGuardada.id,
-          pacienteId: pacienteId,
+          pacienteId: String(pacienteId),
         })
       })
 
@@ -186,7 +186,7 @@ export async function POST(request: NextRequest) {
       },
       { status: 201 },
     )
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error creating session:", error)
     return NextResponse.json(
       {

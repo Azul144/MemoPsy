@@ -228,18 +228,18 @@ export class InformeService {
       contenido: entity.contenido,
       fechaCreacion: entity.fechaCreacion,
       esPrivado: entity.esPrivado,
-      psicologo: entity.psicologo ? new PsicologoResponseDto(
-        entity.psicologo.id,
-        entity.psicologo.especialidad,
-        entity.psicologo.numeroLicencia,
-        entity.psicologo.persona ? {
-          id: entity.psicologo.persona.id,
-          nombre: entity.psicologo.persona.nombre,
-          apellido: entity.psicologo.persona.apellido,
-          dni: entity.psicologo.persona.dni,
-          fechaNacimiento: entity.psicologo.persona.fechaNacimiento,
+      psicologo: entity.psicologo ? new PsicologoResponseDto({
+        id: entity.psicologo.id,
+        especialidad: entity.psicologo.especialidad,
+        numeroLicencia: entity.psicologo.numeroLicencia,
+        persona: entity.psicologo.persona ? {
+          id: entity.psicologo.persona.id,
+          nombre: entity.psicologo.persona.nombre,
+          apellido: entity.psicologo.persona.apellido,
+          dni: entity.psicologo.persona.dni,
+          fechaNacimiento: entity.psicologo.persona.fechaNacimiento,
         } : undefined,
-      ) : undefined,
+      }) : undefined,
       //createdAt: entity.createdAt,
       //updatedAt: entity.updatedAt
     });

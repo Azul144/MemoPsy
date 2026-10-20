@@ -108,7 +108,7 @@ export class PsicologoRepository {
   async delete(id: string): Promise<boolean> {
     try {
       const result = await this.repository.delete(id);
-      return result.affected !== null && result.affected > 0;
+      return (result.affected ?? 0) > 0;
     } catch (error) {
       return false;
     }

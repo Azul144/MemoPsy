@@ -49,8 +49,8 @@ export class DetalleFactura extends Base {
       return new DetalleFactura({
         id: entity.id,
         precio: entity.precio,
-        sesion: entity.sesion,
-        factura: entity.factura // Asignamos la relación
+        sesion: entity.sesion ? Sesion.fromEntity(entity.sesion) : undefined,
+        factura: entity.factura ? Factura.fromEntity(entity.factura) : undefined // Asignamos la relación
       });
     }
     

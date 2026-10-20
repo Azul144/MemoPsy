@@ -236,11 +236,11 @@ export async function POST(request: NextRequest) {
     if (pacientesIds && pacientesIds.length > 0) {
       const existingPacientes = await pacienteRepository.findBy({ id: In(pacientesIds) });
       if(existingPacientes.length !== pacientesIds.length){
-          const notFoundIds = pacientesIds.filter(id => !existingPacientes.some(p => p.id === id));
+          const notFoundIds = pacientesIds.filter((id: string) => !existingPacientes.some(p => p.id === id));
           return NextResponse.json({ message: `Pacientes con IDs ${notFoundIds.join(', ')} no encontrados.` }, { status: 400 });
       }
 
-      const ptiEntities = pacientesIds.map(pacienteId => 
+      const ptiEntities = pacientesIds.map((pacienteId: string) => 
         pacienteTieneInformeRepository.create({
           informe: informeGuardado,
           paciente: { id: pacienteId } as PacienteEntity,

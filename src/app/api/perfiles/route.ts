@@ -186,7 +186,7 @@ export async function POST(request: NextRequest) {
             }
           } catch (error) {
             console.error(`Error al asignar permiso ${permisoId}:`, error)
-            console.error("Stack trace:", error.stack)
+            console.error("Stack trace:", (error as Error)?.stack)
           }
         }
       }

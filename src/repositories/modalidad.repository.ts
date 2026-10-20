@@ -116,7 +116,7 @@ export class ModalidadRepository implements IModalidadRepository {
   async delete(id: string): Promise<boolean> {
     try {
       const result = await this.repository.delete(id);
-      return result.affected !== null && result.affected > 0;
+      return (result.affected ?? 0) > 0;
     } catch (error) {
       throw new Error(`Error al eliminar modalidad: ${error instanceof Error ? error.message : 'Error desconocido'}`);
     }

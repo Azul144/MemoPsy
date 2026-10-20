@@ -41,7 +41,7 @@ export class Ciudad extends Base {
       return new Ciudad({
         id: entity.id,
         nombre: entity.nombre,
-        pais: entity.pais
+        pais: entity.pais ? Pais.fromEntity(entity.pais) : undefined
       });
     }
     

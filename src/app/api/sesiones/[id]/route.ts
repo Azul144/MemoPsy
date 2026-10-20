@@ -173,9 +173,9 @@ export async function PUT(request: NextRequest, { params: paramsPromise }: { par
         // Update session fields
         sesionEntity.fechaHoraInicio = new Date(fechaHoraInicio);
         sesionEntity.fechaHoraFin = new Date(fechaHoraFin);
-        sesionEntity.psicologo = { id: psicologoId } as PsicologoEntity;
-        sesionEntity.modalidad = { id: modalidadId } as ModalidadEntity;
-        sesionEntity.estado = { id: estadoId } as EstadoEntity;
+        sesionEntity.psicologo = { id: String(psicologoId) } as PsicologoEntity;
+        sesionEntity.modalidad = { id: String(modalidadId) } as ModalidadEntity;
+        sesionEntity.estado = { id: String(estadoId) } as EstadoEntity;
         
         await transactionalEntityManager.save(SesionEntity, sesionEntity);
 
@@ -188,7 +188,7 @@ export async function PUT(request: NextRequest, { params: paramsPromise }: { par
             const pacienteRelaciones = pacientesIds.map(pacienteId => {
                 return transactionalEntityManager.create(PacienteTieneSesionEntity, {
                     sesionId: id, // Use the original session ID
-                    pacienteId: pacienteId,
+                    pacienteId: String(pacienteId),
                 });
             });
             await transactionalEntityManager.save(PacienteTieneSesionEntity, pacienteRelaciones);
@@ -260,7 +260,7 @@ export async function PUT(request: NextRequest, { params: paramsPromise }: { par
 
     return NextResponse.json(sesionTransformada, { status: 200 });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error updating session:", error);
     if (error instanceof ZodError) {
       return NextResponse.json({ error: "Error de validación", details: error.issues }, { status: 400 });

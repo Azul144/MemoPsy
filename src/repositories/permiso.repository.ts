@@ -79,7 +79,7 @@ export class PermisoRepository {
 
   async delete(id: string): Promise<boolean> {
     const deleteResult = await this.repository.delete(id);
-    return deleteResult.affected > 0;
+    return (deleteResult.affected ?? 0) > 0;
   }
 
   async exists(id: string): Promise<boolean> {

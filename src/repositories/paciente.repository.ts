@@ -137,7 +137,7 @@ export class PacienteRepository {
   // Eliminar un paciente (soft delete si está configurado en BaseEntity)
   async delete(id: string): Promise<boolean> {
     const deleteResult = await this.repository.delete(id);
-    return deleteResult.affected !== undefined && deleteResult.affected > 0;
+    return (deleteResult.affected ?? 0) > 0;
   }
 
   // Verificar si existe un paciente con una persona específica

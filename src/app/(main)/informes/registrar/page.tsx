@@ -30,6 +30,7 @@ interface Paciente {
     nombre: string;
     apellido: string;
     dni?: string;
+    nombreCompleto?: string;
   };
   nombreCompleto?: string;
 }

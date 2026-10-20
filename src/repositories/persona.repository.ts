@@ -69,7 +69,7 @@ export class PersonaRepository {
   // Eliminar una persona (soft delete si está configurado en BaseEntity)
   async delete(id: string): Promise<boolean> {
     const deleteResult = await this.repository.delete(id);
-    return deleteResult.affected !== undefined && deleteResult.affected > 0;
+    return (deleteResult.affected ?? 0) > 0;
   }
 
   // Verificar si existe una persona con un DNI específico (útil para validaciones)

@@ -1,5 +1,6 @@
 // src/app/api/perfiles/[id]/route.ts
 import { type NextRequest, NextResponse } from "next/server"
+import { PerfilEntity } from "@/entities"
 import { getServerSession } from "next-auth"
 import { authConfig } from "@/lib/auth/auth-config"
 import { initializeDatabase } from "@/lib/database"
@@ -34,7 +35,7 @@ export async function GET(request: NextRequest, { params: paramsPromise }: { par
     const dataSource = await initializeDatabase()
 
     // Buscar el perfil
-    const perfilEntity = await dataSource.getRepository("PerfilEntity").findOne({
+    const perfilEntity = await dataSource.getRepository(PerfilEntity).findOne({
       where: { id: perfilId },
     })
 
@@ -69,7 +70,6 @@ export async function GET(request: NextRequest, { params: paramsPromise }: { par
       id: perfil.id,
       nombre: perfil.nombre,
       descripcion: perfil.descripcion,
-      fechaCreacion: perfilEntity.fechaCreacion,
       permisos,
       usuariosCount,
     }
@@ -110,7 +110,7 @@ export async function DELETE(request: NextRequest, { params: paramsPromise }: { 
     const dataSource = await initializeDatabase()
 
     // Verificar que el perfil existe
-    const perfilEntity = await dataSource.getRepository("PerfilEntity").findOne({
+    const perfilEntity = await dataSource.getRepository(PerfilEntity).findOne({
       where: { id: perfilId },
     })
 
@@ -136,7 +136,7 @@ export async function DELETE(request: NextRequest, { params: paramsPromise }: { 
     await dataSource.getRepository("PerfilTienePermisoEntity").delete({ perfilId: perfilId })
 
     // Eliminar el perfil
-    await dataSource.getRepository("PerfilEntity").delete({ id: perfilId })
+    await dataSource.getRepository(PerfilEntity).delete({ id: perfilId })
 
     return NextResponse.json({ message: "Perfil eliminado exitosamente" }, { status: 200 })
   } catch (error) {
@@ -192,7 +192,7 @@ export async function PUT(request: NextRequest, { params: paramsPromise }: { par
     const dataSource = await initializeDatabase()
 
     // Verificar que el perfil existe
-    const perfilExistente = await dataSource.getRepository("PerfilEntity").findOne({
+    const perfilExistente = await dataSource.getRepository(PerfilEntity).findOne({
       where: { id: perfilId },
     })
 
@@ -201,16 +201,11 @@ export async function PUT(request: NextRequest, { params: paramsPromise }: { par
     }
 
     // Verificar que el nombre no esté en uso por otro perfil
-    const perfilConMismoNombre = await dataSource.getRepository("PerfilEntity").findOne({
+    const perfilConMismoNombre = await dataSource.getRepository(PerfilEntity).findOne({
       where: { nombre: nombre.trim() },
     })
 
-    if (perfilConMismoNombre) {
-      console.log(`DEBUG: perfilId (from URL): ${perfilId}, type: ${typeof perfilId}`);
-      console.log(`DEBUG: perfilConMismoNombre.id (from DB): ${perfilConMismoNombre.id}, type: ${typeof perfilConMismoNombre.id}`);
-    }
-
-    if (perfilConMismoNombre && perfilConMismoNombre.id !== Number(perfilId)) { // Adjusted comparison
+    if (perfilConMismoNombre && String(perfilConMismoNombre.id) !== String(perfilId)) { // Adjusted comparison
       return NextResponse.json(
         {
           message: "El nombre del perfil ya existe",
@@ -229,7 +224,7 @@ export async function PUT(request: NextRequest, { params: paramsPromise }: { par
       })
 
       // Actualizar el perfil
-      await dataSource.getRepository("PerfilEntity").update(perfilId, {
+      await dataSource.getRepository(PerfilEntity).update(perfilId, {
         nombre: perfilActualizado.nombre,
         descripcion: perfilActualizado.descripcion,
       })
@@ -266,9 +261,12 @@ export async function PUT(request: NextRequest, { params: paramsPromise }: { par
       }
 
       // Obtener el perfil actualizado
-      const perfilFinal = await dataSource.getRepository("PerfilEntity").findOne({
+      const perfilFinal = await dataSource.getRepository(PerfilEntity).findOne({
         where: { id: perfilId },
       })
+      if (!perfilFinal) {
+        return NextResponse.json({ message: "Perfil no encontrado" }, { status: 404 })
+      }
 
       return NextResponse.json(
         {
@@ -325,7 +323,7 @@ export async function GET(request: NextRequest, { params: paramsPromise }: { par
     const dataSource = await initializeDatabase()
 
     // Buscar el perfil
-    const perfilEntity = await dataSource.getRepository("PerfilEntity").findOne({
+    const perfilEntity = await dataSource.getRepository(PerfilEntity).findOne({
       where: { id: perfilId },
     })
 
@@ -393,7 +391,7 @@ export async function DELETE(request: NextRequest, { params: paramsPromise }: { 
     const dataSource = await initializeDatabase()
 
     // Verificar que el perfil existe
-    const perfilEntity = await dataSource.getRepository("PerfilEntity").findOne({
+    const perfilEntity = await dataSource.getRepository(PerfilEntity).findOne({
       where: { id: perfilId },
     })
 
@@ -419,7 +417,7 @@ export async function DELETE(request: NextRequest, { params: paramsPromise }: { 
     await dataSource.getRepository("PerfilTienePermisoEntity").delete({ perfilId: perfilId })
 
     // Eliminar el perfil
-    await dataSource.getRepository("PerfilEntity").delete({ id: perfilId })
+    await dataSource.getRepository(PerfilEntity).delete({ id: perfilId })
 
     return NextResponse.json({ message: "Perfil eliminado exitosamente" }, { status: 200 })
   } catch (error) {
@@ -466,7 +464,7 @@ export async function PUT(request: NextRequest, { params: paramsPromise }: { par
     const dataSource = await initializeDatabase()
 
     // Verificar que el perfil existe
-    const perfilExistente = await dataSource.getRepository("PerfilEntity").findOne({
+    const perfilExistente = await dataSource.getRepository(PerfilEntity).findOne({
       where: { id: perfilId },
     })
 
@@ -475,7 +473,7 @@ export async function PUT(request: NextRequest, { params: paramsPromise }: { par
     }
 
     // Verificar que el nombre no esté en uso por otro perfil
-    const perfilConMismoNombre = await dataSource.getRepository("PerfilEntity").findOne({
+    const perfilConMismoNombre = await dataSource.getRepository(PerfilEntity).findOne({
       where: { nombre: nombre.trim() },
     })
 
@@ -498,7 +496,7 @@ export async function PUT(request: NextRequest, { params: paramsPromise }: { par
       })
 
       // Actualizar el perfil
-      await dataSource.getRepository("PerfilEntity").update(perfilId, {
+      await dataSource.getRepository(PerfilEntity).update(perfilId, {
         nombre: perfilActualizado.nombre,
         descripcion: perfilActualizado.descripcion,
       })
@@ -535,7 +533,7 @@ export async function PUT(request: NextRequest, { params: paramsPromise }: { par
       }
 
       // Obtener el perfil actualizado
-      const perfilFinal = await dataSource.getRepository("PerfilEntity").findOne({
+      const perfilFinal = await dataSource.getRepository(PerfilEntity).findOne({
         where: { id: perfilId },
       })
 

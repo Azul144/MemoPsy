@@ -122,7 +122,7 @@ export class SesionRepository {
      */
     async delete(id: string): Promise<boolean> {
         const result = await this.repository.softDelete(id);
-        return result.affected > 0;
+        return (result.affected ?? 0) > 0;
     }
 
     /**
@@ -130,7 +130,7 @@ export class SesionRepository {
      */
     async restore(id: string): Promise<boolean> {
         const result = await this.repository.restore(id);
-        return result.affected > 0;
+        return (result.affected ?? 0) > 0;
     }
 
     /**

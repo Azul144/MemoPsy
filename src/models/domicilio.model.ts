@@ -75,8 +75,8 @@ export class Domicilio extends Base {
         numero: entity.numero,
         codigoPostal: entity.codigoPostal,
         calle: entity.calle,
-        persona: entity.persona, //? Persona.fromEntity(entity.persona) : undefined,
-        ciudad: entity.ciudad //? Ciudad.fromEntity(entity.ciudad) : undefined
+        persona: entity.persona ? Persona.fromEntity(entity.persona) : undefined,
+        ciudad: entity.ciudad ? Ciudad.fromEntity(entity.ciudad) : undefined
       });
     }
     

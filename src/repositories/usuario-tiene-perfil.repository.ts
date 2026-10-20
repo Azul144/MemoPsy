@@ -42,7 +42,7 @@ export class UsuarioTienePerfilRepository {
 
   async delete(usuarioId: string, perfilId: string): Promise<boolean> {
     const result = await this.repository.delete({ usuarioId, perfilId });
-    return result.affected > 0;
+    return (result.affected ?? 0) > 0;
   }
 
   async deleteByUsuarioId(usuarioId: string): Promise<number> {

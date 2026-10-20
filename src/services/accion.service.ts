@@ -26,7 +26,7 @@ export class AccionService {
 
       return this.mapToResponseDto(accionEntity);
     } catch (error) {
-      if (error.message.includes('El nombre no puede estar vacío')) {
+      if (error instanceof Error && error.message.includes('El nombre no puede estar vacío')) {
         throw new BadRequestException(error.message);
       }
       throw error;
@@ -73,7 +73,7 @@ export class AccionService {
         const accionModel = Accion.fromEntity(existingAccion);
         accionModel.nombre = updateAccionDto.nombre;
       } catch (error) {
-        if (error.message.includes('El nombre no puede estar vacío')) {
+        if (error instanceof Error && error.message.includes('El nombre no puede estar vacío')) {
           throw new BadRequestException(error.message);
         }
         throw error;

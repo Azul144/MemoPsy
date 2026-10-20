@@ -98,7 +98,7 @@ export class UsuarioRepository {
   // Eliminar un usuario (soft delete si está configurado en BaseEntity)
   async delete(id: string): Promise<boolean> {
     const deleteResult = await this.repository.delete(id);
-    return deleteResult.affected !== undefined && deleteResult.affected > 0;
+    return (deleteResult.affected ?? 0) > 0;
   }
 
   // Verificar si existe un usuario con un email específico

@@ -43,7 +43,7 @@ export class PerfilTienePermisoRepository {
 
     async delete(perfilId: string, permisoId: string): Promise<boolean> {
         const result = await this.repository.delete({ perfilId, permisoId });
-        return result.affected > 0;
+        return (result.affected ?? 0) > 0;
     }
 
     async deleteByPerfilId(perfilId: string): Promise<number> {
