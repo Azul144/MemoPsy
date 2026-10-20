@@ -62,6 +62,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '10', 10);
     const pacienteId = searchParams.get('pacienteId');
     const pacienteSearch = searchParams.get('pacienteSearch');
+    const etiqueta = searchParams.get('etiqueta')?.trim();
     let effectiveSortBy = searchParams.get('sortBy') || 'informe.fechaCreacion'; // Default sort column
     const sortOrder = searchParams.get('sortOrder')?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC'; // Default sort order
 
@@ -97,7 +98,12 @@ export async function GET(request: NextRequest) {
           .andWhere('(pacientePersona.nombre LIKE :query OR pacientePersona.apellido LIKE :query OR pacientePersona.dni LIKE :query)', 
                     { query: `%${pacienteSearch}%` });*/
       }
-      
+
+      // Filtro por etiqueta (RF 2.1): busca el texto dentro de la lista de etiquetas del informe.
+      if (etiqueta) {
+        queryBuilder.andWhere('informe.etiquetas LIKE :etiq', { etiq: `%${etiqueta}%` });
+      }
+
       if (!effectiveSortBy.includes('.')) {
         effectiveSortBy = `informe.${effectiveSortBy}`;
       }

@@ -2,7 +2,7 @@
 
 import { Suspense, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { MODULOS_DISPONIBLES, type ModuloConfig } from "@/config/modulos";
-import { useSession, signOut } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
 import EncabezadoPagina from "@/components/sistema/EncabezadoPagina";
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -23,7 +23,8 @@ import { cn } from "@/lib/utils";
 interface Informe {
   id: string;
   titulo: string;
-  fechaCreacion: string; 
+  etiquetas?: string | null;
+  fechaCreacion: string;
   esPrivado: boolean;
   psicologo?: { id: string; nombre: string; }; 
   pacientes?: Array<{ id: string; nombre: string; dni?: string }>;
@@ -89,9 +90,11 @@ function ListaInformes() {
     totalItems: 0,
   });
   
-  const [filtersPsicologo, setFiltersPsicologo] = useState<{ pacienteQuery: string }>({ 
-    pacienteQuery: searchParams.get('psicologoPacienteSearch') || '', 
+  const [filtersPsicologo, setFiltersPsicologo] = useState<{ pacienteQuery: string; etiquetaQuery: string }>({
+    pacienteQuery: searchParams.get('psicologoPacienteSearch') || '',
+    etiquetaQuery: searchParams.get('psicologoEtiqueta') || '',
   });
+  const [etiquetaInput, setEtiquetaInput] = useState(searchParams.get('psicologoEtiqueta') || '');
   
   const [selectedPacienteFilterPsicologo, setSelectedPacienteFilterPsicologo] = useState<PacienteInfo | null>(null);
   
@@ -194,6 +197,11 @@ function ListaInformes() {
       } else if (filtersPsicologo.pacienteQuery) {
           params.set('psicologoPacienteSearch', filtersPsicologo.pacienteQuery);
       }
+
+      params.delete('psicologoEtiqueta');
+      if (filtersPsicologo.etiquetaQuery) {
+          params.set('psicologoEtiqueta', filtersPsicologo.etiquetaQuery);
+      }
     }
 
     // Update patient pagination
@@ -225,6 +233,10 @@ function ListaInformes() {
         params.append('pacienteSearch', filtersPsicologo.pacienteQuery);
     }
 
+    if (filtersPsicologo.etiquetaQuery) {
+        params.append('etiqueta', filtersPsicologo.etiquetaQuery);
+    }
+
     try {
       const response = await fetch(`/api/informes?${params.toString()}`);
       if (!response.ok) {
@@ -245,7 +257,7 @@ function ListaInformes() {
     } 
     finally { setIsLoadingPsicologo(false); }
   }, [status, hasPermissionToViewPage, paginationPsicologo.currentPage, paginationPsicologo.limit, 
-      sortingPsicologo, filtersPsicologo.pacienteQuery, userRoles.isPsicologo, selectedPacienteFilterPsicologo]);
+      sortingPsicologo, filtersPsicologo.pacienteQuery, filtersPsicologo.etiquetaQuery, userRoles.isPsicologo, selectedPacienteFilterPsicologo]);
 
   const fetchInformesPaciente = useCallback(async () => {
     if (status !== 'authenticated' || !hasPermissionToViewPage || !userRoles.isPaciente) return;
@@ -392,13 +404,14 @@ function ListaInformes() {
   const clearPacienteFilter = () => {
     setSelectedPacienteFilterPsicologo(null);
     setPacienteSearchInput('');
-    setFiltersPsicologo({ pacienteQuery: '' });
+    setFiltersPsicologo({ pacienteQuery: '', etiquetaQuery: '' });
+    setEtiquetaInput('');
     setPaginationPsicologo(prev => ({ ...prev, currentPage: 1 }));
   };
-  
+
   const handleApplyGeneralSearch = () => {
     setSelectedPacienteFilterPsicologo(null);
-    setFiltersPsicologo({ pacienteQuery: pacienteSearchInput });
+    setFiltersPsicologo({ pacienteQuery: pacienteSearchInput, etiquetaQuery: etiquetaInput.trim() });
     setPaginationPsicologo(prev => ({ ...prev, currentPage: 1 }));
   }
 
@@ -505,7 +518,16 @@ function ListaInformes() {
               <TableBody>
                 {informes.map((informe) => (
                   <TableRow key={informe.id} className="hover:bg-[#2A4A4A] border-gray-600">
-                    <TableCell className="text-white font-medium">{informe.titulo}</TableCell>
+                    <TableCell className="text-white font-medium">
+                      {informe.titulo}
+                      {informe.etiquetas && informe.etiquetas.trim() && (
+                        <div className="mt-1 flex flex-wrap gap-1">
+                          {informe.etiquetas.split(',').map((e) => e.trim()).filter(Boolean).map((etq, i) => (
+                            <Badge key={i} className="bg-[#F1C77A]/20 text-[#F1C77A] text-xs font-normal">{etq}</Badge>
+                          ))}
+                        </div>
+                      )}
+                    </TableCell>
                     <TableCell className="text-gray-300">
                       {new Date(informe.fechaCreacion).toLocaleDateString('es-ES', {
                         year: 'numeric',
@@ -668,7 +690,7 @@ function ListaInformes() {
                       <Search className="w-4 h-4" />
                     </Button>
                     
-                    {(selectedPacienteFilterPsicologo || filtersPsicologo.pacienteQuery) && (
+                    {(selectedPacienteFilterPsicologo || filtersPsicologo.pacienteQuery || filtersPsicologo.etiquetaQuery) && (
                       <Button
                         onClick={clearPacienteFilter}
                         variant="outline"
@@ -679,11 +701,33 @@ function ListaInformes() {
                     )}
                   </div>
                   
+                  {/* Filtro por etiqueta (RF 2.1) */}
+                  <div className="mt-4">
+                    <Label htmlFor="etiqueta-filter" className="text-gray-300 mb-2 block">
+                      Filtrar por Etiqueta
+                    </Label>
+                    <Input
+                      id="etiqueta-filter"
+                      value={etiquetaInput}
+                      onChange={(e) => setEtiquetaInput(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') handleApplyGeneralSearch(); }}
+                      placeholder="Ej: ansiedad, seguimiento..."
+                      className="bg-[#152A2A] border-gray-600 text-white placeholder-gray-400"
+                    />
+                  </div>
+
                   {selectedPacienteFilterPsicologo && (
                     <div className="mt-2">
                       <Badge className="bg-[#F1C77A] text-[#1D3434]">
                         <UserCheck className="w-3 h-3 mr-1" />
                         Filtrando por: {selectedPacienteFilterPsicologo.nombreCompleto}
+                      </Badge>
+                    </div>
+                  )}
+                  {filtersPsicologo.etiquetaQuery && (
+                    <div className="mt-2">
+                      <Badge className="bg-[#F1C77A] text-[#1D3434]">
+                        Etiqueta: {filtersPsicologo.etiquetaQuery}
                       </Badge>
                     </div>
                   )}
