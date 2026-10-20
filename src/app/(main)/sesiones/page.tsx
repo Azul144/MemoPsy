@@ -757,7 +757,8 @@ const handleUpdateSesion = async () => {
           modifiers={{ conTurno: diasConTurno }}
           modifiersClassNames={{
             conTurno:
-              "relative after:pointer-events-none after:absolute after:bottom-0.5 after:left-1/2 after:h-1.5 after:w-1.5 after:-translate-x-1/2 after:rounded-full after:bg-[#F1C77A]",
+              // Punto dorado; en el día de hoy (fondo dorado) va oscuro para que se vea
+              "relative after:pointer-events-none after:absolute after:bottom-0.5 after:left-1/2 after:h-1.5 after:w-1.5 after:-translate-x-1/2 after:rounded-full after:bg-[#F1C77A] data-[today=true]:after:bg-[#142B2A]",
           }}
           // En "Registrar Sesiones" no se pueden elegir sábados ni domingos
           disabled={filterType === "all" ? { dayOfWeek: DIAS_NO_HABILES } : undefined}
@@ -803,7 +804,7 @@ const handleUpdateSesion = async () => {
                                 <span className="text-sm text-gray-300">{sesion.modalidad.nombre}</span>
                             </div>
                         )}
-                        {sesion.enlaceVideollamada && (
+                        {sesion.enlaceVideollamada && sesion.estado?.nombre !== "Cancelada" && sesion.estado?.nombre !== "Finalizada" && (
                             <div className="flex items-center space-x-2">
                                 <Video className="w-4 h-4 text-sky-400" />
                                 <a
