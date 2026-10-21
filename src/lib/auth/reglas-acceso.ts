@@ -121,6 +121,8 @@ export const REGLAS_API: Regla[] = [
   { ruta: "/api/informes", metodos: ["GET"], permisos: ["Ver Informes"] },
   { ruta: "/api/informes", metodos: ["POST"], permisos: ["Registrar Informe"] },
   { ruta: "/api/informes/[id]", metodos: ["GET"], permisos: ["Ver Informes"] },
+  // RF 2.5 - PDF de la nota (la ruta valida además que sea el autor o un paciente asociado)
+  { ruta: "/api/informes/[id]/pdf", metodos: ["GET"], permisos: ["Ver Informes"] },
   { ruta: "/api/informes/[id]", metodos: ["PUT"], permisos: ["Editar Informe"] },
   { ruta: "/api/informes/[id]", metodos: ["DELETE"], permisos: ["Eliminar Informe"] },
 

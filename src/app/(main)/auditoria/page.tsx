@@ -47,6 +47,7 @@ const NOMBRE_ACCION: Record<string, string> = {
   EDITAR: "Edición",
   ELIMINAR: "Baja",
   VER: "Consulta",
+  EXPORTAR_PDF: "Descarga en PDF",
   CAMBIAR_ESTADO: "Cambio de estado",
   REGISTRAR_PAGO: "Registro de pago",
   ASIGNAR_PERFIL: "Asignación de perfil",

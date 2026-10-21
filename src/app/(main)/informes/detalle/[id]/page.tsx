@@ -13,7 +13,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { TypographyH1, TypographyH2, TypographyP, TypographySmall, TypographyMuted } from '@/components/ui/typography';
-import { FileText as PageIcon, User, Users, CalendarDays, Lock, Unlock, Loader2, AlertTriangle, Edit } from "lucide-react"
+import { FileText as PageIcon, User, Users, CalendarDays, Lock, Unlock, Loader2, AlertTriangle, Edit, Download } from "lucide-react"
+import { avisoError } from "@/lib/avisos";
 
 // Interfaces
 interface PsicologoDetalle {
@@ -59,6 +60,32 @@ export default function DetalleInformePage() {
   const [isLoadingData, setIsLoadingData] = useState(true); // Renamed for clarity
   const [pageError, setPageError] = useState<string | null>(null); // Renamed for clarity
   const [canEdit, setCanEdit] = useState(false);
+  const [descargandoPdf, setDescargandoPdf] = useState(false);
+
+  // RF 2.5 - El PDF se genera en el servidor en el momento y se descarga; no queda guardado
+  const descargarPdf = async () => {
+    if (!informe) return;
+    setDescargandoPdf(true);
+    try {
+      const res = await fetch(`/api/informes/${informe.id}/pdf`);
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        avisoError(data?.error || "No se pudo generar el PDF.");
+        return;
+      }
+      const nombre = res.headers.get("Content-Disposition")?.match(/filename="([^"]+)"/)?.[1] ?? `informe-${informe.id}.pdf`;
+      const url = URL.createObjectURL(await res.blob());
+      const enlace = document.createElement("a");
+      enlace.href = url;
+      enlace.download = nombre;
+      enlace.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      avisoError("No se pudo descargar el PDF. Verificá tu conexión.");
+    } finally {
+      setDescargandoPdf(false);
+    }
+  };
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -162,17 +189,27 @@ export default function DetalleInformePage() {
         {informe && (
           <Card className="shadow-lg max-w-3xl mx-auto" style={{ backgroundColor: '#1D3434', borderColor: '#2A4A4A' }}>
             <CardHeader className="p-6 border-b border-gray-700">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                    <PageIcon className="h-8 w-8 text-[#F1C77A]" />
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-start gap-4">
+                    {/* Ícono en recuadro, del alto de la primera línea del título */}
+                    <span className="mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#F1C77A]/15 lg:mt-1 lg:h-14 lg:w-14">
+                        <PageIcon className="h-6 w-6 text-[#F1C77A] lg:h-8 lg:w-8" />
+                    </span>
                     <TypographyH1 className="text-3xl font-semibold text-white">{informe.titulo}</TypographyH1>
                 </div>
-                {canEdit && (
-                    <Button onClick={() => router.push(`/informes/editar/${informe.id}`)}
-                        className="bg-[#F1C77A] text-[#1D3434] hover:bg-opacity-80">
-                        <Edit className="mr-2 h-4 w-4" /> Editar Informe
-                    </Button>
-                )}
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button onClick={descargarPdf} disabled={descargandoPdf} variant="outline"
+                      className="border-[#F1C77A] text-[#F1C77A] hover:bg-[#F1C77A]/10">
+                      {descargandoPdf ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
+                      Descargar PDF
+                  </Button>
+                  {canEdit && (
+                      <Button onClick={() => router.push(`/informes/editar/${informe.id}`)}
+                          className="bg-[#F1C77A] text-[#1D3434] hover:bg-opacity-80">
+                          <Edit className="mr-2 h-4 w-4" /> Editar Informe
+                      </Button>
+                  )}
+                </div>
               </div>
               <CardDescription className="text-gray-400 mt-2">
                 ID del Informe: <TypographyMuted className="text-gray-500">{informe.id}</TypographyMuted>
