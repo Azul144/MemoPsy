@@ -90,11 +90,13 @@ function ListaInformes() {
     totalItems: 0,
   });
   
-  const [filtersPsicologo, setFiltersPsicologo] = useState<{ pacienteQuery: string; etiquetaQuery: string }>({
+  const [filtersPsicologo, setFiltersPsicologo] = useState<{ pacienteQuery: string; etiquetaQuery: string; palabraQuery: string }>({
     pacienteQuery: searchParams.get('psicologoPacienteSearch') || '',
     etiquetaQuery: searchParams.get('psicologoEtiqueta') || '',
+    palabraQuery: searchParams.get('psicologoPalabra') || '',
   });
   const [etiquetaInput, setEtiquetaInput] = useState(searchParams.get('psicologoEtiqueta') || '');
+  const [palabraInput, setPalabraInput] = useState(searchParams.get('psicologoPalabra') || '');
   
   const [selectedPacienteFilterPsicologo, setSelectedPacienteFilterPsicologo] = useState<PacienteInfo | null>(null);
   
@@ -202,6 +204,11 @@ function ListaInformes() {
       if (filtersPsicologo.etiquetaQuery) {
           params.set('psicologoEtiqueta', filtersPsicologo.etiquetaQuery);
       }
+
+      params.delete('psicologoPalabra');
+      if (filtersPsicologo.palabraQuery) {
+          params.set('psicologoPalabra', filtersPsicologo.palabraQuery);
+      }
     }
 
     // Update patient pagination
@@ -237,6 +244,10 @@ function ListaInformes() {
         params.append('etiqueta', filtersPsicologo.etiquetaQuery);
     }
 
+    if (filtersPsicologo.palabraQuery) {
+        params.append('palabra', filtersPsicologo.palabraQuery);
+    }
+
     try {
       const response = await fetch(`/api/informes?${params.toString()}`);
       if (!response.ok) {
@@ -257,7 +268,7 @@ function ListaInformes() {
     } 
     finally { setIsLoadingPsicologo(false); }
   }, [status, hasPermissionToViewPage, paginationPsicologo.currentPage, paginationPsicologo.limit, 
-      sortingPsicologo, filtersPsicologo.pacienteQuery, filtersPsicologo.etiquetaQuery, userRoles.isPsicologo, selectedPacienteFilterPsicologo]);
+      sortingPsicologo, filtersPsicologo.pacienteQuery, filtersPsicologo.etiquetaQuery, filtersPsicologo.palabraQuery, userRoles.isPsicologo, selectedPacienteFilterPsicologo]);
 
   const fetchInformesPaciente = useCallback(async () => {
     if (status !== 'authenticated' || !hasPermissionToViewPage || !userRoles.isPaciente) return;
@@ -404,14 +415,15 @@ function ListaInformes() {
   const clearPacienteFilter = () => {
     setSelectedPacienteFilterPsicologo(null);
     setPacienteSearchInput('');
-    setFiltersPsicologo({ pacienteQuery: '', etiquetaQuery: '' });
+    setFiltersPsicologo({ pacienteQuery: '', etiquetaQuery: '', palabraQuery: '' });
     setEtiquetaInput('');
+    setPalabraInput('');
     setPaginationPsicologo(prev => ({ ...prev, currentPage: 1 }));
   };
 
   const handleApplyGeneralSearch = () => {
     setSelectedPacienteFilterPsicologo(null);
-    setFiltersPsicologo({ pacienteQuery: pacienteSearchInput, etiquetaQuery: etiquetaInput.trim() });
+    setFiltersPsicologo({ pacienteQuery: pacienteSearchInput, etiquetaQuery: etiquetaInput.trim(), palabraQuery: palabraInput.trim() });
     setPaginationPsicologo(prev => ({ ...prev, currentPage: 1 }));
   }
 
@@ -690,7 +702,7 @@ function ListaInformes() {
                       <Search className="w-4 h-4" />
                     </Button>
                     
-                    {(selectedPacienteFilterPsicologo || filtersPsicologo.pacienteQuery || filtersPsicologo.etiquetaQuery) && (
+                    {(selectedPacienteFilterPsicologo || filtersPsicologo.pacienteQuery || filtersPsicologo.etiquetaQuery || filtersPsicologo.palabraQuery) && (
                       <Button
                         onClick={clearPacienteFilter}
                         variant="outline"
@@ -716,6 +728,21 @@ function ListaInformes() {
                     />
                   </div>
 
+                  {/* Búsqueda por palabra clave (RF 2.1): en el título, el texto y las etiquetas */}
+                  <div className="mt-4">
+                    <Label htmlFor="palabra-filter" className="text-gray-300 mb-2 block">
+                      Buscar por palabra clave
+                    </Label>
+                    <Input
+                      id="palabra-filter"
+                      value={palabraInput}
+                      onChange={(e) => setPalabraInput(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') handleApplyGeneralSearch(); }}
+                      placeholder="Busca en el título y el texto de la nota..."
+                      className="bg-[#152A2A] border-gray-600 text-white placeholder-gray-400"
+                    />
+                  </div>
+
                   {selectedPacienteFilterPsicologo && (
                     <div className="mt-2">
                       <Badge className="bg-[#F1C77A] text-[#1D3434]">
@@ -728,6 +755,13 @@ function ListaInformes() {
                     <div className="mt-2">
                       <Badge className="bg-[#F1C77A] text-[#1D3434]">
                         Etiqueta: {filtersPsicologo.etiquetaQuery}
+                      </Badge>
+                    </div>
+                  )}
+                  {filtersPsicologo.palabraQuery && (
+                    <div className="mt-2">
+                      <Badge className="bg-[#F1C77A] text-[#1D3434]">
+                        Palabra clave: {filtersPsicologo.palabraQuery}
                       </Badge>
                     </div>
                   )}

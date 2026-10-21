@@ -2,6 +2,7 @@
 import { Column, Entity, ManyToOne, JoinColumn, OneToMany } from "typeorm";
 import { BaseEntity } from "./base-entity";
 import { PsicologoEntity } from "./psicologo.entity";
+import { columnaCifrada } from "../lib/auth/columna-cifrada";
 
 @Entity({ name: "informe" })
 export class InformeEntity extends BaseEntity {
@@ -11,7 +12,8 @@ export class InformeEntity extends BaseEntity {
   @Column({ name: "titulo" })
   titulo: string;
 
-  @Column({ name: "contenido", type: "text" })
+  // Cifrado en la base (RNF Seguridad)
+  @Column({ name: "contenido", type: "text", transformer: columnaCifrada })
   contenido: string;
 
   // RF 2.1 - Etiquetas separadas por coma para categorizar y buscar

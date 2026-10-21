@@ -18,6 +18,11 @@ import { In } from 'typeorm';
 //  return new Date(data.utc_datetime); // o data.datetime si prefieres hora local
 //}
 
+// Minúsculas y sin tildes, para que "ansiedad" encuentre "Ansiedad" y "sesion" encuentre "sesión"
+function normalizarTexto(texto: string): string {
+  return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+}
+
 async function obtenerFechaDesdeInternet(retries = 3, delay = 1000): Promise<Date> {
   for (let i = 0; i < retries; i++) {
     try {
@@ -64,6 +69,7 @@ export async function GET(request: NextRequest) {
     const pacienteId = searchParams.get('pacienteId');
     const pacienteSearch = searchParams.get('pacienteSearch');
     const etiqueta = searchParams.get('etiqueta')?.trim();
+    const palabra = searchParams.get('palabra')?.trim();
     let effectiveSortBy = searchParams.get('sortBy') || 'informe.fechaCreacion'; // Default sort column
     const sortOrder = searchParams.get('sortOrder')?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC'; // Default sort order
 
@@ -110,8 +116,20 @@ export async function GET(request: NextRequest) {
       }
       queryBuilder.orderBy(effectiveSortBy, sortOrder as 'ASC' | 'DESC');
       
-      totalInformes = await queryBuilder.getCount();
-      const informes = await queryBuilder.skip((page - 1) * limit).take(limit).getMany();
+      let informes: InformeEntity[];
+      if (palabra) {
+        // RF 2.1 - Búsqueda por palabra clave. El contenido está cifrado en la base, así que no se
+        // puede buscar con LIKE: se traen las notas del psicólogo ya descifradas y se filtran acá.
+        const buscada = normalizarTexto(palabra);
+        const coincidentes = (await queryBuilder.getMany()).filter((informe) =>
+          normalizarTexto(`${informe.titulo} ${informe.contenido} ${informe.etiquetas ?? ''}`).includes(buscada),
+        );
+        totalInformes = coincidentes.length;
+        informes = coincidentes.slice((page - 1) * limit, page * limit);
+      } else {
+        totalInformes = await queryBuilder.getCount();
+        informes = await queryBuilder.skip((page - 1) * limit).take(limit).getMany();
+      }
 
       informesData = await Promise.all(informes.map(async (informe) => {
         const pacientesInformes = await pacienteTieneInformeRepository.find({

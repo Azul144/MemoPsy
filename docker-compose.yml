@@ -1,0 +1,43 @@
+# Despliegue de MemoPsy con Docker: un contenedor para la aplicación y otro para MySQL.
+#   1. Copiar .env.docker.example como .env.docker y completar las claves.
+#   2. docker compose --env-file .env.docker up -d --build
+#   3. La primera vez, crear el administrador:
+#      docker compose exec app node scripts/crear-admin.mjs <email> <contraseña> <nombre> <apellido> <dni>
+#   4. Entrar en http://localhost:8080
+services:
+  db:
+    image: mysql:8.4
+    restart: unless-stopped
+    env_file: .env.docker
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-psicologia_db}
+    # Hora de Argentina para NOW() y CURDATE(), igual que en la aplicación
+    command: ["--default-time-zone=-03:00"]
+    volumes:
+      - datos-mysql:/var/lib/mysql
+      # Solo se ejecutan la primera vez, con el volumen vacío: estructura y catálogos
+      - ./docker/mysql:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  app:
+    build:
+      context: .
+      args:
+        NEXT_PUBLIC_WEB3FORMS_KEY: ${NEXT_PUBLIC_WEB3FORMS_KEY:-}
+    restart: unless-stopped
+    env_file: .env.docker
+    environment:
+      DB_HOST: db
+      DB_PORT: "3306"
+    ports:
+      - "8080:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  datos-mysql:

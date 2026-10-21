@@ -5,6 +5,7 @@ import { Column, Entity, JoinColumn, OneToMany, OneToOne } from "typeorm";
 import { BaseEntity } from "./base-entity";
 import { InformeEntity } from "./informe.entity";
 import type { ActividadSeguimientoEntity } from "./actividad-seguimiento.entity";
+import { columnaCifrada } from "../lib/auth/columna-cifrada";
 
 @Entity({ name: "informe_seguimiento" })
 export class InformeSeguimientoEntity extends BaseEntity {
@@ -12,15 +13,15 @@ export class InformeSeguimientoEntity extends BaseEntity {
   @JoinColumn({ name: "informe_id" })
   informe: InformeEntity;
 
-  // Lo que se trabajó en la sesión, en lenguaje simple
-  @Column({ name: "resumen", type: "text" })
+  // Lo que se trabajó en la sesión, en lenguaje simple (resumen, pautas y avances se guardan cifrados)
+  @Column({ name: "resumen", type: "text", transformer: columnaCifrada })
   resumen: string;
 
-  @Column({ name: "pautas", type: "text", nullable: true })
+  @Column({ name: "pautas", type: "text", nullable: true, transformer: columnaCifrada })
   pautas: string | null;
 
   // Devolución del psicólogo: avances y logros
-  @Column({ name: "avances", type: "text", nullable: true })
+  @Column({ name: "avances", type: "text", nullable: true, transformer: columnaCifrada })
   avances: string | null;
 
   @Column({ name: "fecha_creacion", type: "datetime", default: () => "CURRENT_TIMESTAMP" })

@@ -38,7 +38,6 @@ export class InformeRepository {
   async findAll(queryDto: InformeQueryDto): Promise<{ data: InformeEntity[], total: number }> {
     const {
       titulo,
-      contenido,
       psicologoId,
       esPrivado,
       fechaDesde,
@@ -63,11 +62,7 @@ export class InformeRepository {
       });
     }
 
-    if (contenido) {
-      queryBuilder.andWhere('informe.contenido LIKE :contenido', {
-        contenido: `%${contenido}%`
-      });
-    }
+    // El contenido se guarda cifrado (columnaCifrada): no se puede filtrar con LIKE en la base
 
     if (psicologoId) {
       queryBuilder.andWhere('psicologo.id = :psicologoId', {
@@ -240,7 +235,6 @@ export class InformeRepository {
       .leftJoinAndSelect('informe.psicologo', 'psicologo')
       .leftJoinAndSelect('psicologo.persona', 'persona')
       .where('informe.titulo LIKE :term', { term: `%${searchTerm}%` })
-      .orWhere('informe.contenido LIKE :term', { term: `%${searchTerm}%` })
       .orWhere('persona.nombre LIKE :term', { term: `%${searchTerm}%` })
       .orWhere('persona.apellido LIKE :term', { term: `%${searchTerm}%` })
       .orWhere('psicologo.especialidad LIKE :term', { term: `%${searchTerm}%` })
