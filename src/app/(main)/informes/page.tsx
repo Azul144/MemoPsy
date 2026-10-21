@@ -3,7 +3,8 @@
 
 import { useState, useEffect } from 'react';
 import { MODULOS_DISPONIBLES, type ModuloConfig } from "@/config/modulos";
-import { useSession, signOut } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
+
 import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
 import EncabezadoPagina from "@/components/sistema/EncabezadoPagina";
 import TarjetaAccion from "@/components/sistema/TarjetaAccion";
@@ -11,7 +12,7 @@ import { useRouter } from 'next/navigation';
 import MemopsyLogo from '@/app/components/MemopsyLogo';
 import { Button } from '@/components/ui/button';
 import { TypographyH1, TypographyP } from '@/components/ui/typography';
-import { FileText, PlusSquare, ListChecks, Loader2 } from "lucide-react"
+import { FileText, PlusSquare, ListChecks, Loader2, ClipboardCheck } from "lucide-react"
 
 // Interfaces (identical to perfiles/page.tsx)
 
@@ -44,6 +45,15 @@ const SUB_MODULOS_INFORMES: SubModuloConfig[] = [
     ruta: '/informes/lista',
     permisoRequerido: 'Ver Informes',
   },
+  {
+    // RF 2.4 - El paciente no ve las notas clínicas (son del psicólogo): ve sus informes de seguimiento
+    id: 'mis_seguimientos',
+    nombre: 'Mis informes de seguimiento',
+    descripcion: 'Lo que trabajaste en cada sesión, tus actividades y las pautas de tu psicólogo/a.',
+    icon: ClipboardCheck,
+    ruta: '/informes/seguimiento',
+    permisoRequerido: 'Ver Informes',
+  },
 ];
 
 
@@ -74,6 +84,13 @@ export default function GestionInformesPage() {
       const filteredSubModules = SUB_MODULOS_INFORMES.filter(subModule => {
         if (subModule.id === 'registrar_informe') {
           return userPermissions.includes(subModule.permisoRequerido) && !!session.user.psicologoId;
+        }
+        if (subModule.id === 'mis_seguimientos') {
+          return userPermissions.includes(subModule.permisoRequerido) && !!session.user.pacienteId;
+        }
+        // La lista de notas clínicas no es para el paciente
+        if (subModule.id === 'listar_informes' && session.user.pacienteId && !session.user.psicologoId) {
+          return false;
         }
         return userPermissions.includes(subModule.permisoRequerido);
       });

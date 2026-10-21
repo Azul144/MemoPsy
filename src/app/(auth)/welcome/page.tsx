@@ -8,6 +8,7 @@ import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
 import { useRouter } from 'next/navigation';
 import Image from "next/image";
 import FondoAnimado from "@/components/FondoAnimado";
+import CampanaNotificaciones from "@/components/sistema/CampanaNotificaciones";
 import { Button } from "@/components/ui/button";
 import { Menu, X, LogOut, HomeIcon, KeyRound, Loader2, ArrowRight, ShieldCheck, ShieldAlert } from "lucide-react"
 import MfaSetupModal from "@/components/mfa-setup-modal"; // Import the MFA setup modal
@@ -156,6 +157,7 @@ export default function WelcomePage() {
 
           <div className="relative flex items-center gap-3">
             <span className="hidden text-sm text-crema/70 sm:block">{nombreCompleto}</span>
+            <CampanaNotificaciones />
             <button
               type="button"
               onClick={toggleMenu}

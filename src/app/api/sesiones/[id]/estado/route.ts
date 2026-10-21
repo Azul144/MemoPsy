@@ -9,6 +9,7 @@ import { authConfig } from "@/lib/auth/auth-config"
 import { alcanceSesiones } from "@/lib/auth/alcance-sesiones"
 import { initializeDatabase } from "@/lib/database"
 import { SesionEntity, EstadoEntity } from "@/entities"
+import { notificarCambioDeTurno } from "@/lib/notificaciones/notificar"
 
 const estadoSchema = z.object({
   estadoId: z.coerce.number().int().positive(),
@@ -59,6 +60,16 @@ async function manejarPATCH(request: NextRequest, { params }: { params: Promise<
 
     sesion.estado = estado
     await sesionRepository.save(sesion)
+
+    // RF 3.2 - Si se canceló, se avisa al psicólogo y a los pacientes
+    if (estado.nombre === "Cancelada") {
+      await notificarCambioDeTurno({
+        sesionId: id,
+        tipo: "CANCELACION",
+        inicioAnterior: sesion.fechaHoraInicio,
+        usuarioQueCambia: session.user.id,
+      })
+    }
 
     return NextResponse.json({ ok: true, estado: { id: estado.id, nombre: estado.nombre } })
   } catch (error) {

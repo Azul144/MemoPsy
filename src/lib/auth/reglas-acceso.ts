@@ -40,6 +40,7 @@ export const REGLAS_PAGINAS: Regla[] = [
   { ruta: "/informes/editar/[id]", permisos: ["Editar Informe"] },
   { ruta: "/informes/detalle/[id]", permisos: ["Ver Informes"] },
   { ruta: "/informes/lista", permisos: ["Ver Informes"] },
+  { ruta: "/informes/seguimiento", permisos: ["Ver Informes"] },
   { ruta: "/informes", permisos: ["Ver Informes", "Registrar Informe"] },
   { ruta: "/auditoria", permisos: ["Ver Auditoría"] },
 ];
@@ -109,6 +110,12 @@ export const REGLAS_API: Regla[] = [
   { ruta: "/api/sesiones/[id]/pago", metodos: ["PATCH"], permisos: ["Registrar Pago"] },
   // Cambiar el estado del turno (confirmar / cancelar / reprogramar).
   { ruta: "/api/sesiones/[id]/estado", metodos: ["PATCH"], permisos: ["Editar Sesión"] },
+  // RF 4.3 - El paciente mueve su turno a un horario habilitado (la ruta valida además que sea su turno).
+  { ruta: "/api/sesiones/[id]/reprogramar", metodos: ["GET", "POST"], permisos: ["Ver Sesiones"] },
+  // RF 4.3 - Horarios que el psicólogo habilita (la ruta valida que sean los suyos, o que sea recepción).
+  { ruta: "/api/horarios-disponibles", metodos: ["GET", "PUT"], permisos: AGENDA },
+  // RF 3.2 / 3.3 - Avisos propios: cada uno ve solo los suyos.
+  { ruta: "/api/notificaciones", metodos: ["GET", "PATCH"], permisos: "cualquiera" },
   { ruta: "/api/medios-de-pago", metodos: ["GET"], permisos: ["Registrar Pago"] },
   { ruta: "/api/estados", metodos: ["GET"], permisos: AGENDA },
   { ruta: "/api/estados/[id]", metodos: ["GET"], permisos: AGENDA },
@@ -125,6 +132,12 @@ export const REGLAS_API: Regla[] = [
   { ruta: "/api/informes/[id]/pdf", metodos: ["GET"], permisos: ["Ver Informes"] },
   { ruta: "/api/informes/[id]", metodos: ["PUT"], permisos: ["Editar Informe"] },
   { ruta: "/api/informes/[id]", metodos: ["DELETE"], permisos: ["Eliminar Informe"] },
+  // RF 2.4 - Informe de seguimiento para el paciente (las rutas validan además que sea el autor o un paciente de la nota)
+  { ruta: "/api/informes/[id]/seguimiento", metodos: ["GET"], permisos: ["Ver Informes"] },
+  { ruta: "/api/informes/[id]/seguimiento", metodos: ["PUT"], permisos: ["Registrar Informe", "Editar Informe"] },
+  { ruta: "/api/seguimientos", metodos: ["GET"], permisos: ["Ver Informes"] },
+  { ruta: "/api/seguimientos/[id]/pdf", metodos: ["GET"], permisos: ["Ver Informes"] },
+  { ruta: "/api/actividades-seguimiento/[id]", metodos: ["PATCH"], permisos: ["Ver Informes"] },
 
   // Auditoría (RF 1.4): solo lectura
   { ruta: "/api/auditoria", metodos: ["GET"], permisos: ["Ver Auditoría"] },

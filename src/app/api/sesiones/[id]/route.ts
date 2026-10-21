@@ -9,6 +9,7 @@ import { SesionEntity, PacienteTieneSesionEntity, PsicologoEntity, ModalidadEnti
 import { ZodError, z } from "zod";
 import { esDiaHabilEnConsultorio, MENSAJE_DIA_NO_HABIL } from "@/lib/validaciones/dias-habiles";
 import { buscarSesionSuperpuesta, mensajeSuperposicion, MENSAJE_FIN_ANTES_DE_INICIO } from "@/lib/validaciones/superposicion-sesiones";
+import { notificarCambioDeTurno } from "@/lib/notificaciones/notificar";
 
 // Se lanza dentro de la transacción para cortarla cuando el horario está ocupado
 class ErrorSuperposicion extends Error {}
@@ -177,6 +178,7 @@ async function manejarPUT(request: NextRequest, { params: paramsPromise }: { par
 
     // Start transaction
     let updatedSesionEntity;
+    let inicioAnterior = null as Date | null; // RF 3.2 - para avisar si el turno cambió de horario
     await dataSource.transaction(async transactionalEntityManager => {
         const sesionEntity = await transactionalEntityManager.findOne(SesionEntity, {
             where: { id },
@@ -200,6 +202,8 @@ async function manejarPUT(request: NextRequest, { params: paramsPromise }: { par
         if (superpuesta) {
             throw new ErrorSuperposicion(mensajeSuperposicion(superpuesta));
         }
+
+        inicioAnterior = sesionEntity.fechaHoraInicio;
 
         // Update session fields
         sesionEntity.fechaHoraInicio = new Date(fechaHoraInicio);
@@ -290,6 +294,20 @@ async function manejarPUT(request: NextRequest, { params: paramsPromise }: { par
             : null,
         pacientes: pacientesAsociados,
     };
+
+    // RF 3.2 - Avisar a las partes si el turno se canceló o cambió de horario
+    if (inicioAnterior) {
+        const cancelada = finalSesionConRelaciones.estado?.nombre === "Cancelada";
+        const cambioHorario = new Date(inicioAnterior).getTime() !== finalSesionConRelaciones.fechaHoraInicio.getTime();
+        if (cancelada || cambioHorario) {
+            await notificarCambioDeTurno({
+                sesionId: id,
+                tipo: cancelada ? "CANCELACION" : "REPROGRAMACION",
+                inicioAnterior,
+                usuarioQueCambia: session.user.id,
+            });
+        }
+    }
 
     return NextResponse.json(sesionTransformada, { status: 200 });
 

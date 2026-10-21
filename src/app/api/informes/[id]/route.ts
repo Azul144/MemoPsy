@@ -129,10 +129,13 @@ async function manejarPUT(request: NextRequest, { params: paramsPromise }: { par
     }
 
     const body = await request.json();
-    const { titulo, contenido, esPrivado, pacientesIds, etiquetas } = body;
+    // RF 2.4 - La nota clínica es siempre privada del psicólogo: lo que se comparte con el
+    // paciente va en el informe de seguimiento. Se ignora cualquier otro valor que llegue.
+    const { titulo, contenido, pacientesIds, etiquetas } = body;
+    const esPrivado = true;
 
-    if (!titulo || !contenido || typeof esPrivado !== 'boolean') {
-      return NextResponse.json({ message: 'Datos incompletos o inválidos: titulo, contenido y esPrivado son requeridos.' }, { status: 400 });
+    if (!titulo || !contenido) {
+      return NextResponse.json({ message: 'Datos incompletos o inválidos: titulo y contenido son requeridos.' }, { status: 400 });
     }
     if (pacientesIds && (!Array.isArray(pacientesIds) || !pacientesIds.every(id => typeof id === 'string'))) {
         return NextResponse.json({ message: 'pacientesIds debe ser un array de strings.' }, { status: 400 });

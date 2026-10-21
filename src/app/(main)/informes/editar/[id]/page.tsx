@@ -14,11 +14,10 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { TypographyH1, TypographyP, TypographySmall } from '@/components/ui/typography';
-import { FileEdit as PageIcon, Search, X, Loader2, AlertTriangle, Save, ArrowLeft } from "lucide-react"
+import { FileEdit as PageIcon, Search, X, Loader2, AlertTriangle, Save, ArrowLeft, Lock } from "lucide-react"
 import { cn } from "@/lib/utils";
 
 // Interfaces
@@ -66,7 +65,7 @@ export default function EditarInformePage() {
     titulo: '',
     contenido: '',
     etiquetas: '',
-    esPrivado: false,
+    esPrivado: true,
     pacientesIds: [] as string[],
   });
   const [initialInformeTitle, setInitialInformeTitle] = useState('');
@@ -198,7 +197,6 @@ export default function EditarInformePage() {
     if (formErrors[name as keyof FormErrors]) setFormErrors(prev => ({ ...prev, [name]: undefined }));
   };
 
-  const handleCheckboxChange = (checked: boolean) => setFormData(prev => ({ ...prev, esPrivado: checked }));
 
   const handleSelectPaciente = (paciente: Paciente) => {
     if (!selectedPacientes.find(p => p.id === paciente.id)) {
@@ -296,10 +294,10 @@ export default function EditarInformePage() {
                     <TypographySmall className="text-gray-400">Separá las etiquetas con comas.</TypographySmall>
                 </div>
 
-                <div className="flex items-center space-x-3">
-                    <Checkbox id="esPrivado" checked={formData.esPrivado} onCheckedChange={handleCheckboxChange} className="data-[state=checked]:bg-[#F1C77A] data-[state=checked]:text-[#1D3434] border-gray-600"/>
-                    <Label htmlFor="esPrivado" className="font-normal text-gray-300">Marcar como privado</Label>
-                </div>
+                <p className="flex items-start gap-2 rounded-md border border-gray-700 bg-[#152A2A] p-3 text-sm text-gray-300">
+                      <Lock className="mt-0.5 h-4 w-4 shrink-0 text-[#F1C77A]" />
+                      La nota clínica es privada: solo la ves vos. Lo que quieras compartir con el paciente lo cargás después en su informe de seguimiento.
+                    </p>
 
                 <div className="space-y-2">
                     <Label htmlFor="pacienteSearch" className="text-gray-200">Pacientes Asociados</Label>

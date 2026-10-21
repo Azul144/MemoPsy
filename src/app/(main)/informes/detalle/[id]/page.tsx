@@ -15,6 +15,7 @@ import { Badge } from '@/components/ui/badge';
 import { TypographyH1, TypographyH2, TypographyP, TypographySmall, TypographyMuted } from '@/components/ui/typography';
 import { FileText as PageIcon, User, Users, CalendarDays, Lock, Unlock, Loader2, AlertTriangle, Edit, Download } from "lucide-react"
 import { avisoError } from "@/lib/avisos";
+import SeccionSeguimiento from "@/components/informes/SeccionSeguimiento";
 
 // Interfaces
 interface PsicologoDetalle {
@@ -261,7 +262,7 @@ export default function DetalleInformePage() {
                     {informe.esPrivado ? <Lock className="mr-2 h-5 w-5 text-red-500" /> : <Unlock className="mr-2 h-5 w-5 text-green-500" />}
                     <Label className="font-semibold text-gray-200">Privacidad:</Label>
                   </div>
-                  <TypographyP className="ml-7 text-gray-300">{informe.esPrivado ? 'Privado (Solo visible para el psicólogo)' : 'No Privado (Visible para pacientes asociados)'}</TypographyP>
+                  <TypographyP className="ml-7 text-gray-300">{informe.esPrivado ? 'Privada: solo la ves vos. El paciente ve únicamente su informe de seguimiento.' : 'Compartida con los pacientes asociados'}</TypographyP>
                 </div>
               </div>
               
@@ -287,6 +288,11 @@ export default function DetalleInformePage() {
                 <TypographySmall className="text-gray-500">Fin del detalle del informe.</TypographySmall>
             </CardFooter>
           </Card>
+        )}
+
+        {/* RF 2.4 - Informe de seguimiento para el paciente: lo arma solo el psicólogo autor de la nota */}
+        {informe && !!session?.user?.psicologoId && String(informe.psicologo?.id) === String(session.user.psicologoId) && (
+          <SeccionSeguimiento informeId={informe.id} tienePacientes={informe.pacientes.length > 0} />
         )}
       </main>
     </div>

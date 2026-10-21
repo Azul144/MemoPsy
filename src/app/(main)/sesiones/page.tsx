@@ -24,13 +24,15 @@ import { Calendar } from "@/components/ui/calendar"
 import { DIAS_NO_HABILES, MENSAJE_DIA_NO_HABIL, esDiaHabil, esFechaHabil, proximoDiaHabil } from "@/lib/validaciones/dias-habiles"
 import { Badge } from "@/components/ui/badge"
 import { TypographyP } from '@/components/ui/typography';
-import { Loader2, X, CalendarIcon, Plus, Users, User, Brain, Clock, MapPin, Activity, Check, Pencil, Wallet, Video } from "lucide-react"
+import { Loader2, X, CalendarIcon, CalendarClock, Plus, Users, User, Brain, Clock, MapPin, Activity, Check, Pencil, Wallet, Video } from "lucide-react"
 import { format, parseISO, isSameDay } from "date-fns"
 import { es } from "date-fns/locale"
 import { cn } from "@/lib/utils"
 import EncabezadoPagina from "@/components/sistema/EncabezadoPagina";
 import { avisoExito, avisoError, confirmar } from "@/lib/avisos";
 import DialogoPago, { type PagoSesion, type MedioDePago } from "@/components/sesiones/DialogoPago";
+import DialogoHorarios from "@/components/sesiones/DialogoHorarios";
+import DialogoReprogramar from "@/components/sesiones/DialogoReprogramar";
 
 interface Sesion {
   id: string
@@ -156,6 +158,9 @@ export default function SesionesPage() {
   // RF 3.5 - Pago de sesiones
   const [mediosDePago, setMediosDePago] = useState<MedioDePago[]>([])
   const [sesionPago, setSesionPago] = useState<Sesion | null>(null)
+  // RF 4.3 - Horarios que habilita el psicólogo y turno que el paciente quiere mover
+  const [horariosAbierto, setHorariosAbierto] = useState(false)
+  const [sesionReprogramar, setSesionReprogramar] = useState<Sesion | null>(null)
 
   // Refs para debounce
   const psicologoSearchTimeout = useRef<NodeJS.Timeout | null>(null)
@@ -384,11 +389,18 @@ const handleUpdateSesion = async () => {
     }
   }, [session])
 
+  // Se carga una sola vez por usuario (no cada vez que NextAuth entrega un objeto de sesión nuevo)
   useEffect(() => {
     if (session?.user) {
       loadInitialData()
     }
-  }, [session])
+  }, [session?.user?.id])
+
+  // Actualiza la lista de turnos sin la pantalla de "Cargando..." (no cierra nada ni cambia el día elegido)
+  const recargarSesiones = async () => {
+    const res = await fetch("/api/sesiones")
+    if (res.ok) setSesiones(await res.json())
+  }
 
   // Efecto para búsqueda de psicólogos con debounce
   useEffect(() => {
@@ -864,7 +876,11 @@ const handleUpdateSesion = async () => {
                     const cerrada = sesion.estado?.nombre === "Finalizada" || sesion.estado?.nombre === "Cancelada"
                     const puedeEditar = permisos.includes("Editar Sesión") && !cerrada
                     const verPago = !!sesion.pago && sesion.estado?.nombre !== "Cancelada"
-                    if (!puedeEditar && !verPago) return null
+                    // RF 4.3 - El paciente puede mover su turno con al menos 24 h de anticipación
+                    const puedeReprogramar =
+                        filterType === "paciente" && !cerrada &&
+                        parseISO(sesion.fechaHoraInicio).getTime() - Date.now() >= 24 * 60 * 60 * 1000
+                    if (!puedeEditar && !verPago && !puedeReprogramar) return null
                     const claseBoton = "h-8 gap-1.5 rounded-full border bg-transparent px-3 text-xs font-medium"
                     return (
                         <div className="mt-3 flex flex-wrap gap-2 border-t border-gray-700/60 pt-3">
@@ -896,6 +912,16 @@ const handleUpdateSesion = async () => {
                                 >
                                     <Wallet className="h-3.5 w-3.5" />
                                     Pago
+                                </Button>
+                            )}
+                            {puedeReprogramar && (
+                                <Button
+                                    variant="outline"
+                                    onClick={() => setSesionReprogramar(sesion)}
+                                    className={cn(claseBoton, "border-orange-400/60 text-orange-300 hover:bg-orange-400/15 hover:text-orange-200")}
+                                >
+                                    <CalendarClock className="h-3.5 w-3.5" />
+                                    Reprogramar
                                 </Button>
                             )}
                             {puedeEditar && (
@@ -1369,6 +1395,14 @@ const handleUpdateSesion = async () => {
                   <CardDescription className="text-gray-300">
                     Sesiones donde figuras como psicólogo asignado
                   </CardDescription>
+                  <Button
+                    variant="outline"
+                    onClick={() => setHorariosAbierto(true)}
+                    className="mt-2 w-full gap-2 border-[#F1C77A]/60 text-[#F1C77A] hover:bg-[#F1C77A]/10 sm:w-fit"
+                  >
+                    <CalendarClock className="h-4 w-4" />
+                    Horarios para reprogramar
+                  </Button>
                 </CardHeader>
                 <CardContent>{renderCalendarWithSessions("psicologo")}</CardContent>
               </Card>
@@ -1634,6 +1668,14 @@ const handleUpdateSesion = async () => {
       onGuardado={(sesionId, pago) =>
         setSesiones((prev) => prev.map((s) => (s.id === sesionId ? { ...s, pago } : s)))
       }
+    />
+
+    {/* RF 4.3 - Reprogramación por el paciente dentro de los horarios del psicólogo */}
+    <DialogoHorarios abierto={horariosAbierto} onClose={() => setHorariosAbierto(false)} />
+    <DialogoReprogramar
+      sesion={sesionReprogramar}
+      onClose={() => setSesionReprogramar(null)}
+      onReprogramada={recargarSesiones}
     />
 
     </div>
