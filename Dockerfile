@@ -18,7 +18,7 @@ ENV NEXT_PUBLIC_WEB3FORMS_KEY=$NEXT_PUBLIC_WEB3FORMS_KEY
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
-# 3) Ejecución: solo dependencias de producción y lo compilado
+# 3) Ejecución: dependencias y lo compilado
 FROM node:22-bookworm-slim AS ejecucion
 WORKDIR /app
 ENV NODE_ENV=production \
@@ -27,7 +27,8 @@ ENV NODE_ENV=production \
 # Zona horaria del consultorio: las fechas de los turnos se guardan en hora de Argentina
 RUN apt-get update && apt-get install -y --no-install-recommends tzdata && rm -rf /var/lib/apt/lists/*
 COPY package.json package-lock.json ./
-RUN npm ci --omit=dev && npm cache clean --force
+# Incluye TypeScript: Next.js lo necesita para leer next.config.ts al arrancar
+COPY --from=dependencias /app/node_modules ./node_modules
 COPY --from=compilacion /app/.next ./.next
 COPY --from=compilacion /app/public ./public
 COPY --from=compilacion /app/next.config.ts ./next.config.ts
