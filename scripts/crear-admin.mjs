@@ -10,9 +10,11 @@ if (!email || !password || !nombre || !apellido || !dni) {
   process.exit(1)
 }
 
-// Misma política de contraseñas que el sistema (RNF Seguridad)
-const politica = [/.{10,}/, /[A-Z]/, /[a-z]/, /\d/, /[^A-Za-z0-9]/]
-if (!politica.every((regla) => regla.test(password)) || password.toLowerCase().includes(email.split("@")[0].toLowerCase())) {
+// Misma política de contraseñas que el sistema (src/lib/validaciones/password.ts, RNF02)
+const politica = [/.{10,}/, /[A-ZÁÉÍÓÚÑ]/, /[a-záéíóúñ]/, /\d/, /[^A-Za-z0-9ÁÉÍÓÚÑáéíóúñ\s]/]
+const parteDelEmail = email.split("@")[0].toLowerCase()
+const contieneEmail = parteDelEmail.length >= 3 && password.toLowerCase().includes(parteDelEmail)
+if (!politica.every((regla) => regla.test(password)) || contieneEmail) {
   console.error("La contraseña necesita 10 caracteres o más, mayúscula, minúscula, número y símbolo, y no puede contener el correo.")
   process.exit(1)
 }
