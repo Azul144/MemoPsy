@@ -8,16 +8,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { Calendar, FileText, HomeIcon, LogOut, Menu, Shield, Users, X } from "lucide-react";
+import { HomeIcon, LogOut, Menu, X } from "lucide-react";
 import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
-
-// Cada módulo aparece si la persona tiene al menos uno de estos permisos
-export const MODULOS = [
-  { nombre: "Usuarios", ruta: "/usuarios", icono: Users, permisos: ["Ver Usuarios", "Registrar Usuario", "Editar Usuario", "Eliminar Usuario"] },
-  { nombre: "Sesiones", ruta: "/sesiones", icono: Calendar, permisos: ["Ver Sesiones", "Registrar Sesión", "Editar Sesión", "Eliminar Sesión", "Asignar Profesional"] },
-  { nombre: "Perfiles", ruta: "/perfiles", icono: Shield, permisos: ["Ver Perfiles", "Registrar Perfil", "Editar Perfil", "Eliminar Perfil", "Asignar Perfil"] },
-  { nombre: "Informes", ruta: "/informes", icono: FileText, permisos: ["Ver Informes", "Registrar Informe", "Editar Informe", "Eliminar Informe"] },
-];
+import { MODULOS_DISPONIBLES } from "@/config/modulos";
 
 export default function BarraSistema() {
   const { data: session } = useSession();
@@ -43,7 +36,8 @@ export default function BarraSistema() {
     ? `${usuario.persona.nombre?.[0] ?? ""}${usuario.persona.apellido?.[0] ?? ""}`
     : (usuario?.email?.[0] ?? "·").toUpperCase();
   const permisos: string[] = (usuario?.permisos ?? []).map((p: { nombre: string }) => p.nombre);
-  const modulos = MODULOS.filter((m) => m.permisos.some((p) => permisos.includes(p)));
+  // Cada módulo aparece si la persona tiene al menos uno de sus permisos (lista central en src/config/modulos.ts)
+  const modulos = MODULOS_DISPONIBLES.filter((m) => m.permisosRequeridos.some((p) => permisos.includes(p)));
 
   return (
     <nav className="sticky top-0 z-40 border-b border-white/10 bg-background/80 backdrop-blur-md">
@@ -99,7 +93,7 @@ export default function BarraSistema() {
                 </Link>
                 {modulos.map((m) => (
                   <Link key={m.ruta} href={m.ruta} className="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-white/5">
-                    <m.icono className="h-5 w-5 text-primary" />
+                    <m.icon className="h-5 w-5 text-primary" />
                     {m.nombre}
                   </Link>
                 ))}

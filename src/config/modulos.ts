@@ -2,7 +2,7 @@
 // Única fuente de verdad de los módulos del sistema (menú y panel de bienvenida).
 // Antes esta lista estaba copiada en 15 páginas; ahora todas la importan desde acá.
 // Para agregar o cambiar un módulo (ruta, ícono, descripción o permisos), se edita solo este archivo.
-import { Users, Calendar, Shield, FileText, type LucideIcon } from "lucide-react";
+import { Users, Calendar, Shield, FileText, ScrollText, type LucideIcon } from "lucide-react";
 
 export interface ModuloConfig {
   id: string;
@@ -45,5 +45,13 @@ export const MODULOS_DISPONIBLES: ModuloConfig[] = [
     icon: FileText,
     ruta: "/informes",
     permisosRequeridos: ["Ver Informes", "Registrar Informe", "Editar Informe", "Eliminar Informe"],
+  },
+  {
+    id: "auditoria",
+    nombre: "Auditoría",
+    descripcion: "Registro de ingresos y cambios sobre datos sensibles (solo lectura)",
+    icon: ScrollText,
+    ruta: "/auditoria",
+    permisosRequeridos: ["Ver Auditoría"],
   },
 ];

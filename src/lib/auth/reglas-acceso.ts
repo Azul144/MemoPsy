@@ -41,6 +41,7 @@ export const REGLAS_PAGINAS: Regla[] = [
   { ruta: "/informes/detalle/[id]", permisos: ["Ver Informes"] },
   { ruta: "/informes/lista", permisos: ["Ver Informes"] },
   { ruta: "/informes", permisos: ["Ver Informes", "Registrar Informe"] },
+  { ruta: "/auditoria", permisos: ["Ver Auditoría"] },
 ];
 
 // ----- API -----
@@ -122,6 +123,9 @@ export const REGLAS_API: Regla[] = [
   { ruta: "/api/informes/[id]", metodos: ["GET"], permisos: ["Ver Informes"] },
   { ruta: "/api/informes/[id]", metodos: ["PUT"], permisos: ["Editar Informe"] },
   { ruta: "/api/informes/[id]", metodos: ["DELETE"], permisos: ["Eliminar Informe"] },
+
+  // Auditoría (RF 1.4): solo lectura
+  { ruta: "/api/auditoria", metodos: ["GET"], permisos: ["Ver Auditoría"] },
 ];
 
 // "/api/usuarios/[id]/estado" → /^\/api\/usuarios\/[^/]+\/estado\/?$/

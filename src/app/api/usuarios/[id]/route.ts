@@ -1,5 +1,6 @@
 // app/api/usuarios/[id]/route.ts
 import { type NextRequest, NextResponse } from "next/server"
+import { conAuditoria } from "@/lib/auditoria/con-auditoria"
 import { getRepository, getDataSource } from "@/lib/database"
 import {
   PersonaEntity,
@@ -114,7 +115,7 @@ export async function GET(request: NextRequest, { params: paramsPromise }: { par
 }
 
 // PUT - Actualizar usuario completo
-export async function PUT(request: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
+async function manejarPUT(request: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
   const params = await paramsPromise;
   const dataSource = await getDataSource()
   const queryRunner = dataSource.createQueryRunner()
@@ -334,7 +335,7 @@ export async function PUT(request: NextRequest, { params: paramsPromise }: { par
 }
 
 // DELETE - Eliminar usuario (opcional)
-export async function DELETE(request: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
+async function manejarDELETE(request: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
   const params = await paramsPromise;
   try {
     const { id } = params
@@ -677,3 +678,7 @@ export async function DELETE(request: NextRequest, { params: paramsPromise }: { 
     return NextResponse.json({ message: "Error al eliminar usuario" }, { status: 500 })
   }
 }*/
+
+// RF 1.4 - Registro de auditoría de esta ruta
+export const PUT = conAuditoria(manejarPUT, { modulo: "Usuarios", accion: "EDITAR", detalle: "Edición de datos del usuario" })
+export const DELETE = conAuditoria(manejarDELETE, { modulo: "Usuarios", accion: "ELIMINAR", detalle: "Baja de usuario" })

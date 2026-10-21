@@ -1,6 +1,7 @@
 // src/app/api/auth/reset-password/route.ts
 // Paso 2 de la recuperación: con el enlace secreto, la persona elige su contraseña nueva.
 import { NextResponse } from "next/server";
+import { conAuditoria } from "@/lib/auditoria/con-auditoria"
 import * as bcrypt from "bcrypt";
 import { initializeDatabase } from "@/lib/database";
 import { UsuarioEntity } from "@/entities";
@@ -9,7 +10,7 @@ import { validarPassword } from "@/lib/validaciones/password";
 
 const ENLACE_INVALIDO = { message: "El enlace no es válido o ya venció. Pedí uno nuevo." };
 
-export async function POST(request: Request) {
+async function manejarPOST(request: Request) {
   let token = "";
   let password = "";
   try {
@@ -62,3 +63,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: "No se pudo actualizar la contraseña. Intentá de nuevo." }, { status: 500 });
   }
 }
+
+// RF 1.4 - Registro de auditoría de esta ruta
+export const POST = conAuditoria(manejarPOST, { modulo: "Autenticación", accion: "RESTABLECER_CONTRASENA", detalle: "Restablecimiento de contraseña por correo" })

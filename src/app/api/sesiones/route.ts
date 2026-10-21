@@ -1,6 +1,7 @@
 // src/app/api/sesiones/route.ts
 // src/app/api/sesiones/route.ts
 import { type NextRequest, NextResponse } from "next/server"
+import { conAuditoria } from "@/lib/auditoria/con-auditoria"
 import { esDiaHabilEnConsultorio, MENSAJE_DIA_NO_HABIL } from "@/lib/validaciones/dias-habiles"
 import { alcanceSesiones, puedeVerSesion } from "@/lib/auth/alcance-sesiones"
 import { buscarSesionSuperpuesta, mensajeSuperposicion, MENSAJE_FIN_ANTES_DE_INICIO } from "@/lib/validaciones/superposicion-sesiones"
@@ -133,7 +134,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
+async function manejarPOST(request: NextRequest) {
   try {
     const session = await getServerSession(authConfig)
 
@@ -428,3 +429,6 @@ export async function POST(request: NextRequest) {
   return SesionController.createSesion(request);
 }
   */
+
+// RF 1.4 - Registro de auditoría de esta ruta
+export const POST = conAuditoria(manejarPOST, { modulo: "Sesiones", accion: "CREAR", detalle: "Alta de turno" })

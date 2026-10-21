@@ -1,8 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server"
+import { conAuditoria } from "@/lib/auditoria/con-auditoria"
 import { getRepository } from "@/lib/database"
 import { UsuarioEntity } from "@/entities"
 
-export async function PATCH(request: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
+async function manejarPATCH(request: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
   const params = await paramsPromise;
   try {
     const { id } = params
@@ -53,3 +54,6 @@ export async function PATCH(request: NextRequest, { params: paramsPromise }: { p
     return NextResponse.json({ message: "Error interno del servidor" }, { status: 500 })
   }
 }
+
+// RF 1.4 - Registro de auditoría de esta ruta
+export const PATCH = conAuditoria(manejarPATCH, { modulo: "Usuarios", accion: "CAMBIAR_ESTADO", detalle: "Activación o desactivación de la cuenta" })

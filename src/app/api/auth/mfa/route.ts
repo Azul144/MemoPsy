@@ -2,6 +2,7 @@
 // Activar, consultar y desactivar la verificación en dos pasos del usuario que tiene la sesión abierta.
 // Acciones: "status" | "enable" (genera el QR) | "verify" (confirma y activa) | "disable"
 import { NextResponse } from "next/server";
+import { ipDelPedido, registrarAuditoria } from "@/lib/auditoria/registrar";
 import { getServerSession } from "next-auth";
 import { authConfig } from "@/lib/auth/auth-config";
 import { initializeDatabase } from "@/lib/database";
@@ -84,6 +85,11 @@ export async function POST(request: Request) {
       }
       const { codigos, hashesGuardados } = await crearCodigosRecuperacion();
       await repo.update(usuario.id, { mfaHabilitado: true, mfaCodigosRecuperacion: hashesGuardados });
+      // RF 1.4 - Solo se registran los cambios reales (no las consultas de estado ni la generación del QR)
+      await registrarAuditoria({
+        usuarioId: usuario.id, email: usuario.email, accion: "ACTIVAR_2FA", modulo: "Autenticación",
+        entidadId: usuario.id, detalle: "Activó la verificación en dos pasos", ip: ipDelPedido(request.headers),
+      });
       // Los códigos se muestran UNA sola vez; en la base solo queda su hash
       return NextResponse.json({ success: true, codigosRecuperacion: codigos });
     }
@@ -107,6 +113,10 @@ export async function POST(request: Request) {
         mfaSecreto: null,
         mfaCodigosRecuperacion: null,
       });
+      await registrarAuditoria({
+        usuarioId: usuario.id, email: usuario.email, accion: "DESACTIVAR_2FA", modulo: "Autenticación",
+        entidadId: usuario.id, detalle: "Desactivó la verificación en dos pasos", ip: ipDelPedido(request.headers),
+      });
       return NextResponse.json({ success: true });
     }
 
@@ -116,3 +126,4 @@ export async function POST(request: Request) {
     return error("Error interno del servidor.", 500);
   }
 }
+

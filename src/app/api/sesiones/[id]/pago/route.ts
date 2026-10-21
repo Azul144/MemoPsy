@@ -3,6 +3,7 @@
 // Va aparte del PUT de la sesión porque el pago se suele cargar cuando la sesión
 // ya está Finalizada, y esas sesiones no se pueden editar.
 import { type NextRequest, NextResponse } from "next/server"
+import { conAuditoria } from "@/lib/auditoria/con-auditoria"
 import { getServerSession } from "next-auth/next"
 import { z } from "zod"
 import { authConfig } from "@/lib/auth/auth-config"
@@ -22,7 +23,7 @@ const pagoSchema = z
     path: ["medioDePagoId"],
   })
 
-export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+async function manejarPATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
     const session = await getServerSession(authConfig)
@@ -80,3 +81,6 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     return NextResponse.json({ error: "Error interno del servidor", details: error.message }, { status: 500 })
   }
 }
+
+// RF 1.4 - Registro de auditoría de esta ruta
+export const PATCH = conAuditoria(manejarPATCH, { modulo: "Sesiones", accion: "REGISTRAR_PAGO", detalle: (d) => (d?.pago?.estado ? `Estado de pago: ${d.pago.estado}` : "Registro de pago") })

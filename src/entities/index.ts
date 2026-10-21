@@ -4,6 +4,7 @@
 // También se puede utilizar para inicializar la conexión a la base de datos y cargar las entidades necesarias.
 export * from "./base-entity"
 export * from "./accion.entity"
+export * from "./auditoria.entity"
 export * from "./estado.entity"
 export * from "./informe.entity"
 export * from "./medio-de-pago.entity"

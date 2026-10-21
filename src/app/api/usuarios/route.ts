@@ -1,5 +1,6 @@
 // app/api/usuarios/route.ts
 import { type NextRequest, NextResponse } from "next/server"
+import { conAuditoria } from "@/lib/auditoria/con-auditoria"
 import { getRepository } from "@/lib/database"
 import { PersonaEntity, UsuarioEntity, PsicologoEntity, PacienteEntity, ObraSocialEntity } from "@/entities"
 import * as bcrypt from "bcrypt";
@@ -103,7 +104,7 @@ export async function GET() {
   }
 }
 
-export async function POST(request: NextRequest) {
+async function manejarPOST(request: NextRequest) {
   const dataSource = await getDataSource();
   const queryRunner = dataSource.createQueryRunner();
 
@@ -456,3 +457,6 @@ export async function POST(request: NextRequest) {
   return UsuarioController.createUsuario(request);
 }
   */
+
+// RF 1.4 - Registro de auditoría de esta ruta
+export const POST = conAuditoria(manejarPOST, { modulo: "Usuarios", accion: "CREAR", detalle: "Alta de usuario" })

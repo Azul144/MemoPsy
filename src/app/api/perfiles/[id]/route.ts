@@ -1,5 +1,6 @@
 // src/app/api/perfiles/[id]/route.ts
 import { type NextRequest, NextResponse } from "next/server"
+import { conAuditoria } from "@/lib/auditoria/con-auditoria"
 import { PerfilEntity } from "@/entities"
 import { getServerSession } from "next-auth"
 import { authConfig } from "@/lib/auth/auth-config"
@@ -82,7 +83,7 @@ export async function GET(request: NextRequest, { params: paramsPromise }: { par
 }
 
 // DELETE /api/perfiles/[id] - Eliminar perfil
-export async function DELETE(request: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
+async function manejarDELETE(request: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
   const params = await paramsPromise;
   try {
     const session = await getServerSession(authConfig)
@@ -146,7 +147,7 @@ export async function DELETE(request: NextRequest, { params: paramsPromise }: { 
 }
 
 // PUT /api/perfiles/[id] - Actualizar perfil
-export async function PUT(request: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
+async function manejarPUT(request: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
   const params = await paramsPromise;
   try {
     const session = await getServerSession(authConfig)
@@ -590,3 +591,7 @@ export async function DELETE(
   const params = await paramsPromise;
   return PerfilController.deletePerfil(request, { params });
 }*/
+
+// RF 1.4 - Registro de auditoría de esta ruta
+export const PUT = conAuditoria(manejarPUT, { modulo: "Perfiles", accion: "EDITAR", detalle: "Edición de perfil y sus permisos" })
+export const DELETE = conAuditoria(manejarDELETE, { modulo: "Perfiles", accion: "ELIMINAR", detalle: "Baja de perfil" })

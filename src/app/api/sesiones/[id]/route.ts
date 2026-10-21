@@ -1,5 +1,6 @@
 // src/app/api/sesiones/[id]/route.ts
 import { type NextRequest, NextResponse } from "next/server";
+import { conAuditoria } from "@/lib/auditoria/con-auditoria"
 import { getServerSession } from "next-auth/next";
 import { authConfig } from "@/lib/auth/auth-config";
 import { alcanceSesiones, puedeVerSesion } from "@/lib/auth/alcance-sesiones";
@@ -113,7 +114,7 @@ export async function GET(request: NextRequest, { params: paramsPromise }: { par
 }
 
 
-export async function PUT(request: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
+async function manejarPUT(request: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
   const params = await paramsPromise;
   try {
     const session = await getServerSession(authConfig);
@@ -312,3 +313,6 @@ export async function PUT(request: NextRequest, { params: paramsPromise }: { par
     return NextResponse.json({ error: "Error interno del servidor", details: error.message }, { status: 500 });
   }
 }
+
+// RF 1.4 - Registro de auditoría de esta ruta
+export const PUT = conAuditoria(manejarPUT, { modulo: "Sesiones", accion: "EDITAR", detalle: "Edición de turno" })

@@ -2,6 +2,7 @@
 // Cambia SOLO el estado de un turno (confirmar / cancelar / reprogramar), sin tener que
 // reenviar toda la sesión. Lo usan las acciones rápidas de la agenda.
 import { type NextRequest, NextResponse } from "next/server"
+import { conAuditoria } from "@/lib/auditoria/con-auditoria"
 import { getServerSession } from "next-auth/next"
 import { z } from "zod"
 import { authConfig } from "@/lib/auth/auth-config"
@@ -13,7 +14,7 @@ const estadoSchema = z.object({
   estadoId: z.coerce.number().int().positive(),
 })
 
-export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+async function manejarPATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
     const session = await getServerSession(authConfig)
@@ -65,3 +66,6 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 })
   }
 }
+
+// RF 1.4 - Registro de auditoría de esta ruta
+export const PATCH = conAuditoria(manejarPATCH, { modulo: "Sesiones", accion: "CAMBIAR_ESTADO", detalle: (d) => (d?.estado?.nombre ? `Nuevo estado del turno: ${d.estado.nombre}` : "Cambio de estado del turno") })

@@ -23,6 +23,7 @@ import {
 import { initializeDatabase } from "@/lib/database";
 import { verificarLogin } from "./login";
 import { codificarJwt, decodificarJwt } from "./jwt";
+import { ipDelPedido, registrarAuditoria } from "@/lib/auditoria/registrar";
 
 declare module "next-auth" {
   interface User {
@@ -57,10 +58,11 @@ export const authConfig: NextAuthOptions = {
         password: { label: "Contraseña", type: "password" },
         codigo: { label: "Código de verificación", type: "text" },
       },
-      async authorize(credentials): Promise<NextAuthUser | null> {
+      async authorize(credentials, req): Promise<NextAuthUser | null> {
         if (!credentials?.email || !credentials?.password) {
           throw new Error("CREDENCIALES_INVALIDAS");
         }
+        const ip = ipDelPedido(req?.headers);
 
         const dataSource = await initializeDatabase();
 
@@ -75,6 +77,16 @@ export const authConfig: NextAuthOptions = {
             credentials.codigo || undefined
           );
         } catch (error) {
+          // RF 1.4 - Intento de ingreso fallido (MFA_REQUERIDO no es un fallo: es el paso del código)
+          if (!(error instanceof Error && error.message === "MFA_REQUERIDO")) {
+            await registrarAuditoria({
+              email: credentials.email,
+              accion: "LOGIN_FALLIDO",
+              modulo: "Autenticación",
+              detalle: error instanceof Error && ERRORES_CONOCIDOS.includes(error.message) ? error.message : "ERROR_INTERNO",
+              ip,
+            });
+          }
           if (error instanceof Error && ERRORES_CONOCIDOS.includes(error.message)) {
             throw error;
           }
@@ -130,6 +142,16 @@ export const authConfig: NextAuthOptions = {
           if (psicologo) psicologoId = psicologo.id;
         }
 
+        // RF 1.4 - Ingreso exitoso
+        await registrarAuditoria({
+          usuarioId: usuario.id,
+          email: usuario.email,
+          accion: "LOGIN_OK",
+          modulo: "Autenticación",
+          entidadId: usuario.id,
+          ip,
+        });
+
         return {
           id: String(usuario.id),
           email: usuario.email,
@@ -178,6 +200,18 @@ export const authConfig: NextAuthOptions = {
         session.user.psicologoId = token.psicologoId as string | null | undefined;
       }
       return session;
+    },
+  },
+  events: {
+    // RF 1.4 - Cierre de sesión
+    async signOut({ token }) {
+      await registrarAuditoria({
+        usuarioId: (token?.id as string) ?? null,
+        email: (token?.email as string) ?? null,
+        accion: "LOGOUT",
+        modulo: "Autenticación",
+        entidadId: (token?.id as string) ?? null,
+      });
     },
   },
   pages: {

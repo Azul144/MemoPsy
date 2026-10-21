@@ -1,6 +1,7 @@
 // src/app/api/informes/route.ts
 // src/app/api/informes/route.ts
 import { NextRequest, NextResponse } from 'next/server';
+import { conAuditoria } from "@/lib/auditoria/con-auditoria"
 import { getServerSession } from 'next-auth/next';
 import { authConfig } from '@/lib/auth/auth-config';
 import { initializeDatabase } from '@/lib/database';
@@ -185,7 +186,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
+async function manejarPOST(request: NextRequest) {
   try {
     const session = await getServerSession(authConfig);
     if (!session?.user) {
@@ -304,3 +305,6 @@ export async function POST(request: NextRequest) {
   return InformeController.createInforme(request);
 }
   */
+
+// RF 1.4 - Registro de auditoría de esta ruta
+export const POST = conAuditoria(manejarPOST, { modulo: "Informes", accion: "CREAR", detalle: "Alta de nota clínica" })

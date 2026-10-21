@@ -1,5 +1,6 @@
 // src/app/api/perfiles/route.ts
 import { type NextRequest, NextResponse } from "next/server"
+import { conAuditoria } from "@/lib/auditoria/con-auditoria"
 import { getServerSession } from "next-auth"
 import { authConfig } from "@/lib/auth/auth-config"
 import { initializeDatabase } from "@/lib/database"
@@ -72,7 +73,7 @@ export async function GET(request: NextRequest) {
 // POST /api/perfiles - Crear nuevo perfil
 // POST /api/perfiles - Crear nuevo perfil (VERSIÓN CORREGIDA)
 // POST /api/perfiles - Crear nuevo perfil
-export async function POST(request: NextRequest) {
+async function manejarPOST(request: NextRequest) {
   try {
     const session = await getServerSession(authConfig)
 
@@ -414,3 +415,6 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   return PerfilController.createPerfil(request);
 }*/
+
+// RF 1.4 - Registro de auditoría de esta ruta
+export const POST = conAuditoria(manejarPOST, { modulo: "Perfiles", accion: "CREAR", detalle: "Alta de perfil" })

@@ -4,6 +4,7 @@ import { DataSource } from "typeorm"
 import {
   BaseEntity,
   AccionEntity,
+  AuditoriaEntity,
   EstadoEntity,
   InformeEntity,
   MedioDePagoEntity,
@@ -37,6 +38,7 @@ export const AppDataSource = new DataSource({
   entities: [
     BaseEntity,
     AccionEntity,
+  AuditoriaEntity,
     EstadoEntity,
     InformeEntity,
     MedioDePagoEntity,

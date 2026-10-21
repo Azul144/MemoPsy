@@ -52,6 +52,7 @@ export const config = {
     "/sesiones/:path*",
     "/informes/:path*",
     "/perfiles/:path*",
+    "/auditoria/:path*",
     "/api/((?!auth/).*)",
     "/api/auth/mfa/:path*",
   ],

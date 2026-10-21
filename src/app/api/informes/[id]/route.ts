@@ -1,5 +1,6 @@
 // src/app/api/informes/[id]/route.ts
 import { NextRequest, NextResponse } from 'next/server';
+import { conAuditoria } from "@/lib/auditoria/con-auditoria"
 import { getServerSession } from 'next-auth/next';
 import { authConfig } from '@/lib/auth/auth-config'; // Assuming authConfig is in lib
 import { initializeDatabase } from '@/lib/database'; // Assuming db-initializer is in lib
@@ -10,7 +11,7 @@ import { PacienteEntity } from '@/entities/paciente.entity';
 import { AppDataSource } from '@/lib/database';
 import { In } from 'typeorm';
 
-export async function GET(request: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
+async function manejarGET(request: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
   const params = await paramsPromise;
   try {
     const session = await getServerSession(authConfig);
@@ -109,7 +110,7 @@ export async function GET(request: NextRequest, { params: paramsPromise }: { par
 }
 
 
-export async function PUT(request: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
+async function manejarPUT(request: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
   const params = await paramsPromise;
   try {
     const session = await getServerSession(authConfig);
@@ -258,3 +259,7 @@ export async function DELETE(
   return InformeController.deleteInforme(request, { params });
 }
   */
+
+// RF 1.4 - Registro de auditoría de esta ruta
+export const GET = conAuditoria(manejarGET, { modulo: "Informes", accion: "VER", detalle: "Consulta de una nota clínica" })
+export const PUT = conAuditoria(manejarPUT, { modulo: "Informes", accion: "EDITAR", detalle: "Edición de nota clínica" })
