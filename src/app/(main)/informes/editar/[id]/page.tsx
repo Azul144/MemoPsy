@@ -7,6 +7,7 @@ import { MODULOS_DISPONIBLES, type ModuloConfig } from "@/config/modulos";
 import { useSession, signOut } from 'next-auth/react';
 import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
 import EncabezadoPagina from "@/components/sistema/EncabezadoPagina";
+import DictadoVoz from "@/components/sistema/DictadoVoz";
 import { useRouter, useParams } from 'next/navigation';
 import MemopsyLogo from '@/app/components/MemopsyLogo';
 import { Button } from '@/components/ui/button';
@@ -198,6 +199,15 @@ export default function EditarInformePage() {
   };
 
 
+  // Lo dictado se suma al final de lo que ya está escrito, nunca lo reemplaza.
+  const agregarDictado = (texto: string) => {
+    setFormData(prev => ({
+      ...prev,
+      contenido: prev.contenido.trim() ? `${prev.contenido.trimEnd()} ${texto}` : texto,
+    }));
+    if (formErrors.contenido) setFormErrors(prev => ({ ...prev, contenido: undefined }));
+  };
+
   const handleSelectPaciente = (paciente: Paciente) => {
     if (!selectedPacientes.find(p => p.id === paciente.id)) {
       const newSelected = [...selectedPacientes, paciente];
@@ -286,6 +296,7 @@ export default function EditarInformePage() {
                     <Label htmlFor="contenido" className="text-gray-200">Contenido</Label>
                     <Textarea id="contenido" name="contenido" value={formData.contenido} onChange={handleInputChange} rows={8} className={cn("bg-[#152A2A] text-white border-gray-600 focus:border-[#F1C77A]", formErrors.contenido && "border-red-500")} />
                     {formErrors.contenido && <TypographySmall className="text-red-400">{formErrors.contenido}</TypographySmall>}
+                    <DictadoVoz onTexto={agregarDictado} disabled={isSubmitting} />
                 </div>
 
                 <div className="space-y-2">
