@@ -71,6 +71,8 @@ export async function enviarRecordatoriosPorEmail(): Promise<void> {
          JOIN usuario u ON u.persona_id = pa.persona_id AND u.activo = 1
         WHERE s.fecha_hora_inicio BETWEEN ? AND ?
           AND e.nombre NOT IN ('Cancelada', 'Finalizada')
+          -- .test es un dominio reservado que no existe: son las cuentas de prueba y demostración
+          AND u.email NOT LIKE '%.test'
           AND NOT EXISTS (SELECT 1 FROM recordatorio_enviado r
                            WHERE r.sesion_id = s.id AND r.usuario_id = u.id AND r.canal = 'EMAIL')`,
       [ahora, hasta],
