@@ -29,7 +29,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends tzdata && rm -r
 COPY package.json package-lock.json ./
 # Incluye TypeScript: Next.js lo necesita para leer next.config.ts al arrancar
 COPY --from=dependencias /app/node_modules ./node_modules
-COPY --from=compilacion /app/.next ./.next
+# Propiedad del usuario node: Next.js escribe la caché de imágenes dentro de .next
+COPY --from=compilacion --chown=node:node /app/.next ./.next
 COPY --from=compilacion /app/public ./public
 COPY --from=compilacion /app/next.config.ts ./next.config.ts
 COPY --from=compilacion /app/scripts ./scripts
