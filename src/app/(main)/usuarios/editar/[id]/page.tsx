@@ -9,6 +9,7 @@ import { useRouter, useParams } from "next/navigation"
 import MemopsyLogo from "@/app/components/MemopsyLogo"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { AYUDA_CELULAR, normalizarCelular } from "@/lib/telefono"
 import { Label } from "@/components/ui/label"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -50,6 +51,7 @@ interface PersonaDetails {
   apellido: string
   dni: string
   fechaNacimiento: string
+  telefono?: string | null
 }
 
 interface UsuarioDetails {
@@ -79,6 +81,7 @@ interface UserFormData {
   apellido: string
   dni: string
   fechaNacimiento: string
+  telefono: string
   numeroLicencia: string
   especialidad: string
 }
@@ -91,6 +94,7 @@ interface FieldErrors {
   apellido?: string
   dni?: string
   fechaNacimiento?: string
+  telefono?: string
   numeroLicencia?: string
   especialidad?: string
   selectedObraSocialId?: string
@@ -110,6 +114,7 @@ export default function EditarUsuarioPage() {
     apellido: "",
     dni: "",
     fechaNacimiento: "",
+    telefono: "",
     numeroLicencia: "",
     especialidad: "",
   })
@@ -205,6 +210,7 @@ export default function EditarUsuarioPage() {
           apellido: userData.persona.apellido,
           dni: userData.persona.dni,
           fechaNacimiento: userData.persona.fechaNacimiento ? userData.persona.fechaNacimiento.split("T")[0] : "",
+          telefono: userData.persona.telefono || "",
           numeroLicencia: userData.psicologo?.numeroLicencia || "",
           especialidad: userData.psicologo?.especialidad || "",
         })
@@ -342,6 +348,10 @@ export default function EditarUsuarioPage() {
       newErrors.dni = "DNI inválido. Debe contener entre 7 y 8 dígitos numéricos."
     }
 
+    if (normalizarCelular(formData.telefono) === undefined) {
+      newErrors.telefono = AYUDA_CELULAR
+    }
+
     if (!formData.fechaNacimiento) {
       newErrors.fechaNacimiento = "La fecha de nacimiento es requerida."
     } else {
@@ -390,6 +400,7 @@ export default function EditarUsuarioPage() {
         apellido: formData.apellido,
         dni: formData.dni,
         fechaNacimiento: formData.fechaNacimiento,
+        telefono: formData.telefono.trim() || null,
       },
       roles: {
         isPsicologo,
@@ -561,6 +572,26 @@ export default function EditarUsuarioPage() {
                       <p className="text-red-500 text-xs mt-1">{fieldErrors.fechaNacimiento}</p>
                     )}
                   </div>
+                </div>
+                <div>
+                  <Label htmlFor="telefono" className="text-gray-200">
+                    Celular (WhatsApp)
+                  </Label>
+                  <Input
+                    id="telefono"
+                    name="telefono"
+                    type="tel"
+                    inputMode="tel"
+                    value={formData.telefono}
+                    onChange={handleChange}
+                    placeholder="3704 123456"
+                    className="bg-[#2A4242] mt-1"
+                  />
+                  {fieldErrors.telefono ? (
+                    <p className="text-red-500 text-xs mt-1">{fieldErrors.telefono}</p>
+                  ) : (
+                    <p className="text-gray-400 text-xs mt-1">Opcional. Se usa para mandarle al paciente el recordatorio del turno por WhatsApp.</p>
+                  )}
                 </div>
 
                 {/* Account Info */}

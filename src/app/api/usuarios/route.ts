@@ -4,6 +4,7 @@ import { conAuditoria } from "@/lib/auditoria/con-auditoria"
 import { getRepository } from "@/lib/database"
 import { PersonaEntity, UsuarioEntity, PsicologoEntity, PacienteEntity, ObraSocialEntity } from "@/entities"
 import * as bcrypt from "bcrypt";
+import { AYUDA_CELULAR, normalizarCelular } from "@/lib/telefono"
 
 import { getDataSource } from "@/lib/database" // Importar el DataSource
 
@@ -73,6 +74,7 @@ export async function GET() {
               apellido: usuario.persona.apellido,
               dni: usuario.persona.dni,
               fechaNacimiento: usuario.persona.fechaNacimiento,
+              telefono: usuario.persona.telefono,
             }
           : null,
         psicologo: psicologo
@@ -166,12 +168,23 @@ async function manejarPOST(request: NextRequest) {
       )
     }
 
+    // Celular opcional para los recordatorios por WhatsApp
+    const telefono = normalizarCelular(persona.telefono)
+    if (telefono === undefined) {
+      await queryRunner.rollbackTransaction();
+      return NextResponse.json(
+        { message: "El celular no es válido", errors: { telefono: AYUDA_CELULAR } },
+        { status: 400 },
+      )
+    }
+
     // Crear persona
     const nuevaPersona = personaRepo.create({
       nombre: persona.nombre,
       apellido: persona.apellido,
       dni: persona.dni,
       fechaNacimiento: new Date(persona.fechaNacimiento),
+      telefono,
     })
 
     const personaGuardada = await personaRepo.save(nuevaPersona)

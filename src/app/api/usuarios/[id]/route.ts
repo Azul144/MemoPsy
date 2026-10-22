@@ -2,6 +2,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { conAuditoria } from "@/lib/auditoria/con-auditoria"
 import { getRepository, getDataSource } from "@/lib/database"
+import { AYUDA_CELULAR, normalizarCelular } from "@/lib/telefono"
 import {
   PersonaEntity,
   UsuarioEntity,
@@ -101,6 +102,7 @@ export async function GET(request: NextRequest, { params: paramsPromise }: { par
         apellido: usuario.persona.apellido,
         dni: usuario.persona.dni,
         fechaNacimiento: formatDateToISO(usuario.persona.fechaNacimiento),
+        telefono: usuario.persona.telefono,
       },
       psicologo: psicologoData,
       paciente: pacienteData,
@@ -170,12 +172,23 @@ async function manejarPUT(request: NextRequest, { params: paramsPromise }: { par
       )
     }
 
+    // Celular opcional para los recordatorios por WhatsApp
+    const telefono = normalizarCelular(persona.telefono)
+    if (telefono === undefined) {
+      await queryRunner.rollbackTransaction()
+      return NextResponse.json(
+        { message: "El celular no es válido", errors: { telefono: AYUDA_CELULAR } },
+        { status: 400 },
+      )
+    }
+
     // Actualizar datos de persona
     await personaRepo.update(usuarioExistente.persona.id, {
       nombre: persona.nombre,
       apellido: persona.apellido,
       dni: persona.dni,
       fechaNacimiento: new Date(persona.fechaNacimiento),
+      telefono,
     })
 
     // Actualizar datos de usuario

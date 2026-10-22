@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation"
 import MemopsyLogo from "@/app/components/MemopsyLogo"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { AYUDA_CELULAR, normalizarCelular } from "@/lib/telefono"
 import { Label } from "@/components/ui/label"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -41,6 +42,7 @@ interface FormData {
   apellido: string
   dni: string
   fecha_nacimiento: string
+  telefono: string
   numeroLicencia: string
   especialidad: string
 }
@@ -53,6 +55,7 @@ interface FieldErrors {
   apellido?: string
   dni?: string
   fecha_nacimiento?: string
+  telefono?: string
   numeroLicencia?: string
   especialidad?: string
   selectedObraSocialId?: string
@@ -72,6 +75,7 @@ export default function RegistrarUsuarioPage() {
     apellido: "",
     dni: "",
     fecha_nacimiento: "",
+    telefono: "",
     numeroLicencia: "",
     especialidad: "",
   })
@@ -235,6 +239,10 @@ export default function RegistrarUsuarioPage() {
       newErrors.fecha_nacimiento = "La fecha de nacimiento es requerida."
     }
 
+    if (normalizarCelular(formData.telefono) === undefined) {
+      newErrors.telefono = AYUDA_CELULAR
+    }
+
     if (isPsicologo === isPaciente) {
       newErrors.roleSelection = "Debe seleccionar si el usuario es Psicólogo o Paciente."
     }
@@ -292,7 +300,7 @@ export default function RegistrarUsuarioPage() {
 
       // Preparar datos para envío
       const registrationData: any = {
-        persona: persona.toEntity(),
+        persona: { ...persona.toEntity(), telefono: formData.telefono.trim() || null },
         usuario: usuario.toEntity(),
         roles: {
           isPsicologo,
@@ -354,6 +362,7 @@ export default function RegistrarUsuarioPage() {
       apellido: "",
       dni: "",
       fecha_nacimiento: "",
+      telefono: "",
       numeroLicencia: "",
       especialidad: "",
     })
@@ -476,6 +485,26 @@ export default function RegistrarUsuarioPage() {
                     <p className="text-red-500 text-xs">{fieldErrors.fecha_nacimiento}</p>
                   )}
                 </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="telefono" className="text-gray-200">
+                  Celular (WhatsApp)
+                </Label>
+                <Input
+                  id="telefono"
+                  name="telefono"
+                  type="tel"
+                  inputMode="tel"
+                  value={formData.telefono}
+                  onChange={handleChange}
+                  placeholder="3704 123456"
+                  className="bg-[#2A4242] text-white border-gray-600 focus:ring-teal-500 focus:border-teal-500"
+                />
+                {fieldErrors.telefono ? (
+                  <p className="text-red-500 text-xs">{fieldErrors.telefono}</p>
+                ) : (
+                  <p className="text-gray-400 text-xs">Opcional. Se usa para mandarle al paciente el recordatorio del turno por WhatsApp.</p>
+                )}
               </div>
 
               {/* Account Info */}

@@ -15,4 +15,8 @@ export class PersonaEntity extends BaseEntity {
 
   @Column({ name: "fecha_nacimiento", type: "date" })
   fechaNacimiento: Date;
+
+  // Celular para los recordatorios por WhatsApp, en formato internacional sin "+" (5493704123456)
+  @Column({ name: "telefono", type: "varchar", length: 20, nullable: true })
+  telefono?: string | null;
 }
