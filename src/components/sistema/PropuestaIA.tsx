@@ -32,7 +32,8 @@ export default function PropuestaIA({ texto, onAceptar, disabled }: PropuestaIAP
       });
       const datos = await respuesta.json().catch(() => ({}));
       if (!respuesta.ok) {
-        setError(datos.message || "No se pudo obtener la propuesta de la IA.");
+        // Las rutas responden con "message"; el middleware de acceso, con "error"
+        setError(datos.message || datos.error || `No se pudo obtener la propuesta de la IA (error ${respuesta.status}).`);
         return;
       }
       setOriginal(texto);
