@@ -123,7 +123,7 @@ input:-webkit-autofill:hover,
 input:-webkit-autofill:focus {
   -webkit-box-shadow: 0 0 0 1000px #2A4242 inset !important;
   -webkit-text-fill-color: #ffffff !important;
-  caret-color: #ffffff;
+  caret-color: #F1C77A;
   transition: background-color 9999s ease-in-out 0s;
 }
 .input-password-toggle {
@@ -136,6 +136,12 @@ input:-webkit-autofill:focus {
   body {
     @apply bg-background text-foreground;
   }
+}
+/* El cursor de escritura en dorado, para que se vea en todos los campos sobre el fondo oscuro */
+input,
+textarea,
+[contenteditable="true"] {
+  caret-color: #F1C77A;
 }
 .campo {
   @apply h-14 w-full rounded-lg border border-border bg-secondary px-4 text-white placeholder:text-white/60;
