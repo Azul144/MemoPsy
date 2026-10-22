@@ -196,6 +196,15 @@ CREATE TABLE `psicologo` (
   CONSTRAINT `psicologo_ibfk_1` FOREIGN KEY (`persona_id`) REFERENCES `persona` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+CREATE TABLE `recordatorio_enviado` (
+  `sesion_id` int NOT NULL,
+  `usuario_id` int NOT NULL,
+  `canal` varchar(20) NOT NULL,
+  `fecha` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`sesion_id`,`usuario_id`,`canal`),
+  KEY `recordatorio_enviado_ibfk_usuario` (`usuario_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 CREATE TABLE `sesion` (
   `id` int NOT NULL AUTO_INCREMENT,
   `psicologo_id` int NOT NULL,

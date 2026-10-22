@@ -95,6 +95,8 @@ export async function notificarCambioDeTurno(cambio: CambioDeTurno): Promise<voi
 
     // El recordatorio que ya se mandó quedó viejo: si el turno sigue en pie, se vuelve a generar con el nuevo horario
     await manager.delete(NotificacionEntity, { sesionId: Number(sesionId), tipo: "RECORDATORIO" });
+    // Lo mismo con el email: si el turno sigue en pie, se vuelve a mandar con el horario nuevo
+    await manager.query("DELETE FROM recordatorio_enviado WHERE sesion_id = ?", [Number(sesionId)]);
 
     const conQuien = await contraparte(manager, sesion);
     const quienCambia = cambio.usuarioQueCambia != null ? Number(cambio.usuarioQueCambia) : null;
