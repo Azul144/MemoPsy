@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Mic, Square } from "lucide-react";
+import { AlertCircle, Mic, MicOff, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -31,6 +31,16 @@ function obtenerReconocedor(): (new () => Reconocedor) | null {
   return w.SpeechRecognition || w.webkitSpeechRecognition || null;
 }
 
+// Mensajes para los errores que devuelve el reconocimiento; los demás caen en el genérico.
+const MENSAJES_ERROR: Record<string, string> = {
+  "not-allowed": "No se dio permiso para usar el micrófono. Podés habilitarlo desde el candado de la barra de direcciones o escribir a mano.",
+  "service-not-allowed": "No se dio permiso para usar el micrófono. Podés habilitarlo desde el candado de la barra de direcciones o escribir a mano.",
+  "audio-capture": "No se encontró ningún micrófono conectado. Podés escribir a mano.",
+  "network": "El dictado necesita conexión a internet. Revisá la conexión o escribí a mano.",
+  "no-speech": "No se escuchó nada. Volvé a tocar Dictar y hablá cerca del micrófono.",
+};
+const MENSAJE_ERROR_GENERICO = "No se pudo usar el dictado. Podés escribir a mano.";
+
 interface DictadoVozProps {
   // Recibe cada fragmento ya reconocido; el formulario decide cómo agregarlo al texto.
   onTexto: (texto: string) => void;
@@ -38,7 +48,9 @@ interface DictadoVozProps {
 }
 
 export default function DictadoVoz({ onTexto, disabled }: DictadoVozProps) {
-  const [soportado, setSoportado] = useState(false);
+  // null mientras no se sabe (en el servidor no hay window), para no mostrar el aviso de más.
+  const [soportado, setSoportado] = useState<boolean | null>(null);
+  const [aviso, setAviso] = useState("");
   const [grabando, setGrabando] = useState(false);
   const [parcial, setParcial] = useState("");
   const reconocedorRef = useRef<Reconocedor | null>(null);
@@ -70,43 +82,68 @@ export default function DictadoVoz({ onTexto, disabled }: DictadoVozProps) {
       }
       setParcial(enCurso.trim());
     };
-    rec.onerror = () => setGrabando(false);
+    rec.onerror = (e) => {
+      // "aborted" es cuando se corta a propósito, no hace falta avisar nada.
+      if (e.error !== "aborted") setAviso(MENSAJES_ERROR[e.error] ?? MENSAJE_ERROR_GENERICO);
+      setGrabando(false);
+    };
     rec.onend = () => {
       setGrabando(false);
       setParcial("");
     };
 
     reconocedorRef.current = rec;
-    rec.start();
-    setGrabando(true);
+    setAviso("");
+    try {
+      rec.start();
+      setGrabando(true);
+    } catch {
+      setAviso(MENSAJE_ERROR_GENERICO);
+    }
   };
 
   const detener = () => reconocedorRef.current?.stop();
 
-  // El aviso para navegadores sin soporte se resuelve aparte (issue #3).
-  if (!soportado) return null;
+  if (soportado === null) return null;
+
+  if (!soportado) {
+    return (
+      <p className="flex items-start gap-2 text-sm text-gray-400">
+        <MicOff className="mt-0.5 h-4 w-4 shrink-0" />
+        Este navegador no permite dictar por voz. Podés escribir a mano, o abrir MemoPsy en Chrome o Edge para usar el dictado.
+      </p>
+    );
+  }
 
   return (
-    <div className="flex flex-wrap items-center gap-3">
-      <Button
-        type="button"
-        size="sm"
-        disabled={disabled}
-        onClick={grabando ? detener : iniciar}
-        className={cn(
-          grabando
-            ? "bg-red-600 text-white hover:bg-red-700"
-            : "bg-[#F1C77A] text-[#1D3434] hover:bg-opacity-80"
+    <div className="space-y-2">
+      <div className="flex flex-wrap items-center gap-3">
+        <Button
+          type="button"
+          size="sm"
+          disabled={disabled}
+          onClick={grabando ? detener : iniciar}
+          className={cn(
+            grabando
+              ? "bg-red-600 text-white hover:bg-red-700"
+              : "bg-[#F1C77A] text-[#1D3434] hover:bg-opacity-80"
+          )}
+        >
+          {grabando ? <Square className="mr-2 h-4 w-4" /> : <Mic className="mr-2 h-4 w-4" />}
+          {grabando ? "Detener dictado" : "Dictar"}
+        </Button>
+        {grabando && (
+          <span className="text-sm text-gray-300">
+            <span className="mr-2 inline-block h-2 w-2 animate-pulse rounded-full bg-red-500" />
+            {parcial || "Escuchando..."}
+          </span>
         )}
-      >
-        {grabando ? <Square className="mr-2 h-4 w-4" /> : <Mic className="mr-2 h-4 w-4" />}
-        {grabando ? "Detener dictado" : "Dictar"}
-      </Button>
-      {grabando && (
-        <span className="text-sm text-gray-300">
-          <span className="mr-2 inline-block h-2 w-2 animate-pulse rounded-full bg-red-500" />
-          {parcial || "Escuchando..."}
-        </span>
+      </div>
+      {aviso && (
+        <p className="flex items-start gap-2 text-sm text-amber-300">
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+          {aviso}
+        </p>
       )}
     </div>
   );
