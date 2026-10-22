@@ -9,12 +9,19 @@ import { authConfig } from "@/lib/auth/auth-config";
 import { conAuditoria } from "@/lib/auditoria/con-auditoria";
 import {
   estructurarNota,
+  iaConfigurada,
   IaNoConfiguradaError,
   IaRechazoError,
   notaComoTexto,
 } from "@/lib/ia/estructurar-nota";
 
 const LARGO_MAXIMO = 20000;
+
+// Le dice a la pantalla si hay clave configurada, para desactivar el botón si no la hay.
+// Nunca devuelve la clave.
+export async function GET() {
+  return NextResponse.json({ configurada: iaConfigurada() });
+}
 
 async function manejarPOST(request: NextRequest) {
   const session = await getServerSession(authConfig);

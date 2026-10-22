@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { AlertCircle, Check, Loader2, Sparkles, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { AlertCircle, Check, Loader2, ShieldAlert, Sparkles, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface PropuestaIAProps {
@@ -19,6 +19,15 @@ export default function PropuestaIA({ texto, onAceptar, disabled }: PropuestaIAP
   const [propuesta, setPropuesta] = useState<string | null>(null);
   const [original, setOriginal] = useState("");
   const [error, setError] = useState("");
+  // null mientras se consulta si el servidor tiene la clave de la IA
+  const [configurada, setConfigurada] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    fetch("/api/informes/estructurar")
+      .then((r) => (r.ok ? r.json() : { configurada: false }))
+      .then((datos) => setConfigurada(Boolean(datos.configurada)))
+      .catch(() => setConfigurada(false));
+  }, []);
 
   const pedirPropuesta = async () => {
     setCargando(true);
@@ -56,13 +65,27 @@ export default function PropuestaIA({ texto, onAceptar, disabled }: PropuestaIAP
         type="button"
         size="sm"
         variant="outline"
-        disabled={disabled || cargando || !texto.trim()}
+        disabled={disabled || cargando || !configurada || !texto.trim()}
         onClick={pedirPropuesta}
         className="border-[#F1C77A] text-[#F1C77A] hover:bg-[#F1C77A] hover:text-[#1D3434]"
       >
         {cargando ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
         {cargando ? "Ordenando..." : "Ordenar con IA"}
       </Button>
+
+      {configurada === false ? (
+        <p className="flex items-start gap-2 text-sm text-gray-400">
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+          La IA no está configurada en este servidor. Podés ordenar la nota a mano.
+        </p>
+      ) : (
+        // Ley 25.326: el profesional tiene que saber que el texto sale del sistema antes de usarla
+        <p className="flex items-start gap-2 text-xs text-gray-400">
+          <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-[#F1C77A]" />
+          Al usar la IA, el texto de la nota se envía a un servicio externo (Anthropic) para ordenarlo. No se guarda en
+          MemoPsy hasta que lo aceptes. Evitá incluir nombre, DNI u otros datos que identifiquen al paciente.
+        </p>
+      )}
 
       {error && (
         <p className="flex items-start gap-2 text-sm text-amber-300">

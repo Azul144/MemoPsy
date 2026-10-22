@@ -128,7 +128,7 @@ export const REGLAS_API: Regla[] = [
   { ruta: "/api/informes", metodos: ["GET"], permisos: ["Ver Informes"] },
   { ruta: "/api/informes", metodos: ["POST"], permisos: ["Registrar Informe"] },
   // Propuesta de la IA para ordenar la nota dictada (no guarda nada)
-  { ruta: "/api/informes/estructurar", metodos: ["POST"], permisos: ["Registrar Informe", "Editar Informe"] },
+  { ruta: "/api/informes/estructurar", metodos: ["GET", "POST"], permisos: ["Registrar Informe", "Editar Informe"] },
   { ruta: "/api/informes/[id]", metodos: ["GET"], permisos: ["Ver Informes"] },
   // RF 2.5 - PDF de la nota (la ruta valida además que sea el autor o un paciente asociado)
   { ruta: "/api/informes/[id]/pdf", metodos: ["GET"], permisos: ["Ver Informes"] },
