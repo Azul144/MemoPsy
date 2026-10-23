@@ -202,7 +202,7 @@ export default function SesionesPage() {
         avisoError(data.error || "No se pudo cambiar el estado del turno.");
         return;
       }
-      await loadInitialData();
+      await loadInitialData(selectedDate);
       avisoExito(nombreEstado === "Confirmada" ? "Turno confirmado." : "Turno cancelado.");
     } catch (error) {
       console.error("Error cambiando el estado:", error);
@@ -331,7 +331,7 @@ const handleUpdateSesion = async () => {
 
         if (response.ok) {
             setIsEditDialogOpen(false);
-            await loadInitialData(); 
+            await loadInitialData(fechaHoraInicio);
             setEditingSesion(null); 
             avisoExito("Sesión actualizada correctamente.");
         } else {
@@ -504,7 +504,8 @@ const handleUpdateSesion = async () => {
     }
   }, [])
 
-  const loadInitialData = async () => {
+  // fechaAMostrar: día que queda seleccionado después de crear o editar un turno, para que se vea
+  const loadInitialData = async (fechaAMostrar?: Date) => {
     try {
       setLoading(true)
 
@@ -519,7 +520,9 @@ const handleUpdateSesion = async () => {
         const today = new Date()
         const sesionesHoy = sesionesData.filter((sesion: { fechaHoraInicio: string }) => isSameDay(parseISO(sesion.fechaHoraInicio), today))
 
-        if (sesionesHoy.length === 0 && sesionesData.length > 0) {
+        if (fechaAMostrar) {
+          setSelectedDate(fechaAMostrar)
+        } else if (sesionesHoy.length === 0 && sesionesData.length > 0) {
           // Ordenar sesiones por fecha
           const sesionesOrdenadas = [...sesionesData].sort(
             (a, b) => new Date(a.fechaHoraInicio).getTime() - new Date(b.fechaHoraInicio).getTime(),
@@ -691,11 +694,8 @@ const handleUpdateSesion = async () => {
       if (response.ok) {
         setIsCreateDialogOpen(false)
 
-        // Set the selected date to the date of the new session
-        setSelectedDate(fechaHoraInicio)
-
-        // Reload data to include the new session
-        await loadInitialData()
+        // Recargar y quedarse en el día del turno nuevo, para que se vea (con su enlace, si es remoto)
+        await loadInitialData(fechaHoraInicio)
 
         // Reset form
         setFormData({
