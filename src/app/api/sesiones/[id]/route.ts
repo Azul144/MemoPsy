@@ -10,6 +10,7 @@ import { ZodError, z } from "zod";
 import { esDiaHabilEnConsultorio, MENSAJE_DIA_NO_HABIL } from "@/lib/validaciones/dias-habiles";
 import { buscarSesionSuperpuesta, mensajeSuperposicion, MENSAJE_FIN_ANTES_DE_INICIO } from "@/lib/validaciones/superposicion-sesiones";
 import { notificarCambioDeTurno } from "@/lib/notificaciones/notificar";
+import { enlaceParaSesion } from "@/lib/videollamada";
 
 // Se lanza dentro de la transacción para cortarla cuando el horario está ocupado
 class ErrorSuperposicion extends Error {}
@@ -176,6 +177,16 @@ async function manejarPUT(request: NextRequest, { params: paramsPromise }: { par
       }
     }
 
+    // RF 3.4 - Si pasó a remota (o sigue remota) sin enlace, se genera uno. Va fuera de la
+    // transacción porque puede llamar a Google.
+    const enlace = await enlaceParaSesion({
+      manager: dataSource.manager,
+      modalidadId,
+      enlaceEscrito: enlaceVideollamada,
+      inicio: new Date(fechaHoraInicio),
+      fin: new Date(fechaHoraFin),
+    });
+
     // Start transaction
     let updatedSesionEntity;
     let inicioAnterior = null as Date | null; // RF 3.2 - para avisar si el turno cambió de horario
@@ -211,7 +222,7 @@ async function manejarPUT(request: NextRequest, { params: paramsPromise }: { par
         sesionEntity.psicologo = { id: String(psicologoId) } as PsicologoEntity;
         sesionEntity.modalidad = { id: String(modalidadId) } as ModalidadEntity;
         sesionEntity.estado = { id: String(estadoId) } as EstadoEntity;
-        sesionEntity.enlaceVideollamada = enlaceVideollamada && enlaceVideollamada.trim() ? enlaceVideollamada.trim() : null;
+        sesionEntity.enlaceVideollamada = enlace;
 
         await transactionalEntityManager.save(SesionEntity, sesionEntity);
 

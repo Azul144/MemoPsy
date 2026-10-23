@@ -6,6 +6,7 @@ import { esDiaHabilEnConsultorio, MENSAJE_DIA_NO_HABIL } from "@/lib/validacione
 import { alcanceSesiones, puedeVerSesion } from "@/lib/auth/alcance-sesiones"
 import { buscarSesionSuperpuesta, mensajeSuperposicion, MENSAJE_FIN_ANTES_DE_INICIO } from "@/lib/validaciones/superposicion-sesiones"
 import { datosPago, puedeVerPagos } from "@/lib/sesiones/pagos"
+import { enlaceParaSesion } from "@/lib/videollamada"
 import { getServerSession } from "next-auth/next"
 import { authConfig } from "@/lib/auth/auth-config"
 import { initializeDatabase } from "@/lib/database"
@@ -202,6 +203,15 @@ async function manejarPOST(request: NextRequest) {
       return NextResponse.json({ error: mensaje, details: { horaInicio: mensaje } }, { status: 409 })
     }
 
+    // RF 3.4 - Si es remota y no escribieron enlace, se genera uno
+    const enlace = await enlaceParaSesion({
+      manager: dataSource.manager,
+      modalidadId,
+      enlaceEscrito: enlaceVideollamada,
+      inicio,
+      fin,
+    })
+
     // Crear la sesión con valores explícitos (no DEFAULT)
     const nuevaSesion = sesionRepository.create({
       fechaHoraInicio: new Date(fechaHoraInicio),
@@ -209,7 +219,7 @@ async function manejarPOST(request: NextRequest) {
       psicologo: { id: psicologoId } as PsicologoEntity,
       modalidad: { id: modalidadId } as ModalidadEntity,
       estado: { id: estadoId } as EstadoEntity,
-      enlaceVideollamada: typeof enlaceVideollamada === "string" && enlaceVideollamada.trim() ? enlaceVideollamada.trim() : null,
+      enlaceVideollamada: enlace,
     })
 
     const sesionGuardada = await sesionRepository.save(nuevaSesion)

@@ -1235,12 +1235,12 @@ const handleUpdateSesion = async () => {
                                   <Input
                                     id="enlaceVideollamada"
                                     type="url"
-                                    placeholder="https://meet.google.com/..."
+                                    placeholder="Se genera solo si lo dejás vacío"
                                     value={formData.enlaceVideollamada}
                                     onChange={(e) => setFormData({ ...formData, enlaceVideollamada: e.target.value })}
                                     className="bg-[#152A2A] text-white border-gray-600"
                                   />
-                                  <p className="text-xs text-gray-400">Pegá el enlace de Google Meet (opcional).</p>
+                                  <p className="text-xs text-gray-400">Si lo dejás vacío, MemoPsy crea el enlace automáticamente. Si ya tenés uno, pegalo acá.</p>
                                 </div>
                               )}
 
@@ -1565,12 +1565,12 @@ const handleUpdateSesion = async () => {
                     <Input
                       id="edit_enlaceVideollamada"
                       type="url"
-                      placeholder="https://meet.google.com/..."
+                      placeholder="Se genera solo si lo dejás vacío"
                       value={editFormData.enlaceVideollamada}
                       onChange={(e) => setEditFormData({ ...editFormData, enlaceVideollamada: e.target.value })}
                       className="bg-[#152A2A] text-white border-gray-600"
                     />
-                    <p className="text-xs text-gray-400">Pegá el enlace de Google Meet (opcional).</p>
+                    <p className="text-xs text-gray-400">Si lo dejás vacío, MemoPsy crea el enlace automáticamente. Si ya tenés uno, pegalo acá.</p>
                   </div>
                 )}
 
