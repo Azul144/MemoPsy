@@ -4,8 +4,7 @@
 // si WhatsApp falla, el paciente igual recibe el email y el aviso dentro del sistema.
 // En el mensaje va solo con quién, cuándo y la modalidad (con el enlace si es virtual). Nunca contenido clínico.
 import { initializeDatabase } from "@/lib/database";
-import { enviarWhatsapp, WhatsappError, whatsappConfigurado } from "@/lib/whatsapp/meta";
-import { fechaTurno } from "./notificar";
+import { enviarWhatsapp, WhatsappError, whatsappConfigurado, type RecordatorioWhatsapp } from "@/lib/whatsapp";
 
 const HORAS_RECORDATORIO = 24;
 
@@ -20,11 +19,14 @@ interface TurnoPendiente {
   psicologoApellido: string;
 }
 
-// Los tres datos que completa la plantilla "recordatorio_turno": {{1}} psicólogo, {{2}} cuándo, {{3}} modalidad
-function parametros(turno: TurnoPendiente): string[] {
-  const modalidad = (turno.modalidad ?? "presencial").toLowerCase();
-  const enlace = turno.enlace && /^https?:\/\//i.test(turno.enlace) ? ` - enlace: ${turno.enlace}` : "";
-  return [`${turno.psicologoNombre} ${turno.psicologoApellido}`.trim(), fechaTurno(new Date(turno.inicio)), `${modalidad}${enlace}`];
+function recordatorio(turno: TurnoPendiente): RecordatorioWhatsapp {
+  return {
+    para: turno.telefono,
+    psicologo: `${turno.psicologoNombre} ${turno.psicologoApellido}`.trim(),
+    inicio: new Date(turno.inicio),
+    modalidad: (turno.modalidad ?? "presencial").toLowerCase(),
+    enlace: turno.enlace && /^https?:\/\//i.test(turno.enlace) ? turno.enlace : null,
+  };
 }
 
 let enCurso = false;
@@ -32,7 +34,7 @@ let enCurso = false;
 export async function enviarRecordatoriosPorWhatsapp(): Promise<void> {
   if (enCurso) return;
   if (!whatsappConfigurado()) {
-    console.error("RECORDATORIOS_WHATSAPP está activo pero falta WHATSAPP_TOKEN o WHATSAPP_PHONE_NUMBER_ID");
+    console.error("RECORDATORIOS_WHATSAPP está activo pero faltan los datos del proveedor de WhatsApp en .env.local");
     return;
   }
   enCurso = true;
@@ -71,7 +73,7 @@ export async function enviarRecordatoriosPorWhatsapp(): Promise<void> {
       if (!reserva?.affectedRows) continue;
 
       try {
-        await enviarWhatsapp({ para: turno.telefono, parametros: parametros(turno) });
+        await enviarWhatsapp(recordatorio(turno));
       } catch (error) {
         // Si el número no puede recibir (error 4xx) no se reintenta; si fue un corte, sí
         if (!(error instanceof WhatsappError && error.definitivo)) {
