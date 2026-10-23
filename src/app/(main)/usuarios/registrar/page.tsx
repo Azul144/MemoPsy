@@ -488,7 +488,7 @@ export default function RegistrarUsuarioPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="telefono" className="text-gray-200">
-                  Celular (WhatsApp)
+                  Celular
                 </Label>
                 <Input
                   id="telefono"
@@ -503,7 +503,7 @@ export default function RegistrarUsuarioPage() {
                 {fieldErrors.telefono ? (
                   <p className="text-red-500 text-xs">{fieldErrors.telefono}</p>
                 ) : (
-                  <p className="text-gray-400 text-xs">Opcional. Se usa para mandarle al paciente el recordatorio del turno por WhatsApp.</p>
+                  <p className="text-gray-400 text-xs">Opcional. Dato de contacto del paciente.</p>
                 )}
               </div>
 

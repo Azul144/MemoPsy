@@ -23,7 +23,7 @@ const modulos = [
     icono: Video,
     titulo: "Gestión de sesiones",
     texto:
-      "Agenda que controla la disponibilidad del profesional, recordatorios automáticos por WhatsApp y enlace de Google Meet para las sesiones remotas.",
+      "Agenda que controla la disponibilidad del profesional, recordatorios automáticos por email y enlace de Google Meet para las sesiones remotas.",
     foto: "/assets/agenda.jpg",
     alt: "Agenda abierta junto a un celular y una lapicera",
   },

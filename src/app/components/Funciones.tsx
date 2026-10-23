@@ -1,4 +1,4 @@
-import { Lock, FileText, CalendarDays, Bell, Check } from "lucide-react";
+import { Lock, FileText, CalendarDays, Bell, Mail } from "lucide-react";
 
 // Mosaico de funciones: cada tarjeta muestra una "mini pantalla" de lo que hace el sistema
 export default function Funciones() {
@@ -65,15 +65,16 @@ export default function Funciones() {
           {/* Recordatorios */}
           <article className="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-card p-8 md:col-span-3">
             <Encabezado icono={Bell} titulo="Recordatorios">
-              Tus pacientes reciben un aviso por WhatsApp antes de cada sesión.
+              Tus pacientes reciben un email y un aviso en el sistema 24 horas antes de cada sesión.
             </Encabezado>
 
-            {/* Mini mensaje de WhatsApp */}
-            <div className="mt-8 max-w-xs rounded-2xl rounded-tl-sm bg-[#1F5C4B] p-4 text-sm text-white shadow-lg transition-transform duration-500 group-hover:-translate-y-1">
-              Hola Tomás 👋 Te recordamos tu sesión de mañana a las 11:00 con la Lic. Benítez.
-              <span className="mt-2 flex items-center justify-end gap-1 text-xs text-white/60">
-                10:02 <Check className="h-3 w-3" /><Check className="-ml-2 h-3 w-3" />
+            {/* Mini email de recordatorio */}
+            <div className="mt-8 max-w-xs rounded-2xl border border-white/10 bg-background/60 p-4 text-sm text-crema shadow-lg transition-transform duration-500 group-hover:-translate-y-1">
+              <span className="flex items-center gap-2 text-xs text-crema/60">
+                <Mail className="h-4 w-4 text-primary" />
+                Recordatorio de tu turno en MemoPsy
               </span>
+              <p className="mt-2">Te recordamos que tenés turno con Carla Benítez el vie 23/10 a las 12:00.</p>
             </div>
           </article>
 

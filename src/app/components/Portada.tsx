@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import FondoAnimado from "@/components/FondoAnimado";
-import { CalendarClock, Lock, MessageCircle, ShieldCheck, KeyRound } from "lucide-react";
+import { CalendarClock, Lock, Mail, ShieldCheck, KeyRound } from "lucide-react";
 
 // Tarjetitas que "flotan" sobre la foto: muestran lo que hace el sistema
 const tarjetas = [
@@ -20,9 +20,9 @@ const tarjetas = [
     retraso: "1s",
   },
   {
-    icono: MessageCircle,
+    icono: Mail,
     titulo: "Recordatorio enviado",
-    detalle: "Por WhatsApp, 24 h antes",
+    detalle: "Por email, 24 h antes",
     posicion: "bottom-8 left-2 lg:-left-6",
     retraso: "1.3s",
   },

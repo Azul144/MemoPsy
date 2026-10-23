@@ -575,7 +575,7 @@ export default function EditarUsuarioPage() {
                 </div>
                 <div>
                   <Label htmlFor="telefono" className="text-gray-200">
-                    Celular (WhatsApp)
+                    Celular
                   </Label>
                   <Input
                     id="telefono"
@@ -590,7 +590,7 @@ export default function EditarUsuarioPage() {
                   {fieldErrors.telefono ? (
                     <p className="text-red-500 text-xs mt-1">{fieldErrors.telefono}</p>
                   ) : (
-                    <p className="text-gray-400 text-xs mt-1">Opcional. Se usa para mandarle al paciente el recordatorio del turno por WhatsApp.</p>
+                    <p className="text-gray-400 text-xs mt-1">Opcional. Dato de contacto del paciente.</p>
                   )}
                 </div>
 
