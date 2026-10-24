@@ -57,6 +57,9 @@ const NOMBRE_ACCION: Record<string, string> = {
   DESACTIVAR_2FA: "Desactivó verificación en dos pasos",
   CONFIGURAR_2FA: "Verificación en dos pasos",
   ACCESO_DENEGADO: "Acceso denegado",
+  ESTRUCTURAR_IA: "Nota ordenada con IA",
+  REPROGRAMAR: "Reprogramación de turno",
+  RESPONDER_ACTIVIDAD: "Respuesta a actividad",
 }
 
 const MOTIVO_LOGIN: Record<string, string> = {

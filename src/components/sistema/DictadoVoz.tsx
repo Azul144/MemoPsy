@@ -23,6 +23,7 @@ interface Reconocedor {
   onend: (() => void) | null;
   start: () => void;
   stop: () => void;
+  abort: () => void;
 }
 
 function obtenerReconocedor(): (new () => Reconocedor) | null {
@@ -40,6 +41,12 @@ const MENSAJES_ERROR: Record<string, string> = {
   "no-speech": "No se escuchó nada. Volvé a tocar Dictar y hablá cerca del micrófono.",
 };
 const MENSAJE_ERROR_GENERICO = "No se pudo usar el dictado. Podés escribir a mano.";
+const MENSAJE_SIN_RESPUESTA = "No llega el texto dictado. Revisá la conexión a internet o escribí a mano.";
+
+// Sin internet, Chrome a veces reconoce en el propio equipo y a veces se queda escuchando sin
+// dar error. No se bloquea el dictado offline: si en este tiempo no llega ningún resultado,
+// se corta y se avisa.
+const ESPERA_PRIMER_RESULTADO_MS = 10000;
 
 interface DictadoVozProps {
   // Recibe cada fragmento ya reconocido; el formulario decide cómo agregarlo al texto.
@@ -54,12 +61,35 @@ export default function DictadoVoz({ onTexto, disabled }: DictadoVozProps) {
   const [grabando, setGrabando] = useState(false);
   const [parcial, setParcial] = useState("");
   const reconocedorRef = useRef<Reconocedor | null>(null);
+  const esperaRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onTextoRef = useRef(onTexto);
   onTextoRef.current = onTexto;
 
+  const cancelarEspera = () => {
+    if (esperaRef.current) clearTimeout(esperaRef.current);
+    esperaRef.current = null;
+  };
+
+  // Corta el dictado a la fuerza: colgado, stop() puede no llegar a disparar onend
+  const cortarConAviso = (mensaje: string) => {
+    cancelarEspera();
+    const rec = reconocedorRef.current;
+    if (rec) {
+      rec.onend = null;
+      rec.onerror = null;
+      rec.abort();
+    }
+    setAviso(mensaje);
+    setGrabando(false);
+    setParcial("");
+  };
+
   useEffect(() => {
     setSoportado(obtenerReconocedor() !== null);
-    return () => reconocedorRef.current?.stop();
+    return () => {
+      cancelarEspera();
+      reconocedorRef.current?.stop();
+    };
   }, []);
 
   const iniciar = () => {
@@ -71,6 +101,7 @@ export default function DictadoVoz({ onTexto, disabled }: DictadoVozProps) {
     rec.interimResults = true;
 
     rec.onresult = (e) => {
+      cancelarEspera();
       let enCurso = "";
       for (let i = e.resultIndex; i < e.results.length; i++) {
         const texto = e.results[i][0].transcript.trim();
@@ -83,11 +114,13 @@ export default function DictadoVoz({ onTexto, disabled }: DictadoVozProps) {
       setParcial(enCurso.trim());
     };
     rec.onerror = (e) => {
+      cancelarEspera();
       // "aborted" es cuando se corta a propósito, no hace falta avisar nada.
       if (e.error !== "aborted") setAviso(MENSAJES_ERROR[e.error] ?? MENSAJE_ERROR_GENERICO);
       setGrabando(false);
     };
     rec.onend = () => {
+      cancelarEspera();
       setGrabando(false);
       setParcial("");
     };
@@ -97,6 +130,7 @@ export default function DictadoVoz({ onTexto, disabled }: DictadoVozProps) {
     try {
       rec.start();
       setGrabando(true);
+      esperaRef.current = setTimeout(() => cortarConAviso(MENSAJE_SIN_RESPUESTA), ESPERA_PRIMER_RESULTADO_MS);
     } catch {
       setAviso(MENSAJE_ERROR_GENERICO);
     }
