@@ -43,6 +43,37 @@ CREATE TABLE `estado` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+CREATE TABLE `historia_clinica` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `paciente_id` int NOT NULL,
+  `psicologo_id` int NOT NULL,
+  `fecha_admision` date NOT NULL,
+  `estado_civil` text,
+  `ocupacion` text,
+  `escolaridad` text,
+  `convivencia` text,
+  `contacto_emergencia` text,
+  `derivado_por` text,
+  `motivo_consulta` text,
+  `historia_problema` text,
+  `antecedentes_personales` text,
+  `antecedentes_familiares` text,
+  `examen_mental` text,
+  `evaluaciones` text,
+  `impresion_diagnostica` text,
+  `plan_tratamiento` text,
+  `consentimiento_informado` tinyint NOT NULL DEFAULT '0',
+  `fecha_consentimiento` date DEFAULT NULL,
+  `fecha_cierre` date DEFAULT NULL,
+  `motivo_cierre` varchar(20) DEFAULT NULL,
+  `epicrisis` text,
+  `fecha_creacion` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `fecha_actualizacion` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_historia_paciente_psicologo` (`paciente_id`,`psicologo_id`),
+  KEY `historia_clinica_ibfk_psicologo` (`psicologo_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 CREATE TABLE `horario_disponible` (
   `id` int NOT NULL AUTO_INCREMENT,
   `psicologo_id` int NOT NULL,

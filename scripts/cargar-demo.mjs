@@ -1,6 +1,6 @@
 // Carga datos de demostración FICTICIOS: cinco psicólogos de distintas especialidades, sus
 // pacientes (adultos, adolescentes, un niño y una pareja), turnos pasados y futuros con pagos,
-// notas clínicas, informes de seguimiento con actividades, avisos y registros de auditoría.
+// notas clínicas, historias clínicas, informes de seguimiento con actividades, avisos y registros de auditoría.
 // Sirve para mostrar el sistema y sacar capturas sin datos reales.
 //  - Si ya existe la cuenta psicologa@memopsy.test, se usa como la psicóloga clínica y se le
 //    asignan los pacientes que ya estaban cargados (así las cuentas de prueba también ven datos).
@@ -13,6 +13,7 @@ import { createCipheriv, randomBytes } from "node:crypto"
 import { writeFileSync } from "node:fs"
 import bcrypt from "bcrypt"
 import mysql from "mysql2/promise"
+import { insertarHistoriasDemo } from "./historias-demo.mjs"
 
 const salida = process.argv[2]
 if (!salida) {
@@ -360,10 +361,13 @@ try {
       [formato(fecha), usuarioId, email, accion, modulo, entidadId, detalle])
   }
 
+  // --- Historias clínicas de ejemplo (admisión completa, cifrada)
+  const historias = await insertarHistoriasDemo(c, cifrar)
+
   // Primero las credenciales: si no se pueden guardar, no se confirma nada
   writeFileSync(salida, `Cuentas de demostración (datos ficticios)\n${credenciales.join("\n")}\n`)
   await c.commit()
-  console.log(`Datos de demostración cargados: ${Object.keys(psicologos).length} psicólogos, ${Object.keys(pacientes).length} pacientes, ${sesiones.length} turnos, ${NOTAS.length} notas. ${credenciales.length} cuentas nuevas; credenciales en ${salida}`)
+  console.log(`Datos de demostración cargados: ${Object.keys(psicologos).length} psicólogos, ${Object.keys(pacientes).length} pacientes, ${sesiones.length} turnos, ${NOTAS.length} notas, ${historias} historias clínicas. ${credenciales.length} cuentas nuevas; credenciales en ${salida}`)
 } catch (error) {
   await c.rollback()
   console.error("No se cargó nada:", error.message)

@@ -12,7 +12,7 @@ import { useRouter } from 'next/navigation';
 import MemopsyLogo from '@/app/components/MemopsyLogo';
 import { Button } from '@/components/ui/button';
 import { TypographyH1, TypographyP } from '@/components/ui/typography';
-import { FileText, PlusSquare, ListChecks, Loader2, ClipboardCheck } from "lucide-react"
+import { FileText, PlusSquare, ListChecks, Loader2, ClipboardCheck, BookOpen } from "lucide-react"
 
 // Interfaces (identical to perfiles/page.tsx)
 
@@ -44,6 +44,15 @@ const SUB_MODULOS_INFORMES: SubModuloConfig[] = [
     icon: ListChecks,
     ruta: '/informes/lista',
     permisoRequerido: 'Ver Informes',
+  },
+  {
+    // Historia clínica del paciente (Ley 26.529): admisión, evolución y cierre, con descarga en PDF foliado
+    id: 'historias_clinicas',
+    nombre: 'Historias clínicas',
+    descripcion: 'Completá la historia clínica de cada paciente y descargala en PDF.',
+    icon: BookOpen,
+    ruta: '/informes/historias',
+    permisoRequerido: 'Registrar Informe',
   },
   {
     // RF 2.4 - El paciente no ve las notas clínicas (son del psicólogo): ve sus informes de seguimiento
@@ -83,6 +92,9 @@ export default function GestionInformesPage() {
       // Specific logic for Informes sub-modules
       const filteredSubModules = SUB_MODULOS_INFORMES.filter(subModule => {
         if (subModule.id === 'registrar_informe') {
+          return userPermissions.includes(subModule.permisoRequerido) && !!session.user.psicologoId;
+        }
+        if (subModule.id === 'historias_clinicas') {
           return userPermissions.includes(subModule.permisoRequerido) && !!session.user.psicologoId;
         }
         if (subModule.id === 'mis_seguimientos') {

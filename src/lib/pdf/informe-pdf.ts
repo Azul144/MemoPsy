@@ -22,18 +22,18 @@ export interface OpcionesPdf {
   generadoPor: string;
 }
 
-const A4 = { ancho: 595.28, alto: 841.89 };
-const MARGEN = 56;
-const ANCHO_UTIL = A4.ancho - MARGEN * 2;
-const PIE = 64; // espacio reservado abajo para el pie de página
+export const A4 = { ancho: 595.28, alto: 841.89 };
+export const MARGEN = 56;
+export const ANCHO_UTIL = A4.ancho - MARGEN * 2;
+export const PIE = 64; // espacio reservado abajo para el pie de página
 
-const VERDE = rgb(0x1d / 255, 0x34 / 255, 0x34 / 255);
-const DORADO = rgb(0xf1 / 255, 0xc7 / 255, 0x7a / 255);
-const GRIS = rgb(0.38, 0.42, 0.42);
-const TEXTO = rgb(0.12, 0.14, 0.14);
-const LINEA = rgb(0.85, 0.87, 0.87);
+export const VERDE = rgb(0x1d / 255, 0x34 / 255, 0x34 / 255);
+export const DORADO = rgb(0xf1 / 255, 0xc7 / 255, 0x7a / 255);
+export const GRIS = rgb(0.38, 0.42, 0.42);
+export const TEXTO = rgb(0.12, 0.14, 0.14);
+export const LINEA = rgb(0.85, 0.87, 0.87);
 
-const formatoFecha = (fecha: Date | string, conHora = true) =>
+export const formatoFecha = (fecha: Date | string, conHora = true) =>
   new Intl.DateTimeFormat("es-AR", {
     day: "2-digit",
     month: "2-digit",
@@ -44,7 +44,7 @@ const formatoFecha = (fecha: Date | string, conHora = true) =>
 
 // Las fuentes estándar de PDF solo traen caracteres latinos (incluye tildes, ñ, ¿ y ¡).
 // Cualquier otro (emojis, etc.) se omite para que la generación no falle.
-function soloImprimible(texto: string, fuente: PDFFont): string {
+export function soloImprimible(texto: string, fuente: PDFFont): string {
   const soportados = new Set(fuente.getCharacterSet());
   return Array.from(texto.replace(/\t/g, "    "))
     .filter((c) => c === "\n" || soportados.has(c.codePointAt(0)!))
@@ -53,7 +53,7 @@ function soloImprimible(texto: string, fuente: PDFFont): string {
 }
 
 // Corta un texto en líneas que entren en el ancho disponible
-function partirEnLineas(texto: string, fuente: PDFFont, tam: number, ancho: number): string[] {
+export function partirEnLineas(texto: string, fuente: PDFFont, tam: number, ancho: number): string[] {
   const lineas: string[] = [];
   for (const parrafo of texto.split(/\r?\n/)) {
     if (parrafo.trim() === "") {

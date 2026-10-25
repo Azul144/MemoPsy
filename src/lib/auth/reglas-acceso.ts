@@ -22,6 +22,8 @@ const GESTIONA_PERFILES = ["Ver Perfiles", "Registrar Perfil", "Editar Perfil"];
 const AGENDA = ["Ver Sesiones", "Registrar Sesión", "Editar Sesión"];
 // Ver la lista de pacientes: NO alcanza con "Ver Sesiones" ni "Ver Informes",
 // porque el paciente también tiene esos permisos (para ver lo suyo).
+// La historia clínica la lleva el psicólogo tratante
+const HISTORIA_CLINICA = ["Registrar Informe", "Editar Informe"];
 const BUSCA_PACIENTES = ["Registrar Sesión", "Editar Sesión", "Registrar Informe", "Editar Informe", "Ver Usuarios"];
 
 // ----- PÁGINAS -----
@@ -41,6 +43,9 @@ export const REGLAS_PAGINAS: Regla[] = [
   { ruta: "/informes/detalle/[id]", permisos: ["Ver Informes"] },
   { ruta: "/informes/lista", permisos: ["Ver Informes"] },
   { ruta: "/informes/seguimiento", permisos: ["Ver Informes"] },
+  // Historia clínica: solo el psicólogo (el paciente no tiene estos permisos)
+  { ruta: "/informes/historias/[id]", permisos: HISTORIA_CLINICA },
+  { ruta: "/informes/historias", permisos: HISTORIA_CLINICA },
   { ruta: "/informes", permisos: ["Ver Informes", "Registrar Informe"] },
   { ruta: "/auditoria", permisos: ["Ver Auditoría"] },
 ];
@@ -140,6 +145,11 @@ export const REGLAS_API: Regla[] = [
   { ruta: "/api/seguimientos", metodos: ["GET"], permisos: ["Ver Informes"] },
   { ruta: "/api/seguimientos/[id]/pdf", metodos: ["GET"], permisos: ["Ver Informes"] },
   { ruta: "/api/actividades-seguimiento/[id]", metodos: ["PATCH"], permisos: ["Ver Informes"] },
+
+  // Historia clínica del paciente (las rutas validan además que sea un psicólogo; cada uno ve solo la suya)
+  { ruta: "/api/historias-clinicas", metodos: ["GET"], permisos: HISTORIA_CLINICA },
+  { ruta: "/api/historias-clinicas/[id]", metodos: ["GET", "PUT"], permisos: HISTORIA_CLINICA },
+  { ruta: "/api/historias-clinicas/[id]/pdf", metodos: ["GET"], permisos: HISTORIA_CLINICA },
 
   // Auditoría (RF 1.4): solo lectura
   { ruta: "/api/auditoria", metodos: ["GET"], permisos: ["Ver Auditoría"] },
