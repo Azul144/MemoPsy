@@ -67,7 +67,22 @@ export interface HistoriaCompleta {
   evoluciones: { id: string; titulo: string; contenido: string; fecha: string }[];
 }
 
+// ¿El psicólogo atiende a este paciente? (turnos o notas con él, o una historia suya ya abierta)
+// Sin esto, cualquier psicólogo vería los datos de cualquier paciente con solo cambiar el id.
+export async function atiendeAlPaciente(ds: DataSource, pacienteId: string, psicologoId: string): Promise<boolean> {
+  const filas: any[] = await ds.query(
+    `SELECT 1 FROM historia_clinica WHERE paciente_id = ? AND psicologo_id = ?
+     UNION SELECT 1 FROM paciente_tiene_sesion pts JOIN sesion s ON s.id = pts.sesion_id WHERE pts.paciente_id = ? AND s.psicologo_id = ?
+     UNION SELECT 1 FROM paciente_tiene_informe pti JOIN informe i ON i.id = pti.informe_id WHERE pti.paciente_id = ? AND i.psicologo_id = ?
+     LIMIT 1`,
+    [pacienteId, psicologoId, pacienteId, psicologoId, pacienteId, psicologoId],
+  );
+  return filas.length > 0;
+}
+
+// null = el paciente no existe o no es de este psicólogo (se responde igual, para no revelar nada)
 export async function cargarHistoria(ds: DataSource, pacienteId: string, psicologoId: string): Promise<HistoriaCompleta | null> {
+  if (!(await atiendeAlPaciente(ds, pacienteId, psicologoId))) return null;
   const paciente = await ds.getRepository(PacienteEntity).findOne({
     where: { id: pacienteId },
     relations: ["persona", "obraSocial"],

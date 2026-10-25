@@ -8,7 +8,7 @@ import { authConfig } from "@/lib/auth/auth-config";
 import { initializeDatabase } from "@/lib/database";
 import { conAuditoria } from "@/lib/auditoria/con-auditoria";
 import { HistoriaClinicaEntity, PacienteEntity } from "@/entities";
-import { cargarHistoria, validarHistoria } from "@/lib/historia-clinica/datos";
+import { atiendeAlPaciente, cargarHistoria, validarHistoria } from "@/lib/historia-clinica/datos";
 
 type Contexto = { params: Promise<{ id: string }> };
 
@@ -47,7 +47,9 @@ async function manejarPUT(request: NextRequest, { params }: Contexto) {
   try {
     const ds = await initializeDatabase();
     const paciente = await ds.getRepository(PacienteEntity).findOne({ where: { id } });
-    if (!paciente) return NextResponse.json({ message: "Paciente no encontrado." }, { status: 404 });
+    if (!paciente || !(await atiendeAlPaciente(ds, id, auth.psicologoId))) {
+      return NextResponse.json({ message: "Paciente no encontrado." }, { status: 404 });
+    }
 
     const repo = ds.getRepository(HistoriaClinicaEntity);
     const existente = await repo.findOne({ where: { paciente: { id }, psicologo: { id: auth.psicologoId } } });
