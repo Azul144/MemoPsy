@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ShieldCheck } from "lucide-react";
 import FondoAnimado from "@/components/FondoAnimado";
+import LogoMemoPsy from "@/components/LogoMemoPsy"
 
 export default function PantallaAcceso({ children }: { children: React.ReactNode }) {
   return (
@@ -49,8 +50,7 @@ export default function PantallaAcceso({ children }: { children: React.ReactNode
 
         <div className="relative mx-auto flex w-full max-w-sm flex-1 flex-col justify-center py-10">
           <div className="entrar mb-8 flex items-center gap-3">
-            <Image src="/assets/logopng.png" alt="" width={40} height={48} />
-            <span className="titulo text-3xl font-semibold text-dorado">MemoPsy</span>
+            <LogoMemoPsy tamano="lg" />
           </div>
           <div className="entrar" style={{ animationDelay: "0.1s" }}>
             {children}

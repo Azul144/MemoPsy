@@ -525,7 +525,7 @@ export default function EditarUsuarioPage() {
                       onChange={handleChange}
                       className="bg-superficie mt-1"
                     />
-                    {fieldErrors.nombre && <p className="text-peligro text-xs mt-1">{fieldErrors.nombre}</p>}
+                    {fieldErrors.nombre && <p className="text-peligro text-sm mt-1">{fieldErrors.nombre}</p>}
                   </div>
                   <div>
                     <Label htmlFor="apellido" className="text-texto-2">
@@ -538,7 +538,7 @@ export default function EditarUsuarioPage() {
                       onChange={handleChange}
                       className="bg-superficie mt-1"
                     />
-                    {fieldErrors.apellido && <p className="text-peligro text-xs mt-1">{fieldErrors.apellido}</p>}
+                    {fieldErrors.apellido && <p className="text-peligro text-sm mt-1">{fieldErrors.apellido}</p>}
                   </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -553,7 +553,7 @@ export default function EditarUsuarioPage() {
                       onChange={handleChange}
                       className="bg-superficie mt-1"
                     />
-                    {fieldErrors.dni && <p className="text-peligro text-xs mt-1">{fieldErrors.dni}</p>}
+                    {fieldErrors.dni && <p className="text-peligro text-sm mt-1">{fieldErrors.dni}</p>}
                   </div>
                   <div>
                     <Label htmlFor="fechaNacimiento" className="text-texto-2">
@@ -569,7 +569,7 @@ export default function EditarUsuarioPage() {
                       style={{ colorScheme: "dark" }}
                     />
                     {fieldErrors.fechaNacimiento && (
-                      <p className="text-peligro text-xs mt-1">{fieldErrors.fechaNacimiento}</p>
+                      <p className="text-peligro text-sm mt-1">{fieldErrors.fechaNacimiento}</p>
                     )}
                   </div>
                 </div>
@@ -588,9 +588,9 @@ export default function EditarUsuarioPage() {
                     className="bg-superficie mt-1"
                   />
                   {fieldErrors.telefono ? (
-                    <p className="text-peligro text-xs mt-1">{fieldErrors.telefono}</p>
+                    <p className="text-peligro text-sm mt-1">{fieldErrors.telefono}</p>
                   ) : (
-                    <p className="text-tenue text-xs mt-1">Opcional. Dato de contacto del paciente.</p>
+                    <p className="text-tenue text-sm mt-1">Opcional. Dato de contacto del paciente.</p>
                   )}
                 </div>
 
@@ -633,7 +633,7 @@ export default function EditarUsuarioPage() {
                     <Label htmlFor="isPsicologo" className="text-texto-2 flex items-center">
                       <Brain className="w-5 h-5 mr-2 text-info" /> Psicólogo
                       {hasExistingPsicologoData && (
-                        <span className="text-xs text-aviso ml-2">
+                        <span className="text-sm text-aviso ml-2">
                           (No se puede desactivar - datos existentes)
                         </span>
                       )}
@@ -651,7 +651,7 @@ export default function EditarUsuarioPage() {
                     <Label htmlFor="isPaciente" className="text-texto-2 flex items-center">
                       <Activity className="w-5 h-5 mr-2 text-lime-400" /> Paciente
                       {hasExistingPacienteData && (
-                        <span className="text-xs text-aviso ml-2">
+                        <span className="text-sm text-aviso ml-2">
                           (No se puede desactivar - datos existentes)
                         </span>
                       )}
@@ -673,7 +673,7 @@ export default function EditarUsuarioPage() {
                         className="bg-superficie mt-1"
                       />
                       {fieldErrors.numeroLicencia && (
-                        <p className="text-peligro text-xs mt-1">{fieldErrors.numeroLicencia}</p>
+                        <p className="text-peligro text-sm mt-1">{fieldErrors.numeroLicencia}</p>
                       )}
                     </div>
                     <div>
@@ -708,7 +708,7 @@ export default function EditarUsuarioPage() {
                         </SelectContent>
                       </Select>
                       {fieldErrors.especialidad && (
-                        <p className="text-peligro text-xs mt-1">{fieldErrors.especialidad}</p>
+                        <p className="text-peligro text-sm mt-1">{fieldErrors.especialidad}</p>
                       )}
                     </div>
                   </div>
@@ -751,12 +751,12 @@ export default function EditarUsuarioPage() {
                         </SelectContent>
                       </Select>
                       {obrasSocialesList.find((o) => o.id === selectedObraSocialId)?.nombre.trim().toLowerCase() === "particular" && (
-                        <p className="text-aviso text-xs mt-1">
+                        <p className="text-aviso text-sm mt-1">
                           Paciente particular: abona la sesión en efectivo o por QR del psicólogo.
                         </p>
                       )}
                       {fieldErrors.selectedObraSocialId && (
-                        <p className="text-peligro text-xs mt-1">{fieldErrors.selectedObraSocialId}</p>
+                        <p className="text-peligro text-sm mt-1">{fieldErrors.selectedObraSocialId}</p>
                       )}
                     </div>
                   </div>
@@ -781,7 +781,7 @@ export default function EditarUsuarioPage() {
                           <Label htmlFor={`perfil-${perfil.id}`} className="text-suave font-normal">
                             {perfil.nombre}
                             {perfil.descripcion && (
-                              <span className="text-xs text-tenue ml-2">({perfil.descripcion})</span>
+                              <span className="text-sm text-tenue ml-2">({perfil.descripcion})</span>
                             )}
                           </Label>
                         </div>

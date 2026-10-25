@@ -135,7 +135,7 @@ export default function HistoriasClinicasPage() {
                         <p className="font-medium text-foreground">
                           {p.apellido}, {p.nombre}
                         </p>
-                        <p className="text-xs text-tenue">
+                        <p className="text-sm text-tenue">
                           DNI {p.dni}
                           {p.obraSocial ? ` · ${p.obraSocial}` : ""}
                           {p.fechaActualizacion ? ` · actualizada el ${fechaCorta(p.fechaActualizacion)}` : ""}

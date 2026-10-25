@@ -860,7 +860,7 @@ const handleUpdateSesion = async () => {
                                     {sesion.pago.estado}
                                 </Badge>
                                 {sesion.pago.estado === "Pagado" && (
-                                    <span className="text-xs text-suave">
+                                    <span className="text-sm text-suave">
                                         {sesion.pago.medio?.descripcion}
                                         {sesion.pago.monto != null &&
                                             ` · $ ${sesion.pago.monto.toLocaleString("es-AR", { minimumFractionDigits: 2 })}`}
@@ -881,7 +881,7 @@ const handleUpdateSesion = async () => {
                         filterType === "paciente" && !cerrada &&
                         parseISO(sesion.fechaHoraInicio).getTime() - Date.now() >= 24 * 60 * 60 * 1000
                     if (!puedeEditar && !verPago && !puedeReprogramar) return null
-                    const claseBoton = "h-8 gap-1.5 rounded-full border bg-transparent px-3 text-xs font-medium"
+                    const claseBoton = "h-8 gap-1.5 rounded-full border bg-transparent px-3 text-sm font-medium"
                     return (
                         <div className="mt-3 flex flex-wrap gap-2 border-t border-borde/60 pt-3">
                             {puedeEditar && sesion.estado?.nombre !== "Confirmada" && (
@@ -1082,7 +1082,7 @@ const handleUpdateSesion = async () => {
                                     )}
                                   />
                                   {formErrors.fechaInicio && (
-                                    <p className="text-xs text-peligro">{formErrors.fechaInicio}</p>
+                                    <p className="text-sm text-peligro">{formErrors.fechaInicio}</p>
                                   )}
                                 </div>
                                 <div className="space-y-2">
@@ -1100,7 +1100,7 @@ const handleUpdateSesion = async () => {
                                     )}
                                   />
                                   {formErrors.horaInicio && (
-                                    <p className="text-xs text-peligro">{formErrors.horaInicio}</p>
+                                    <p className="text-sm text-peligro">{formErrors.horaInicio}</p>
                                   )}
                                 </div>
                               </div>
@@ -1119,7 +1119,7 @@ const handleUpdateSesion = async () => {
                                       formErrors.fechaFin && "border-red-500",
                                     )}
                                   />
-                                  {formErrors.fechaFin && <p className="text-xs text-peligro">{formErrors.fechaFin}</p>}
+                                  {formErrors.fechaFin && <p className="text-sm text-peligro">{formErrors.fechaFin}</p>}
                                 </div>
                                 <div className="space-y-2">
                                   <Label htmlFor="horaFin" className="text-foreground">
@@ -1135,7 +1135,7 @@ const handleUpdateSesion = async () => {
                                       formErrors.horaFin && "border-red-500",
                                     )}
                                   />
-                                  {formErrors.horaFin && <p className="text-xs text-peligro">{formErrors.horaFin}</p>}
+                                  {formErrors.horaFin && <p className="text-sm text-peligro">{formErrors.horaFin}</p>}
                                 </div>
                               </div>
 
@@ -1178,7 +1178,7 @@ const handleUpdateSesion = async () => {
                                             <div className="flex min-w-0 flex-col">
                                               <span>{psicologo.persona.nombreCompleto}</span>
                                               {psicologo.especialidad && (
-                                                <span className="text-xs text-info">{psicologo.especialidad}</span>
+                                                <span className="text-sm text-info">{psicologo.especialidad}</span>
                                               )}
                                             </div>
                                           </div>
@@ -1192,7 +1192,7 @@ const handleUpdateSesion = async () => {
                                   )}
                                 </div>
                                 {formErrors.psicologoId && (
-                                  <p className="text-xs text-peligro">{formErrors.psicologoId}</p>
+                                  <p className="text-sm text-peligro">{formErrors.psicologoId}</p>
                                 )}
                               </div>
 
@@ -1222,7 +1222,7 @@ const handleUpdateSesion = async () => {
                                   </SelectContent>
                                 </Select>
                                 {formErrors.modalidadId && (
-                                  <p className="text-xs text-peligro">{formErrors.modalidadId}</p>
+                                  <p className="text-sm text-peligro">{formErrors.modalidadId}</p>
                                 )}
                               </div>
 
@@ -1240,7 +1240,7 @@ const handleUpdateSesion = async () => {
                                     onChange={(e) => setFormData({ ...formData, enlaceVideollamada: e.target.value })}
                                     className="bg-background text-foreground border-borde-fuerte"
                                   />
-                                  <p className="text-xs text-tenue">Si lo dejás vacío, MemoPsy crea el enlace automáticamente. Si ya tenés uno, pegalo acá.</p>
+                                  <p className="text-sm text-tenue">Si lo dejás vacío, MemoPsy crea el enlace automáticamente. Si ya tenés uno, pegalo acá.</p>
                                 </div>
                               )}
 
@@ -1269,7 +1269,7 @@ const handleUpdateSesion = async () => {
                                     ))}
                                   </SelectContent>
                                 </Select>
-                                {formErrors.estadoId && <p className="text-xs text-peligro">{formErrors.estadoId}</p>}
+                                {formErrors.estadoId && <p className="text-sm text-peligro">{formErrors.estadoId}</p>}
                               </div>
 
                               {/* Pacientes con búsqueda y selección múltiple */}
@@ -1335,7 +1335,7 @@ const handleUpdateSesion = async () => {
                                               />
                                               <span>{paciente.persona.nombreCompleto}</span>
                                               {paciente.esDelPsicologo && pacienteSearch.trim().length > 1 && (
-                                                <span className="ml-auto text-xs text-info">Su paciente</span>
+                                                <span className="ml-auto text-sm text-info">Su paciente</span>
                                               )}
                                             </div>
                                           ))
@@ -1353,7 +1353,7 @@ const handleUpdateSesion = async () => {
                                   </div>
                                 </div>
                                 {formErrors.pacientesIds && (
-                                  <p className="text-xs text-peligro">{formErrors.pacientesIds}</p>
+                                  <p className="text-sm text-peligro">{formErrors.pacientesIds}</p>
                                 )}
                               </div>
                             </div>
@@ -1484,12 +1484,12 @@ const handleUpdateSesion = async () => {
                     <div className="space-y-2">
                         <Label htmlFor="edit_fechaInicio" className="text-foreground">Fecha Inicio</Label>
                         <Input id="edit_fechaInicio" type="date" value={editFormData.fechaInicio} onChange={(e) => setEditFormData({ ...editFormData, fechaInicio: e.target.value })} className={cn("bg-background text-foreground border-borde-fuerte w-full", editFormErrors.fechaInicio && "border-red-500")} />
-                        {editFormErrors.fechaInicio && <p className="text-xs text-peligro">{editFormErrors.fechaInicio}</p>}
+                        {editFormErrors.fechaInicio && <p className="text-sm text-peligro">{editFormErrors.fechaInicio}</p>}
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="edit_horaInicio" className="text-foreground">Hora Inicio</Label>
                         <Input id="edit_horaInicio" type="time" value={editFormData.horaInicio} onChange={(e) => setEditFormData({ ...editFormData, horaInicio: e.target.value })} className={cn("bg-background text-foreground border-borde-fuerte w-full", editFormErrors.horaInicio && "border-red-500")} />
-                        {editFormErrors.horaInicio && <p className="text-xs text-peligro">{editFormErrors.horaInicio}</p>}
+                        {editFormErrors.horaInicio && <p className="text-sm text-peligro">{editFormErrors.horaInicio}</p>}
                     </div>
                 </div>
                 {/* Fecha Fin y Hora Fin */}
@@ -1497,12 +1497,12 @@ const handleUpdateSesion = async () => {
                     <div className="space-y-2">
                         <Label htmlFor="edit_fechaFin" className="text-foreground">Fecha Fin</Label>
                         <Input id="edit_fechaFin" type="date" value={editFormData.fechaFin} onChange={(e) => setEditFormData({ ...editFormData, fechaFin: e.target.value })} className={cn("bg-background text-foreground border-borde-fuerte w-full", editFormErrors.fechaFin && "border-red-500")} />
-                        {editFormErrors.fechaFin && <p className="text-xs text-peligro">{editFormErrors.fechaFin}</p>}
+                        {editFormErrors.fechaFin && <p className="text-sm text-peligro">{editFormErrors.fechaFin}</p>}
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="edit_horaFin" className="text-foreground">Hora Fin</Label>
                         <Input id="edit_horaFin" type="time" value={editFormData.horaFin} onChange={(e) => setEditFormData({ ...editFormData, horaFin: e.target.value })} className={cn("bg-background text-foreground border-borde-fuerte w-full", editFormErrors.horaFin && "border-red-500")} />
-                        {editFormErrors.horaFin && <p className="text-xs text-peligro">{editFormErrors.horaFin}</p>}
+                        {editFormErrors.horaFin && <p className="text-sm text-peligro">{editFormErrors.horaFin}</p>}
                     </div>
                 </div>
 
@@ -1530,7 +1530,7 @@ const handleUpdateSesion = async () => {
                                             <div className="flex min-w-0 flex-col">
                                                 <span>{psicologo.persona.nombreCompleto}</span>
                                                 {psicologo.especialidad && (
-                                                    <span className="text-xs text-info">{psicologo.especialidad}</span>
+                                                    <span className="text-sm text-info">{psicologo.especialidad}</span>
                                                 )}
                                             </div>
                                         </div>
@@ -1539,7 +1539,7 @@ const handleUpdateSesion = async () => {
                             </div>
                         )}
                     </div>
-                    {editFormErrors.psicologoId && <p className="text-xs text-peligro">{editFormErrors.psicologoId}</p>}
+                    {editFormErrors.psicologoId && <p className="text-sm text-peligro">{editFormErrors.psicologoId}</p>}
                 </div>
 
                 {/* Modalidad (Edit) */}
@@ -1555,7 +1555,7 @@ const handleUpdateSesion = async () => {
                             ))}
                         </SelectContent>
                     </Select>
-                    {editFormErrors.modalidadId && <p className="text-xs text-peligro">{editFormErrors.modalidadId}</p>}
+                    {editFormErrors.modalidadId && <p className="text-sm text-peligro">{editFormErrors.modalidadId}</p>}
                 </div>
 
                 {/* Enlace de videollamada (RF 3.4): solo para sesiones remotas */}
@@ -1570,7 +1570,7 @@ const handleUpdateSesion = async () => {
                       onChange={(e) => setEditFormData({ ...editFormData, enlaceVideollamada: e.target.value })}
                       className="bg-background text-foreground border-borde-fuerte"
                     />
-                    <p className="text-xs text-tenue">Si lo dejás vacío, MemoPsy crea el enlace automáticamente. Si ya tenés uno, pegalo acá.</p>
+                    <p className="text-sm text-tenue">Si lo dejás vacío, MemoPsy crea el enlace automáticamente. Si ya tenés uno, pegalo acá.</p>
                   </div>
                 )}
 
@@ -1587,7 +1587,7 @@ const handleUpdateSesion = async () => {
                             ))}
                         </SelectContent>
                     </Select>
-                    {editFormErrors.estadoId && <p className="text-xs text-peligro">{editFormErrors.estadoId}</p>}
+                    {editFormErrors.estadoId && <p className="text-sm text-peligro">{editFormErrors.estadoId}</p>}
                 </div>
 
                 {/* Pacientes con búsqueda y selección múltiple (Edit) */}
@@ -1624,7 +1624,7 @@ const handleUpdateSesion = async () => {
                                                 <Check className={cn("h-4 w-4", editSelectedPacientes.some(p => p.id === paciente.id) ? "opacity-100" : "opacity-0")} />
                                                 <span>{paciente.persona.nombreCompleto}</span>
                                                 {paciente.esDelPsicologo && editPacienteSearch.trim().length > 1 && (
-                                                    <span className="ml-auto text-xs text-info">Su paciente</span>
+                                                    <span className="ml-auto text-sm text-info">Su paciente</span>
                                                 )}
                                             </div>
                                         ))
@@ -1641,7 +1641,7 @@ const handleUpdateSesion = async () => {
                             )}
                         </div>
                     </div>
-                    {editFormErrors.pacientesIds && <p className="text-xs text-peligro">{editFormErrors.pacientesIds}</p>}
+                    {editFormErrors.pacientesIds && <p className="text-sm text-peligro">{editFormErrors.pacientesIds}</p>}
                 </div>
                 {editFormErrors.general && <p className="text-sm text-peligro py-2 text-center">{editFormErrors.general}</p>}
             </div>

@@ -1,6 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
 import { MapPin, Phone, Mail } from "lucide-react";
+import LogoMemoPsy from "@/components/LogoMemoPsy"
 
 const contacto = {
   direccion: "Av. 25 de Mayo 450, Oficina 2",
@@ -58,8 +58,7 @@ export default function PiePagina() {
         {/* Columna 3: Marca */}
         <div className="md:text-right">
           <div className="flex items-center gap-3 md:justify-end">
-            <Image src="/assets/logopng.png" alt="Logo de MemoPsy" width={36} height={44} />
-            <span className="titulo text-2xl font-semibold text-dorado">MemoPsy</span>
+            <LogoMemoPsy tamano="md" />
           </div>
           <p className="mt-4 text-foreground/80">
             En MemoPsy impulsamos la psicología moderna con herramientas intuitivas y seguras,

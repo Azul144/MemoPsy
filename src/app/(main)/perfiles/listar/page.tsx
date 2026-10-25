@@ -184,6 +184,59 @@ export default function ListarPerfilesPage() {
     ? `${session.user.persona.nombre} ${session.user.persona.apellido}`
     : session?.user?.email || "Usuario"
 
+  const insigniasPermisos = (perfil: PerfilCompleto) => {
+    const permisosPorModulo = perfil.permisos.reduce(
+      (acc, permiso) => {
+        acc[permiso.modulo] = (acc[permiso.modulo] ?? 0) + 1
+        return acc
+      },
+      {} as Record<string, number>,
+    )
+    const modulos = Object.entries(permisosPorModulo)
+    if (modulos.length === 0) {
+      return <Badge variant="secondary" className="text-xs">Sin permisos</Badge>
+    }
+    return modulos.map(([modulo, count]) => (
+      <Badge key={modulo} variant="outline" className="text-xs border-info text-info">
+        {modulo}: {count}
+      </Badge>
+    ))
+  }
+
+  const menuAcciones = (perfil: PerfilCompleto) => (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="h-9 w-9 shrink-0 p-0 text-suave hover:text-foreground hover:bg-superficie">
+          <span className="sr-only">Abrir menú</span>
+          <MoreVertical className="h-5 w-5" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" style={{ backgroundColor: "var(--background)", borderColor: "var(--borde)" }}>
+        {perfilActionPermissions.canEdit && (
+          <DropdownMenuItem
+            onClick={() => handleEdit(perfil.id)}
+            className="text-suave hover:bg-superficie focus:bg-superficie focus:text-foreground"
+          >
+            <Edit3 className="mr-2 h-4 w-4" /> Editar
+          </DropdownMenuItem>
+        )}
+        {perfilActionPermissions.canDelete && (
+          <DropdownMenuItem
+            onClick={() => handleDelete(perfil.id, perfil.nombre)}
+            className="text-suave hover:!bg-red-700 hover:!text-[#ffffff] focus:!bg-red-700 focus:text-[#ffffff]"
+          >
+            <Trash2 className="mr-2 h-4 w-4" /> Eliminar
+          </DropdownMenuItem>
+        )}
+        {!perfilActionPermissions.canEdit && !perfilActionPermissions.canDelete && !perfilActionPermissions.canAssign && (
+          <DropdownMenuItem disabled className="text-tenue">
+            Sin acciones disponibles
+          </DropdownMenuItem>
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+
   if (status === "loading" && isLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-4" style={{ backgroundColor: "var(--background)" }}>
@@ -212,7 +265,7 @@ export default function ListarPerfilesPage() {
     <div className="min-h-screen">
 
       {/* Main Content */}
-      <main className="mx-auto w-full max-w-6xl px-6 py-10">
+      <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-10">
         <EncabezadoPagina titulo="Perfiles" descripcion="Perfiles del sistema y los permisos de cada uno." volverA="/perfiles" textoVolver="Volver a Perfiles">
           {perfilActionPermissions.canRegister && (
             <Button
@@ -249,112 +302,73 @@ export default function ListarPerfilesPage() {
               : "No hay perfiles registrados en el sistema."}
           </div>
         ) : (
-          <div className="overflow-x-auto rounded-lg shadow" style={{ backgroundColor: "var(--card)" }}>
-            <Table>
-              <TableHeader>
-                <TableRow className="border-b border-borde">
-                  <TableHead className="text-foreground font-semibold">Nombre del Perfil</TableHead>
-                  <TableHead className="text-foreground font-semibold">Descripción</TableHead>
-                  <TableHead className="text-foreground font-semibold">Permisos por Módulo</TableHead>
-                  <TableHead className="text-foreground font-semibold">Usuarios Asignados</TableHead>
-                  <TableHead className="text-foreground font-semibold">Fecha de Creación</TableHead>
-                  <TableHead className="text-foreground font-semibold text-right">Acciones</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredPerfiles.map((perfil) => {
-                  const permisosPorModulo = perfil.permisos.reduce(
-                    (acc, permiso) => {
-                      if (!acc[permiso.modulo]) acc[permiso.modulo] = 0
-                      acc[permiso.modulo]++
-                      return acc
-                    },
-                    {} as Record<string, number>,
-                  )
+          <>
+            {/* Celular y tablet: una tarjeta por perfil */}
+            <ul className="space-y-3 lg:hidden">
+              {filteredPerfiles.map((perfil) => (
+                <li key={perfil.id} className="rounded-xl border border-borde p-4 shadow-sm" style={{ backgroundColor: "var(--card)" }}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="flex items-center text-base font-semibold text-foreground">
+                        <Shield className="mr-2 h-4 w-4 shrink-0 text-info" />
+                        {perfil.nombre}
+                      </p>
+                      {perfil.descripcion && <p className="mt-1 text-sm text-suave">{perfil.descripcion}</p>}
+                    </div>
+                    {menuAcciones(perfil)}
+                  </div>
+                  <div className="mt-3 flex flex-wrap gap-1">{insigniasPermisos(perfil)}</div>
+                  <p className="mt-3 flex items-center gap-4 text-sm text-tenue">
+                    <span className="flex items-center">
+                      <Users className="mr-1 h-4 w-4" /> {perfil.usuariosCount} usuario(s)
+                    </span>
+                    <span>Creado el {new Date(perfil.fechaCreacion).toLocaleDateString("es-AR")}</span>
+                  </p>
+                </li>
+              ))}
+            </ul>
 
-                  return (
+            {/* Computadora: tabla completa, sin desplazamiento lateral */}
+            <div className="hidden rounded-xl border border-borde shadow lg:block" style={{ backgroundColor: "var(--card)" }}>
+              <Table className="text-base">
+                <TableHeader>
+                  <TableRow className="border-b border-borde">
+                    <TableHead className="px-4 py-3 text-foreground font-semibold">Perfil</TableHead>
+                    <TableHead className="px-4 py-3 text-foreground font-semibold">Permisos por módulo</TableHead>
+                    <TableHead className="px-4 py-3 text-foreground font-semibold">Usuarios</TableHead>
+                    <TableHead className="px-4 py-3 text-foreground font-semibold">Creado</TableHead>
+                    <TableHead className="px-4 py-3 text-foreground font-semibold text-right">Acciones</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredPerfiles.map((perfil) => (
                     <TableRow key={perfil.id} className="border-b border-borde hover:bg-background transition-colors">
-                      <TableCell className="text-texto-2 font-medium">
-                        <div className="flex items-center">
-                          <Shield className="w-4 h-4 mr-2 text-info" />
+                      <TableCell className="px-4 py-3 whitespace-normal max-w-md">
+                        <p className="flex items-center font-medium text-foreground">
+                          <Shield className="mr-2 h-4 w-4 shrink-0 text-info" />
                           {perfil.nombre}
-                        </div>
+                        </p>
+                        {perfil.descripcion && <p className="mt-0.5 text-sm text-suave">{perfil.descripcion}</p>}
                       </TableCell>
-                      <TableCell className="text-suave max-w-xs">
-                        <div className="truncate" title={perfil.descripcion}>
-                          {perfil.descripcion}
-                        </div>
+                      <TableCell className="px-4 py-3 whitespace-normal">
+                        <div className="flex flex-wrap gap-1">{insigniasPermisos(perfil)}</div>
                       </TableCell>
-                      <TableCell>
-                        <div className="flex flex-wrap gap-1">
-                          {Object.entries(permisosPorModulo).map(([modulo, count]) => (
-                            <Badge key={modulo} variant="outline" className="text-xs border-teal-500 text-info">
-                              {modulo}: {count}
-                            </Badge>
-                          ))}
-                          {Object.keys(permisosPorModulo).length === 0 && (
-                            <Badge variant="secondary" className="text-xs">
-                              Sin permisos
-                            </Badge>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-suave">
+                      <TableCell className="px-4 py-3 text-suave">
                         <div className="flex items-center">
-                          <Users className="w-4 h-4 mr-1 text-tenue" />
+                          <Users className="mr-1 h-4 w-4 text-tenue" />
                           {perfil.usuariosCount}
                         </div>
                       </TableCell>
-                      <TableCell className="text-suave">
-                        {new Date(perfil.fechaCreacion).toLocaleDateString("es-ES")}
+                      <TableCell className="px-4 py-3 text-suave">
+                        {new Date(perfil.fechaCreacion).toLocaleDateString("es-AR")}
                       </TableCell>
-                      <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              className="h-8 w-8 p-0 text-suave hover:text-foreground hover:bg-superficie"
-                            >
-                              <span className="sr-only">Abrir menú</span>
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent
-                            align="end"
-                            style={{ backgroundColor: "var(--background)", borderColor: "var(--borde)" }}
-                          >
-                            {perfilActionPermissions.canEdit && (
-                              <DropdownMenuItem
-                                onClick={() => handleEdit(perfil.id)}
-                                className="text-suave hover:bg-superficie focus:bg-superficie focus:text-foreground"
-                              >
-                                <Edit3 className="mr-2 h-4 w-4" /> Editar
-                              </DropdownMenuItem>
-                            )}
-                            {perfilActionPermissions.canDelete && (
-                              <DropdownMenuItem
-                                onClick={() => handleDelete(perfil.id, perfil.nombre)}
-                                className="text-suave hover:!bg-red-700 hover:!text-[#ffffff] focus:!bg-red-700 focus:text-[#ffffff]"
-                              >
-                                <Trash2 className="mr-2 h-4 w-4" /> Eliminar
-                              </DropdownMenuItem>
-                            )}
-                            {!perfilActionPermissions.canEdit &&
-                              !perfilActionPermissions.canDelete &&
-                              !perfilActionPermissions.canAssign && (
-                                <DropdownMenuItem disabled className="text-tenue">
-                                  Sin acciones disponibles
-                                </DropdownMenuItem>
-                              )}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
+                      <TableCell className="px-4 py-3 text-right">{menuAcciones(perfil)}</TableCell>
                     </TableRow>
-                  )
-                })}
-              </TableBody>
-            </Table>
-          </div>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </>
         )}
       </main>
     </div>

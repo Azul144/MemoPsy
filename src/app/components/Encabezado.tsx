@@ -1,9 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
+import LogoMemoPsy from "@/components/LogoMemoPsy"
 
 const links = [
   { href: "#funciones", texto: "Funciones" },
@@ -22,8 +22,7 @@ export default function Encabezado() {
 
         {/* Logo */}
         <a href="#inicio" className="flex items-center gap-3">
-          <Image src="/assets/logopng.png" alt="Logo de MemoPsy" width={36} height={44} />
-          <span className="titulo text-2xl font-semibold text-dorado">MemoPsy</span>
+          <LogoMemoPsy tamano="md" />
         </a>
 
         {/* Menú de computadora */}

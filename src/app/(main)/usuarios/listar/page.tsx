@@ -33,6 +33,7 @@ interface UsuarioCompleto {
   email: string
   activo: boolean
   ultimoAcceso: Date
+  perfiles: { id: string; nombre: string; descripcion: string }[]
   persona: {
     id: string
     nombre: string
@@ -53,6 +54,23 @@ interface UsuarioCompleto {
       activo: boolean
     } | null
   } | null
+}
+
+// Qué puede hacer cada rol del sistema (RF 4.1 y RF 4.2). Los perfiles creados a mano muestran su descripción.
+const FUNCIONES_POR_PERFIL: Record<string, string> = {
+  Administrador: "Gestiona las cuentas de usuario y los perfiles, y ve la auditoría",
+  "Psicólogo": "Atiende sus sesiones y escribe los informes clínicos",
+  Recepcionista: "Maneja la agenda: turnos, pagos y profesionales",
+  Auditor: "Consulta la auditoría, los usuarios, los perfiles y la agenda (solo lectura)",
+  Paciente: "Ve sus turnos y el material que le comparte su psicólogo",
+}
+
+const COLOR_PERFIL: Record<string, string> = {
+  Administrador: "border-aviso text-aviso",
+  "Psicólogo": "border-info text-info",
+  Recepcionista: "border-naranja text-naranja",
+  Auditor: "border-borde-fuerte text-suave",
+  Paciente: "border-exito text-exito",
 }
 
 export default function ListarUsuariosPage() {
@@ -149,6 +167,7 @@ export default function ListarUsuariosPage() {
         user.persona?.nombre.toLowerCase().includes(searchTermLower) ||
         user.persona?.apellido.toLowerCase().includes(searchTermLower) ||
         user.email.toLowerCase().includes(searchTermLower) ||
+        (user.perfiles ?? []).some((p) => p.nombre.toLowerCase().includes(searchTermLower)) ||
         user.persona?.dni.includes(searchTermLower) ||
         (user.psicologo?.especialidad && user.psicologo.especialidad.toLowerCase().includes(searchTermLower)) ||
         (user.psicologo?.numeroLicencia && user.psicologo.numeroLicencia.toLowerCase().includes(searchTermLower)) ||
@@ -183,6 +202,90 @@ export default function ListarUsuariosPage() {
       avisoError(err.message || "No se pudo cambiar el estado del usuario.")
     }
   }
+
+  const nombreDe = (user: UsuarioCompleto) =>
+    user.persona ? `${user.persona.nombre} ${user.persona.apellido}` : "Sin datos personales"
+
+  const perfilesDe = (user: UsuarioCompleto) => {
+    if (user.perfiles?.length) return user.perfiles
+    const deducidos: { id: string; nombre: string; descripcion: string }[] = []
+    if (user.psicologo) deducidos.push({ id: "psicologo", nombre: "Psicólogo", descripcion: "" })
+    if (user.paciente) deducidos.push({ id: "paciente", nombre: "Paciente", descripcion: "" })
+    return deducidos
+  }
+
+  const funcionDe = (perfil: { nombre: string; descripcion: string }) =>
+    FUNCIONES_POR_PERFIL[perfil.nombre] ?? perfil.descripcion
+
+  const insigniasTipo = (user: UsuarioCompleto) => {
+    const perfiles = perfilesDe(user)
+    if (perfiles.length === 0) {
+      return <Badge variant="outline" className="border-peligro text-peligro">Sin perfil</Badge>
+    }
+    return perfiles.map((perfil) => (
+      <Badge
+        key={perfil.id}
+        variant="outline"
+        title={funcionDe(perfil)}
+        className={COLOR_PERFIL[perfil.nombre] ?? "border-borde-fuerte text-suave"}
+      >
+        {perfil.nombre}
+      </Badge>
+    ))
+  }
+
+  const funcionesDe = (user: UsuarioCompleto) =>
+    perfilesDe(user)
+      .map(funcionDe)
+      .filter(Boolean)
+      .map((texto) => (
+        <p key={texto} className="text-sm text-tenue">
+          {texto}
+        </p>
+      ))
+
+  const insigniaEstado = (activo: boolean) => (
+    <Badge style={{ backgroundColor: activo ? "#2E7D32" : "#C62828", color: "#ffffff" }}>
+      {activo ? "Activo" : "Inactivo"}
+    </Badge>
+  )
+
+  const menuAcciones = (user: UsuarioCompleto) => (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="h-9 w-9 shrink-0 p-0 text-suave hover:text-foreground hover:bg-superficie">
+          <span className="sr-only">Abrir menú</span>
+          <MoreVertical className="h-5 w-5" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" style={{ backgroundColor: "var(--background)", borderColor: "var(--borde)" }}>
+        {userActionPermissions.canEdit && (
+          <DropdownMenuItem
+            onClick={() => handleEdit(user.id)}
+            className="text-suave hover:bg-superficie focus:bg-superficie focus:text-foreground"
+          >
+            <Edit3 className="mr-2 h-4 w-4" /> Editar
+          </DropdownMenuItem>
+        )}
+        {userActionPermissions.canToggleStatus && (
+          <DropdownMenuItem
+            onClick={() => handleToggleStatus(user.id, user.activo)}
+            className={`text-suave hover:bg-superficie focus:bg-superficie focus:text-foreground ${
+              user.activo ? "hover:!bg-red-700 focus:!bg-red-700" : "hover:!bg-green-700 focus:!bg-green-700"
+            }`}
+          >
+            {user.activo ? <UserX className="mr-2 h-4 w-4" /> : <UserCheck className="mr-2 h-4 w-4" />}
+            {user.activo ? "Desactivar" : "Activar"}
+          </DropdownMenuItem>
+        )}
+        {!userActionPermissions.canEdit && !userActionPermissions.canToggleStatus && (
+          <DropdownMenuItem disabled className="text-tenue">
+            Sin acciones
+          </DropdownMenuItem>
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
 
   const handleLogout = async () => await cerrarSesion()
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen)
@@ -225,7 +328,7 @@ export default function ListarUsuariosPage() {
     <div className="min-h-screen">
 
       {/* Main Content */}
-      <main className="mx-auto w-full max-w-6xl px-6 py-10">
+      <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-10">
         <EncabezadoPagina titulo="Usuarios" volverA="/usuarios" textoVolver="Volver a Usuarios">
           {userActionPermissions.canRegister && (
             <Button
@@ -242,7 +345,7 @@ export default function ListarUsuariosPage() {
           <Search className="text-tenue mr-3 w-5 h-5" />
           <Input
             type="text"
-            placeholder="Buscar por nombre, apellido, email, DNI, especialidad o obra social..."
+            placeholder="Buscar por nombre, email, DNI, perfil, especialidad u obra social..."
             value={searchTerm}
             onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
             className="w-full bg-transparent text-foreground border-none focus:ring-0 placeholder-gray-400"
@@ -263,114 +366,93 @@ export default function ListarUsuariosPage() {
             No se encontraron usuarios que coincidan con la búsqueda o no hay usuarios registrados.
           </div>
         ) : (
-          <div className="overflow-x-auto rounded-lg shadow" style={{ backgroundColor: "var(--card)" }}>
-            <Table>
-              <TableHeader>
-                <TableRow className="border-b border-borde">
-                  <TableHead className="text-foreground font-semibold">Nombre Completo</TableHead>
-                  <TableHead className="text-foreground font-semibold">Email</TableHead>
-                  <TableHead className="text-foreground font-semibold">DNI</TableHead>
-                  <TableHead className="text-foreground font-semibold">Tipo de Usuario</TableHead>
-                  <TableHead className="text-foreground font-semibold">Especialidad</TableHead>
-                  <TableHead className="text-foreground font-semibold">Nro. Licencia</TableHead>
-                  <TableHead className="text-foreground font-semibold">Obra Social</TableHead>
-                  <TableHead className="text-foreground font-semibold">Estado</TableHead>
-                  <TableHead className="text-foreground font-semibold text-right">Acciones</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredUsers.map((user) => {
-                  const tiposUsuario = []
-                  if (user.psicologo) tiposUsuario.push("Psicólogo")
-                  if (user.paciente) tiposUsuario.push("Paciente")
-                  if (tiposUsuario.length === 0) tiposUsuario.push("Usuario")
+          <>
+            {/* Celular y tablet: una tarjeta por usuario */}
+            <ul className="space-y-3 lg:hidden">
+              {filteredUsers.map((user) => (
+                <li key={user.id} className="rounded-xl border border-borde p-4 shadow-sm" style={{ backgroundColor: "var(--card)" }}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="text-base font-semibold text-foreground">{nombreDe(user)}</p>
+                      <p className="break-all text-sm text-suave">{user.email}</p>
+                    </div>
+                    {menuAcciones(user)}
+                  </div>
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    {insigniasTipo(user)}
+                    {insigniaEstado(user.activo)}
+                  </div>
+                  <div className="mt-2">{funcionesDe(user)}</div>
+                  <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
+                    <dt className="text-tenue">DNI</dt>
+                    <dd className="text-texto-2">{user.persona?.dni || "—"}</dd>
+                    {user.psicologo && (
+                      <>
+                        <dt className="text-tenue">Especialidad</dt>
+                        <dd className="text-texto-2">{user.psicologo.especialidad || "—"}</dd>
+                        <dt className="text-tenue">Licencia</dt>
+                        <dd className="text-texto-2">{user.psicologo.numeroLicencia || "—"}</dd>
+                      </>
+                    )}
+                    {user.paciente && (
+                      <>
+                        <dt className="text-tenue">Obra social</dt>
+                        <dd className="text-texto-2">{user.paciente.obraSocial?.nombre || "Sin obra social"}</dd>
+                      </>
+                    )}
+                  </dl>
+                </li>
+              ))}
+            </ul>
 
-                  return (
+            {/* Computadora: tabla completa, sin desplazamiento lateral */}
+            <div className="hidden rounded-xl border border-borde shadow lg:block" style={{ backgroundColor: "var(--card)" }}>
+              <Table className="text-base">
+                <TableHeader>
+                  <TableRow className="border-b border-borde">
+                    <TableHead className="px-4 py-3 text-foreground font-semibold">Usuario</TableHead>
+                    <TableHead className="px-4 py-3 text-foreground font-semibold">DNI</TableHead>
+                    <TableHead className="px-4 py-3 text-foreground font-semibold">Perfil y funciones</TableHead>
+                    <TableHead className="px-4 py-3 text-foreground font-semibold">Especialidad / Obra social</TableHead>
+                    <TableHead className="px-4 py-3 text-foreground font-semibold">Estado</TableHead>
+                    <TableHead className="px-4 py-3 text-foreground font-semibold text-right">Acciones</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredUsers.map((user) => (
                     <TableRow key={user.id} className="border-b border-borde hover:bg-background transition-colors">
-                      <TableCell className="text-texto-2">
-                        {user.persona ? `${user.persona.nombre} ${user.persona.apellido}` : "Sin datos personales"}
+                      <TableCell className="px-4 py-3 whitespace-normal">
+                        <p className="font-medium text-foreground">{nombreDe(user)}</p>
+                        <p className="text-sm text-suave break-all">{user.email}</p>
                       </TableCell>
-                      <TableCell className="text-suave">{user.email}</TableCell>
-                      <TableCell className="text-suave">{user.persona?.dni || "N/A"}</TableCell>
-                      <TableCell>
-                        {tiposUsuario.map((tipo, index) => (
-                          <Badge
-                            key={tipo}
-                            variant="outline"
-                            className={`mr-1 mb-1 ${
-                              tipo === "Psicólogo"
-                                ? "border-teal-500 text-info"
-                                : tipo === "Paciente"
-                                  ? "border-lime-500 text-lime-300"
-                                  : "border-borde-fuerte text-suave"
-                            }`}
-                          >
-                            {tipo}
-                          </Badge>
-                        ))}
+                      <TableCell className="px-4 py-3 text-suave">{user.persona?.dni || "—"}</TableCell>
+                      <TableCell className="px-4 py-3 whitespace-normal max-w-xs">
+                        <div className="flex flex-wrap gap-1">{insigniasTipo(user)}</div>
+                        <div className="mt-1">{funcionesDe(user)}</div>
                       </TableCell>
-                      <TableCell className="text-suave">{user.psicologo?.especialidad || "N/A"}</TableCell>
-                      <TableCell className="text-suave">{user.psicologo?.numeroLicencia || "N/A"}</TableCell>
-                      <TableCell className="text-suave">{user.paciente?.obraSocial?.nombre || "N/A"}</TableCell>
-                      <TableCell>
-                        <Badge style={{ backgroundColor: user.activo ? "#2E7D32" : "#C62828", color: "#ffffff" }}>
-                          {user.activo ? "Activo" : "Inactivo"}
-                        </Badge>
+                      <TableCell className="px-4 py-3 whitespace-normal">
+                        {user.psicologo && (
+                          <>
+                            <p className="text-texto-2">{user.psicologo.especialidad || "—"}</p>
+                            <p className="text-sm text-tenue">Licencia {user.psicologo.numeroLicencia || "—"}</p>
+                          </>
+                        )}
+                        {user.paciente && (
+                          <p className="text-texto-2">
+                            {user.psicologo && <span className="text-sm text-tenue">Obra social: </span>}
+                            {user.paciente.obraSocial?.nombre || "Sin obra social"}
+                          </p>
+                        )}
+                        {!user.psicologo && !user.paciente && <span className="text-tenue">—</span>}
                       </TableCell>
-                      <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              className="h-8 w-8 p-0 text-suave hover:text-foreground hover:bg-superficie"
-                            >
-                              <span className="sr-only">Abrir menú</span>
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent
-                            align="end"
-                            style={{ backgroundColor: "var(--background)", borderColor: "var(--borde)" }}
-                          >
-                            {userActionPermissions.canEdit && (
-                              <DropdownMenuItem
-                                onClick={() => handleEdit(user.id)}
-                                className="text-suave hover:bg-superficie focus:bg-superficie focus:text-foreground"
-                              >
-                                <Edit3 className="mr-2 h-4 w-4" /> Editar
-                              </DropdownMenuItem>
-                            )}
-                            {userActionPermissions.canToggleStatus && (
-                              <DropdownMenuItem
-                                onClick={() => handleToggleStatus(user.id, user.activo)}
-                                className={`text-suave hover:bg-superficie focus:bg-superficie focus:text-foreground ${
-                                  user.activo
-                                    ? "hover:!bg-red-700 focus:!bg-red-700"
-                                    : "hover:!bg-green-700 focus:!bg-green-700"
-                                }`}
-                              >
-                                {user.activo ? (
-                                  <UserX className="mr-2 h-4 w-4" />
-                                ) : (
-                                  <UserCheck className="mr-2 h-4 w-4" />
-                                )}
-                                {user.activo ? "Desactivar" : "Activar"}
-                              </DropdownMenuItem>
-                            )}
-                            {!userActionPermissions.canEdit && !userActionPermissions.canToggleStatus && (
-                              <DropdownMenuItem disabled className="text-tenue">
-                                Sin acciones
-                              </DropdownMenuItem>
-                            )}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
+                      <TableCell className="px-4 py-3">{insigniaEstado(user.activo)}</TableCell>
+                      <TableCell className="px-4 py-3 text-right">{menuAcciones(user)}</TableCell>
                     </TableRow>
-                  )
-                })}
-              </TableBody>
-            </Table>
-          </div>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </>
         )}
       </main>
     </div>

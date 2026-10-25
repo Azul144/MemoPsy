@@ -2,7 +2,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { conAuditoria } from "@/lib/auditoria/con-auditoria"
 import { getRepository } from "@/lib/database"
-import { PersonaEntity, UsuarioEntity, PsicologoEntity, PacienteEntity, ObraSocialEntity } from "@/entities"
+import { PersonaEntity, UsuarioEntity, PsicologoEntity, PacienteEntity, ObraSocialEntity, UsuarioTienePerfilEntity } from "@/entities"
 import * as bcrypt from "bcrypt";
 import { AYUDA_CELULAR, normalizarCelular } from "@/lib/telefono"
 
@@ -42,6 +42,16 @@ export async function GET() {
       },
     })
 
+    // Perfiles (roles) de cada usuario
+    const asignaciones = await (await getRepository(UsuarioTienePerfilEntity)).find({ relations: { perfil: true } })
+    const perfilesMap = new Map<string, { id: string; nombre: string; descripcion: string }[]>()
+    asignaciones.forEach((a) => {
+      if (!a.perfil) return
+      const lista = perfilesMap.get(a.usuarioId) ?? []
+      lista.push({ id: a.perfil.id, nombre: a.perfil.nombre, descripcion: a.perfil.descripcion })
+      perfilesMap.set(a.usuarioId, lista)
+    })
+
     // Crear mapas para búsqueda rápida
     const psicologoMap = new Map()
     psicologos.forEach((psi) => {
@@ -67,6 +77,7 @@ export async function GET() {
         email: usuario.email,
         activo: usuario.activo,
         ultimoAcceso: usuario.ultimoAcceso,
+        perfiles: perfilesMap.get(usuario.id) ?? [],
         persona: usuario.persona
           ? {
               id: usuario.persona.id,

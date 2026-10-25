@@ -134,7 +134,7 @@ export default function AuditoriaPage() {
 
   return (
     <div className="min-h-screen">
-      <main className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6">
+      <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-10">
         <EncabezadoPagina
           titulo="Registro de auditoría"
           descripcion="Ingresos al sistema y cambios sobre datos sensibles: quién, qué, sobre qué registro y cuándo. Nunca se muestra contenido clínico."
@@ -220,40 +220,69 @@ export default function AuditoriaPage() {
             {hayFiltros ? "No hay eventos que coincidan con los filtros." : "Todavía no hay eventos registrados."}
           </div>
         ) : (
-          <div className="overflow-x-auto rounded-2xl border border-foreground/10" style={{ backgroundColor: "var(--card)" }}>
-            <Table>
-              <TableHeader>
-                <TableRow className="border-b border-borde">
-                  <TableHead className="whitespace-nowrap font-semibold text-foreground">Fecha y hora</TableHead>
-                  <TableHead className="font-semibold text-foreground">Usuario</TableHead>
-                  <TableHead className="font-semibold text-foreground">Acción</TableHead>
-                  <TableHead className="font-semibold text-foreground">Módulo</TableHead>
-                  <TableHead className="font-semibold text-foreground">Detalle</TableHead>
-                  <TableHead className="whitespace-nowrap font-semibold text-foreground">Registro</TableHead>
-                  <TableHead className="font-semibold text-foreground">IP</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {eventos.map((e) => (
-                  <TableRow key={e.id} className="border-b border-borde hover:bg-background">
-                    <TableCell className="whitespace-nowrap text-suave">
-                      {format(new Date(e.fecha), "dd/MM/yyyy HH:mm:ss", { locale: es })}
-                    </TableCell>
-                    <TableCell className="text-texto-2">{e.email ?? <span className="text-tenue">—</span>}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className={cn("whitespace-nowrap text-xs", colorAccion(e.accion))}>
-                        {nombreAccion(e.accion)}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-suave">{e.modulo}</TableCell>
-                    <TableCell className="min-w-[14rem] text-suave">{textoDetalle(e) ?? <span className="text-tenue">—</span>}</TableCell>
-                    <TableCell className="text-tenue">{e.entidadId ? `#${e.entidadId}` : "—"}</TableCell>
-                    <TableCell className="whitespace-nowrap text-tenue">{e.ip ?? "—"}</TableCell>
+          <>
+            {/* Celular y tablet: una tarjeta por evento */}
+            <ul className="space-y-3 lg:hidden">
+              {eventos.map((e) => (
+                <li key={e.id} className="rounded-xl border border-borde p-4 shadow-sm" style={{ backgroundColor: "var(--card)" }}>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <Badge variant="outline" className={cn("text-xs", colorAccion(e.accion))}>
+                      {nombreAccion(e.accion)}
+                    </Badge>
+                    <span className="text-sm text-tenue">
+                      {format(new Date(e.fecha), "dd/MM/yyyy HH:mm", { locale: es })}
+                    </span>
+                  </div>
+                  <p className="mt-2 break-all text-sm font-medium text-texto-2">{e.email ?? "Sin usuario"}</p>
+                  {textoDetalle(e) && <p className="mt-1 text-sm text-suave">{textoDetalle(e)}</p>}
+                  <p className="mt-2 text-xs text-tenue">
+                    {e.modulo}
+                    {e.entidadId ? ` · registro #${e.entidadId}` : ""}
+                    {e.ip ? ` · IP ${e.ip}` : ""}
+                  </p>
+                </li>
+              ))}
+            </ul>
+
+            {/* Computadora: tabla completa, sin desplazamiento lateral */}
+            <div className="hidden rounded-xl border border-borde shadow lg:block" style={{ backgroundColor: "var(--card)" }}>
+              <Table className="text-base">
+                <TableHeader>
+                  <TableRow className="border-b border-borde">
+                    <TableHead className="px-4 py-3 font-semibold text-foreground">Fecha y hora</TableHead>
+                    <TableHead className="px-4 py-3 font-semibold text-foreground">Usuario</TableHead>
+                    <TableHead className="px-4 py-3 font-semibold text-foreground">Acción</TableHead>
+                    <TableHead className="px-4 py-3 font-semibold text-foreground">Detalle</TableHead>
+                    <TableHead className="px-4 py-3 font-semibold text-foreground">IP</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+                </TableHeader>
+                <TableBody>
+                  {eventos.map((e) => (
+                    <TableRow key={e.id} className="border-b border-borde hover:bg-background">
+                      <TableCell className="px-4 py-3 text-suave">
+                        <p>{format(new Date(e.fecha), "dd/MM/yyyy", { locale: es })}</p>
+                        <p className="text-sm text-tenue">{format(new Date(e.fecha), "HH:mm:ss", { locale: es })}</p>
+                      </TableCell>
+                      <TableCell className="px-4 py-3 whitespace-normal break-all text-texto-2">
+                        {e.email ?? <span className="text-tenue">—</span>}
+                      </TableCell>
+                      <TableCell className="px-4 py-3">
+                        <Badge variant="outline" className={cn("text-xs", colorAccion(e.accion))}>
+                          {nombreAccion(e.accion)}
+                        </Badge>
+                        <p className="mt-1 text-sm text-tenue">{e.modulo}</p>
+                      </TableCell>
+                      <TableCell className="px-4 py-3 whitespace-normal text-suave">
+                        {textoDetalle(e) ?? <span className="text-tenue">—</span>}
+                        {e.entidadId && <p className="text-sm text-tenue">Registro #{e.entidadId}</p>}
+                      </TableCell>
+                      <TableCell className="px-4 py-3 text-tenue">{e.ip ?? "—"}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </>
         )}
 
         {!cargando && !error && totalPages > 1 && (

@@ -312,7 +312,7 @@ export default function HistoriaClinicaPage({ params }: { params: Promise<{ id: 
                   <li key={n.id} className="rounded-md border border-borde bg-background p-4">
                     <div className="flex flex-wrap items-baseline justify-between gap-2">
                       <p className="font-medium text-foreground">{n.titulo}</p>
-                      <p className="text-xs text-tenue">{fechaHora(n.fecha)}</p>
+                      <p className="text-sm text-tenue">{fechaHora(n.fecha)}</p>
                     </div>
                     <p className="mt-2 line-clamp-4 whitespace-pre-wrap text-sm text-suave">{n.contenido}</p>
                     <Link href={`/informes/detalle/${n.id}`} className="mt-2 inline-block text-sm text-dorado hover:underline">

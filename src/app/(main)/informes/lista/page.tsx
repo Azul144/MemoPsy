@@ -501,7 +501,7 @@ function ListaInformes() {
       {!isLoading && !error && informes.length > 0 && (
         <Card style={{ backgroundColor: "var(--card)", borderColor: "var(--borde)" }}>
           <CardContent className="p-0">
-            <Table>
+            <Table className="text-base">
               <TableHeader className="bg-superficie">
                 <TableRow>
                   <SortableHeader 
@@ -630,7 +630,7 @@ function ListaInformes() {
     <div className="min-h-screen flex flex-col">
 
       {/* Main Content */}
-      <main className="mx-auto w-full max-w-6xl px-6 py-10 flex-grow">
+      <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-10 flex-grow">
         <EncabezadoPagina titulo="Notas clínicas" descripcion="Consultá y filtrá las notas clínicas de tus pacientes." volverA="/informes" textoVolver="Volver a Informes" />
 
         {/* Psychologist View */}
@@ -684,7 +684,7 @@ function ListaInformes() {
                                   <div>
                                     <div className="font-medium">{paciente.nombreCompleto}</div>
                                     {paciente.persona?.dni && (
-                                      <div className="text-xs text-tenue">DNI: {paciente.persona.dni}</div>
+                                      <div className="text-sm text-tenue">DNI: {paciente.persona.dni}</div>
                                     )}
                                   </div>
                                 </div>

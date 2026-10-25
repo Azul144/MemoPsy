@@ -57,48 +57,58 @@
   --naranja: #FDBA74;
   --luz-fondo: rgba(62, 124, 122, 0.3); /* Manchas de luz de los encabezados */
   --fondo-pestanas: rgba(0, 0, 0, 0.2); /* Barra de pestañas */
+  --logo-fondo: #F1C77A; /* Logo Ψ con chispa: cuadrado, trazo y punto */
+  --logo-trazo: #1D3434;
+  --logo-punto: #1D3434;
+  --logo-memo: #F6EFE2; /* Nombre en dos tonos: "Memo" y "Psy" */
+  --logo-psy: #F1C77A;
   color-scheme: dark;
 }
 
-/* Modo claro: crema, blanco y el mismo verde petróleo para el texto (todos AA de WCAG) */
+/* Modo claro "Niebla petróleo": el petróleo del logo en versión clara; el dorado queda solo como acento (todos AA de WCAG) */
 :root.claro {
-  --background: #F5F1E8;
-  --foreground: #1D3434;
+  --background: #EEF3F2;
+  --foreground: #173030;
   --card: #FFFFFF;
-  --card-foreground: #1D3434;
+  --card-foreground: #173030;
   --popover: #FFFFFF;
-  --popover-foreground: #1D3434;
-  --primary: #F1C77A;
-  --primary-foreground: #1D3434;
-  --secondary: #F3EEE4;
-  --secondary-foreground: #1D3434;
-  --muted: #F3EEE4;
-  --muted-foreground: #8A5A00;
-  --accent: #F1C77A;
-  --accent-foreground: #1D3434;
+  --popover-foreground: #173030;
+  --primary: #1D4A48;
+  --primary-foreground: #FFFFFF;
+  --secondary: #E3ECEA;
+  --secondary-foreground: #173030;
+  --muted: #E3ECEA;
+  --muted-foreground: #1D5E5B;
+  --accent: #DCE8E6;
+  --accent-foreground: #173030;
   --destructive: #B42318;
-  --border: #E2DCCF;
-  --input: #D8D1C2;
-  --ring: #8A5A00;
+  --border: #D6E2E0;
+  --input: #C3D3D0;
+  --ring: #1D5E5B;
   --sidebar: #FFFFFF;
-  --sidebar-foreground: #1D3434;
-  --sidebar-border: #E2DCCF;
-  --sidebar-ring: #8A5A00;
-  --crema: #1D3434;
-  --dorado: #8A5A00;
-  --superficie: #F3EEE4;
-  --borde: #E2DCCF;
-  --borde-fuerte: #CFC7B6;
-  --texto-2: #23393A;
-  --texto-suave: #4A5F5E;
-  --texto-tenue: #5A6D6C;
+  --sidebar-foreground: #173030;
+  --sidebar-border: #D6E2E0;
+  --sidebar-ring: #1D5E5B;
+  --crema: #173030;
+  --dorado: #1D5E5B;
+  --superficie: #E3ECEA;
+  --borde: #D6E2E0;
+  --borde-fuerte: #AFC4C1;
+  --texto-2: #1F3A39;
+  --texto-suave: #3F5755;
+  --texto-tenue: #4E6664;
   --peligro: #B42318;
   --aviso: #8A4B00;
-  --exito: #1E7A4C;
+  --exito: #1A6B43;
   --info: #1D5F8A;
   --naranja: #9A4A00;
-  --luz-fondo: rgba(127, 179, 166, 0.35);
-  --fondo-pestanas: #EDE7DA;
+  --luz-fondo: rgba(29, 94, 91, 0.18);
+  --fondo-pestanas: #DCE8E6;
+  --logo-fondo: #1D4A48;
+  --logo-trazo: #FFFFFF;
+  --logo-punto: #E2B864;
+  --logo-memo: #173030;
+  --logo-psy: #86621A;
   color-scheme: light;
 }
 

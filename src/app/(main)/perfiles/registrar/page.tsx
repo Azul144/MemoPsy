@@ -370,7 +370,7 @@ export default function RegistrarPerfilPage() {
                               {permiso.nombre}
                             </Label>
                             {permiso.descripcion && (
-                              <p className="text-xs text-tenue mt-1 leading-tight">{permiso.descripcion}</p>
+                              <p className="text-sm text-tenue mt-1 leading-tight">{permiso.descripcion}</p>
                             )}
                           </div>
                         </div>

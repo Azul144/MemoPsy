@@ -434,7 +434,7 @@ export default function RegistrarUsuarioPage() {
                     required
                     className="bg-superficie text-foreground border-borde-fuerte focus:ring-teal-500 focus:border-teal-500"
                   />
-                  {fieldErrors.nombre && <p className="text-peligro text-xs">{fieldErrors.nombre}</p>}
+                  {fieldErrors.nombre && <p className="text-peligro text-sm">{fieldErrors.nombre}</p>}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="apellido" className="text-texto-2">
@@ -448,7 +448,7 @@ export default function RegistrarUsuarioPage() {
                     required
                     className="bg-superficie text-foreground border-borde-fuerte focus:ring-teal-500 focus:border-teal-500"
                   />
-                  {fieldErrors.apellido && <p className="text-peligro text-xs">{fieldErrors.apellido}</p>}
+                  {fieldErrors.apellido && <p className="text-peligro text-sm">{fieldErrors.apellido}</p>}
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6">
@@ -465,7 +465,7 @@ export default function RegistrarUsuarioPage() {
                     required
                     className="bg-superficie text-foreground border-borde-fuerte focus:ring-teal-500 focus:border-teal-500"
                   />
-                  {fieldErrors.dni && <p className="text-peligro text-xs">{fieldErrors.dni}</p>}
+                  {fieldErrors.dni && <p className="text-peligro text-sm">{fieldErrors.dni}</p>}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="fecha_nacimiento" className="text-texto-2">
@@ -482,7 +482,7 @@ export default function RegistrarUsuarioPage() {
                     style={{ colorScheme: "dark" }}
                   />
                   {fieldErrors.fecha_nacimiento && (
-                    <p className="text-peligro text-xs">{fieldErrors.fecha_nacimiento}</p>
+                    <p className="text-peligro text-sm">{fieldErrors.fecha_nacimiento}</p>
                   )}
                 </div>
               </div>
@@ -501,9 +501,9 @@ export default function RegistrarUsuarioPage() {
                   className="bg-superficie text-foreground border-borde-fuerte focus:ring-teal-500 focus:border-teal-500"
                 />
                 {fieldErrors.telefono ? (
-                  <p className="text-peligro text-xs">{fieldErrors.telefono}</p>
+                  <p className="text-peligro text-sm">{fieldErrors.telefono}</p>
                 ) : (
-                  <p className="text-tenue text-xs">Opcional. Dato de contacto del paciente.</p>
+                  <p className="text-tenue text-sm">Opcional. Dato de contacto del paciente.</p>
                 )}
               </div>
 
@@ -521,7 +521,7 @@ export default function RegistrarUsuarioPage() {
                   required
                   className="bg-superficie text-foreground border-borde-fuerte focus:ring-teal-500 focus:border-teal-500"
                 />
-                {fieldErrors.email && <p className="text-peligro text-xs">{fieldErrors.email}</p>}
+                {fieldErrors.email && <p className="text-peligro text-sm">{fieldErrors.email}</p>}
               </div>
               <div className="space-y-3">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6">
@@ -538,7 +538,7 @@ export default function RegistrarUsuarioPage() {
                       aria-describedby="requisitos-password"
                       required
                     />
-                    {fieldErrors.password && <p className="text-peligro text-xs">{fieldErrors.password}</p>}
+                    {fieldErrors.password && <p className="text-peligro text-sm">{fieldErrors.password}</p>}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="confirmPassword" className="text-texto-2">
@@ -553,11 +553,11 @@ export default function RegistrarUsuarioPage() {
                       required
                     />
                     {fieldErrors.confirmPassword ? (
-                      <p className="text-peligro text-xs">{fieldErrors.confirmPassword}</p>
+                      <p className="text-peligro text-sm">{fieldErrors.confirmPassword}</p>
                     ) : (
                       formData.confirmPassword.length > 0 &&
                       formData.password !== formData.confirmPassword && (
-                        <p className="text-peligro text-xs">Las contraseñas no coinciden.</p>
+                        <p className="text-peligro text-sm">Las contraseñas no coinciden.</p>
                       )
                     )}
                   </div>
@@ -592,7 +592,7 @@ export default function RegistrarUsuarioPage() {
                         className="bg-superficie text-foreground border-borde-fuerte focus:ring-teal-500 focus:border-teal-500"
                       />
                       {fieldErrors.numeroLicencia && (
-                        <p className="text-peligro text-xs">{fieldErrors.numeroLicencia}</p>
+                        <p className="text-peligro text-sm">{fieldErrors.numeroLicencia}</p>
                       )}
                     </div>
                     <div className="space-y-2">
@@ -624,7 +624,7 @@ export default function RegistrarUsuarioPage() {
                         </SelectContent>
                       </Select>
                       {fieldErrors.especialidad && (
-                        <p className="text-peligro text-xs">{fieldErrors.especialidad}</p>
+                        <p className="text-peligro text-sm">{fieldErrors.especialidad}</p>
                       )}
                     </div>
                   </div>
@@ -679,18 +679,18 @@ export default function RegistrarUsuarioPage() {
                         </SelectContent>
                       </Select>
                       {obrasSocialesList.find((o) => o.id === selectedObraSocialId)?.nombre.trim().toLowerCase() === "particular" && (
-                        <p className="text-aviso text-xs">
+                        <p className="text-aviso text-sm">
                           Paciente particular: abona la sesión en efectivo o por QR del psicólogo.
                         </p>
                       )}
-                      {errorObrasSociales && <p className="text-peligro text-xs">{errorObrasSociales}</p>}
+                      {errorObrasSociales && <p className="text-peligro text-sm">{errorObrasSociales}</p>}
                       {fieldErrors.selectedObraSocialId && (
-                        <p className="text-peligro text-xs">{fieldErrors.selectedObraSocialId}</p>
+                        <p className="text-peligro text-sm">{fieldErrors.selectedObraSocialId}</p>
                       )}
                     </div>
                   </div>
                 )}
-                {fieldErrors.roleSelection && <p role="alert" className="text-peligro text-xs">{fieldErrors.roleSelection}</p>}
+                {fieldErrors.roleSelection && <p role="alert" className="text-peligro text-sm">{fieldErrors.roleSelection}</p>}
               </div>
 
               {error && (

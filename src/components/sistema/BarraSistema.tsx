@@ -4,7 +4,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -13,6 +12,7 @@ import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
 import { MODULOS_DISPONIBLES } from "@/config/modulos";
 import CampanaNotificaciones from "./CampanaNotificaciones";
 import BotonTema from "./BotonTema";
+import LogoMemoPsy from "@/components/LogoMemoPsy"
 
 export default function BarraSistema() {
   const { data: session } = useSession();
@@ -45,8 +45,7 @@ export default function BarraSistema() {
     <nav className="sticky top-0 z-40 border-b border-foreground/10 bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-6">
         <Link href="/welcome" className="flex items-center gap-3">
-          <Image src="/assets/logopng.png" alt="" width={30} height={36} />
-          <span className="titulo text-xl text-dorado">MemoPsy</span>
+          <LogoMemoPsy tamano="sm" />
         </Link>
 
         {/* Accesos rápidos a los módulos (en pantallas grandes) */}

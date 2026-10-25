@@ -255,7 +255,7 @@ function ActividadParaResponder({
           />
           <div className="flex items-center justify-end gap-3">
             {actividad.fechaRespuesta && sinCambios && (
-              <span className="text-xs text-tenue">Enviado el {format(parseISO(actividad.fechaRespuesta), "d/MM HH:mm")}</span>
+              <span className="text-sm text-tenue">Enviado el {format(parseISO(actividad.fechaRespuesta), "d/MM HH:mm")}</span>
             )}
             <Button
               onClick={enviar}

@@ -6,7 +6,6 @@ import { MODULOS_DISPONIBLES, type ModuloConfig } from "@/config/modulos";
 import { useSession, signOut } from 'next-auth/react';
 import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
 import { useRouter } from 'next/navigation';
-import Image from "next/image";
 import FondoAnimado from "@/components/FondoAnimado";
 import CampanaNotificaciones from "@/components/sistema/CampanaNotificaciones";
 import BotonTema from "@/components/sistema/BotonTema";
@@ -15,6 +14,7 @@ import { Menu, X, LogOut, HomeIcon, KeyRound, Loader2, ArrowRight, ShieldCheck, 
 import MfaSetupModal from "@/components/mfa-setup-modal"; // Import the MFA setup modal
 import MfaDesactivarModal from "@/components/mfa-desactivar-modal";
 import toast from "react-hot-toast";
+import LogoMemoPsy from "@/components/LogoMemoPsy"
 
 
 
@@ -152,8 +152,7 @@ export default function WelcomePage() {
       <nav className="sticky top-0 z-40 border-b border-foreground/10 bg-background/80 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
           <button type="button" onClick={() => router.push('/welcome')} className="flex items-center gap-3">
-            <Image src="/assets/logopng.png" alt="" width={30} height={36} />
-            <span className="titulo text-xl text-dorado">MemoPsy</span>
+            <LogoMemoPsy tamano="sm" />
           </button>
 
           <div className="relative flex items-center gap-3">
