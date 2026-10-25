@@ -39,23 +39,14 @@ Estado: ✅ pasa · ❌ falla · ⏳ pendiente
 | CP-14 | Sin emails repetidos | Esperar una pasada más después de CP-13 | No se vuelve a mandar el mismo recordatorio | Después de las pasadas de las 12:24 sigue habiendo un solo envío para la sesión 66 (el de las 12:14) | ✅ |
 | CP-15 | WhatsApp apagado | Pasadas de CP-11 y CP-13 con `RECORDATORIOS_WHATSAPP` comentado | No se envía nada por WhatsApp (queda como mejora futura, tarjeta #12) | Ningún registro con canal WHATSAPP para los turnos de prueba | ✅ |
 
-## Observaciones
-
-- Cuando un turno remoto cambia de horario, el enlace de Google Meet se conserva. El enlace sigue sirviendo, porque una sala de Meet no vence, pero el evento del calendario de Google queda con el horario viejo.
-- La caída de Google (respaldo con Jitsi Meet) y la falla de Brevo no se probaron en esta tanda, porque necesitan cambiar las credenciales y reiniciar el servidor.
-
-## Recordatorio por email (RF 3.3)
-
-| ID | Caso | Pasos | Resultado esperado | Resultado obtenido | Estado |
-|---|---|---|---|---|---|
-| CP-11 | Email de recordatorio | El turno remoto de CP-01 entra en las próximas 24 horas y el servidor hace su pasada | A Tomás le llega un email con la psicóloga, la fecha, la hora y el enlace de Google Meet | Llegó el email a la casilla de la autora (lo confirmó con una captura) y quedó registrado en `recordatorio_enviado` | ✅ |
-| CP-12 | Reenvío al reprogramar | Recepción mueve el turno de CP-01 de las 08:00 a las 09:00 | Se borra el registro del envío anterior, Tomás y Carla reciben el aviso del cambio y en la pasada siguiente sale un email nuevo con las 09:00 | Avisos: "El turno con Carla Benítez del lun 26/10 a las 08:00 pasó al lun 26/10 a las 09:00." El email nuevo salió a las 12:14. El asunto ahora lleva la fecha y la hora, para que el email nuevo no quede escondido en la conversación del anterior | ✅ |
-| CP-13 | Sin emails repetidos | Se espera una pasada más del servidor (10 minutos) | No se vuelve a mandar el mismo recordatorio | Después de las pasadas de las 12:24 sigue habiendo un solo envío para la sesión 66 (el de las 12:14) | ✅ |
-| CP-14 | Direcciones de prueba | El turno de Valentina Sosa (cuenta `@demo.memopsy.test`) del lun 26/10 11:00 entra en las 24 horas | No se manda email a direcciones de prueba; el aviso en la campana sí se crea | Sin registro de envío para la sesión 37; el recordatorio en la campana sí está | ✅ |
-| CP-15 | WhatsApp apagado | `RECORDATORIOS_WHATSAPP` comentado en `.env.local` | No sale ningún mensaje de WhatsApp | Ningún envío por WhatsApp desde el 22/10 (el único registro es de la prueba de ese día) | ✅ |
-
 ## Falla encontrada
 
 | ID | Caso | Pasos | Resultado esperado | Resultado obtenido | Estado |
 |---|---|---|---|---|---|
 | CP-16 | Pedidos simultáneos a la campana | Se borran los recordatorios de Carla y se piden sus avisos cuatro veces a la vez | Un solo recordatorio por turno | Antes de la corrección, Carla tenía dos recordatorios iguales del mismo turno (la campana y la página pedían a la vez). Corregido: los pedidos simultáneos del mismo usuario esperan al primero; quedó uno por turno | ✅ |
+
+## Observaciones
+
+- Cuando un turno remoto cambia de horario, el enlace de Google Meet se conserva. El enlace sigue sirviendo, porque una sala de Meet no vence, pero el evento del calendario de Google queda con el horario viejo.
+- La caída de Google (respaldo con Jitsi Meet) y la falla de Brevo no se probaron en esta tanda, porque necesitan cambiar las credenciales y reiniciar el servidor.
+- Después de las pruebas se borraron de la base los turnos de prueba (sesiones 63 a 68) con sus avisos y registros de envío. Los eventos que Google Meet creó en el calendario de la autora para esos turnos quedan en su Google Calendar.
