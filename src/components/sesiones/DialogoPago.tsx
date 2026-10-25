@@ -43,7 +43,7 @@ interface Props {
 const esParticular = (nombre?: string) => !nombre || nombre.trim().toLowerCase() === "particular"
 
 const claseItem =
-  "text-gray-200 cursor-pointer hover:!bg-teal-700/60 hover:!text-amber-200 focus:!bg-teal-700/60 focus:!text-amber-200 data-[state=checked]:!text-amber-300"
+  "text-texto-2 cursor-pointer hover:!bg-teal-700/60 hover:!text-aviso focus:!bg-teal-700/60 focus:!text-aviso data-[state=checked]:!text-aviso"
 
 export default function DialogoPago({ sesion, mediosDePago, onClose, onGuardado }: Props) {
   const [estadoPago, setEstadoPago] = useState("Pendiente")
@@ -116,11 +116,11 @@ export default function DialogoPago({ sesion, mediosDePago, onClose, onGuardado 
     <Dialog open={!!sesion} onOpenChange={(abierto) => !abierto && onClose()}>
       <DialogContent
         className="p-4 sm:max-w-[440px] sm:p-6"
-        style={{ backgroundColor: "#1D3434", border: "1px solid #F1C77A" }}
+        style={{ backgroundColor: "var(--card)", border: "1px solid var(--dorado)" }}
       >
         <DialogHeader>
-          <DialogTitle className="text-white">Pago de la sesión</DialogTitle>
-          <DialogDescription className="text-gray-300">
+          <DialogTitle className="text-foreground">Pago de la sesión</DialogTitle>
+          <DialogDescription className="text-suave">
             {sesion && format(parseISO(sesion.fechaHoraInicio), "dd/MM/yyyy HH:mm")}
             {paciente && ` · ${paciente.persona.nombre} ${paciente.persona.apellido}`}
           </DialogDescription>
@@ -128,19 +128,19 @@ export default function DialogoPago({ sesion, mediosDePago, onClose, onGuardado 
 
         <div className="space-y-4">
           {paciente && (
-            <p className="text-sm text-gray-300">
+            <p className="text-sm text-suave">
               Obra social:{" "}
-              <span className="text-white">{esParticular(obraSocial) ? "Particular (sin obra social)" : obraSocial}</span>
+              <span className="text-foreground">{esParticular(obraSocial) ? "Particular (sin obra social)" : obraSocial}</span>
             </p>
           )}
 
           <div className="space-y-2">
-            <Label className="text-gray-300">Estado del pago</Label>
+            <Label className="text-suave">Estado del pago</Label>
             <Select value={estadoPago} onValueChange={setEstadoPago}>
-              <SelectTrigger className="w-full bg-[#152A2A] text-white border-gray-600">
+              <SelectTrigger className="w-full bg-background text-foreground border-borde-fuerte">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent style={{ backgroundColor: "#1D3434", borderColor: "#2A4A4A" }}>
+              <SelectContent style={{ backgroundColor: "var(--card)", borderColor: "var(--borde)" }}>
                 <SelectItem value="Pendiente" className={claseItem}>Pendiente</SelectItem>
                 <SelectItem value="Pagado" className={claseItem}>Pagado</SelectItem>
               </SelectContent>
@@ -150,7 +150,7 @@ export default function DialogoPago({ sesion, mediosDePago, onClose, onGuardado 
           {estadoPago === "Pagado" && (
             <>
               <div className="space-y-2">
-                <Label className="text-gray-300">Medio de pago *</Label>
+                <Label className="text-suave">Medio de pago *</Label>
                 <Select
                   value={medioId}
                   onValueChange={(v) => {
@@ -159,11 +159,11 @@ export default function DialogoPago({ sesion, mediosDePago, onClose, onGuardado 
                   }}
                 >
                   <SelectTrigger
-                    className={`w-full bg-[#152A2A] text-white border-gray-600 data-[placeholder]:text-gray-400 ${errores.medioDePagoId ? "border-red-500" : ""}`}
+                    className={`w-full bg-background text-foreground border-borde-fuerte data-[placeholder]:text-tenue ${errores.medioDePagoId ? "border-red-500" : ""}`}
                   >
                     <SelectValue placeholder="¿Cómo pagó?" />
                   </SelectTrigger>
-                  <SelectContent style={{ backgroundColor: "#1D3434", borderColor: "#2A4A4A" }}>
+                  <SelectContent style={{ backgroundColor: "var(--card)", borderColor: "var(--borde)" }}>
                     {mediosDePago.map((m) => (
                       <SelectItem key={m.id} value={String(m.id)} className={claseItem}>
                         {m.descripcion}
@@ -171,11 +171,11 @@ export default function DialogoPago({ sesion, mediosDePago, onClose, onGuardado 
                     ))}
                   </SelectContent>
                 </Select>
-                {errores.medioDePagoId && <p className="text-xs text-red-500">{errores.medioDePagoId}</p>}
+                {errores.medioDePagoId && <p className="text-xs text-peligro">{errores.medioDePagoId}</p>}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="monto_pago" className="text-gray-300">Monto (opcional)</Label>
+                <Label htmlFor="monto_pago" className="text-suave">Monto (opcional)</Label>
                 <Input
                   id="monto_pago"
                   type="number"
@@ -185,9 +185,9 @@ export default function DialogoPago({ sesion, mediosDePago, onClose, onGuardado 
                   placeholder="$ 0,00"
                   value={monto}
                   onChange={(e) => setMonto(e.target.value)}
-                  className={`bg-[#152A2A] text-white border-gray-600 ${errores.monto ? "border-red-500" : ""}`}
+                  className={`bg-background text-foreground border-borde-fuerte ${errores.monto ? "border-red-500" : ""}`}
                 />
-                {errores.monto && <p className="text-xs text-red-500">{errores.monto}</p>}
+                {errores.monto && <p className="text-xs text-peligro">{errores.monto}</p>}
               </div>
             </>
           )}
@@ -197,7 +197,7 @@ export default function DialogoPago({ sesion, mediosDePago, onClose, onGuardado 
           <Button variant="outline" onClick={onClose} disabled={guardando}>
             Cancelar
           </Button>
-          <Button onClick={guardar} disabled={guardando} style={{ backgroundColor: "#F1C77A", color: "#1D3434" }}>
+          <Button onClick={guardar} disabled={guardando} style={{ backgroundColor: "var(--primary)", color: "var(--primary-foreground)" }}>
             {guardando && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Guardar
           </Button>

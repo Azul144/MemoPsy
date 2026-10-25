@@ -59,12 +59,12 @@ export default function MfaDesactivarModal({ isOpen, onClose, onSuccess }: Props
         role="dialog"
         aria-modal="true"
         aria-labelledby="titulo-desactivar"
-        className="w-full max-w-md rounded-2xl bg-card p-6 text-white shadow-xl"
+        className="w-full max-w-md rounded-2xl bg-card p-6 text-foreground shadow-xl"
       >
-        <h2 id="titulo-desactivar" className="mb-2 text-center text-xl font-bold text-primary">
+        <h2 id="titulo-desactivar" className="mb-2 text-center text-xl font-bold text-dorado">
           Desactivar verificación en dos pasos
         </h2>
-        <p className="mb-4 text-center text-sm text-white/80">
+        <p className="mb-4 text-center text-sm text-foreground/80">
           Para confirmar que sos vos, escribí el código de tu app de autenticación o uno de tus
           códigos de recuperación.
         </p>
@@ -81,7 +81,7 @@ export default function MfaDesactivarModal({ isOpen, onClose, onSuccess }: Props
               required
             />
           </div>
-          {error && <p role="alert" className="text-center text-sm text-red-300">{error}</p>}
+          {error && <p role="alert" className="text-center text-sm text-peligro">{error}</p>}
           <Button type="submit" className="w-full" disabled={!codigo || cargando}>
             {cargando && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Desactivar

@@ -75,12 +75,12 @@ const textoDetalle = (e: Evento) =>
   e.accion === "LOGIN_FALLIDO" ? (MOTIVO_LOGIN[e.detalle ?? ""] ?? e.detalle) : e.detalle
 
 function colorAccion(accion: string) {
-  if (accion === "LOGIN_FALLIDO" || accion === "ACCESO_DENEGADO") return "border-red-500 text-red-300"
-  if (accion === "ELIMINAR") return "border-orange-400 text-orange-300"
-  if (accion === "CREAR") return "border-emerald-500 text-emerald-300"
-  if (accion === "LOGIN_OK" || accion === "LOGOUT") return "border-sky-500 text-sky-300"
-  if (accion === "VER") return "border-gray-500 text-gray-300"
-  return "border-amber-400 text-amber-300"
+  if (accion === "LOGIN_FALLIDO" || accion === "ACCESO_DENEGADO") return "border-red-500 text-peligro"
+  if (accion === "ELIMINAR") return "border-orange-400 text-naranja"
+  if (accion === "CREAR") return "border-emerald-500 text-exito"
+  if (accion === "LOGIN_OK" || accion === "LOGOUT") return "border-sky-500 text-info"
+  if (accion === "VER") return "border-borde-fuerte text-suave"
+  return "border-amber-400 text-aviso"
 }
 
 export default function AuditoriaPage() {
@@ -130,7 +130,7 @@ export default function AuditoriaPage() {
   }
   const hayFiltros = Object.values(filtros).some(Boolean)
 
-  const campo = "bg-[#152A2A] text-white border-gray-600"
+  const campo = "bg-background text-foreground border-borde-fuerte"
 
   return (
     <div className="min-h-screen">
@@ -139,16 +139,16 @@ export default function AuditoriaPage() {
           titulo="Registro de auditoría"
           descripcion="Ingresos al sistema y cambios sobre datos sensibles: quién, qué, sobre qué registro y cuándo. Nunca se muestra contenido clínico."
         >
-          <Badge variant="outline" className="border-sky-500 px-3 py-1 text-sky-300">
+          <Badge variant="outline" className="border-sky-500 px-3 py-1 text-info">
             <Eye className="mr-1.5 h-3.5 w-3.5" /> Solo lectura
           </Badge>
         </EncabezadoPagina>
 
         {/* Filtros */}
-        <div className="mb-6 rounded-2xl border border-white/10 bg-[#152B2B] p-4">
+        <div className="mb-6 rounded-2xl border border-foreground/10 bg-background p-4">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
             <div className="space-y-1.5 lg:col-span-2">
-              <Label htmlFor="aud-usuario" className="text-gray-300">Usuario (email)</Label>
+              <Label htmlFor="aud-usuario" className="text-suave">Usuario (email)</Label>
               <Input
                 id="aud-usuario"
                 value={borrador.usuario}
@@ -159,45 +159,45 @@ export default function AuditoriaPage() {
               />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-gray-300">Módulo</Label>
+              <Label className="text-suave">Módulo</Label>
               <Select
                 value={borrador.modulo || TODOS}
                 onValueChange={(v) => setBorrador({ ...borrador, modulo: v === TODOS ? "" : v })}
               >
                 <SelectTrigger className={cn(campo, "w-full")}><SelectValue /></SelectTrigger>
-                <SelectContent className="bg-[#1D3434] text-white border-gray-600">
+                <SelectContent className="bg-card text-foreground border-borde-fuerte">
                   <SelectItem value={TODOS}>Todos</SelectItem>
                   {opciones.modulos.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-1.5 lg:col-span-2">
-              <Label className="text-gray-300">Acción</Label>
+              <Label className="text-suave">Acción</Label>
               <Select
                 value={borrador.accion || TODOS}
                 onValueChange={(v) => setBorrador({ ...borrador, accion: v === TODOS ? "" : v })}
               >
                 <SelectTrigger className={cn(campo, "w-full")}><SelectValue /></SelectTrigger>
-                <SelectContent className="bg-[#1D3434] text-white border-gray-600">
+                <SelectContent className="bg-card text-foreground border-borde-fuerte">
                   <SelectItem value={TODOS}>Todas</SelectItem>
                   {opciones.acciones.map((a) => <SelectItem key={a} value={a}>{nombreAccion(a)}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="aud-desde" className="text-gray-300">Desde</Label>
+              <Label htmlFor="aud-desde" className="text-suave">Desde</Label>
               <Input id="aud-desde" type="date" value={borrador.desde} onChange={(e) => setBorrador({ ...borrador, desde: e.target.value })} className={campo} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="aud-hasta" className="text-gray-300">Hasta</Label>
+              <Label htmlFor="aud-hasta" className="text-suave">Hasta</Label>
               <Input id="aud-hasta" type="date" value={borrador.hasta} onChange={(e) => setBorrador({ ...borrador, hasta: e.target.value })} className={campo} />
             </div>
             <div className="flex items-end gap-2 sm:col-span-2 lg:col-span-3">
-              <Button onClick={aplicar} style={{ backgroundColor: "#F1C77A", color: "#1D3434" }}>
+              <Button onClick={aplicar} style={{ backgroundColor: "var(--primary)", color: "var(--primary-foreground)" }}>
                 <Filter className="mr-2 h-4 w-4" /> Filtrar
               </Button>
               {hayFiltros && (
-                <Button variant="outline" onClick={limpiar} className="border-red-500 text-red-400 hover:bg-red-500 hover:text-white">
+                <Button variant="outline" onClick={limpiar} className="border-red-500 text-peligro hover:bg-red-500 hover:text-[#ffffff]">
                   <XCircle className="mr-2 h-4 w-4" /> Limpiar
                 </Button>
               )}
@@ -205,50 +205,50 @@ export default function AuditoriaPage() {
           </div>
         </div>
 
-        <p className="mb-3 text-sm text-gray-300">{total} evento(s) registrado(s)</p>
+        <p className="mb-3 text-sm text-suave">{total} evento(s) registrado(s)</p>
 
         {cargando ? (
-          <div className="flex items-center justify-center gap-2 py-12 text-gray-300">
-            <Loader2 className="h-5 w-5 animate-spin text-[#F1C77A]" /> Cargando registro...
+          <div className="flex items-center justify-center gap-2 py-12 text-suave">
+            <Loader2 className="h-5 w-5 animate-spin text-dorado" /> Cargando registro...
           </div>
         ) : error ? (
-          <div className="rounded-md bg-red-500/10 p-6 text-center text-red-400">
+          <div className="rounded-md bg-red-500/10 p-6 text-center text-peligro">
             <AlertCircle className="mx-auto mb-2 h-8 w-8" /> {error}
           </div>
         ) : eventos.length === 0 ? (
-          <div className="rounded-md bg-[#152B2B] p-8 text-center text-gray-400">
+          <div className="rounded-md bg-background p-8 text-center text-tenue">
             {hayFiltros ? "No hay eventos que coincidan con los filtros." : "Todavía no hay eventos registrados."}
           </div>
         ) : (
-          <div className="overflow-x-auto rounded-2xl border border-white/10" style={{ backgroundColor: "#1D3434" }}>
+          <div className="overflow-x-auto rounded-2xl border border-foreground/10" style={{ backgroundColor: "var(--card)" }}>
             <Table>
               <TableHeader>
-                <TableRow className="border-b border-gray-700">
-                  <TableHead className="whitespace-nowrap font-semibold text-white">Fecha y hora</TableHead>
-                  <TableHead className="font-semibold text-white">Usuario</TableHead>
-                  <TableHead className="font-semibold text-white">Acción</TableHead>
-                  <TableHead className="font-semibold text-white">Módulo</TableHead>
-                  <TableHead className="font-semibold text-white">Detalle</TableHead>
-                  <TableHead className="whitespace-nowrap font-semibold text-white">Registro</TableHead>
-                  <TableHead className="font-semibold text-white">IP</TableHead>
+                <TableRow className="border-b border-borde">
+                  <TableHead className="whitespace-nowrap font-semibold text-foreground">Fecha y hora</TableHead>
+                  <TableHead className="font-semibold text-foreground">Usuario</TableHead>
+                  <TableHead className="font-semibold text-foreground">Acción</TableHead>
+                  <TableHead className="font-semibold text-foreground">Módulo</TableHead>
+                  <TableHead className="font-semibold text-foreground">Detalle</TableHead>
+                  <TableHead className="whitespace-nowrap font-semibold text-foreground">Registro</TableHead>
+                  <TableHead className="font-semibold text-foreground">IP</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {eventos.map((e) => (
-                  <TableRow key={e.id} className="border-b border-gray-700 hover:bg-[#152B2B]">
-                    <TableCell className="whitespace-nowrap text-gray-300">
+                  <TableRow key={e.id} className="border-b border-borde hover:bg-background">
+                    <TableCell className="whitespace-nowrap text-suave">
                       {format(new Date(e.fecha), "dd/MM/yyyy HH:mm:ss", { locale: es })}
                     </TableCell>
-                    <TableCell className="text-gray-200">{e.email ?? <span className="text-gray-500">—</span>}</TableCell>
+                    <TableCell className="text-texto-2">{e.email ?? <span className="text-tenue">—</span>}</TableCell>
                     <TableCell>
                       <Badge variant="outline" className={cn("whitespace-nowrap text-xs", colorAccion(e.accion))}>
                         {nombreAccion(e.accion)}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-gray-300">{e.modulo}</TableCell>
-                    <TableCell className="min-w-[14rem] text-gray-300">{textoDetalle(e) ?? <span className="text-gray-500">—</span>}</TableCell>
-                    <TableCell className="text-gray-400">{e.entidadId ? `#${e.entidadId}` : "—"}</TableCell>
-                    <TableCell className="whitespace-nowrap text-gray-400">{e.ip ?? "—"}</TableCell>
+                    <TableCell className="text-suave">{e.modulo}</TableCell>
+                    <TableCell className="min-w-[14rem] text-suave">{textoDetalle(e) ?? <span className="text-tenue">—</span>}</TableCell>
+                    <TableCell className="text-tenue">{e.entidadId ? `#${e.entidadId}` : "—"}</TableCell>
+                    <TableCell className="whitespace-nowrap text-tenue">{e.ip ?? "—"}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -261,7 +261,7 @@ export default function AuditoriaPage() {
             <Button variant="outline" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
               <ChevronLeft className="mr-1 h-4 w-4" /> Anterior
             </Button>
-            <span className="text-sm text-gray-300">Página {page} de {totalPages}</span>
+            <span className="text-sm text-suave">Página {page} de {totalPages}</span>
             <Button variant="outline" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>
               Siguiente <ChevronRight className="ml-1 h-4 w-4" />
             </Button>

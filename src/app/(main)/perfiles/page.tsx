@@ -101,9 +101,9 @@ export default function PerfilesPage() {
 
   if (status === 'loading') {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-4" style={{ backgroundColor: '#152A2A' }}>
-            <Loader2 className="h-16 w-16 animate-spin text-[#F1C77A] mb-4" />
-            <TypographyP className="text-white">Cargando...</TypographyP>
+      <div className="flex flex-col items-center justify-center min-h-screen p-4" style={{ backgroundColor: "var(--background)" }}>
+            <Loader2 className="h-16 w-16 animate-spin text-dorado mb-4" />
+            <TypographyP className="text-foreground">Cargando...</TypographyP>
         </div>
     );
   }
@@ -133,12 +133,12 @@ export default function PerfilesPage() {
           </div>
         ) : (
           <div className="text-center mt-12">
-            <div className="p-8 rounded-2xl max-w-md mx-auto" style={{ backgroundColor: '#1D3434' }}>
-              <Shield className="w-16 h-16 mx-auto mb-6" style={{ color: '#F1C77A' }}/> {/* Icon for Perfiles */}
-              <h3 className="text-2xl font-semibold text-white mb-4">
+            <div className="p-8 rounded-2xl max-w-md mx-auto" style={{ backgroundColor: "var(--card)" }}>
+              <Shield className="w-16 h-16 mx-auto mb-6" style={{ color: "var(--dorado)" }}/> {/* Icon for Perfiles */}
+              <h3 className="text-2xl font-semibold text-foreground mb-4">
                 Sin Acciones Disponibles en Perfiles
               </h3>
-              <p className="text-gray-300">
+              <p className="text-suave">
                 No tenés los permisos necesarios para usar el módulo de perfiles. 
                 Si creés que es un error, consultá con el administrador del sistema.
               </p>

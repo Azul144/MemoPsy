@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import Image from "next/image";
 import FondoAnimado from "@/components/FondoAnimado";
 import CampanaNotificaciones from "@/components/sistema/CampanaNotificaciones";
+import BotonTema from "@/components/sistema/BotonTema";
 import { Button } from "@/components/ui/button";
 import { Menu, X, LogOut, HomeIcon, KeyRound, Loader2, ArrowRight, ShieldCheck, ShieldAlert } from "lucide-react"
 import MfaSetupModal from "@/components/mfa-setup-modal"; // Import the MFA setup modal
@@ -126,7 +127,7 @@ export default function WelcomePage() {
   if (status === 'loading' || (status === 'authenticated' && !session?.user)) {
     return (
       <div className="flex min-h-screen items-center justify-center gap-4 bg-background">
-        <Loader2 className="h-10 w-10 animate-spin text-primary" />
+        <Loader2 className="h-10 w-10 animate-spin text-dorado" />
         <p className="text-lg text-crema">Cargando...</p>
       </div>
     );
@@ -148,22 +149,23 @@ export default function WelcomePage() {
   return (
     <div className="min-h-screen bg-background text-crema">
       {/* Barra superior */}
-      <nav className="sticky top-0 z-40 border-b border-white/10 bg-background/80 backdrop-blur-md">
+      <nav className="sticky top-0 z-40 border-b border-foreground/10 bg-background/80 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
           <button type="button" onClick={() => router.push('/welcome')} className="flex items-center gap-3">
             <Image src="/assets/logopng.png" alt="" width={30} height={36} />
-            <span className="titulo text-xl text-primary">MemoPsy</span>
+            <span className="titulo text-xl text-dorado">MemoPsy</span>
           </button>
 
           <div className="relative flex items-center gap-3">
             <span className="hidden text-sm text-crema/70 sm:block">{nombreCompleto}</span>
+            <BotonTema />
             <CampanaNotificaciones />
             <button
               type="button"
               onClick={toggleMenu}
               aria-expanded={isMenuOpen}
               aria-label={isMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
-              className="flex h-10 items-center gap-2 rounded-full border border-white/15 pl-1 pr-3 transition-colors hover:border-primary/60"
+              className="flex h-10 items-center gap-2 rounded-full border border-foreground/15 pl-1 pr-3 transition-colors hover:border-primary/60"
             >
               <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
                 {iniciales}
@@ -173,8 +175,8 @@ export default function WelcomePage() {
 
             {/* Menú desplegable */}
             {isMenuOpen && (
-              <div className="absolute right-0 top-12 z-50 w-72 overflow-hidden rounded-2xl border border-white/10 bg-card shadow-2xl shadow-black/40">
-                <div className="border-b border-white/10 p-4">
+              <div className="absolute right-0 top-12 z-50 w-72 overflow-hidden rounded-2xl border border-foreground/10 bg-card shadow-2xl shadow-black/40">
+                <div className="border-b border-foreground/10 p-4">
                   <p className="font-semibold">{nombreCompleto}</p>
                   <p className="text-sm text-crema/65">{session.user.email}</p>
                 </div>
@@ -187,9 +189,9 @@ export default function WelcomePage() {
                           key={modulo.id}
                           type="button"
                           onClick={() => navigateToModule(modulo.ruta)}
-                          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-white/5"
+                          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-foreground/5"
                         >
-                          <IconComponent className="h-5 w-5 text-primary" />
+                          <IconComponent className="h-5 w-5 text-dorado" />
                           {modulo.nombre}
                         </button>
                       );
@@ -198,11 +200,11 @@ export default function WelcomePage() {
                     <p className="px-3 py-2 text-sm text-crema/60">Todavía no tenés módulos asignados.</p>
                   )}
                 </div>
-                <div className="border-t border-white/10 p-2">
+                <div className="border-t border-foreground/10 p-2">
                   <button
                     type="button"
                     onClick={() => navigateToModule('/welcome')}
-                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-white/5"
+                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-foreground/5"
                   >
                     <HomeIcon className="h-5 w-5 text-crema/70" />
                     Inicio
@@ -210,7 +212,7 @@ export default function WelcomePage() {
                   <button
                     type="button"
                     onClick={handleLogout}
-                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-red-300 transition-colors hover:bg-red-500/10"
+                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-peligro transition-colors hover:bg-red-500/10"
                   >
                     <LogOut className="h-5 w-5" />
                     Cerrar sesión
@@ -224,7 +226,7 @@ export default function WelcomePage() {
 
       <main className="mx-auto max-w-6xl px-6 py-10">
         {/* Saludo */}
-        <section className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-card px-8 py-10 sm:px-12">
+        <section className="relative overflow-hidden rounded-[2rem] border border-foreground/10 bg-card px-8 py-10 sm:px-12">
           <FondoAnimado />
           <div className="relative">
             <p className="entrar text-sm text-crema/60">{hoy}</p>
@@ -237,7 +239,7 @@ export default function WelcomePage() {
             {perfiles.length > 0 && (
               <div className="entrar mt-5 flex flex-wrap gap-2" style={{ animationDelay: '0.3s' }}>
                 {perfiles.map((perfil) => (
-                  <span key={perfil} className="rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
+                  <span key={perfil} className="rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-sm font-medium text-dorado">
                     {perfil}
                   </span>
                 ))}
@@ -258,15 +260,15 @@ export default function WelcomePage() {
                       key={modulo.id}
                       type="button"
                       onClick={() => navigateToModule(modulo.ruta)}
-                      className="entrar group flex flex-col rounded-3xl border border-white/10 bg-card p-6 text-left transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-xl hover:shadow-black/30 focus-visible:outline-2 focus-visible:outline-primary"
+                      className="entrar group flex flex-col rounded-3xl border border-foreground/10 bg-card p-6 text-left transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-xl hover:shadow-black/30 focus-visible:outline-2 focus-visible:outline-primary"
                       style={{ animationDelay: `${0.35 + i * 0.08}s` }}
                     >
                       <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/15 transition-colors group-hover:bg-primary">
-                        <IconComponent className="h-6 w-6 text-primary transition-colors group-hover:text-primary-foreground" />
+                        <IconComponent className="h-6 w-6 text-dorado transition-colors group-hover:text-primary-foreground" />
                       </span>
                       <span className="mt-5 text-xl font-semibold">{modulo.nombre}</span>
                       <span className="mt-1 flex-1 text-crema/65">{modulo.descripcion}</span>
-                      <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-primary">
+                      <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-dorado">
                         Entrar
                         <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                       </span>
@@ -275,7 +277,7 @@ export default function WelcomePage() {
                 })}
               </div>
             ) : (
-              <div className="rounded-3xl border border-dashed border-white/15 p-10 text-center">
+              <div className="rounded-3xl border border-dashed border-foreground/15 p-10 text-center">
                 <h2 className="text-xl font-semibold">Todavía no tenés módulos asignados</h2>
                 <p className="mt-2 text-crema/65">
                   Pedile al administrador del consultorio que te asigne un perfil para empezar a trabajar.
@@ -285,7 +287,7 @@ export default function WelcomePage() {
           </section>
 
           {/* Cuenta */}
-          <aside className="entrar h-fit rounded-3xl border border-white/10 bg-card p-6" style={{ animationDelay: '0.5s' }}>
+          <aside className="entrar h-fit rounded-3xl border border-foreground/10 bg-card p-6" style={{ animationDelay: '0.5s' }}>
             <div className="flex items-center gap-4">
               <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-primary text-lg font-bold text-primary-foreground">
                 {iniciales}
@@ -296,10 +298,10 @@ export default function WelcomePage() {
               </div>
             </div>
 
-            <dl className="mt-6 space-y-3 border-t border-white/10 pt-5 text-sm">
+            <dl className="mt-6 space-y-3 border-t border-foreground/10 pt-5 text-sm">
               <div className="flex justify-between">
                 <dt className="text-crema/65">Estado</dt>
-                <dd className={session.user.activo ? 'text-emerald-300' : 'text-red-300'}>
+                <dd className={session.user.activo ? 'text-exito' : 'text-peligro'}>
                   {session.user.activo ? 'Activo' : 'Inactivo'}
                 </dd>
               </div>
@@ -315,9 +317,9 @@ export default function WelcomePage() {
                 {loadingMfaStatus ? (
                   <Loader2 className="mt-0.5 h-5 w-5 animate-spin text-crema/60" />
                 ) : mfaEnabled ? (
-                  <ShieldCheck className="mt-0.5 h-5 w-5 text-emerald-300" />
+                  <ShieldCheck className="mt-0.5 h-5 w-5 text-exito" />
                 ) : (
-                  <ShieldAlert className="mt-0.5 h-5 w-5 text-primary" />
+                  <ShieldAlert className="mt-0.5 h-5 w-5 text-dorado" />
                 )}
                 <div>
                   <p className="font-semibold">Verificación en dos pasos</p>
@@ -326,11 +328,11 @@ export default function WelcomePage() {
                   </p>
                 </div>
               </div>
-              {mfaError && <p className="mt-2 text-xs text-red-300">{mfaError}</p>}
+              {mfaError && <p className="mt-2 text-xs text-peligro">{mfaError}</p>}
               <Button
                 onClick={handleToggleMfa}
                 disabled={loadingMfaStatus || isTogglingMfa || mfaEnabled === null}
-                className={`mt-4 w-full rounded-full ${mfaEnabled ? 'border border-primary/60 bg-transparent text-primary hover:bg-primary/10' : ''}`}
+                className={`mt-4 w-full rounded-full ${mfaEnabled ? 'border border-primary/60 bg-transparent text-dorado hover:bg-primary/10' : ''}`}
               >
                 {isTogglingMfa ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <KeyRound className="mr-2 h-4 w-4" />}
                 {mfaEnabled ? 'Desactivar' : 'Activar ahora'}

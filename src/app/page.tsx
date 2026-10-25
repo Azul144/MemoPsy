@@ -8,8 +8,9 @@ import PorQue from "@/app/components/PorQue";
 import PiePagina from "@/app/components/PiePagina";
 
 export default function Home() {
+  // La portada queda siempre en modo oscuro, aunque el sistema esté en modo claro
   return (
-    <>
+    <div className="tema-oscuro bg-background">
       <Encabezado />
       <main className="min-h-screen bg-background text-foreground">
         <Portada />
@@ -20,6 +21,6 @@ export default function Home() {
         <Contacto />
         <PiePagina />
       </main>
-    </>
+    </div>
   );
 }

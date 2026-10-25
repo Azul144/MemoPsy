@@ -9,7 +9,7 @@ import FondoAnimado from "@/components/FondoAnimado";
 
 export default function PantallaAcceso({ children }: { children: React.ReactNode }) {
   return (
-    <main className="grid min-h-screen bg-background lg:grid-cols-[1.1fr_1fr]">
+    <main className="tema-oscuro grid min-h-screen bg-background text-foreground lg:grid-cols-[1.1fr_1fr]">
       {/* Panel con la foto (solo en pantallas grandes) */}
       <aside className="relative hidden overflow-hidden lg:block">
         <Image
@@ -41,7 +41,7 @@ export default function PantallaAcceso({ children }: { children: React.ReactNode
         <FondoAnimado intensidad="suave" />
         <Link
           href="/"
-          className="relative inline-flex w-fit items-center gap-2 text-sm text-crema/70 transition-colors hover:text-primary"
+          className="relative inline-flex w-fit items-center gap-2 text-sm text-crema/70 transition-colors hover:text-dorado"
         >
           <ArrowLeft className="h-4 w-4" />
           Volver al inicio
@@ -50,7 +50,7 @@ export default function PantallaAcceso({ children }: { children: React.ReactNode
         <div className="relative mx-auto flex w-full max-w-sm flex-1 flex-col justify-center py-10">
           <div className="entrar mb-8 flex items-center gap-3">
             <Image src="/assets/logopng.png" alt="" width={40} height={48} />
-            <span className="titulo text-3xl font-semibold text-primary">MemoPsy</span>
+            <span className="titulo text-3xl font-semibold text-dorado">MemoPsy</span>
           </div>
           <div className="entrar" style={{ animationDelay: "0.1s" }}>
             {children}

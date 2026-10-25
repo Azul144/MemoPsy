@@ -11,7 +11,7 @@ export function TypographyH1({ children, className }: TypographyProps) {
       className={`scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl ${
         className || ''
       }`}
-      style={{ color: '#F1C77A' }}
+      style={{ color: "var(--dorado)" }}
     >
       {children}
     </h1>

@@ -95,11 +95,11 @@ export default function DialogoReprogramar({ sesion, onClose, onReprogramada }: 
     <Dialog open={!!sesion} onOpenChange={(a) => !a && onClose()}>
       <DialogContent
         className="p-4 sm:max-w-[520px] sm:p-6"
-        style={{ backgroundColor: "#1D3434", border: "1px solid #F1C77A" }}
+        style={{ backgroundColor: "var(--card)", border: "1px solid var(--dorado)" }}
       >
         <DialogHeader>
-          <DialogTitle className="text-white">Reprogramar turno</DialogTitle>
-          <DialogDescription className="text-gray-300">
+          <DialogTitle className="text-foreground">Reprogramar turno</DialogTitle>
+          <DialogDescription className="text-suave">
             {sesion && `Turno actual: ${format(parseISO(sesion.fechaHoraInicio), "EEEE d/MM 'a las' HH:mm", { locale: es })}`}
             {psicologo && ` · ${psicologo.nombre} ${psicologo.apellido}`}
           </DialogDescription>
@@ -107,12 +107,12 @@ export default function DialogoReprogramar({ sesion, onClose, onReprogramada }: 
 
         {cargando ? (
           <div className="flex justify-center py-8">
-            <Loader2 className="h-6 w-6 animate-spin text-[#F1C77A]" />
+            <Loader2 className="h-6 w-6 animate-spin text-dorado" />
           </div>
         ) : error ? (
-          <p className="rounded-lg border border-red-500/40 p-4 text-center text-sm text-red-300">{error}</p>
+          <p className="rounded-lg border border-red-500/40 p-4 text-center text-sm text-peligro">{error}</p>
         ) : porDia.length === 0 ? (
-          <p className="rounded-lg border border-dashed border-gray-600 p-4 text-center text-sm text-gray-300">
+          <p className="rounded-lg border border-dashed border-borde-fuerte p-4 text-center text-sm text-suave">
             Tu psicólogo no tiene horarios libres habilitados en las próximas semanas. Comunicate con el consultorio
             para reprogramar.
           </p>
@@ -120,7 +120,7 @@ export default function DialogoReprogramar({ sesion, onClose, onReprogramada }: 
           <div className="max-h-[50vh] space-y-4 overflow-y-auto pr-1">
             {porDia.map(([dia, lista]) => (
               <div key={dia}>
-                <p className="mb-2 text-sm font-semibold capitalize text-white">
+                <p className="mb-2 text-sm font-semibold capitalize text-foreground">
                   {format(parseISO(lista[0].inicio), "EEEE d 'de' MMMM", { locale: es })}
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -133,8 +133,8 @@ export default function DialogoReprogramar({ sesion, onClose, onReprogramada }: 
                       className={cn(
                         "rounded-full border px-3 py-1.5 text-sm transition-colors",
                         elegido === h.inicio
-                          ? "border-[#F1C77A] bg-[#F1C77A] font-semibold text-[#1D3434]"
-                          : "border-gray-600 text-gray-200 hover:border-[#F1C77A]/70",
+                          ? "border-dorado bg-primary font-semibold text-primary-foreground"
+                          : "border-borde-fuerte text-texto-2 hover:border-dorado/70",
                       )}
                     >
                       {format(parseISO(h.inicio), "HH:mm")}
@@ -150,7 +150,7 @@ export default function DialogoReprogramar({ sesion, onClose, onReprogramada }: 
           <Button variant="outline" onClick={onClose} disabled={guardando}>
             Cancelar
           </Button>
-          <Button onClick={confirmar} disabled={!elegido || guardando} style={{ backgroundColor: "#F1C77A", color: "#1D3434" }}>
+          <Button onClick={confirmar} disabled={!elegido || guardando} style={{ backgroundColor: "var(--primary)", color: "var(--primary-foreground)" }}>
             {guardando && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Reprogramar
           </Button>

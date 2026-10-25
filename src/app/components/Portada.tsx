@@ -58,7 +58,7 @@ export default function Portada() {
             </a>
             <Link
               href="/login"
-              className="rounded-full border border-crema/30 px-7 py-3.5 font-semibold text-crema transition-colors hover:border-primary hover:text-primary"
+              className="rounded-full border border-crema/30 px-7 py-3.5 font-semibold text-crema transition-colors hover:border-primary hover:text-dorado"
             >
               Iniciar sesión
             </Link>
@@ -82,7 +82,7 @@ export default function Portada() {
         {/* Foto en forma de arco con las tarjetitas encima */}
         <div className="relative mx-auto w-full max-w-md lg:mr-0 lg:max-w-[30rem]">
           <div
-            className="entrar relative aspect-[4/5] overflow-hidden rounded-t-[999px] rounded-b-[2.5rem] border border-white/10 shadow-2xl shadow-black/40"
+            className="entrar relative aspect-[4/5] overflow-hidden rounded-t-[999px] rounded-b-[2.5rem] border border-foreground/10 shadow-2xl shadow-black/40"
             style={{ animationDelay: "0.2s" }}
           >
             <Image
@@ -102,11 +102,11 @@ export default function Portada() {
               className={`absolute ${t.posicion}`}
             >
               <div
-                className="tarjeta-flotante flex items-center gap-3 rounded-2xl border border-white/10 bg-card/90 px-4 py-3 shadow-xl shadow-black/30 backdrop-blur"
+                className="tarjeta-flotante flex items-center gap-3 rounded-2xl border border-foreground/10 bg-card/90 px-4 py-3 shadow-xl shadow-black/30 backdrop-blur"
                 style={{ animationDelay: `${t.retraso}, calc(${t.retraso} + 0.9s)` }}
               >
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/15">
-                  <t.icono className="h-4 w-4 text-primary" />
+                  <t.icono className="h-4 w-4 text-dorado" />
                 </span>
                 <span>
                   <span className="block text-sm font-semibold text-crema">{t.titulo}</span>

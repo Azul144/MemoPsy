@@ -186,9 +186,9 @@ export default function ListarPerfilesPage() {
 
   if (status === "loading" && isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-4" style={{ backgroundColor: '#152A2A' }}>
-                  <Loader2 className="h-16 w-16 animate-spin text-[#F1C77A] mb-4" />
-                  <TypographyP className="text-white">Cargando...</TypographyP>
+      <div className="flex flex-col items-center justify-center min-h-screen p-4" style={{ backgroundColor: "var(--background)" }}>
+                  <Loader2 className="h-16 w-16 animate-spin text-dorado mb-4" />
+                  <TypographyP className="text-foreground">Cargando...</TypographyP>
       </div>
     )
   }
@@ -197,10 +197,10 @@ export default function ListarPerfilesPage() {
     return (
       <div className="min-h-screen">
         <main className="mx-auto w-full max-w-6xl px-6 py-10 text-center">
-          <AlertCircle className="w-16 h-16 mx-auto mb-6 text-red-500" />
-          <h1 className="text-3xl font-bold text-red-500 mb-4">Acceso Denegado</h1>
-          <p className="text-gray-300 mb-6">{error || "No tenés permiso para ver esta página."}</p>
-          <Button onClick={() => router.push("/perfiles")} style={{ backgroundColor: "#F1C77A", color: "#1D3434" }}>
+          <AlertCircle className="w-16 h-16 mx-auto mb-6 text-peligro" />
+          <h1 className="text-3xl font-bold text-peligro mb-4">Acceso Denegado</h1>
+          <p className="text-suave mb-6">{error || "No tenés permiso para ver esta página."}</p>
+          <Button onClick={() => router.push("/perfiles")} style={{ backgroundColor: "var(--primary)", color: "var(--primary-foreground)" }}>
             Volver a Perfiles
           </Button>
         </main>
@@ -217,7 +217,7 @@ export default function ListarPerfilesPage() {
           {perfilActionPermissions.canRegister && (
             <Button
               onClick={navigateToRegister}
-              style={{ backgroundColor: "#F1C77A", color: "#1D3434" }}
+              style={{ backgroundColor: "var(--primary)", color: "var(--primary-foreground)" }}
               className="flex items-center"
             >
               <PlusCircle className="w-5 h-5 mr-2" /> Registrar perfil
@@ -225,40 +225,40 @@ export default function ListarPerfilesPage() {
           )}
         </EncabezadoPagina>
 
-        <div className="mb-6 flex items-center bg-[#152B2B] p-3 rounded-lg shadow">
-          <Search className="text-gray-400 mr-3 w-5 h-5" />
+        <div className="mb-6 flex items-center bg-background p-3 rounded-lg shadow">
+          <Search className="text-tenue mr-3 w-5 h-5" />
           <Input
             type="text"
             placeholder="Buscar por nombre, descripción o permisos..."
             value={searchTerm}
             onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
-            className="w-full bg-transparent text-white border-none focus:ring-0 placeholder-gray-400"
+            className="w-full bg-transparent text-foreground border-none focus:ring-0 placeholder-gray-400"
           />
         </div>
 
         {isLoading && perfilActionPermissions.canView ? (
-          <div className="text-center text-gray-300 py-10">Cargando perfiles...</div>
+          <div className="text-center text-suave py-10">Cargando perfiles...</div>
         ) : error ? (
-          <div className="text-center text-red-400 py-10 bg-red-500/10 bg-opacity-30 p-4 rounded-md">
+          <div className="text-center text-peligro py-10 bg-red-500/10 bg-opacity-30 p-4 rounded-md">
             <AlertCircle className="w-8 h-8 mx-auto mb-2" /> {error}
           </div>
         ) : !filteredPerfiles.length ? (
-          <div className="text-center text-gray-400 py-10 bg-[#152B2B] p-6 rounded-md">
+          <div className="text-center text-tenue py-10 bg-background p-6 rounded-md">
             {searchTerm
               ? "No se encontraron perfiles que coincidan con la búsqueda."
               : "No hay perfiles registrados en el sistema."}
           </div>
         ) : (
-          <div className="overflow-x-auto rounded-lg shadow" style={{ backgroundColor: "#1D3434" }}>
+          <div className="overflow-x-auto rounded-lg shadow" style={{ backgroundColor: "var(--card)" }}>
             <Table>
               <TableHeader>
-                <TableRow className="border-b border-gray-700">
-                  <TableHead className="text-white font-semibold">Nombre del Perfil</TableHead>
-                  <TableHead className="text-white font-semibold">Descripción</TableHead>
-                  <TableHead className="text-white font-semibold">Permisos por Módulo</TableHead>
-                  <TableHead className="text-white font-semibold">Usuarios Asignados</TableHead>
-                  <TableHead className="text-white font-semibold">Fecha de Creación</TableHead>
-                  <TableHead className="text-white font-semibold text-right">Acciones</TableHead>
+                <TableRow className="border-b border-borde">
+                  <TableHead className="text-foreground font-semibold">Nombre del Perfil</TableHead>
+                  <TableHead className="text-foreground font-semibold">Descripción</TableHead>
+                  <TableHead className="text-foreground font-semibold">Permisos por Módulo</TableHead>
+                  <TableHead className="text-foreground font-semibold">Usuarios Asignados</TableHead>
+                  <TableHead className="text-foreground font-semibold">Fecha de Creación</TableHead>
+                  <TableHead className="text-foreground font-semibold text-right">Acciones</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -273,14 +273,14 @@ export default function ListarPerfilesPage() {
                   )
 
                   return (
-                    <TableRow key={perfil.id} className="border-b border-gray-700 hover:bg-[#152B2B] transition-colors">
-                      <TableCell className="text-gray-200 font-medium">
+                    <TableRow key={perfil.id} className="border-b border-borde hover:bg-background transition-colors">
+                      <TableCell className="text-texto-2 font-medium">
                         <div className="flex items-center">
-                          <Shield className="w-4 h-4 mr-2 text-teal-400" />
+                          <Shield className="w-4 h-4 mr-2 text-info" />
                           {perfil.nombre}
                         </div>
                       </TableCell>
-                      <TableCell className="text-gray-300 max-w-xs">
+                      <TableCell className="text-suave max-w-xs">
                         <div className="truncate" title={perfil.descripcion}>
                           {perfil.descripcion}
                         </div>
@@ -288,7 +288,7 @@ export default function ListarPerfilesPage() {
                       <TableCell>
                         <div className="flex flex-wrap gap-1">
                           {Object.entries(permisosPorModulo).map(([modulo, count]) => (
-                            <Badge key={modulo} variant="outline" className="text-xs border-teal-500 text-teal-300">
+                            <Badge key={modulo} variant="outline" className="text-xs border-teal-500 text-info">
                               {modulo}: {count}
                             </Badge>
                           ))}
@@ -299,13 +299,13 @@ export default function ListarPerfilesPage() {
                           )}
                         </div>
                       </TableCell>
-                      <TableCell className="text-gray-300">
+                      <TableCell className="text-suave">
                         <div className="flex items-center">
-                          <Users className="w-4 h-4 mr-1 text-gray-400" />
+                          <Users className="w-4 h-4 mr-1 text-tenue" />
                           {perfil.usuariosCount}
                         </div>
                       </TableCell>
-                      <TableCell className="text-gray-300">
+                      <TableCell className="text-suave">
                         {new Date(perfil.fechaCreacion).toLocaleDateString("es-ES")}
                       </TableCell>
                       <TableCell className="text-right">
@@ -313,7 +313,7 @@ export default function ListarPerfilesPage() {
                           <DropdownMenuTrigger asChild>
                             <Button
                               variant="ghost"
-                              className="h-8 w-8 p-0 text-gray-300 hover:text-white hover:bg-[#2A4242]"
+                              className="h-8 w-8 p-0 text-suave hover:text-foreground hover:bg-superficie"
                             >
                               <span className="sr-only">Abrir menú</span>
                               <MoreVertical className="h-4 w-4" />
@@ -321,12 +321,12 @@ export default function ListarPerfilesPage() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent
                             align="end"
-                            style={{ backgroundColor: "#152A2A", borderColor: "#2A4A4A" }}
+                            style={{ backgroundColor: "var(--background)", borderColor: "var(--borde)" }}
                           >
                             {perfilActionPermissions.canEdit && (
                               <DropdownMenuItem
                                 onClick={() => handleEdit(perfil.id)}
-                                className="text-gray-300 hover:bg-[#2A4242] focus:bg-[#2A4242] focus:text-white"
+                                className="text-suave hover:bg-superficie focus:bg-superficie focus:text-foreground"
                               >
                                 <Edit3 className="mr-2 h-4 w-4" /> Editar
                               </DropdownMenuItem>
@@ -334,7 +334,7 @@ export default function ListarPerfilesPage() {
                             {perfilActionPermissions.canDelete && (
                               <DropdownMenuItem
                                 onClick={() => handleDelete(perfil.id, perfil.nombre)}
-                                className="text-gray-300 hover:!bg-red-700 focus:!bg-red-700 focus:text-white"
+                                className="text-suave hover:!bg-red-700 hover:!text-[#ffffff] focus:!bg-red-700 focus:text-[#ffffff]"
                               >
                                 <Trash2 className="mr-2 h-4 w-4" /> Eliminar
                               </DropdownMenuItem>
@@ -342,7 +342,7 @@ export default function ListarPerfilesPage() {
                             {!perfilActionPermissions.canEdit &&
                               !perfilActionPermissions.canDelete &&
                               !perfilActionPermissions.canAssign && (
-                                <DropdownMenuItem disabled className="text-gray-500">
+                                <DropdownMenuItem disabled className="text-tenue">
                                   Sin acciones disponibles
                                 </DropdownMenuItem>
                               )}

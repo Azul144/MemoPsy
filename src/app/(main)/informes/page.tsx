@@ -134,9 +134,9 @@ export default function GestionInformesPage() {
   // Loading state (identical to perfiles/page.tsx)
   if (loadingPermissions) { // Combines session loading and permission processing
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-4" style={{ backgroundColor: '#152A2A' }}>
-        <Loader2 className="h-16 w-16 animate-spin text-[#F1C77A] mb-4" />
-        <TypographyP className="text-white">Cargando...</TypographyP>
+      <div className="flex flex-col items-center justify-center min-h-screen p-4" style={{ backgroundColor: "var(--background)" }}>
+        <Loader2 className="h-16 w-16 animate-spin text-dorado mb-4" />
+        <TypographyP className="text-foreground">Cargando...</TypographyP>
       </div>
     );
   }
@@ -149,10 +149,10 @@ export default function GestionInformesPage() {
         <EncabezadoPagina titulo="Gestión de Informes" descripcion="Registrá y consultá notas clínicas, historias clínicas e informes de seguimiento." volverA="/welcome" textoVolver="Volver al inicio" />
 
         {status === 'authenticated' && subModulosInformesPermitidos.length === 0 && (
-          <div className="flex flex-col items-center justify-center text-center p-8 rounded-2xl max-w-md mx-auto" style={{ backgroundColor: '#1D3434' }}>
-            <FileText className="w-16 h-16 mx-auto mb-6" style={{ color: '#F1C77A' }} /> {/* Using FileText as a general icon for Informes module */}
-            <h3 className="text-2xl font-semibold text-white mb-4">Sin Acciones Disponibles en Informes</h3>
-            <TypographyP className="text-gray-300">
+          <div className="flex flex-col items-center justify-center text-center p-8 rounded-2xl max-w-md mx-auto" style={{ backgroundColor: "var(--card)" }}>
+            <FileText className="w-16 h-16 mx-auto mb-6" style={{ color: "var(--dorado)" }} /> {/* Using FileText as a general icon for Informes module */}
+            <h3 className="text-2xl font-semibold text-foreground mb-4">Sin Acciones Disponibles en Informes</h3>
+            <TypographyP className="text-suave">
               No tenés los permisos necesarios para usar este módulo.
               Si creés que es un error, consultá con el administrador del sistema.
             </TypographyP>

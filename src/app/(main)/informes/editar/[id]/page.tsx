@@ -257,7 +257,7 @@ export default function EditarInformePage() {
   };
 
   if (loadingPermissions || isLoadingData) {
-    return <div className="flex flex-col items-center justify-center min-h-screen p-4" style={{backgroundColor: '#152A2A'}}><Loader2 className="h-16 w-16 animate-spin text-[#F1C77A] mb-4" /><TypographyP className="text-white">Cargando datos...</TypographyP></div>;
+    return <div className="flex flex-col items-center justify-center min-h-screen p-4" style={{backgroundColor: "var(--background)"}}><Loader2 className="h-16 w-16 animate-spin text-dorado mb-4" /><TypographyP className="text-foreground">Cargando datos...</TypographyP></div>;
   }
 
   return (
@@ -267,11 +267,11 @@ export default function EditarInformePage() {
       
       <main className="mx-auto w-full max-w-6xl px-6 py-10">
         {pageError ? (
-            <div className="text-center p-8 rounded-2xl max-w-md mx-auto" style={{ backgroundColor: '#1D3434' }}>
-                <AlertTriangle className="w-16 h-16 mx-auto mb-6 text-red-500" />
-                <TypographyH1 className="mb-4 text-white">Error</TypographyH1>
-                <TypographyP className="text-gray-300">{pageError}</TypographyP>
-                <Button onClick={() => router.push('/informes/lista')} className="mt-6 bg-[#F1C77A] text-[#1D3434] hover:bg-opacity-80">
+            <div className="text-center p-8 rounded-2xl max-w-md mx-auto" style={{ backgroundColor: "var(--card)" }}>
+                <AlertTriangle className="w-16 h-16 mx-auto mb-6 text-peligro" />
+                <TypographyH1 className="mb-4 text-foreground">Error</TypographyH1>
+                <TypographyP className="text-suave">{pageError}</TypographyP>
+                <Button onClick={() => router.push('/informes/lista')} className="mt-6 bg-primary text-primary-foreground hover:bg-opacity-80">
                     <ArrowLeft className="mr-2 h-4 w-4" /> Volver a la Lista
                 </Button>
             </div>
@@ -279,45 +279,45 @@ export default function EditarInformePage() {
         <>
             <EncabezadoPagina titulo="Editar nota clínica" descripcion={<>Modificando: <span className="font-semibold">&ldquo;{initialInformeTitle}&rdquo;</span></>} volverA="/informes" textoVolver="Volver a Informes" />
             
-            <Card className="max-w-2xl mx-auto" style={{ backgroundColor: '#1D3434', borderColor: '#2A4A4A' }}>
+            <Card className="max-w-2xl mx-auto" style={{ backgroundColor: "var(--card)", borderColor: "var(--borde)" }}>
             <CardHeader>
-                <CardTitle className="text-2xl text-[#F1C77A] flex items-center"><PageIcon className="mr-3 h-7 w-7"/>Actualizar Datos</CardTitle>
-                <CardDescription className="text-gray-400">Modifique los campos necesarios y guarde los cambios.</CardDescription>
+                <CardTitle className="text-2xl text-dorado flex items-center"><PageIcon className="mr-3 h-7 w-7"/>Actualizar Datos</CardTitle>
+                <CardDescription className="text-tenue">Modifique los campos necesarios y guarde los cambios.</CardDescription>
             </CardHeader>
             <form onSubmit={handleSubmit}>
                 <CardContent className="space-y-6">
                 {formErrors.general && (
-                    <div className="p-3 bg-red-500/10 text-red-300 border border-red-400/40 rounded-md flex items-center">
-                    <AlertTriangle className="h-5 w-5 mr-2 text-red-400" /> <p>{formErrors.general}</p>
+                    <div className="p-3 bg-red-500/10 text-peligro border border-red-400/40 rounded-md flex items-center">
+                    <AlertTriangle className="h-5 w-5 mr-2 text-peligro" /> <p>{formErrors.general}</p>
                     </div>
                 )}
                 <div className="space-y-2">
-                    <Label htmlFor="titulo" className="text-gray-200">Título</Label>
-                    <Input id="titulo" name="titulo" value={formData.titulo} onChange={handleInputChange} className={cn("bg-[#152A2A] text-white border-gray-600 focus:border-[#F1C77A]", formErrors.titulo && "border-red-500")} />
-                    {formErrors.titulo && <TypographySmall className="text-red-400">{formErrors.titulo}</TypographySmall>}
+                    <Label htmlFor="titulo" className="text-texto-2">Título</Label>
+                    <Input id="titulo" name="titulo" value={formData.titulo} onChange={handleInputChange} className={cn("bg-background text-foreground border-borde-fuerte focus:border-dorado", formErrors.titulo && "border-red-500")} />
+                    {formErrors.titulo && <TypographySmall className="text-peligro">{formErrors.titulo}</TypographySmall>}
                 </div>
 
                 <div className="space-y-2">
-                    <Label htmlFor="contenido" className="text-gray-200">Contenido</Label>
-                    <Textarea id="contenido" name="contenido" value={formData.contenido} onChange={handleInputChange} rows={8} className={cn("bg-[#152A2A] text-white border-gray-600 focus:border-[#F1C77A]", formErrors.contenido && "border-red-500")} />
-                    {formErrors.contenido && <TypographySmall className="text-red-400">{formErrors.contenido}</TypographySmall>}
+                    <Label htmlFor="contenido" className="text-texto-2">Contenido</Label>
+                    <Textarea id="contenido" name="contenido" value={formData.contenido} onChange={handleInputChange} rows={8} className={cn("bg-background text-foreground border-borde-fuerte focus:border-dorado", formErrors.contenido && "border-red-500")} />
+                    {formErrors.contenido && <TypographySmall className="text-peligro">{formErrors.contenido}</TypographySmall>}
                     <DictadoVoz onTexto={agregarDictado} disabled={isSubmitting} />
                     <PropuestaIA texto={formData.contenido} onAceptar={usarPropuestaIA} disabled={isSubmitting} />
                 </div>
 
                 <div className="space-y-2">
-                    <Label htmlFor="etiquetas" className="text-gray-200">Etiquetas</Label>
-                    <Input id="etiquetas" name="etiquetas" value={formData.etiquetas} onChange={handleInputChange} placeholder="Ej: ansiedad, seguimiento, primera consulta" className="bg-[#152A2A] text-white border-gray-600 focus:border-[#F1C77A]" />
-                    <TypographySmall className="text-gray-400">Separá las etiquetas con comas.</TypographySmall>
+                    <Label htmlFor="etiquetas" className="text-texto-2">Etiquetas</Label>
+                    <Input id="etiquetas" name="etiquetas" value={formData.etiquetas} onChange={handleInputChange} placeholder="Ej: ansiedad, seguimiento, primera consulta" className="bg-background text-foreground border-borde-fuerte focus:border-dorado" />
+                    <TypographySmall className="text-tenue">Separá las etiquetas con comas.</TypographySmall>
                 </div>
 
-                <p className="flex items-start gap-2 rounded-md border border-gray-700 bg-[#152A2A] p-3 text-sm text-gray-300">
-                      <Lock className="mt-0.5 h-4 w-4 shrink-0 text-[#F1C77A]" />
+                <p className="flex items-start gap-2 rounded-md border border-borde bg-background p-3 text-sm text-suave">
+                      <Lock className="mt-0.5 h-4 w-4 shrink-0 text-dorado" />
                       La nota clínica es privada: solo la ves vos. Lo que quieras compartir con el paciente lo cargás después en su informe de seguimiento.
                     </p>
 
                 <div className="space-y-2">
-                    <Label htmlFor="pacienteSearch" className="text-gray-200">Pacientes asociados</Label>
+                    <Label htmlFor="pacienteSearch" className="text-texto-2">Pacientes asociados</Label>
                     <div ref={popoverRef}>
                     <Popover open={isPacientePopoverOpen} onOpenChange={setIsPacientePopoverOpen}>
                         <PopoverTrigger asChild>
@@ -325,42 +325,42 @@ export default function EditarInformePage() {
                             <Input id="pacienteSearch" type="text" placeholder="Buscar paciente..." value={pacienteSearchQuery}
                                 onChange={(e) => {setPacienteSearchQuery(e.target.value); setIsPacientePopoverOpen(true);}}
                                 onFocus={() => {setIsPacientePopoverOpen(true); debouncedFetchPacientes(pacienteSearchQuery);}}
-                                className={cn("bg-[#152A2A] text-white border-gray-600 focus:border-[#F1C77A] pr-10", formErrors.pacientesIds && "border-red-500")}
+                                className={cn("bg-background text-foreground border-borde-fuerte focus:border-dorado pr-10", formErrors.pacientesIds && "border-red-500")}
                             />
-                            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-tenue" />
                         </div>
                         </PopoverTrigger>
                         {isPacientePopoverOpen && (pacienteSearchResults.length > 0 || isPacienteSearchLoading) && (
-                        <PopoverContent className="w-[--radix-popover-trigger-width] p-0 bg-[#1D3434] border-gray-600 text-white">
-                            {isPacienteSearchLoading && <div className="p-4 text-center text-sm text-gray-400">Buscando...</div>}
-                            {!isPacienteSearchLoading && pacienteSearchResults.length === 0 && pacienteSearchQuery.length > 1 && <div className="p-4 text-center text-sm text-gray-400">No se encontraron pacientes.</div>}
+                        <PopoverContent className="w-[--radix-popover-trigger-width] p-0 bg-card border-borde-fuerte text-foreground">
+                            {isPacienteSearchLoading && <div className="p-4 text-center text-sm text-tenue">Buscando...</div>}
+                            {!isPacienteSearchLoading && pacienteSearchResults.length === 0 && pacienteSearchQuery.length > 1 && <div className="p-4 text-center text-sm text-tenue">No se encontraron pacientes.</div>}
                             {!isPacienteSearchLoading && pacienteSearchResults.length > 0 && (
                             <ul className="max-h-60 overflow-y-auto">
                                 {pacienteSearchResults.map(paciente => (
-                                <li key={paciente.id} onMouseDown={(e) => { e.preventDefault(); handleSelectPaciente(paciente); }} className="p-3 hover:bg-[#152A2A] cursor-pointer text-sm border-b border-gray-700 last:border-b-0">
+                                <li key={paciente.id} onMouseDown={(e) => { e.preventDefault(); handleSelectPaciente(paciente); }} className="p-3 hover:bg-background cursor-pointer text-sm border-b border-borde last:border-b-0">
                                     {paciente.nombreCompleto} (DNI: {paciente.dni || 'N/A'})
                                 </li>))}
                             </ul>)}
                         </PopoverContent>)}
                     </Popover>
                     </div>
-                    {formErrors.pacientesIds && <TypographySmall className="text-red-400">{formErrors.pacientesIds}</TypographySmall>}
+                    {formErrors.pacientesIds && <TypographySmall className="text-peligro">{formErrors.pacientesIds}</TypographySmall>}
                     <div className="mt-3 space-x-2 space-y-2">
                     {selectedPacientes.map(paciente => (
-                        <Badge key={paciente.id} className="bg-[#F1C77A] text-[#1D3434] hover:bg-[#e0b66e] text-sm font-medium">
+                        <Badge key={paciente.id} className="bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-medium">
                         {paciente.nombreCompleto}
-                        <Button type="button" variant="ghost" size="icon" onClick={() => handleRemovePaciente(paciente.id)} className="ml-1.5 p-0 h-4 w-4 text-[#1D3434] hover:bg-transparent hover:text-red-500"><X className="h-3.5 w-3.5" /></Button>
+                        <Button type="button" variant="ghost" size="icon" onClick={() => handleRemovePaciente(paciente.id)} className="ml-1.5 p-0 h-4 w-4 text-primary-foreground hover:bg-transparent hover:text-peligro"><X className="h-3.5 w-3.5" /></Button>
                         </Badge>
                     ))}
                     </div>
                 </div>
                 </CardContent>
-                <CardFooter className="flex justify-end space-x-3 pt-6 border-t border-gray-700 mt-6">
+                <CardFooter className="flex justify-end space-x-3 pt-6 border-t border-borde mt-6">
                 <Button type="button" variant="outline" onClick={() => router.push(informeId ? `/informes/detalle/${informeId}` : '/informes/lista')}
-                    className="border-[#F1C77A] text-[#F1C77A] hover:bg-[#F1C77A] hover:text-[#1D3434]">
+                    className="border-dorado text-dorado hover:bg-primary hover:text-primary-foreground">
                     Cancelar
                 </Button>
-                <Button type="submit" disabled={isSubmitting} className="bg-[#F1C77A] text-[#1D3434] hover:bg-opacity-80">
+                <Button type="submit" disabled={isSubmitting} className="bg-primary text-primary-foreground hover:bg-opacity-80">
                     {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                     Guardar Cambios
                 </Button>

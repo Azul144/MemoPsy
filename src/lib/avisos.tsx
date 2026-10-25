@@ -22,7 +22,7 @@ export function confirmar(mensaje: string, textoConfirmar = "Sí, continuar"): P
         <div
           role="alertdialog"
           aria-live="assertive"
-          className={`w-[min(26rem,calc(100vw-2rem))] rounded-2xl border border-white/10 bg-card p-5 text-crema shadow-2xl shadow-black/40 transition-all ${
+          className={`w-[min(26rem,calc(100vw-2rem))] rounded-2xl border border-foreground/10 bg-card p-5 text-crema shadow-2xl shadow-black/40 transition-all ${
             t.visible ? "opacity-100" : "opacity-0"
           }`}
         >
@@ -34,7 +34,7 @@ export function confirmar(mensaje: string, textoConfirmar = "Sí, continuar"): P
                 toast.dismiss(t.id);
                 resolve(false);
               }}
-              className="rounded-full border border-white/15 px-5 py-2 text-sm font-semibold transition-colors hover:border-crema/40"
+              className="rounded-full border border-foreground/15 px-5 py-2 text-sm font-semibold transition-colors hover:border-crema/40"
             >
               Cancelar
             </button>

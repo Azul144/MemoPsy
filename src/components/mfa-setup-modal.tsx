@@ -116,29 +116,29 @@ export default function MfaSetupModal({ isOpen, onClose, onSuccess }: Props) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="titulo-mfa"
-        className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl bg-card p-6 text-white shadow-xl"
+        className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl bg-card p-6 text-foreground shadow-xl"
       >
-        <h2 id="titulo-mfa" className="mb-4 text-center text-xl font-bold text-primary">
+        <h2 id="titulo-mfa" className="mb-4 text-center text-xl font-bold text-dorado">
           Activar verificación en dos pasos
         </h2>
 
         {paso === "cargando" && (
           <div className="flex h-48 flex-col items-center justify-center">
-            <Loader2 className="h-10 w-10 animate-spin text-primary" />
-            <p className="mt-2 text-white/80">Generando configuración…</p>
+            <Loader2 className="h-10 w-10 animate-spin text-dorado" />
+            <p className="mt-2 text-foreground/80">Generando configuración…</p>
           </div>
         )}
 
         {paso === "error" && (
           <div className="space-y-4 text-center">
-            <p role="alert" className="text-red-300">{error}</p>
+            <p role="alert" className="text-peligro">{error}</p>
             <Button variant="outline" className="w-full" onClick={onClose}>Cerrar</Button>
           </div>
         )}
 
         {paso === "qr" && (
           <form onSubmit={verificar} className="space-y-4">
-            <p className="text-sm text-white/85">
+            <p className="text-sm text-foreground/85">
               <strong>1.</strong> Abrí una app de autenticación (Google Authenticator, Microsoft
               Authenticator, Authy…) y escaneá este código:
             </p>
@@ -150,11 +150,11 @@ export default function MfaSetupModal({ isOpen, onClose, onSuccess }: Props) {
               height={240}
               className="mx-auto rounded-lg bg-white p-2"
             />
-            <p className="text-xs text-white/70">Si no podés escanearlo, cargá esta clave a mano:</p>
+            <p className="text-xs text-foreground/70">Si no podés escanearlo, cargá esta clave a mano:</p>
             <p className="break-all rounded bg-secondary p-2 text-center font-mono text-sm">{secreto}</p>
 
             <div>
-              <Label htmlFor="codigo-activacion" className="text-sm text-white/85">
+              <Label htmlFor="codigo-activacion" className="text-sm text-foreground/85">
                 <strong>2.</strong> Escribí el código de 6 dígitos que muestra la app:
               </Label>
               <Input
@@ -169,7 +169,7 @@ export default function MfaSetupModal({ isOpen, onClose, onSuccess }: Props) {
               />
             </div>
 
-            {error && <p role="alert" className="text-center text-sm text-red-300">{error}</p>}
+            {error && <p role="alert" className="text-center text-sm text-peligro">{error}</p>}
 
             <Button type="submit" className="w-full" disabled={codigo.length !== 6 || verificando}>
               {verificando && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -184,10 +184,10 @@ export default function MfaSetupModal({ isOpen, onClose, onSuccess }: Props) {
         {paso === "codigos" && (
           <div className="space-y-4">
             <div className="text-center">
-              <ShieldCheck className="mx-auto h-10 w-10 text-primary" aria-hidden="true" />
+              <ShieldCheck className="mx-auto h-10 w-10 text-dorado" aria-hidden="true" />
               <p className="mt-2 font-semibold">¡Listo! La verificación en dos pasos quedó activada.</p>
             </div>
-            <p className="text-sm text-white/85">
+            <p className="text-sm text-foreground/85">
               Guardá estos <strong>códigos de recuperación</strong> en un lugar seguro. Si perdés el
               celular, cada uno te deja entrar <strong>una sola vez</strong>.
               <strong> No se vuelven a mostrar.</strong>

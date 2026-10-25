@@ -386,8 +386,8 @@ export default function RegistrarUsuarioPage() {
   // Render states
   if (status === "loading" || hasPermission === null) {
     return (
-      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: "#152A2A" }}>
-        <div className="text-white text-lg">Cargando sesión y permisos...</div>
+      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: "var(--background)" }}>
+        <div className="text-foreground text-lg">Cargando sesión y permisos...</div>
       </div>
     )
   }
@@ -396,9 +396,9 @@ export default function RegistrarUsuarioPage() {
     return (
       <div className="min-h-screen">
         <main className="mx-auto w-full max-w-6xl px-6 py-10 text-center">
-          <h1 className="text-3xl font-bold text-red-500 mb-4">Acceso Denegado</h1>
-          <p className="text-gray-300 mb-6">No tenés los permisos necesarios para registrar usuarios.</p>
-          <Button onClick={() => router.push("/usuarios")} style={{ backgroundColor: "#F1C77A", color: "#1D3434" }}>
+          <h1 className="text-3xl font-bold text-peligro mb-4">Acceso Denegado</h1>
+          <p className="text-suave mb-6">No tenés los permisos necesarios para registrar usuarios.</p>
+          <Button onClick={() => router.push("/usuarios")} style={{ backgroundColor: "var(--primary)", color: "var(--primary-foreground)" }}>
             Volver a Usuarios
           </Button>
         </main>
@@ -417,13 +417,13 @@ export default function RegistrarUsuarioPage() {
       {/* Main Content */}
       <main className="mx-auto w-full max-w-6xl px-6 py-10">
         <EncabezadoPagina titulo="Registrar usuario" descripcion="Completá los datos para crear la cuenta." volverA="/usuarios" textoVolver="Volver a Usuarios" />
-        <Card className="max-w-2xl mx-auto" style={{ backgroundColor: "#1D3434", borderColor: "#2A4A4A" }}>
+        <Card className="max-w-2xl mx-auto" style={{ backgroundColor: "var(--card)", borderColor: "var(--borde)" }}>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Personal Info */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6">
                 <div className="space-y-2">
-                  <Label htmlFor="nombre" className="text-gray-200">
+                  <Label htmlFor="nombre" className="text-texto-2">
                     Nombre *
                   </Label>
                   <Input
@@ -432,12 +432,12 @@ export default function RegistrarUsuarioPage() {
                     value={formData.nombre}
                     onChange={handleChange}
                     required
-                    className="bg-[#2A4242] text-white border-gray-600 focus:ring-teal-500 focus:border-teal-500"
+                    className="bg-superficie text-foreground border-borde-fuerte focus:ring-teal-500 focus:border-teal-500"
                   />
-                  {fieldErrors.nombre && <p className="text-red-500 text-xs">{fieldErrors.nombre}</p>}
+                  {fieldErrors.nombre && <p className="text-peligro text-xs">{fieldErrors.nombre}</p>}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="apellido" className="text-gray-200">
+                  <Label htmlFor="apellido" className="text-texto-2">
                     Apellido *
                   </Label>
                   <Input
@@ -446,14 +446,14 @@ export default function RegistrarUsuarioPage() {
                     value={formData.apellido}
                     onChange={handleChange}
                     required
-                    className="bg-[#2A4242] text-white border-gray-600 focus:ring-teal-500 focus:border-teal-500"
+                    className="bg-superficie text-foreground border-borde-fuerte focus:ring-teal-500 focus:border-teal-500"
                   />
-                  {fieldErrors.apellido && <p className="text-red-500 text-xs">{fieldErrors.apellido}</p>}
+                  {fieldErrors.apellido && <p className="text-peligro text-xs">{fieldErrors.apellido}</p>}
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6">
                 <div className="space-y-2">
-                  <Label htmlFor="dni" className="text-gray-200">
+                  <Label htmlFor="dni" className="text-texto-2">
                     DNI *
                   </Label>
                   <Input
@@ -463,12 +463,12 @@ export default function RegistrarUsuarioPage() {
                     value={formData.dni}
                     onChange={handleChange}
                     required
-                    className="bg-[#2A4242] text-white border-gray-600 focus:ring-teal-500 focus:border-teal-500"
+                    className="bg-superficie text-foreground border-borde-fuerte focus:ring-teal-500 focus:border-teal-500"
                   />
-                  {fieldErrors.dni && <p className="text-red-500 text-xs">{fieldErrors.dni}</p>}
+                  {fieldErrors.dni && <p className="text-peligro text-xs">{fieldErrors.dni}</p>}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="fecha_nacimiento" className="text-gray-200">
+                  <Label htmlFor="fecha_nacimiento" className="text-texto-2">
                     Fecha de Nacimiento *
                   </Label>
                   <Input
@@ -478,16 +478,16 @@ export default function RegistrarUsuarioPage() {
                     value={formData.fecha_nacimiento}
                     onChange={handleChange}
                     required
-                    className="bg-[#2A4242] text-white border-gray-600 focus:ring-teal-500 focus:border-teal-500"
+                    className="bg-superficie text-foreground border-borde-fuerte focus:ring-teal-500 focus:border-teal-500"
                     style={{ colorScheme: "dark" }}
                   />
                   {fieldErrors.fecha_nacimiento && (
-                    <p className="text-red-500 text-xs">{fieldErrors.fecha_nacimiento}</p>
+                    <p className="text-peligro text-xs">{fieldErrors.fecha_nacimiento}</p>
                   )}
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="telefono" className="text-gray-200">
+                <Label htmlFor="telefono" className="text-texto-2">
                   Celular
                 </Label>
                 <Input
@@ -498,18 +498,18 @@ export default function RegistrarUsuarioPage() {
                   value={formData.telefono}
                   onChange={handleChange}
                   placeholder="3704 123456"
-                  className="bg-[#2A4242] text-white border-gray-600 focus:ring-teal-500 focus:border-teal-500"
+                  className="bg-superficie text-foreground border-borde-fuerte focus:ring-teal-500 focus:border-teal-500"
                 />
                 {fieldErrors.telefono ? (
-                  <p className="text-red-500 text-xs">{fieldErrors.telefono}</p>
+                  <p className="text-peligro text-xs">{fieldErrors.telefono}</p>
                 ) : (
-                  <p className="text-gray-400 text-xs">Opcional. Dato de contacto del paciente.</p>
+                  <p className="text-tenue text-xs">Opcional. Dato de contacto del paciente.</p>
                 )}
               </div>
 
               {/* Account Info */}
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-gray-200">
+                <Label htmlFor="email" className="text-texto-2">
                   Email *
                 </Label>
                 <Input
@@ -519,14 +519,14 @@ export default function RegistrarUsuarioPage() {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="bg-[#2A4242] text-white border-gray-600 focus:ring-teal-500 focus:border-teal-500"
+                  className="bg-superficie text-foreground border-borde-fuerte focus:ring-teal-500 focus:border-teal-500"
                 />
-                {fieldErrors.email && <p className="text-red-500 text-xs">{fieldErrors.email}</p>}
+                {fieldErrors.email && <p className="text-peligro text-xs">{fieldErrors.email}</p>}
               </div>
               <div className="space-y-3">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6">
                   <div className="space-y-2">
-                    <Label htmlFor="password" className="text-gray-200">
+                    <Label htmlFor="password" className="text-texto-2">
                       Contraseña *
                     </Label>
                     <InputPassword
@@ -538,10 +538,10 @@ export default function RegistrarUsuarioPage() {
                       aria-describedby="requisitos-password"
                       required
                     />
-                    {fieldErrors.password && <p className="text-red-500 text-xs">{fieldErrors.password}</p>}
+                    {fieldErrors.password && <p className="text-peligro text-xs">{fieldErrors.password}</p>}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="confirmPassword" className="text-gray-200">
+                    <Label htmlFor="confirmPassword" className="text-texto-2">
                       Confirmar Contraseña *
                     </Label>
                     <InputPassword
@@ -553,17 +553,17 @@ export default function RegistrarUsuarioPage() {
                       required
                     />
                     {fieldErrors.confirmPassword ? (
-                      <p className="text-red-500 text-xs">{fieldErrors.confirmPassword}</p>
+                      <p className="text-peligro text-xs">{fieldErrors.confirmPassword}</p>
                     ) : (
                       formData.confirmPassword.length > 0 &&
                       formData.password !== formData.confirmPassword && (
-                        <p className="text-red-300 text-xs">Las contraseñas no coinciden.</p>
+                        <p className="text-peligro text-xs">Las contraseñas no coinciden.</p>
                       )
                     )}
                   </div>
                 </div>
-                <div id="requisitos-password" className="rounded-md border border-[#2A4A4A] bg-[#152A2A]/60 px-4 py-3">
-                  <p className="text-xs font-medium uppercase tracking-wide text-gray-400">La contraseña debe tener</p>
+                <div id="requisitos-password" className="rounded-md border border-borde bg-background/60 px-4 py-3">
+                  <p className="text-xs font-medium uppercase tracking-wide text-tenue">La contraseña debe tener</p>
                   <RequisitosPassword password={formData.password} />
                 </div>
               </div>
@@ -572,15 +572,15 @@ export default function RegistrarUsuarioPage() {
               <div className="space-y-4">
                 <div className="flex items-center space-x-2">
                   <Switch id="isPsicologo" checked={isPsicologo} onCheckedChange={handlePsicologoToggle} />
-                  <Label htmlFor="isPsicologo" className="text-gray-200 flex items-center">
-                    <Brain className="w-5 h-5 mr-2 text-teal-400" /> Registrar como Psicólogo
+                  <Label htmlFor="isPsicologo" className="text-texto-2 flex items-center">
+                    <Brain className="w-5 h-5 mr-2 text-info" /> Registrar como Psicólogo
                   </Label>
                 </div>
 
                 {isPsicologo && (
                   <div className="pl-8 space-y-4 transition-all duration-300 ease-in-out">
                     <div className="space-y-2">
-                      <Label htmlFor="numeroLicencia" className="text-gray-300">
+                      <Label htmlFor="numeroLicencia" className="text-suave">
                         Número de Licencia *
                       </Label>
                       <Input
@@ -589,14 +589,14 @@ export default function RegistrarUsuarioPage() {
                         value={formData.numeroLicencia}
                         onChange={handleChange}
                         required={isPsicologo}
-                        className="bg-[#2A4242] text-white border-gray-600 focus:ring-teal-500 focus:border-teal-500"
+                        className="bg-superficie text-foreground border-borde-fuerte focus:ring-teal-500 focus:border-teal-500"
                       />
                       {fieldErrors.numeroLicencia && (
-                        <p className="text-red-500 text-xs">{fieldErrors.numeroLicencia}</p>
+                        <p className="text-peligro text-xs">{fieldErrors.numeroLicencia}</p>
                       )}
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="especialidad" className="text-gray-300">
+                      <Label htmlFor="especialidad" className="text-suave">
                         Especialidad *
                       </Label>
                       <Select
@@ -607,16 +607,16 @@ export default function RegistrarUsuarioPage() {
                       >
                         <SelectTrigger
                           id="especialidad"
-                          className="w-full bg-[#2A4242] text-white border-gray-600 focus:ring-teal-500 focus:border-teal-500 data-[placeholder]:text-gray-400"
+                          className="w-full bg-superficie text-foreground border-borde-fuerte focus:ring-teal-500 focus:border-teal-500 data-[placeholder]:text-tenue"
                         >
                           <SelectValue placeholder="Elegí una especialidad" />
                         </SelectTrigger>
-                        <SelectContent style={{ backgroundColor: "#1D3434", borderColor: "#2A4A4A" }}>
+                        <SelectContent style={{ backgroundColor: "var(--card)", borderColor: "var(--borde)" }}>
                           {ESPECIALIDADES_PSICOLOGIA.map((esp) => (
                             <SelectItem
                               key={esp}
                               value={esp}
-                              className="text-gray-200 cursor-pointer hover:!bg-teal-700/60 hover:!text-amber-200 focus:!bg-teal-700/60 focus:!text-amber-200 data-[state=checked]:!text-amber-300"
+                              className="text-texto-2 cursor-pointer hover:!bg-teal-700/60 hover:!text-aviso focus:!bg-teal-700/60 focus:!text-aviso data-[state=checked]:!text-aviso"
                             >
                               {esp}
                             </SelectItem>
@@ -624,7 +624,7 @@ export default function RegistrarUsuarioPage() {
                         </SelectContent>
                       </Select>
                       {fieldErrors.especialidad && (
-                        <p className="text-red-500 text-xs">{fieldErrors.especialidad}</p>
+                        <p className="text-peligro text-xs">{fieldErrors.especialidad}</p>
                       )}
                     </div>
                   </div>
@@ -632,7 +632,7 @@ export default function RegistrarUsuarioPage() {
 
                 <div className="flex items-center space-x-2 pt-2">
                   <Switch id="isPaciente" checked={isPaciente} onCheckedChange={handlePacienteToggle} />
-                  <Label htmlFor="isPaciente" className="text-gray-200 flex items-center">
+                  <Label htmlFor="isPaciente" className="text-texto-2 flex items-center">
                     <UserPlusIcon className="w-5 h-5 mr-2 text-lime-400" /> Registrar como Paciente
                   </Label>
                 </div>
@@ -640,7 +640,7 @@ export default function RegistrarUsuarioPage() {
                 {isPaciente && (
                   <div className="pl-8 space-y-4 transition-all duration-300 ease-in-out">
                     <div className="space-y-2">
-                      <Label htmlFor="selectedObraSocialId" className="text-gray-300">
+                      <Label htmlFor="selectedObraSocialId" className="text-suave">
                         Obra Social *
                       </Label>
                       <Select
@@ -652,15 +652,15 @@ export default function RegistrarUsuarioPage() {
                       >
                         <SelectTrigger
                           id="selectedObraSocialId"
-                          className="w-full bg-[#2A4242] text-white border-gray-600 focus:ring-teal-500 focus:border-teal-500 data-[placeholder]:text-gray-400"
+                          className="w-full bg-superficie text-foreground border-borde-fuerte focus:ring-teal-500 focus:border-teal-500 data-[placeholder]:text-tenue"
                         >
                           <SelectValue
                             placeholder={isLoadingObrasSociales ? "Cargando obras sociales..." : "Elegí una obra social"}
                           />
                         </SelectTrigger>
-                        <SelectContent style={{ backgroundColor: "#1D3434", borderColor: "#2A4A4A" }}>
+                        <SelectContent style={{ backgroundColor: "var(--card)", borderColor: "var(--borde)" }}>
                           {obrasSocialesList.length === 0 ? (
-                            <SelectItem value="no-options" disabled className="text-gray-400">
+                            <SelectItem value="no-options" disabled className="text-tenue">
                               No hay obras sociales
                             </SelectItem>
                           ) : (
@@ -668,7 +668,7 @@ export default function RegistrarUsuarioPage() {
                               <SelectItem
                                 key={obra.id}
                                 value={obra.id}
-                                className="text-gray-200 cursor-pointer hover:!bg-teal-700/60 hover:!text-amber-200 focus:!bg-teal-700/60 focus:!text-amber-200 data-[state=checked]:!text-amber-300"
+                                className="text-texto-2 cursor-pointer hover:!bg-teal-700/60 hover:!text-aviso focus:!bg-teal-700/60 focus:!text-aviso data-[state=checked]:!text-aviso"
                               >
                                 {obra.nombre.trim().toLowerCase() === "particular"
                                   ? "Particular (sin obra social)"
@@ -679,29 +679,29 @@ export default function RegistrarUsuarioPage() {
                         </SelectContent>
                       </Select>
                       {obrasSocialesList.find((o) => o.id === selectedObraSocialId)?.nombre.trim().toLowerCase() === "particular" && (
-                        <p className="text-amber-300 text-xs">
+                        <p className="text-aviso text-xs">
                           Paciente particular: abona la sesión en efectivo o por QR del psicólogo.
                         </p>
                       )}
-                      {errorObrasSociales && <p className="text-red-500 text-xs">{errorObrasSociales}</p>}
+                      {errorObrasSociales && <p className="text-peligro text-xs">{errorObrasSociales}</p>}
                       {fieldErrors.selectedObraSocialId && (
-                        <p className="text-red-500 text-xs">{fieldErrors.selectedObraSocialId}</p>
+                        <p className="text-peligro text-xs">{fieldErrors.selectedObraSocialId}</p>
                       )}
                     </div>
                   </div>
                 )}
-                {fieldErrors.roleSelection && <p role="alert" className="text-red-500 text-xs">{fieldErrors.roleSelection}</p>}
+                {fieldErrors.roleSelection && <p role="alert" className="text-peligro text-xs">{fieldErrors.roleSelection}</p>}
               </div>
 
               {error && (
-                <p className="text-red-500 text-sm text-center bg-red-500/10 bg-opacity-30 p-3 rounded-md">{error}</p>
+                <p className="text-peligro text-sm text-center bg-red-500/10 bg-opacity-30 p-3 rounded-md">{error}</p>
               )}
 
               <CardFooter className="flex justify-end pt-6">
                 <Button
                   type="submit"
                   disabled={isLoading || isLoadingObrasSociales}
-                  className="bg-primary !text-primary-foreground hover:bg-primary/90 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-300"
+                  className="bg-primary !text-primary-foreground hover:bg-primary/90 text-foreground font-semibold py-3 px-6 rounded-lg transition-colors duration-300"
                 >
                   {isLoading ? "Registrando..." : "Registrar Usuario"}
                 </Button>

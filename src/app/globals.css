@@ -3,47 +3,122 @@
 
 @custom-variant dark (&:is(.dark *));
 
-:root { /* Light gray background */
-  --teal: #14b8a6; /* Mantenemos el teal para el icono */
+/* ---------- Colores del sistema ----------
+   Modo oscuro (el de siempre) por defecto. El modo claro se activa con la clase "claro" en <html>
+   (la pone el botón sol/luna de la barra). La portada y el login quedan siempre en oscuro:
+   van envueltos en .tema-oscuro, que vuelve a declarar los valores oscuros. */
+:root,
+.tema-oscuro {
   --radius: 0.625rem;
-  --background: #152B2B; /* Fondo principal */
-  --foreground: #ffffff; /* Letra blanca */
-  --card: #1D3434; /* Fondo segundo para cards */
-  --card-foreground: #ffffff; /* Letra blanca para card */
-  --popover: #1D3434; /* Fondo para popovers */
-  --popover-foreground: #ffffff; /* Letra blanca para popover */
-  --primary: #F1C77A; /* Color dorado como primario */
-  --primary-foreground: #152B2B; /* Fondo principal como texto en primario */
-  --secondary: #2B4243; /* Color de input como secundario */
-  --secondary-foreground: #ffffff; /* Letra blanca para secundario */
-  --muted: #2B4243; /* Color input para muted */
-  --muted-foreground: #F1C77A; /* Dorado como texto muted */
-  --accent: #F1C77A; /* Dorado como acento */
-  --accent-foreground: #152B2B; /* Fondo principal como texto en acento */
-  --destructive: #e53e3e; /* Mantenemos el rojo para destructivo */
-  --border: #2B4243; /* Color de input para bordes */
-  --input: #2B4243; /* Color especificado para inputs */
-  --ring: #F1C77A; /* Dorado para anillos de enfoque */
-  --chart-1: #14b8a6; /* Mantenemos colores de gráficos originales */
+  --background: #152A2A; /* Fondo principal */
+  --foreground: #ffffff;
+  --card: #1D3434; /* Tarjetas */
+  --card-foreground: #ffffff;
+  --popover: #1D3434;
+  --popover-foreground: #ffffff;
+  --primary: #F1C77A; /* Dorado: botones */
+  --primary-foreground: #1D3434;
+  --secondary: #2A4242; /* Campos y superficies elevadas */
+  --secondary-foreground: #ffffff;
+  --muted: #2A4242;
+  --muted-foreground: #F1C77A;
+  --accent: #F1C77A;
+  --accent-foreground: #1D3434;
+  --destructive: #e53e3e;
+  --border: #2A4A4A;
+  --input: #2A4242;
+  --ring: #F1C77A;
+  --chart-1: #14b8a6;
   --chart-2: #3182ce;
   --chart-3: #6574cd;
   --chart-4: #93c5fd;
   --chart-5: #6ee7b7;
-  --sidebar: #1D3434; /* Fondo segundo para sidebar */
-  --sidebar-foreground: #ffffff; /* Letra blanca para sidebar */
-  --sidebar-primary: #F1C77A; /* Dorado como primario para sidebar */
-  --sidebar-primary-foreground: #152B2B; /* Fondo principal como texto en primario de sidebar */
-  --sidebar-accent: #F1C77A; /* Dorado como acento para sidebar */
-  --sidebar-accent-foreground: #152B2B; /* Fondo principal como texto en acento de sidebar */
-  --sidebar-border: #2B4243; /* Color de input para bordes de sidebar */
-  --sidebar-ring: #F1C77A; /* Dorado para anillos de enfoque de sidebar */
+  --sidebar: #1D3434;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #F1C77A;
+  --sidebar-primary-foreground: #1D3434;
+  --sidebar-accent: #F1C77A;
+  --sidebar-accent-foreground: #1D3434;
+  --sidebar-border: #2A4A4A;
+  --sidebar-ring: #F1C77A;
+  /* Propios de MemoPsy */
+  --crema: #F6EFE2; /* Títulos y texto principal de la portada y los encabezados */
+  --dorado: #F1C77A; /* Dorado para textos, íconos y bordes */
+  --superficie: #2A4242; /* Campos, filas al pasar el mouse, fondos secundarios */
+  --borde: #2A4A4A;
+  --borde-fuerte: #4B5563;
+  --texto-2: #E5E7EB; /* Etiquetas */
+  --texto-suave: #D1D5DB; /* Descripciones */
+  --texto-tenue: #9CA3AF; /* Ayudas y datos secundarios */
+  --peligro: #F87171;
+  --aviso: #FCD34D;
+  --exito: #6EE7B7;
+  --info: #7DD3FC;
+  --naranja: #FDBA74;
+  --luz-fondo: rgba(62, 124, 122, 0.3); /* Manchas de luz de los encabezados */
+  --fondo-pestanas: rgba(0, 0, 0, 0.2); /* Barra de pestañas */
+  color-scheme: dark;
+}
+
+/* Modo claro: crema, blanco y el mismo verde petróleo para el texto (todos AA de WCAG) */
+:root.claro {
+  --background: #F5F1E8;
+  --foreground: #1D3434;
+  --card: #FFFFFF;
+  --card-foreground: #1D3434;
+  --popover: #FFFFFF;
+  --popover-foreground: #1D3434;
+  --primary: #F1C77A;
+  --primary-foreground: #1D3434;
+  --secondary: #F3EEE4;
+  --secondary-foreground: #1D3434;
+  --muted: #F3EEE4;
+  --muted-foreground: #8A5A00;
+  --accent: #F1C77A;
+  --accent-foreground: #1D3434;
+  --destructive: #B42318;
+  --border: #E2DCCF;
+  --input: #D8D1C2;
+  --ring: #8A5A00;
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #1D3434;
+  --sidebar-border: #E2DCCF;
+  --sidebar-ring: #8A5A00;
+  --crema: #1D3434;
+  --dorado: #8A5A00;
+  --superficie: #F3EEE4;
+  --borde: #E2DCCF;
+  --borde-fuerte: #CFC7B6;
+  --texto-2: #23393A;
+  --texto-suave: #4A5F5E;
+  --texto-tenue: #5A6D6C;
+  --peligro: #B42318;
+  --aviso: #8A4B00;
+  --exito: #1E7A4C;
+  --info: #1D5F8A;
+  --naranja: #9A4A00;
+  --luz-fondo: rgba(127, 179, 166, 0.35);
+  --fondo-pestanas: #EDE7DA;
+  color-scheme: light;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: "Plus Jakarta Sans Variable", ui-sans-serif, system-ui, sans-serif;
-  --color-crema: #F6EFE2;
+  --color-crema: var(--crema);
+  --color-dorado: var(--dorado);
+  --color-superficie: var(--superficie);
+  --color-borde: var(--borde);
+  --color-borde-fuerte: var(--borde-fuerte);
+  --color-texto-2: var(--texto-2);
+  --color-suave: var(--texto-suave);
+  --color-tenue: var(--texto-tenue);
+  --color-peligro: var(--peligro);
+  --color-aviso: var(--aviso);
+  --color-exito: var(--exito);
+  --color-info: var(--info);
+  --color-naranja: var(--naranja);
   --color-salvia: #7FB3A6;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -83,47 +158,14 @@
 body {
   font-family: var(--font-sans);
 }
-.dark {
-  --background: #152B2B; /* Fondo principal */
-  --foreground: #ffffff; /* Letra blanca */
-  --card: #1D3434; /* Fondo segundo para cards */
-  --card-foreground: #ffffff; /* Letra blanca para card */
-  --popover: #1D3434; /* Fondo para popovers */
-  --popover-foreground: #ffffff; /* Letra blanca para popover */
-  --primary: #F1C77A; /* Color dorado como primario */
-  --primary-foreground: #152B2B; /* Fondo principal como texto en primario */
-  --secondary: #2B4243; /* Color de input como secundario */
-  --secondary-foreground: #ffffff; /* Letra blanca para secundario */
-  --muted: #2B4243; /* Color input para muted */
-  --muted-foreground: #F1C77A; /* Dorado como texto muted */
-  --accent: #F1C77A; /* Dorado como acento */
-  --accent-foreground: #152B2B; /* Fondo principal como texto en acento */
-  --destructive: #e53e3e; /* Mantenemos el rojo para destructivo */
-  --border: #2B4243; /* Color de input para bordes */
-  --input: #2B4243; /* Color especificado para inputs */
-  --ring: #F1C77A; /* Dorado para anillos de enfoque */
-  --chart-1: #14b8a6; /* Mantenemos colores de gráficos originales */
-  --chart-2: #3182ce;
-  --chart-3: #6574cd;
-  --chart-4: #93c5fd;
-  --chart-5: #6ee7b7;
-  --sidebar: #1D3434; /* Fondo segundo para sidebar */
-  --sidebar-foreground: #ffffff; /* Letra blanca para sidebar */
-  --sidebar-primary: #F1C77A; /* Dorado como primario para sidebar */
-  --sidebar-primary-foreground: #152B2B; /* Fondo principal como texto en primario de sidebar */
-  --sidebar-accent: #F1C77A; /* Dorado como acento para sidebar */
-  --sidebar-accent-foreground: #152B2B; /* Fondo principal como texto en acento de sidebar */
-  --sidebar-border: #2B4243; /* Color de input para bordes de sidebar */
-  --sidebar-ring: #F1C77A; /* Dorado para anillos de enfoque de sidebar */
-}
-/* Cuando el navegador autocompleta un campo le pone su propio fondo claro;
-   esto mantiene el fondo oscuro y la letra blanca de MemoPsy */
+/* Cuando el navegador autocompleta un campo le pone su propio fondo;
+   esto mantiene los colores de MemoPsy en los dos modos */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus {
-  -webkit-box-shadow: 0 0 0 1000px #2A4242 inset !important;
-  -webkit-text-fill-color: #ffffff !important;
-  caret-color: #F1C77A;
+  -webkit-box-shadow: 0 0 0 1000px var(--superficie) inset !important;
+  -webkit-text-fill-color: var(--foreground) !important;
+  caret-color: var(--dorado);
   transition: background-color 9999s ease-in-out 0s;
 }
 .input-password-toggle {
@@ -137,15 +179,14 @@ input:-webkit-autofill:focus {
     @apply bg-background text-foreground;
   }
 }
-/* El cursor de escritura en dorado, para que se vea en todos los campos sobre el fondo oscuro */
+/* El cursor de escritura en dorado, para que se vea en todos los campos */
 input,
 textarea,
 [contenteditable="true"] {
-  caret-color: #F1C77A;
+  caret-color: var(--dorado);
 }
 .campo {
-  @apply h-14 w-full rounded-lg border border-border bg-secondary px-4 text-white placeholder:text-white/60;
-  color-scheme: dark;
+  @apply h-14 w-full rounded-lg border border-border bg-secondary px-4 text-foreground placeholder:text-foreground/60;
 }
 .campo:focus {
   @apply border-primary outline-none;

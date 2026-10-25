@@ -173,11 +173,11 @@ export default function SesionesPage() {
   // Estados del turno: color del badge e id a partir del nombre.
   const colorEstado = (nombre?: string) => {
     switch (nombre) {
-      case "Confirmada": return "border-emerald-500 text-emerald-300";
-      case "Cancelada": return "border-red-500 text-red-300";
-      case "Finalizada": return "border-sky-500 text-sky-300";
-      case "Reprogramada": return "border-orange-400 text-orange-300";
-      default: return "border-amber-400 text-amber-300"; // Pendiente u otros
+      case "Confirmada": return "border-emerald-500 text-exito";
+      case "Cancelada": return "border-red-500 text-peligro";
+      case "Finalizada": return "border-sky-500 text-info";
+      case "Reprogramada": return "border-orange-400 text-naranja";
+      default: return "border-amber-400 text-aviso"; // Pendiente u otros
     }
   };
   const estadoIdPorNombre = (nombre: string) =>
@@ -770,7 +770,7 @@ const handleUpdateSesion = async () => {
           modifiersClassNames={{
             conTurno:
               // Punto dorado; en el día de hoy (fondo dorado) va oscuro para que se vea
-              "relative after:pointer-events-none after:absolute after:bottom-0.5 after:left-1/2 after:h-1.5 after:w-1.5 after:-translate-x-1/2 after:rounded-full after:bg-[#F1C77A] data-[today=true]:after:bg-[#142B2A]",
+              "relative after:pointer-events-none after:absolute after:bottom-0.5 after:left-1/2 after:h-1.5 after:w-1.5 after:-translate-x-1/2 after:rounded-full after:bg-primary data-[today=true]:after:bg-background",
           }}
           // En "Registrar Sesiones" no se pueden elegir sábados ni domingos
           disabled={filterType === "all" ? { dayOfWeek: DIAS_NO_HABILES } : undefined}
@@ -782,48 +782,48 @@ const handleUpdateSesion = async () => {
             }
           }}
           className="self-center rounded-md border lg:self-start"
-          style={{ backgroundColor: "#142B2A", borderRadius: "8px", padding: "10px" }}
+          style={{ backgroundColor: "var(--background)", borderRadius: "8px", padding: "10px" }}
           locale={es}
         />
 
         <div className="w-full min-w-0 space-y-2">
-          <h4 className="font-semibold text-white">
+          <h4 className="font-semibold text-foreground">
             Sesiones para {format(selectedDate, "dd/MM/yyyy", { locale: es })}
           </h4>
           <div className="space-y-3">
             {getSesionesForDate(selectedDate, filterType).map((sesion) => (
-              <Card key={sesion.id} className="p-3" style={{ backgroundColor: "#142B2A" }}>
+              <Card key={sesion.id} className="p-3" style={{ backgroundColor: "var(--background)" }}>
                 <div className="flex items-start justify-between"> {/* items-start for alignment */}
                     <div className="space-y-1 flex-grow"> {/* This div wraps the session details */}
                         <div className="flex items-center space-x-2">
-                            <Clock className="w-4 h-4" style={{ color: "#F1C77A" }} />
-                            <span className="text-sm text-white">
+                            <Clock className="w-4 h-4" style={{ color: "var(--dorado)" }} />
+                            <span className="text-sm text-foreground">
                                 {format(parseISO(sesion.fechaHoraInicio), "HH:mm")} -{" "}
                                 {format(parseISO(sesion.fechaHoraFin), "HH:mm")}
                             </span>
                         </div>
                         {sesion.psicologo && (
                             <div className="flex items-center space-x-2">
-                                <Brain className="w-4 h-4 text-teal-400" />
-                                <span className="text-sm text-gray-300">
+                                <Brain className="w-4 h-4 text-info" />
+                                <span className="text-sm text-suave">
                                     Psicóloga/o {sesion.psicologo.persona.nombre} {sesion.psicologo.persona.apellido}
                                 </span>
                             </div>
                         )}
                         {sesion.modalidad && (
                             <div className="flex items-center space-x-2">
-                                <MapPin className="w-4 h-4 text-green-400" />
-                                <span className="text-sm text-gray-300">{sesion.modalidad.nombre}</span>
+                                <MapPin className="w-4 h-4 text-exito" />
+                                <span className="text-sm text-suave">{sesion.modalidad.nombre}</span>
                             </div>
                         )}
                         {sesion.enlaceVideollamada && sesion.estado?.nombre !== "Cancelada" && sesion.estado?.nombre !== "Finalizada" && (
                             <div className="flex items-center space-x-2">
-                                <Video className="w-4 h-4 text-sky-400" />
+                                <Video className="w-4 h-4 text-info" />
                                 <a
                                     href={sesion.enlaceVideollamada}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-sm text-sky-400 underline hover:text-sky-300"
+                                    className="text-sm text-info underline hover:text-info"
                                 >
                                     Unirse a la videollamada
                                 </a>
@@ -831,7 +831,7 @@ const handleUpdateSesion = async () => {
                         )}
                         {sesion.estado && (
                             <div className="flex items-center space-x-2">
-                                <Activity className="w-4 h-4 text-orange-400" />
+                                <Activity className="w-4 h-4 text-naranja" />
                                 <Badge variant="outline" className={cn("text-xs", colorEstado(sesion.estado.nombre))}>
                                     {sesion.estado.nombre}
                                 </Badge>
@@ -840,27 +840,27 @@ const handleUpdateSesion = async () => {
                         {sesion.pacientes && sesion.pacientes.length > 0 && (
                             <div className="flex items-center space-x-2">
                                 <Users className="w-4 h-4 text-purple-400" />
-                                <span className="text-sm text-gray-300">
+                                <span className="text-sm text-suave">
                                     {sesion.pacientes.map((p) => `${p.persona.nombre} ${p.persona.apellido}`).join(", ")}
                                 </span>
                             </div>
                         )}
                         {sesion.pago && (
                             <div className="flex flex-wrap items-center gap-2">
-                                <Wallet className="w-4 h-4 text-amber-300" />
+                                <Wallet className="w-4 h-4 text-aviso" />
                                 <Badge
                                     variant="outline"
                                     className={cn(
                                         "text-xs",
                                         sesion.pago.estado === "Pagado"
-                                            ? "border-emerald-500 text-emerald-300"
-                                            : "border-amber-400 text-amber-300",
+                                            ? "border-emerald-500 text-exito"
+                                            : "border-amber-400 text-aviso",
                                     )}
                                 >
                                     {sesion.pago.estado}
                                 </Badge>
                                 {sesion.pago.estado === "Pagado" && (
-                                    <span className="text-xs text-gray-300">
+                                    <span className="text-xs text-suave">
                                         {sesion.pago.medio?.descripcion}
                                         {sesion.pago.monto != null &&
                                             ` · $ ${sesion.pago.monto.toLocaleString("es-AR", { minimumFractionDigits: 2 })}`}
@@ -883,12 +883,12 @@ const handleUpdateSesion = async () => {
                     if (!puedeEditar && !verPago && !puedeReprogramar) return null
                     const claseBoton = "h-8 gap-1.5 rounded-full border bg-transparent px-3 text-xs font-medium"
                     return (
-                        <div className="mt-3 flex flex-wrap gap-2 border-t border-gray-700/60 pt-3">
+                        <div className="mt-3 flex flex-wrap gap-2 border-t border-borde/60 pt-3">
                             {puedeEditar && sesion.estado?.nombre !== "Confirmada" && (
                                 <Button
                                     variant="outline"
                                     onClick={() => cambiarEstadoSesion(sesion, "Confirmada")}
-                                    className={cn(claseBoton, "border-emerald-500/60 text-emerald-300 hover:bg-emerald-500/15 hover:text-emerald-200")}
+                                    className={cn(claseBoton, "border-emerald-500/60 text-exito hover:bg-emerald-500/15 hover:text-exito")}
                                 >
                                     <Check className="h-3.5 w-3.5" />
                                     Confirmar
@@ -898,7 +898,7 @@ const handleUpdateSesion = async () => {
                                 <Button
                                     variant="outline"
                                     onClick={() => cambiarEstadoSesion(sesion, "Cancelada")}
-                                    className={cn(claseBoton, "border-red-500/60 text-red-300 hover:bg-red-500/15 hover:text-red-200")}
+                                    className={cn(claseBoton, "border-red-500/60 text-peligro hover:bg-red-500/15 hover:text-peligro")}
                                 >
                                     <X className="h-3.5 w-3.5" />
                                     Cancelar
@@ -908,7 +908,7 @@ const handleUpdateSesion = async () => {
                                 <Button
                                     variant="outline"
                                     onClick={() => setSesionPago(sesion)}
-                                    className={cn(claseBoton, "border-amber-400/60 text-amber-300 hover:bg-amber-400/15 hover:text-amber-200")}
+                                    className={cn(claseBoton, "border-amber-400/60 text-aviso hover:bg-amber-400/15 hover:text-aviso")}
                                 >
                                     <Wallet className="h-3.5 w-3.5" />
                                     Pago
@@ -918,7 +918,7 @@ const handleUpdateSesion = async () => {
                                 <Button
                                     variant="outline"
                                     onClick={() => setSesionReprogramar(sesion)}
-                                    className={cn(claseBoton, "border-orange-400/60 text-orange-300 hover:bg-orange-400/15 hover:text-orange-200")}
+                                    className={cn(claseBoton, "border-orange-400/60 text-naranja hover:bg-orange-400/15 hover:text-naranja")}
                                 >
                                     <CalendarClock className="h-3.5 w-3.5" />
                                     Reprogramar
@@ -928,7 +928,7 @@ const handleUpdateSesion = async () => {
                                 <Button
                                     variant="outline"
                                     onClick={() => handleOpenEditDialog(sesion)}
-                                    className={cn(claseBoton, "border-gray-500/60 text-gray-200 hover:bg-white/10 hover:text-white")}
+                                    className={cn(claseBoton, "border-borde-fuerte/60 text-texto-2 hover:bg-foreground/10 hover:text-foreground")}
                                 >
                                     <Pencil className="h-3.5 w-3.5" />
                                     Editar
@@ -940,7 +940,7 @@ const handleUpdateSesion = async () => {
               </Card>
             ))}
             {getSesionesForDate(selectedDate, filterType).length === 0 && (
-              <p className="text-gray-400 text-sm text-center py-4">
+              <p className="text-tenue text-sm text-center py-4">
                 No hay sesiones programadas para esta fecha. Los días con turnos están marcados con un punto en el calendario.
               </p>
             )}
@@ -952,9 +952,9 @@ const handleUpdateSesion = async () => {
 
   if (status === "loading" || loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-4" style={{ backgroundColor: '#152A2A' }}>
-            <Loader2 className="h-16 w-16 animate-spin text-[#F1C77A] mb-4" />
-            <TypographyP className="text-white">Cargando...</TypographyP>
+      <div className="flex flex-col items-center justify-center min-h-screen p-4" style={{ backgroundColor: "var(--background)" }}>
+            <Loader2 className="h-16 w-16 animate-spin text-dorado mb-4" />
+            <TypographyP className="text-foreground">Cargando...</TypographyP>
         </div>
     )
   }
@@ -1024,13 +1024,13 @@ const handleUpdateSesion = async () => {
 
             {puedeRegistrarSesiones && (
               <TabsContent value="registrar" className="space-y-4">
-                <Card style={{ backgroundColor: "#1D3434" }}>
+                <Card style={{ backgroundColor: "var(--card)" }}>
                   <CardHeader>
-                    <CardTitle className="text-white flex items-center space-x-2">
-                      <Plus className="w-5 h-5" style={{ color: "#F1C77A" }} />
+                    <CardTitle className="text-foreground flex items-center space-x-2">
+                      <Plus className="w-5 h-5" style={{ color: "var(--dorado)" }} />
                       <span>Calendario de Registro de Sesiones</span>
                     </CardTitle>
-                    <CardDescription className="text-gray-300">
+                    <CardDescription className="text-suave">
                       Selecciona una fecha para programar una nueva sesión
                     </CardDescription>
                   </CardHeader>
@@ -1050,25 +1050,25 @@ const handleUpdateSesion = async () => {
                           }}
                         >
                           <DialogTrigger asChild>
-                            <Button className="w-full" style={{ backgroundColor: "#F1C77A", color: "#1D3434" }}>
+                            <Button className="w-full" style={{ backgroundColor: "var(--primary)", color: "var(--primary-foreground)" }}>
                               <Plus className="w-4 h-4 mr-2" />
                               Nueva Sesión
                             </Button>
                           </DialogTrigger>
                           <DialogContent
                             className="max-h-[90dvh] overflow-y-auto p-4 sm:max-w-[500px] sm:p-6"
-                            style={{ backgroundColor: "#1D3434", border: "1px solid #F1C77A" }}
+                            style={{ backgroundColor: "var(--card)", border: "1px solid var(--dorado)" }}
                           >
                             <DialogHeader>
-                              <DialogTitle className="text-white">Registrar Nueva Sesión</DialogTitle>
-                              <DialogDescription className="text-gray-300">
+                              <DialogTitle className="text-foreground">Registrar Nueva Sesión</DialogTitle>
+                              <DialogDescription className="text-suave">
                                 Complete los datos para programar una nueva sesión.
                               </DialogDescription>
                             </DialogHeader>
                             <div className="grid gap-4 py-4">
                               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <div className="space-y-2">
-                                  <Label htmlFor="fechaInicio" className="text-white">
+                                  <Label htmlFor="fechaInicio" className="text-foreground">
                                     Fecha Inicio
                                   </Label>
                                   <Input
@@ -1077,16 +1077,16 @@ const handleUpdateSesion = async () => {
                                     value={formData.fechaInicio}
                                     onChange={(e) => setFormData({ ...formData, fechaInicio: e.target.value })}
                                     className={cn(
-                                      "bg-[#152A2A] text-white border-gray-600",
+                                      "bg-background text-foreground border-borde-fuerte",
                                       formErrors.fechaInicio && "border-red-500",
                                     )}
                                   />
                                   {formErrors.fechaInicio && (
-                                    <p className="text-xs text-red-500">{formErrors.fechaInicio}</p>
+                                    <p className="text-xs text-peligro">{formErrors.fechaInicio}</p>
                                   )}
                                 </div>
                                 <div className="space-y-2">
-                                  <Label htmlFor="horaInicio" className="text-white">
+                                  <Label htmlFor="horaInicio" className="text-foreground">
                                     Hora Inicio
                                   </Label>
                                   <Input
@@ -1095,18 +1095,18 @@ const handleUpdateSesion = async () => {
                                     value={formData.horaInicio}
                                     onChange={(e) => setFormData({ ...formData, horaInicio: e.target.value })}
                                     className={cn(
-                                      "bg-[#152A2A] text-white border-gray-600",
+                                      "bg-background text-foreground border-borde-fuerte",
                                       formErrors.horaInicio && "border-red-500",
                                     )}
                                   />
                                   {formErrors.horaInicio && (
-                                    <p className="text-xs text-red-500">{formErrors.horaInicio}</p>
+                                    <p className="text-xs text-peligro">{formErrors.horaInicio}</p>
                                   )}
                                 </div>
                               </div>
                               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <div className="space-y-2">
-                                  <Label htmlFor="fechaFin" className="text-white">
+                                  <Label htmlFor="fechaFin" className="text-foreground">
                                     Fecha Fin
                                   </Label>
                                   <Input
@@ -1115,14 +1115,14 @@ const handleUpdateSesion = async () => {
                                     value={formData.fechaFin}
                                     onChange={(e) => setFormData({ ...formData, fechaFin: e.target.value })}
                                     className={cn(
-                                      "bg-[#152A2A] text-white border-gray-600",
+                                      "bg-background text-foreground border-borde-fuerte",
                                       formErrors.fechaFin && "border-red-500",
                                     )}
                                   />
-                                  {formErrors.fechaFin && <p className="text-xs text-red-500">{formErrors.fechaFin}</p>}
+                                  {formErrors.fechaFin && <p className="text-xs text-peligro">{formErrors.fechaFin}</p>}
                                 </div>
                                 <div className="space-y-2">
-                                  <Label htmlFor="horaFin" className="text-white">
+                                  <Label htmlFor="horaFin" className="text-foreground">
                                     Hora Fin
                                   </Label>
                                   <Input
@@ -1131,17 +1131,17 @@ const handleUpdateSesion = async () => {
                                     value={formData.horaFin}
                                     onChange={(e) => setFormData({ ...formData, horaFin: e.target.value })}
                                     className={cn(
-                                      "bg-[#152A2A] text-white border-gray-600",
+                                      "bg-background text-foreground border-borde-fuerte",
                                       formErrors.horaFin && "border-red-500",
                                     )}
                                   />
-                                  {formErrors.horaFin && <p className="text-xs text-red-500">{formErrors.horaFin}</p>}
+                                  {formErrors.horaFin && <p className="text-xs text-peligro">{formErrors.horaFin}</p>}
                                 </div>
                               </div>
 
                               {/* Psicólogo con búsqueda */}
                               <div className="space-y-2">
-                                <Label htmlFor="psicologo_search_create_input" className="text-white">
+                                <Label htmlFor="psicologo_search_create_input" className="text-foreground">
                                   Psicólogo
                                 </Label>
                                 <div id="create-psicologo-popover-wrapper" className="relative">
@@ -1156,17 +1156,17 @@ const handleUpdateSesion = async () => {
                                       if (formData.psicologoId) searchPsicologos("", setPsicologoSearchResults)
                                     }}
                                     className={cn(
-                                      "bg-[#152A2A] text-white border-gray-600",
+                                      "bg-background text-foreground border-borde-fuerte",
                                       formErrors.psicologoId && "border-red-500",
                                     )}
                                   />
                                   {isPsicologoPopoverOpen && (
-                                    <div className="absolute z-50 w-full mt-1 bg-[#1D3434] border border-gray-600 rounded-md shadow-lg max-h-60 overflow-auto">
+                                    <div className="absolute z-50 w-full mt-1 bg-card border border-borde-fuerte rounded-md shadow-lg max-h-60 overflow-auto">
                                       {psicologoSearchResults.length > 0 ? (
                                         psicologoSearchResults.map((psicologo) => (
                                           <div
                                             key={psicologo.id}
-                                            className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-[#152A2A] text-white border-b border-gray-700 last:border-b-0"
+                                            className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-background text-foreground border-b border-borde last:border-b-0"
                                             onClick={() => handleSelectPsicologo(psicologo)}
                                           >
                                             <Check
@@ -1178,13 +1178,13 @@ const handleUpdateSesion = async () => {
                                             <div className="flex min-w-0 flex-col">
                                               <span>{psicologo.persona.nombreCompleto}</span>
                                               {psicologo.especialidad && (
-                                                <span className="text-xs text-teal-300">{psicologo.especialidad}</span>
+                                                <span className="text-xs text-info">{psicologo.especialidad}</span>
                                               )}
                                             </div>
                                           </div>
                                         ))
                                       ) : (
-                                        <div className="px-3 py-6 text-center text-sm text-gray-400">
+                                        <div className="px-3 py-6 text-center text-sm text-tenue">
                                           No se encontraron psicólogos
                                         </div>
                                       )}
@@ -1192,13 +1192,13 @@ const handleUpdateSesion = async () => {
                                   )}
                                 </div>
                                 {formErrors.psicologoId && (
-                                  <p className="text-xs text-red-500">{formErrors.psicologoId}</p>
+                                  <p className="text-xs text-peligro">{formErrors.psicologoId}</p>
                                 )}
                               </div>
 
                               {/* Modalidad */}
                               <div className="space-y-2">
-                                <Label htmlFor="modalidad" className="text-white">
+                                <Label htmlFor="modalidad" className="text-foreground">
                                   Modalidad
                                 </Label>
                                 <Select
@@ -1207,29 +1207,29 @@ const handleUpdateSesion = async () => {
                                 >
                                   <SelectTrigger
                                     className={cn(
-                                      "bg-[#152A2A] text-white border-gray-600",
+                                      "bg-background text-foreground border-borde-fuerte",
                                       formErrors.modalidadId && "border-red-500",
                                     )}
                                   >
                                     <SelectValue placeholder="Seleccionar modalidad" />
                                   </SelectTrigger>
-                                  <SelectContent className="bg-[#1D3434] text-white border-gray-600">
+                                  <SelectContent className="bg-card text-foreground border-borde-fuerte">
                                     {modalidades.map((modalidad) => (
-                                      <SelectItem key={modalidad.id} value={modalidad.id} className="text-white">
+                                      <SelectItem key={modalidad.id} value={modalidad.id} className="text-foreground">
                                         {modalidad.nombre}
                                       </SelectItem>
                                     ))}
                                   </SelectContent>
                                 </Select>
                                 {formErrors.modalidadId && (
-                                  <p className="text-xs text-red-500">{formErrors.modalidadId}</p>
+                                  <p className="text-xs text-peligro">{formErrors.modalidadId}</p>
                                 )}
                               </div>
 
                               {/* Enlace de videollamada (RF 3.4): solo para sesiones remotas */}
                               {esModalidadRemota(formData.modalidadId) && (
                                 <div className="space-y-2">
-                                  <Label htmlFor="enlaceVideollamada" className="text-white">
+                                  <Label htmlFor="enlaceVideollamada" className="text-foreground">
                                     Enlace de videollamada
                                   </Label>
                                   <Input
@@ -1238,15 +1238,15 @@ const handleUpdateSesion = async () => {
                                     placeholder="Se genera solo si lo dejás vacío"
                                     value={formData.enlaceVideollamada}
                                     onChange={(e) => setFormData({ ...formData, enlaceVideollamada: e.target.value })}
-                                    className="bg-[#152A2A] text-white border-gray-600"
+                                    className="bg-background text-foreground border-borde-fuerte"
                                   />
-                                  <p className="text-xs text-gray-400">Si lo dejás vacío, MemoPsy crea el enlace automáticamente. Si ya tenés uno, pegalo acá.</p>
+                                  <p className="text-xs text-tenue">Si lo dejás vacío, MemoPsy crea el enlace automáticamente. Si ya tenés uno, pegalo acá.</p>
                                 </div>
                               )}
 
                               {/* Estado */}
                               <div className="space-y-2">
-                                <Label htmlFor="estado" className="text-white">
+                                <Label htmlFor="estado" className="text-foreground">
                                   Estado
                                 </Label>
                                 <Select
@@ -1255,40 +1255,40 @@ const handleUpdateSesion = async () => {
                                 >
                                   <SelectTrigger
                                     className={cn(
-                                      "bg-[#152A2A] text-white border-gray-600",
+                                      "bg-background text-foreground border-borde-fuerte",
                                       formErrors.estadoId && "border-red-500",
                                     )}
                                   >
                                     <SelectValue placeholder="Seleccionar estado" />
                                   </SelectTrigger>
-                                  <SelectContent className="bg-[#1D3434] text-white border-gray-600">
+                                  <SelectContent className="bg-card text-foreground border-borde-fuerte">
                                     {estados.map((estado) => (
-                                      <SelectItem key={estado.id} value={estado.id} className="text-white">
+                                      <SelectItem key={estado.id} value={estado.id} className="text-foreground">
                                         {estado.nombre}
                                       </SelectItem>
                                     ))}
                                   </SelectContent>
                                 </Select>
-                                {formErrors.estadoId && <p className="text-xs text-red-500">{formErrors.estadoId}</p>}
+                                {formErrors.estadoId && <p className="text-xs text-peligro">{formErrors.estadoId}</p>}
                               </div>
 
                               {/* Pacientes con búsqueda y selección múltiple */}
                               <div className="space-y-2">
-                                <Label htmlFor="paciente_search_create_input" className="text-white">
+                                <Label htmlFor="paciente_search_create_input" className="text-foreground">
                                   Pacientes
                                 </Label>
                                 <div
                                   className={cn(
-                                    "min-h-10 p-2 rounded-md border bg-[#152A2A] text-white w-full",
+                                    "min-h-10 p-2 rounded-md border bg-background text-foreground w-full",
                                     formErrors.pacientesIds && "border-red-500",
-                                    !formErrors.pacientesIds && "border-gray-600",
+                                    !formErrors.pacientesIds && "border-borde-fuerte",
                                   )}
                                 >
                                   <div className="flex flex-wrap gap-2 mb-2">
                                     {selectedPacientes.map((paciente) => (
                                       <Badge
                                         key={paciente.id}
-                                        className="bg-[#F1C77A] text-[#1D3434] hover:bg-[#e0b66e]"
+                                        className="bg-primary text-primary-foreground hover:bg-primary/90"
                                       >
                                         {paciente.persona.nombreCompleto}
                                         <button
@@ -1309,12 +1309,12 @@ const handleUpdateSesion = async () => {
                                       value={pacienteSearch}
                                       onChange={(e) => setPacienteSearch(e.target.value)}
                                       onFocus={() => setIsPacientePopoverOpen(true)}
-                                      className="bg-transparent border-0 text-white placeholder:text-gray-400 focus:ring-0 focus:outline-none p-0 w-full"
+                                      className="bg-transparent border-0 text-foreground placeholder:text-tenue focus:ring-0 focus:outline-none p-0 w-full"
                                     />
                                     {isPacientePopoverOpen && (
-                                      <div className="absolute z-50 w-full mt-1 bg-[#1D3434] border border-gray-600 rounded-md shadow-lg max-h-60 overflow-auto">
+                                      <div className="absolute z-50 w-full mt-1 bg-card border border-borde-fuerte rounded-md shadow-lg max-h-60 overflow-auto">
                                         {pacienteSearchResults.length > 0 && pacienteSearch.trim().length < 2 && (
-                                          <div className="px-3 pt-2 pb-1 text-xs font-medium uppercase tracking-wide text-gray-400">
+                                          <div className="px-3 pt-2 pb-1 text-xs font-medium uppercase tracking-wide text-tenue">
                                             Pacientes de este psicólogo
                                           </div>
                                         )}
@@ -1322,7 +1322,7 @@ const handleUpdateSesion = async () => {
                                           pacienteSearchResults.map((paciente) => (
                                             <div
                                               key={paciente.id}
-                                              className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-[#152A2A] text-white border-b border-gray-700 last:border-b-0"
+                                              className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-background text-foreground border-b border-borde last:border-b-0"
                                               onClick={() => handleSelectPaciente(paciente)}
                                             >
                                               <Check
@@ -1335,12 +1335,12 @@ const handleUpdateSesion = async () => {
                                               />
                                               <span>{paciente.persona.nombreCompleto}</span>
                                               {paciente.esDelPsicologo && pacienteSearch.trim().length > 1 && (
-                                                <span className="ml-auto text-xs text-teal-300">Su paciente</span>
+                                                <span className="ml-auto text-xs text-info">Su paciente</span>
                                               )}
                                             </div>
                                           ))
                                         ) : (
-                                          <div className="px-3 py-6 text-center text-sm text-gray-400">
+                                          <div className="px-3 py-6 text-center text-sm text-tenue">
                                             {pacienteSearch.trim().length > 1
                                               ? "No se encontraron pacientes"
                                               : formData.psicologoId
@@ -1353,7 +1353,7 @@ const handleUpdateSesion = async () => {
                                   </div>
                                 </div>
                                 {formErrors.pacientesIds && (
-                                  <p className="text-xs text-red-500">{formErrors.pacientesIds}</p>
+                                  <p className="text-xs text-peligro">{formErrors.pacientesIds}</p>
                                 )}
                               </div>
                             </div>
@@ -1361,7 +1361,7 @@ const handleUpdateSesion = async () => {
                               <Button
                                 variant="outline"
                                 onClick={() => setIsCreateDialogOpen(false)}
-                                className="w-full border-gray-600 text-gray-300 sm:w-auto"
+                                className="w-full border-borde-fuerte text-suave sm:w-auto"
                                 disabled={isSubmitting}
                               >
                                 Cancelar
@@ -1369,7 +1369,7 @@ const handleUpdateSesion = async () => {
                               <Button
                                 onClick={handleCreateSesion}
                                 className="w-full sm:w-auto"
-                                style={{ backgroundColor: "#F1C77A", color: "#1D3434" }}
+                                style={{ backgroundColor: "var(--primary)", color: "var(--primary-foreground)" }}
                                 disabled={isSubmitting}
                               >
                                 {isSubmitting ? "Creando..." : "Crear Sesión"}
@@ -1386,19 +1386,19 @@ const handleUpdateSesion = async () => {
 
             {session?.user?.psicologoId && (
             <TabsContent value="psicologo" className="space-y-4">
-              <Card style={{ backgroundColor: "#1D3434" }}>
+              <Card style={{ backgroundColor: "var(--card)" }}>
                 <CardHeader>
-                  <CardTitle className="text-white flex items-center space-x-2">
-                    <Brain className="w-5 h-5" style={{ color: "#F1C77A" }} />
+                  <CardTitle className="text-foreground flex items-center space-x-2">
+                    <Brain className="w-5 h-5" style={{ color: "var(--dorado)" }} />
                     <span>Mis Sesiones como Psicólogo</span>
                   </CardTitle>
-                  <CardDescription className="text-gray-300">
+                  <CardDescription className="text-suave">
                     Sesiones donde figuras como psicólogo asignado
                   </CardDescription>
                   <Button
                     variant="outline"
                     onClick={() => setHorariosAbierto(true)}
-                    className="mt-2 w-full gap-2 border-[#F1C77A]/60 text-[#F1C77A] hover:bg-[#F1C77A]/10 sm:w-fit"
+                    className="mt-2 w-full gap-2 border-dorado/60 text-dorado hover:bg-primary/10 sm:w-fit"
                   >
                     <CalendarClock className="h-4 w-4" />
                     Horarios para reprogramar
@@ -1410,13 +1410,13 @@ const handleUpdateSesion = async () => {
             )}
             {session?.user?.pacienteId && (
             <TabsContent value="paciente" className="space-y-4">
-              <Card style={{ backgroundColor: "#1D3434" }}>
+              <Card style={{ backgroundColor: "var(--card)" }}>
                 <CardHeader>
-                  <CardTitle className="text-white flex items-center space-x-2">
-                    <User className="w-5 h-5" style={{ color: "#F1C77A" }} />
+                  <CardTitle className="text-foreground flex items-center space-x-2">
+                    <User className="w-5 h-5" style={{ color: "var(--dorado)" }} />
                     <span>Mis Sesiones como Paciente</span>
                   </CardTitle>
-                  <CardDescription className="text-gray-300">Sesiones donde figuras como paciente</CardDescription>
+                  <CardDescription className="text-suave">Sesiones donde figuras como paciente</CardDescription>
                 </CardHeader>
                 <CardContent>{renderCalendarWithSessions("paciente")}</CardContent>
               </Card>
@@ -1425,10 +1425,10 @@ const handleUpdateSesion = async () => {
           </Tabs>
         ) : (
           <div className="text-center mt-12">
-            <div className="p-8 rounded-2xl max-w-md mx-auto" style={{ backgroundColor: "#1D3434" }}>
-              <CalendarIcon className="w-16 h-16 mx-auto mb-6" style={{ color: "#F1C77A" }} />
-              <h3 className="text-2xl font-semibold text-white mb-4">Sin Acceso a Sesiones</h3>
-              <p className="text-gray-300">
+            <div className="p-8 rounded-2xl max-w-md mx-auto" style={{ backgroundColor: "var(--card)" }}>
+              <CalendarIcon className="w-16 h-16 mx-auto mb-6" style={{ color: "var(--dorado)" }} />
+              <h3 className="text-2xl font-semibold text-foreground mb-4">Sin Acceso a Sesiones</h3>
+              <p className="text-suave">
                 No tenés los permisos necesarios para ver las sesiones. Si creés que es un error,
                 consultá con el administrador del sistema.
               </p>
@@ -1471,10 +1471,10 @@ const handleUpdateSesion = async () => {
         }
         setIsEditDialogOpen(isOpen);
     }}>
-        <DialogContent className="max-h-[90dvh] p-4 sm:max-w-[500px] sm:p-6" style={{ backgroundColor: "#1D3434", border: "1px solid #F1C77A" }}>
+        <DialogContent className="max-h-[90dvh] p-4 sm:max-w-[500px] sm:p-6" style={{ backgroundColor: "var(--card)", border: "1px solid var(--dorado)" }}>
             <DialogHeader>
-                <DialogTitle className="text-white">Editar Sesión</DialogTitle>
-                <DialogDescription className="text-gray-300">
+                <DialogTitle className="text-foreground">Editar Sesión</DialogTitle>
+                <DialogDescription className="text-suave">
                     Modifique los datos de la sesión.
                 </DialogDescription>
             </DialogHeader>
@@ -1482,33 +1482,33 @@ const handleUpdateSesion = async () => {
                 {/* Fecha Inicio y Hora Inicio */}
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div className="space-y-2">
-                        <Label htmlFor="edit_fechaInicio" className="text-white">Fecha Inicio</Label>
-                        <Input id="edit_fechaInicio" type="date" value={editFormData.fechaInicio} onChange={(e) => setEditFormData({ ...editFormData, fechaInicio: e.target.value })} className={cn("bg-[#152A2A] text-white border-gray-600 w-full", editFormErrors.fechaInicio && "border-red-500")} />
-                        {editFormErrors.fechaInicio && <p className="text-xs text-red-500">{editFormErrors.fechaInicio}</p>}
+                        <Label htmlFor="edit_fechaInicio" className="text-foreground">Fecha Inicio</Label>
+                        <Input id="edit_fechaInicio" type="date" value={editFormData.fechaInicio} onChange={(e) => setEditFormData({ ...editFormData, fechaInicio: e.target.value })} className={cn("bg-background text-foreground border-borde-fuerte w-full", editFormErrors.fechaInicio && "border-red-500")} />
+                        {editFormErrors.fechaInicio && <p className="text-xs text-peligro">{editFormErrors.fechaInicio}</p>}
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="edit_horaInicio" className="text-white">Hora Inicio</Label>
-                        <Input id="edit_horaInicio" type="time" value={editFormData.horaInicio} onChange={(e) => setEditFormData({ ...editFormData, horaInicio: e.target.value })} className={cn("bg-[#152A2A] text-white border-gray-600 w-full", editFormErrors.horaInicio && "border-red-500")} />
-                        {editFormErrors.horaInicio && <p className="text-xs text-red-500">{editFormErrors.horaInicio}</p>}
+                        <Label htmlFor="edit_horaInicio" className="text-foreground">Hora Inicio</Label>
+                        <Input id="edit_horaInicio" type="time" value={editFormData.horaInicio} onChange={(e) => setEditFormData({ ...editFormData, horaInicio: e.target.value })} className={cn("bg-background text-foreground border-borde-fuerte w-full", editFormErrors.horaInicio && "border-red-500")} />
+                        {editFormErrors.horaInicio && <p className="text-xs text-peligro">{editFormErrors.horaInicio}</p>}
                     </div>
                 </div>
                 {/* Fecha Fin y Hora Fin */}
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div className="space-y-2">
-                        <Label htmlFor="edit_fechaFin" className="text-white">Fecha Fin</Label>
-                        <Input id="edit_fechaFin" type="date" value={editFormData.fechaFin} onChange={(e) => setEditFormData({ ...editFormData, fechaFin: e.target.value })} className={cn("bg-[#152A2A] text-white border-gray-600 w-full", editFormErrors.fechaFin && "border-red-500")} />
-                        {editFormErrors.fechaFin && <p className="text-xs text-red-500">{editFormErrors.fechaFin}</p>}
+                        <Label htmlFor="edit_fechaFin" className="text-foreground">Fecha Fin</Label>
+                        <Input id="edit_fechaFin" type="date" value={editFormData.fechaFin} onChange={(e) => setEditFormData({ ...editFormData, fechaFin: e.target.value })} className={cn("bg-background text-foreground border-borde-fuerte w-full", editFormErrors.fechaFin && "border-red-500")} />
+                        {editFormErrors.fechaFin && <p className="text-xs text-peligro">{editFormErrors.fechaFin}</p>}
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="edit_horaFin" className="text-white">Hora Fin</Label>
-                        <Input id="edit_horaFin" type="time" value={editFormData.horaFin} onChange={(e) => setEditFormData({ ...editFormData, horaFin: e.target.value })} className={cn("bg-[#152A2A] text-white border-gray-600 w-full", editFormErrors.horaFin && "border-red-500")} />
-                        {editFormErrors.horaFin && <p className="text-xs text-red-500">{editFormErrors.horaFin}</p>}
+                        <Label htmlFor="edit_horaFin" className="text-foreground">Hora Fin</Label>
+                        <Input id="edit_horaFin" type="time" value={editFormData.horaFin} onChange={(e) => setEditFormData({ ...editFormData, horaFin: e.target.value })} className={cn("bg-background text-foreground border-borde-fuerte w-full", editFormErrors.horaFin && "border-red-500")} />
+                        {editFormErrors.horaFin && <p className="text-xs text-peligro">{editFormErrors.horaFin}</p>}
                     </div>
                 </div>
 
                 {/* Psicólogo con búsqueda (Edit) */}
                 <div className="space-y-2">
-                    <Label htmlFor="edit_psicologo_search_input" className="text-white">Psicólogo</Label>
+                    <Label htmlFor="edit_psicologo_search_input" className="text-foreground">Psicólogo</Label>
                     <div id="edit-psicologo-popover-wrapper" className="relative">
                         <Input
                             id="edit_psicologo_search_input"
@@ -1519,85 +1519,85 @@ const handleUpdateSesion = async () => {
                                 setIsEditPsicologoPopoverOpen(true);
                                 if (editFormData.psicologoId) searchPsicologos("", setEditPsicologoSearchResults);
                             }}
-                            className={cn("bg-[#152A2A] text-white border-gray-600 w-full", editFormErrors.psicologoId && "border-red-500")}
+                            className={cn("bg-background text-foreground border-borde-fuerte w-full", editFormErrors.psicologoId && "border-red-500")}
                         />
                         {isEditPsicologoPopoverOpen && (
-                            <div className="absolute z-[60] w-full mt-1 bg-[#1D3434] border border-gray-600 rounded-md shadow-lg max-h-60 overflow-auto">
+                            <div className="absolute z-[60] w-full mt-1 bg-card border border-borde-fuerte rounded-md shadow-lg max-h-60 overflow-auto">
                                 {editPsicologoSearchResults.length > 0 ? (
                                     editPsicologoSearchResults.map((psicologo) => (
-                                        <div key={psicologo.id} className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-[#152A2A] text-white border-b border-gray-700 last:border-b-0" onClick={() => handleSelectEditPsicologo(psicologo)}>
+                                        <div key={psicologo.id} className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-background text-foreground border-b border-borde last:border-b-0" onClick={() => handleSelectEditPsicologo(psicologo)}>
                                             <Check className={cn("h-4 w-4 shrink-0", editFormData.psicologoId === psicologo.id ? "opacity-100" : "opacity-0")} />
                                             <div className="flex min-w-0 flex-col">
                                                 <span>{psicologo.persona.nombreCompleto}</span>
                                                 {psicologo.especialidad && (
-                                                    <span className="text-xs text-teal-300">{psicologo.especialidad}</span>
+                                                    <span className="text-xs text-info">{psicologo.especialidad}</span>
                                                 )}
                                             </div>
                                         </div>
                                     ))
-                                ) : ( <div className="px-3 py-6 text-center text-sm text-gray-400">No se encontraron psicólogos.</div> )}
+                                ) : ( <div className="px-3 py-6 text-center text-sm text-tenue">No se encontraron psicólogos.</div> )}
                             </div>
                         )}
                     </div>
-                    {editFormErrors.psicologoId && <p className="text-xs text-red-500">{editFormErrors.psicologoId}</p>}
+                    {editFormErrors.psicologoId && <p className="text-xs text-peligro">{editFormErrors.psicologoId}</p>}
                 </div>
 
                 {/* Modalidad (Edit) */}
                 <div className="space-y-2">
-                    <Label htmlFor="edit_modalidad_trigger" className="text-white">Modalidad</Label>
+                    <Label htmlFor="edit_modalidad_trigger" className="text-foreground">Modalidad</Label>
                     <Select value={editFormData.modalidadId} onValueChange={(value) => setEditFormData({ ...editFormData, modalidadId: value })}>
-                        <SelectTrigger id="edit_modalidad_trigger" className={cn("bg-[#152A2A] text-white border-gray-600 w-full", editFormErrors.modalidadId && "border-red-500")}>
+                        <SelectTrigger id="edit_modalidad_trigger" className={cn("bg-background text-foreground border-borde-fuerte w-full", editFormErrors.modalidadId && "border-red-500")}>
                             <SelectValue placeholder="Seleccionar modalidad" />
                         </SelectTrigger>
-                        <SelectContent className="bg-[#1D3434] text-white border-gray-600 z-[60]">
+                        <SelectContent className="bg-card text-foreground border-borde-fuerte z-[60]">
                             {modalidades.map((modalidad) => (
-                                <SelectItem key={modalidad.id} value={modalidad.id} className="text-white hover:bg-[#152A2A]">{modalidad.nombre}</SelectItem>
+                                <SelectItem key={modalidad.id} value={modalidad.id} className="text-foreground hover:bg-background">{modalidad.nombre}</SelectItem>
                             ))}
                         </SelectContent>
                     </Select>
-                    {editFormErrors.modalidadId && <p className="text-xs text-red-500">{editFormErrors.modalidadId}</p>}
+                    {editFormErrors.modalidadId && <p className="text-xs text-peligro">{editFormErrors.modalidadId}</p>}
                 </div>
 
                 {/* Enlace de videollamada (RF 3.4): solo para sesiones remotas */}
                 {esModalidadRemota(editFormData.modalidadId) && (
                   <div className="space-y-2">
-                    <Label htmlFor="edit_enlaceVideollamada" className="text-white">Enlace de videollamada</Label>
+                    <Label htmlFor="edit_enlaceVideollamada" className="text-foreground">Enlace de videollamada</Label>
                     <Input
                       id="edit_enlaceVideollamada"
                       type="url"
                       placeholder="Se genera solo si lo dejás vacío"
                       value={editFormData.enlaceVideollamada}
                       onChange={(e) => setEditFormData({ ...editFormData, enlaceVideollamada: e.target.value })}
-                      className="bg-[#152A2A] text-white border-gray-600"
+                      className="bg-background text-foreground border-borde-fuerte"
                     />
-                    <p className="text-xs text-gray-400">Si lo dejás vacío, MemoPsy crea el enlace automáticamente. Si ya tenés uno, pegalo acá.</p>
+                    <p className="text-xs text-tenue">Si lo dejás vacío, MemoPsy crea el enlace automáticamente. Si ya tenés uno, pegalo acá.</p>
                   </div>
                 )}
 
                 {/* Estado (Edit) */}
                 <div className="space-y-2">
-                    <Label htmlFor="edit_estado_trigger" className="text-white">Estado</Label>
+                    <Label htmlFor="edit_estado_trigger" className="text-foreground">Estado</Label>
                     <Select value={editFormData.estadoId} onValueChange={(value) => setEditFormData({ ...editFormData, estadoId: value })}>
-                        <SelectTrigger id="edit_estado_trigger" className={cn("bg-[#152A2A] text-white border-gray-600 w-full", editFormErrors.estadoId && "border-red-500")}>
+                        <SelectTrigger id="edit_estado_trigger" className={cn("bg-background text-foreground border-borde-fuerte w-full", editFormErrors.estadoId && "border-red-500")}>
                             <SelectValue placeholder="Seleccionar estado" />
                         </SelectTrigger>
-                        <SelectContent className="bg-[#1D3434] text-white border-gray-600 z-[60]">
+                        <SelectContent className="bg-card text-foreground border-borde-fuerte z-[60]">
                             {estados.map((estado) => (
-                                <SelectItem key={estado.id} value={estado.id} className="text-white hover:bg-[#152A2A]">{estado.nombre}</SelectItem>
+                                <SelectItem key={estado.id} value={estado.id} className="text-foreground hover:bg-background">{estado.nombre}</SelectItem>
                             ))}
                         </SelectContent>
                     </Select>
-                    {editFormErrors.estadoId && <p className="text-xs text-red-500">{editFormErrors.estadoId}</p>}
+                    {editFormErrors.estadoId && <p className="text-xs text-peligro">{editFormErrors.estadoId}</p>}
                 </div>
 
                 {/* Pacientes con búsqueda y selección múltiple (Edit) */}
                 <div className="space-y-2">
-                    <Label htmlFor="edit_pacientes_search_input" className="text-white">Pacientes</Label>
+                    <Label htmlFor="edit_pacientes_search_input" className="text-foreground">Pacientes</Label>
                     <div id="edit-paciente-popover-wrapper" className="relative">
-                        <div className={cn("min-h-10 p-2 rounded-md border bg-[#152A2A] text-white w-full", editFormErrors.pacientesIds && "border-red-500", !editFormErrors.pacientesIds && "border-gray-600")}>
+                        <div className={cn("min-h-10 p-2 rounded-md border bg-background text-foreground w-full", editFormErrors.pacientesIds && "border-red-500", !editFormErrors.pacientesIds && "border-borde-fuerte")}>
                             <div className="flex flex-wrap gap-2 mb-2">
                                 {editSelectedPacientes.map((paciente) => (
-                                    <Badge key={paciente.id} className="bg-[#F1C77A] text-[#1D3434] hover:bg-[#e0b66e]">
+                                    <Badge key={paciente.id} className="bg-primary text-primary-foreground hover:bg-primary/90">
                                         {paciente.persona.nombreCompleto}
                                         <button type="button" className="ml-1 rounded-full outline-none focus:outline-none" onClick={() => handleRemoveEditPaciente(paciente.id)}><X className="h-3 w-3" /></button>
                                     </Badge>
@@ -1609,27 +1609,27 @@ const handleUpdateSesion = async () => {
                                 value={editPacienteSearch}
                                 onChange={(e) => setEditPacienteSearch(e.target.value)}
                                 onFocus={() => setIsEditPacientePopoverOpen(true)}
-                                className="bg-transparent border-0 text-white placeholder:text-gray-400 focus:ring-0 focus:outline-none p-0 w-full"
+                                className="bg-transparent border-0 text-foreground placeholder:text-tenue focus:ring-0 focus:outline-none p-0 w-full"
                             />
                             {isEditPacientePopoverOpen && (
-                                <div className="absolute z-[60] w-full mt-1 bg-[#1D3434] border border-gray-600 rounded-md shadow-lg max-h-60 overflow-auto">
+                                <div className="absolute z-[60] w-full mt-1 bg-card border border-borde-fuerte rounded-md shadow-lg max-h-60 overflow-auto">
                                     {editPacienteSearchResults.length > 0 && editPacienteSearch.trim().length < 2 && (
-                                        <div className="px-3 pt-2 pb-1 text-xs font-medium uppercase tracking-wide text-gray-400">
+                                        <div className="px-3 pt-2 pb-1 text-xs font-medium uppercase tracking-wide text-tenue">
                                             Pacientes de este psicólogo
                                         </div>
                                     )}
                                     {editPacienteSearchResults.length > 0 ? (
                                         editPacienteSearchResults.map((paciente) => (
-                                            <div key={paciente.id} className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-[#152A2A] text-white border-b border-gray-700 last:border-b-0" onClick={() => handleSelectEditPaciente(paciente)}>
+                                            <div key={paciente.id} className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-background text-foreground border-b border-borde last:border-b-0" onClick={() => handleSelectEditPaciente(paciente)}>
                                                 <Check className={cn("h-4 w-4", editSelectedPacientes.some(p => p.id === paciente.id) ? "opacity-100" : "opacity-0")} />
                                                 <span>{paciente.persona.nombreCompleto}</span>
                                                 {paciente.esDelPsicologo && editPacienteSearch.trim().length > 1 && (
-                                                    <span className="ml-auto text-xs text-teal-300">Su paciente</span>
+                                                    <span className="ml-auto text-xs text-info">Su paciente</span>
                                                 )}
                                             </div>
                                         ))
                                     ) : (
-                                        <div className="px-3 py-6 text-center text-sm text-gray-400">
+                                        <div className="px-3 py-6 text-center text-sm text-tenue">
                                             {editPacienteSearch.trim().length > 1
                                                 ? "No se encontraron pacientes."
                                                 : editFormData.psicologoId
@@ -1641,16 +1641,16 @@ const handleUpdateSesion = async () => {
                             )}
                         </div>
                     </div>
-                    {editFormErrors.pacientesIds && <p className="text-xs text-red-500">{editFormErrors.pacientesIds}</p>}
+                    {editFormErrors.pacientesIds && <p className="text-xs text-peligro">{editFormErrors.pacientesIds}</p>}
                 </div>
-                {editFormErrors.general && <p className="text-sm text-red-500 py-2 text-center">{editFormErrors.general}</p>}
+                {editFormErrors.general && <p className="text-sm text-peligro py-2 text-center">{editFormErrors.general}</p>}
             </div>
-            <div className="flex flex-col-reverse gap-2 pt-4 mt-auto border-t border-gray-700 sm:flex-row sm:justify-end">
-                <Button variant="outline" onClick={() => setIsEditDialogOpen(false)} className="w-full border-gray-600 text-gray-300 hover:bg-[#2A4242] sm:w-auto" disabled={isEditSubmitting}>Cancelar</Button>
+            <div className="flex flex-col-reverse gap-2 pt-4 mt-auto border-t border-borde sm:flex-row sm:justify-end">
+                <Button variant="outline" onClick={() => setIsEditDialogOpen(false)} className="w-full border-borde-fuerte text-suave hover:bg-superficie sm:w-auto" disabled={isEditSubmitting}>Cancelar</Button>
                 <Button
                     onClick={handleUpdateSesion}
                     className="w-full sm:w-auto" 
-                    style={{ backgroundColor: "#F1C77A", color: "#1D3434" }} 
+                    style={{ backgroundColor: "var(--primary)", color: "var(--primary-foreground)" }} 
                     disabled={isEditSubmitting || editingSesion?.estado?.nombre === "Finalizada" || editingSesion?.estado?.nombre === "Cancelada"}
                     title={editingSesion?.estado?.nombre === "Finalizada" || editingSesion?.estado?.nombre === "Cancelada" ? "No se puede guardar una sesión finalizada o cancelada" : ""}
                 >

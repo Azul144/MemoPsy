@@ -9,7 +9,7 @@ export default function RequisitosPassword({ password }: { password: string }) {
       {REQUISITOS_PASSWORD.map((requisito) => {
         const ok = requisito.cumple(password);
         return (
-          <li key={requisito.id} className={`flex items-center gap-2 ${ok ? "text-primary" : "text-white/70"}`}>
+          <li key={requisito.id} className={`flex items-center gap-2 ${ok ? "text-dorado" : "text-foreground/70"}`}>
             {ok ? <Check className="h-4 w-4" aria-hidden="true" /> : <X className="h-4 w-4" aria-hidden="true" />}
             <span>
               {requisito.texto}

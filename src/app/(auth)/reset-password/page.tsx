@@ -61,14 +61,14 @@ function FormularioNuevaPassword() {
 
         {!token ? (
           <div className="mt-6">
-            <p className="text-white/90">Este enlace no es válido.</p>
-            <Link href="/olvide-password" className="mt-4 inline-block text-primary underline">Pedir un enlace nuevo</Link>
+            <p className="text-foreground/90">Este enlace no es válido.</p>
+            <Link href="/olvide-password" className="mt-4 inline-block text-dorado underline">Pedir un enlace nuevo</Link>
           </div>
         ) : listo ? (
           <div className="mt-6">
-            <CheckCircle2 className="h-10 w-10 text-primary" aria-hidden="true" />
-            <p role="status" className="mt-3 text-white/90">Tu contraseña se actualizó.</p>
-            <Link href="/login" className="mt-6 inline-block text-primary underline">Iniciar sesión</Link>
+            <CheckCircle2 className="h-10 w-10 text-dorado" aria-hidden="true" />
+            <p role="status" className="mt-3 text-foreground/90">Tu contraseña se actualizó.</p>
+            <Link href="/login" className="mt-6 inline-block text-dorado underline">Iniciar sesión</Link>
           </div>
         ) : (
           <>
@@ -100,12 +100,12 @@ function FormularioNuevaPassword() {
                   className="mt-1"
                 />
                 {confirmacion.length > 0 && !coinciden && (
-                  <p className="mt-1 text-sm text-red-300">Las contraseñas no coinciden.</p>
+                  <p className="mt-1 text-sm text-peligro">Las contraseñas no coinciden.</p>
                 )}
               </div>
 
               {errores.length > 0 && (
-                <ul role="alert" className="space-y-1 text-sm text-red-300">
+                <ul role="alert" className="space-y-1 text-sm text-peligro">
                   {errores.map((error) => <li key={error}>{error}</li>)}
                 </ul>
               )}

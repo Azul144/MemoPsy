@@ -12,6 +12,7 @@ import { HomeIcon, LogOut, Menu, X } from "lucide-react";
 import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
 import { MODULOS_DISPONIBLES } from "@/config/modulos";
 import CampanaNotificaciones from "./CampanaNotificaciones";
+import BotonTema from "./BotonTema";
 
 export default function BarraSistema() {
   const { data: session } = useSession();
@@ -41,11 +42,11 @@ export default function BarraSistema() {
   const modulos = MODULOS_DISPONIBLES.filter((m) => m.permisosRequeridos.some((p) => permisos.includes(p)));
 
   return (
-    <nav className="sticky top-0 z-40 border-b border-white/10 bg-background/80 backdrop-blur-md">
+    <nav className="sticky top-0 z-40 border-b border-foreground/10 bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-6">
         <Link href="/welcome" className="flex items-center gap-3">
           <Image src="/assets/logopng.png" alt="" width={30} height={36} />
-          <span className="titulo text-xl text-primary">MemoPsy</span>
+          <span className="titulo text-xl text-dorado">MemoPsy</span>
         </Link>
 
         {/* Accesos rápidos a los módulos (en pantallas grandes) */}
@@ -57,7 +58,7 @@ export default function BarraSistema() {
                 key={m.ruta}
                 href={m.ruta}
                 className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-                  activo ? "bg-primary/15 text-primary" : "text-crema/75 hover:bg-white/5 hover:text-crema"
+                  activo ? "bg-primary/15 text-dorado" : "text-crema/75 hover:bg-foreground/5 hover:text-crema"
                 }`}
               >
                 {m.nombre}
@@ -68,6 +69,7 @@ export default function BarraSistema() {
 
         <div className="flex items-center gap-3">
           <span className="hidden text-sm text-crema/70 lg:block">{nombreCompleto}</span>
+          <BotonTema />
           <CampanaNotificaciones />
           <div ref={menu} className="relative flex items-center gap-3">
             <button
@@ -75,7 +77,7 @@ export default function BarraSistema() {
               onClick={() => setAbierto(!abierto)}
               aria-expanded={abierto}
               aria-label={abierto ? "Cerrar menú" : "Abrir menú"}
-              className="flex h-10 items-center gap-2 rounded-full border border-white/15 pl-1 pr-3 text-crema transition-colors hover:border-primary/60"
+              className="flex h-10 items-center gap-2 rounded-full border border-foreground/15 pl-1 pr-3 text-crema transition-colors hover:border-primary/60"
             >
               <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
                 {iniciales}
@@ -84,28 +86,28 @@ export default function BarraSistema() {
             </button>
   
             {abierto && (
-              <div className="absolute right-0 top-12 z-50 w-72 overflow-hidden rounded-2xl border border-white/10 bg-card text-crema shadow-2xl shadow-black/40">
-                <div className="border-b border-white/10 p-4">
+              <div className="absolute right-0 top-12 z-50 w-72 overflow-hidden rounded-2xl border border-foreground/10 bg-card text-crema shadow-2xl shadow-black/40">
+                <div className="border-b border-foreground/10 p-4">
                   <p className="font-semibold">{nombreCompleto}</p>
                   <p className="text-sm text-crema/65">{usuario?.email}</p>
                 </div>
                 <div className="p-2">
-                  <Link href="/welcome" className="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-white/5">
+                  <Link href="/welcome" className="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-foreground/5">
                     <HomeIcon className="h-5 w-5 text-crema/70" />
                     Inicio
                   </Link>
                   {modulos.map((m) => (
-                    <Link key={m.ruta} href={m.ruta} className="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-white/5">
-                      <m.icon className="h-5 w-5 text-primary" />
+                    <Link key={m.ruta} href={m.ruta} className="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-foreground/5">
+                      <m.icon className="h-5 w-5 text-dorado" />
                       {m.nombre}
                     </Link>
                   ))}
                 </div>
-                <div className="border-t border-white/10 p-2">
+                <div className="border-t border-foreground/10 p-2">
                   <button
                     type="button"
                     onClick={cerrarSesion}
-                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-red-300 transition-colors hover:bg-red-500/10"
+                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-peligro transition-colors hover:bg-red-500/10"
                   >
                     <LogOut className="h-5 w-5" />
                     Cerrar sesión

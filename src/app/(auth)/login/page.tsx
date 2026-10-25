@@ -101,7 +101,7 @@ export default function LoginPage() {
                 />
               </div>
 
-              {error && <p role="alert" className="text-sm text-red-300">{error}</p>}
+              {error && <p role="alert" className="text-sm text-peligro">{error}</p>}
 
               <Button type="submit" className="w-full" disabled={cargando}>
                 {cargando && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -110,7 +110,7 @@ export default function LoginPage() {
             </form>
 
             <p className="mt-6 text-sm">
-              <Link href="/olvide-password" className="text-primary underline">
+              <Link href="/olvide-password" className="text-dorado underline">
                 ¿Olvidaste tu contraseña?
               </Link>
             </p>
@@ -118,9 +118,9 @@ export default function LoginPage() {
         ) : (
           <>
             <div className="mt-4 mb-6">
-              <ShieldCheck className="h-10 w-10 text-primary" aria-hidden="true" />
+              <ShieldCheck className="h-10 w-10 text-dorado" aria-hidden="true" />
               <h1 className="mt-2 titulo text-3xl text-crema">Verificación en dos pasos</h1>
-              <p className="mt-2 text-sm text-white/80">
+              <p className="mt-2 text-sm text-foreground/80">
                 Abrí tu app de autenticación e ingresá el código de 6 dígitos.
                 También podés usar uno de tus códigos de recuperación.
               </p>
@@ -141,7 +141,7 @@ export default function LoginPage() {
                 />
               </div>
 
-              {error && <p role="alert" className="text-sm text-red-300">{error}</p>}
+              {error && <p role="alert" className="text-sm text-peligro">{error}</p>}
 
               <Button type="submit" className="w-full" disabled={cargando}>
                 {cargando && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

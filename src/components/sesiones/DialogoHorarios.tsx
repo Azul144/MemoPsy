@@ -143,11 +143,11 @@ export default function DialogoHorarios({ abierto, onClose }: Props) {
     <Dialog open={abierto} onOpenChange={(a) => !a && onClose()}>
       <DialogContent
         className="p-4 sm:max-w-[520px] sm:p-6"
-        style={{ backgroundColor: "#1D3434", border: "1px solid #F1C77A" }}
+        style={{ backgroundColor: "var(--card)", border: "1px solid var(--dorado)" }}
       >
         <DialogHeader>
-          <DialogTitle className="text-white">Horarios para reprogramar</DialogTitle>
-          <DialogDescription className="text-gray-300">
+          <DialogTitle className="text-foreground">Horarios para reprogramar</DialogTitle>
+          <DialogDescription className="text-suave">
             Elegí los días y el horario. Tus pacientes van a poder mover sus turnos solo a estos horarios, si están
             libres.
           </DialogDescription>
@@ -155,19 +155,19 @@ export default function DialogoHorarios({ abierto, onClose }: Props) {
 
         {cargando ? (
           <div className="flex justify-center py-8">
-            <Loader2 className="h-6 w-6 animate-spin text-[#F1C77A]" />
+            <Loader2 className="h-6 w-6 animate-spin text-dorado" />
           </div>
         ) : (
           <div className="max-h-[55vh] space-y-3 overflow-y-auto pr-1">
             {bloques.length === 0 && (
-              <p className="rounded-lg border border-dashed border-gray-600 p-4 text-center text-sm text-gray-300">
+              <p className="rounded-lg border border-dashed border-borde-fuerte p-4 text-center text-sm text-suave">
                 No habilitaste horarios. Mientras tanto, tus pacientes no pueden reprogramar por su cuenta.
               </p>
             )}
             {bloques.map((b, i) => (
               <div
                 key={i}
-                className={cn("space-y-3 rounded-xl border p-3", errores[i] ? "border-red-500/70" : "border-gray-600")}
+                className={cn("space-y-3 rounded-xl border p-3", errores[i] ? "border-red-500/70" : "border-borde-fuerte")}
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex flex-wrap gap-1.5" role="group" aria-label="Días">
@@ -183,8 +183,8 @@ export default function DialogoHorarios({ abierto, onClose }: Props) {
                           className={cn(
                             "h-9 min-w-12 rounded-full border px-3 text-sm transition-colors",
                             activo
-                              ? "border-[#F1C77A] bg-[#F1C77A] font-semibold text-[#1D3434]"
-                              : "border-gray-600 text-gray-300 hover:border-[#F1C77A]/70",
+                              ? "border-dorado bg-primary font-semibold text-primary-foreground"
+                              : "border-borde-fuerte text-suave hover:border-dorado/70",
                           )}
                         >
                           {dia.corto}
@@ -197,7 +197,7 @@ export default function DialogoHorarios({ abierto, onClose }: Props) {
                     size="icon"
                     onClick={() => quitar(i)}
                     aria-label="Quitar horario"
-                    className="shrink-0 text-red-300 hover:bg-red-500/15 hover:text-red-200"
+                    className="shrink-0 text-peligro hover:bg-red-500/15 hover:text-peligro"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -208,18 +208,18 @@ export default function DialogoHorarios({ abierto, onClose }: Props) {
                     aria-label="Desde"
                     value={b.horaInicio}
                     onChange={(e) => cambiar(i, { horaInicio: e.target.value })}
-                    className="flex-1 bg-[#152A2A] text-white border-gray-600"
+                    className="flex-1 bg-background text-foreground border-borde-fuerte"
                   />
-                  <span className="text-sm text-gray-300">a</span>
+                  <span className="text-sm text-suave">a</span>
                   <Input
                     type="time"
                     aria-label="Hasta"
                     value={b.horaFin}
                     onChange={(e) => cambiar(i, { horaFin: e.target.value })}
-                    className="flex-1 bg-[#152A2A] text-white border-gray-600"
+                    className="flex-1 bg-background text-foreground border-borde-fuerte"
                   />
                 </div>
-                {errores[i] && <p className="text-xs text-red-500">{errores[i]}</p>}
+                {errores[i] && <p className="text-xs text-peligro">{errores[i]}</p>}
               </div>
             ))}
             <Button variant="outline" onClick={() => setBloques([...bloques, nuevoBloque()])} className="w-full border-dashed">
@@ -233,7 +233,7 @@ export default function DialogoHorarios({ abierto, onClose }: Props) {
           <Button variant="outline" onClick={onClose} disabled={guardando}>
             Cancelar
           </Button>
-          <Button onClick={guardar} disabled={guardando || cargando} style={{ backgroundColor: "#F1C77A", color: "#1D3434" }}>
+          <Button onClick={guardar} disabled={guardando || cargando} style={{ backgroundColor: "var(--primary)", color: "var(--primary-foreground)" }}>
             {guardando && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Guardar
           </Button>

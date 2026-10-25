@@ -78,15 +78,15 @@ function formularioDesde(historia: DatosPagina["historia"]): Formulario {
   };
 }
 
-const estiloCampo = "bg-[#152A2A] text-white border-gray-600 focus:border-[#F1C77A]";
+const estiloCampo = "bg-background text-foreground border-borde-fuerte focus:border-dorado";
 
 function Seccion({ numero, titulo, children, descripcion }: { numero: number; titulo: string; descripcion?: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-2xl border border-[#2A4A4A] bg-[#1D3434] p-6">
-      <h2 className="text-xl font-semibold text-[#F1C77A]">
+    <section className="rounded-2xl border border-borde bg-card p-6">
+      <h2 className="text-xl font-semibold text-dorado">
         {numero}. {titulo}
       </h2>
-      {descripcion && <p className="mt-1 text-sm text-gray-400">{descripcion}</p>}
+      {descripcion && <p className="mt-1 text-sm text-tenue">{descripcion}</p>}
       <div className="mt-5 space-y-5">{children}</div>
     </section>
   );
@@ -169,7 +169,7 @@ export default function HistoriaClinicaPage({ params }: { params: Promise<{ id: 
     return (
       <main className="mx-auto w-full max-w-4xl px-6 py-10">
         <EncabezadoPagina titulo="Historia clínica" volverA="/informes/historias" textoVolver="Volver a Historias clínicas" />
-        <div className="flex items-center gap-2 rounded-md border border-red-400/40 bg-red-500/10 p-3 text-red-300">
+        <div className="flex items-center gap-2 rounded-md border border-red-400/40 bg-red-500/10 p-3 text-peligro">
           <AlertCircle className="h-5 w-5 shrink-0" />
           {errorCarga}
         </div>
@@ -179,8 +179,8 @@ export default function HistoriaClinicaPage({ params }: { params: Promise<{ id: 
 
   if (!datos || !form) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center gap-3 text-gray-300">
-        <Loader2 className="h-6 w-6 animate-spin text-[#F1C77A]" />
+      <div className="flex min-h-[60vh] items-center justify-center gap-3 text-suave">
+        <Loader2 className="h-6 w-6 animate-spin text-dorado" />
         Cargando historia clínica...
       </div>
     );
@@ -200,7 +200,7 @@ export default function HistoriaClinicaPage({ params }: { params: Promise<{ id: 
           textoVolver="Volver a Historias clínicas"
         >
           {tieneHistoria && (
-            <Button asChild className="bg-[#F1C77A] text-[#1D3434] hover:bg-opacity-80">
+            <Button asChild className="bg-primary text-primary-foreground hover:bg-opacity-80">
               <a href={`/api/historias-clinicas/${id}/pdf`}>
                 <Download className="mr-2 h-4 w-4" />
                 Descargar PDF
@@ -209,14 +209,14 @@ export default function HistoriaClinicaPage({ params }: { params: Promise<{ id: 
           )}
         </EncabezadoPagina>
 
-        <p className="mb-6 flex items-start gap-2 rounded-md border border-gray-700 bg-[#152A2A] p-3 text-sm text-gray-300">
-          <Lock className="mt-0.5 h-4 w-4 shrink-0 text-[#F1C77A]" />
+        <p className="mb-6 flex items-start gap-2 rounded-md border border-borde bg-background p-3 text-sm text-suave">
+          <Lock className="mt-0.5 h-4 w-4 shrink-0 text-dorado" />
           La historia clínica se guarda cifrada y solo la ves vos. Cada consulta, cambio y descarga queda registrado en la auditoría (Ley 26.529 y Ley 25.326).
         </p>
 
         <form onSubmit={guardar} className="space-y-6">
           <Seccion numero={1} titulo="Datos de identificación" descripcion="Los datos personales salen de la ficha del paciente.">
-            <dl className="grid gap-x-6 gap-y-3 rounded-md border border-gray-700 bg-[#152A2A] p-4 text-sm sm:grid-cols-2">
+            <dl className="grid gap-x-6 gap-y-3 rounded-md border border-borde bg-background p-4 text-sm sm:grid-cols-2">
               {[
                 ["DNI", paciente.dni],
                 ["Fecha de nacimiento", paciente.fechaNacimiento ? `${fechaDia(paciente.fechaNacimiento)}${edad !== null ? ` (${edad} años)` : ""}` : "-"],
@@ -225,14 +225,14 @@ export default function HistoriaClinicaPage({ params }: { params: Promise<{ id: 
                 ["Profesional tratante", [psicologo.nombre, psicologo.especialidad, psicologo.licencia].filter(Boolean).join(" · ")],
               ].map(([rotulo, valor]) => (
                 <div key={rotulo}>
-                  <dt className="text-xs uppercase tracking-wide text-gray-400">{rotulo}</dt>
-                  <dd className="text-white">{valor}</dd>
+                  <dt className="text-xs uppercase tracking-wide text-tenue">{rotulo}</dt>
+                  <dd className="text-foreground">{valor}</dd>
                 </div>
               ))}
             </dl>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="fechaAdmision" className="text-gray-200">Fecha de admisión</Label>
+                <Label htmlFor="fechaAdmision" className="text-texto-2">Fecha de admisión</Label>
                 <Input
                   id="fechaAdmision"
                   type="date"
@@ -244,7 +244,7 @@ export default function HistoriaClinicaPage({ params }: { params: Promise<{ id: 
               </div>
               {CAMPOS_IDENTIFICACION.map(({ campo, titulo, ayuda }) => (
                 <div key={campo} className="space-y-2">
-                  <Label htmlFor={campo} className="text-gray-200">{titulo}</Label>
+                  <Label htmlFor={campo} className="text-texto-2">{titulo}</Label>
                   <Input id={campo} value={form[campo]} placeholder={ayuda} onChange={(e) => cambiar(campo, e.target.value)} className={estiloCampo} />
                 </div>
               ))}
@@ -254,7 +254,7 @@ export default function HistoriaClinicaPage({ params }: { params: Promise<{ id: 
           <Seccion numero={2} titulo="Admisión" descripcion="Podés escribir o dictar cada apartado.">
             {APARTADOS_ADMISION.map(({ campo, titulo, ayuda }) => (
               <div key={campo} className="space-y-2">
-                <Label htmlFor={campo} className="text-gray-200">{titulo}</Label>
+                <Label htmlFor={campo} className="text-texto-2">{titulo}</Label>
                 <Textarea
                   id={campo}
                   rows={4}
@@ -266,8 +266,8 @@ export default function HistoriaClinicaPage({ params }: { params: Promise<{ id: 
                 <DictadoVoz onTexto={agregarDictado(campo)} disabled={guardando} />
               </div>
             ))}
-            <div className="rounded-md border border-gray-700 bg-[#152A2A] p-4">
-              <label className="flex items-start gap-3 text-sm text-gray-200">
+            <div className="rounded-md border border-borde bg-background p-4">
+              <label className="flex items-start gap-3 text-sm text-texto-2">
                 <input
                   type="checkbox"
                   checked={form.consentimientoInformado}
@@ -275,18 +275,18 @@ export default function HistoriaClinicaPage({ params }: { params: Promise<{ id: 
                     cambiar("consentimientoInformado", e.target.checked);
                     if (e.target.checked && !form.fechaConsentimiento) cambiar("fechaConsentimiento", form.fechaAdmision);
                   }}
-                  className="mt-0.5 h-4 w-4 accent-[#F1C77A]"
+                  className="mt-0.5 h-4 w-4 accent-dorado"
                 />
                 <span>
-                  <span className="font-medium text-white">Consentimiento informado</span>
-                  <span className="block text-gray-400">
+                  <span className="font-medium text-foreground">Consentimiento informado</span>
+                  <span className="block text-tenue">
                     El paciente (o su representante, si es menor) firmó el consentimiento para el tratamiento y el registro de sus datos.
                   </span>
                 </span>
               </label>
               {form.consentimientoInformado && (
                 <div className="mt-3 max-w-xs space-y-2 pl-7">
-                  <Label htmlFor="fechaConsentimiento" className="text-gray-200">Fecha del consentimiento</Label>
+                  <Label htmlFor="fechaConsentimiento" className="text-texto-2">Fecha del consentimiento</Label>
                   <Input
                     id="fechaConsentimiento"
                     type="date"
@@ -305,24 +305,24 @@ export default function HistoriaClinicaPage({ params }: { params: Promise<{ id: 
             descripcion="Son tus notas clínicas sobre este paciente, en orden de fecha. Para agregar una sesión, registrá una nota nueva."
           >
             {evoluciones.length === 0 ? (
-              <p className="text-sm text-gray-400">Todavía no hay notas clínicas de este paciente.</p>
+              <p className="text-sm text-tenue">Todavía no hay notas clínicas de este paciente.</p>
             ) : (
               <ol className="space-y-3">
                 {evoluciones.map((n) => (
-                  <li key={n.id} className="rounded-md border border-gray-700 bg-[#152A2A] p-4">
+                  <li key={n.id} className="rounded-md border border-borde bg-background p-4">
                     <div className="flex flex-wrap items-baseline justify-between gap-2">
-                      <p className="font-medium text-white">{n.titulo}</p>
-                      <p className="text-xs text-gray-400">{fechaHora(n.fecha)}</p>
+                      <p className="font-medium text-foreground">{n.titulo}</p>
+                      <p className="text-xs text-tenue">{fechaHora(n.fecha)}</p>
                     </div>
-                    <p className="mt-2 line-clamp-4 whitespace-pre-wrap text-sm text-gray-300">{n.contenido}</p>
-                    <Link href={`/informes/detalle/${n.id}`} className="mt-2 inline-block text-sm text-[#F1C77A] hover:underline">
+                    <p className="mt-2 line-clamp-4 whitespace-pre-wrap text-sm text-suave">{n.contenido}</p>
+                    <Link href={`/informes/detalle/${n.id}`} className="mt-2 inline-block text-sm text-dorado hover:underline">
                       Ver nota completa
                     </Link>
                   </li>
                 ))}
               </ol>
             )}
-            <Button asChild variant="outline" size="sm" className="border-[#F1C77A] text-[#F1C77A] hover:bg-[#F1C77A] hover:text-[#1D3434]">
+            <Button asChild variant="outline" size="sm" className="border-dorado text-dorado hover:bg-primary hover:text-primary-foreground">
               <Link href="/informes/registrar">
                 <NotebookPen className="mr-2 h-4 w-4" />
                 Registrar nota de sesión
@@ -333,11 +333,11 @@ export default function HistoriaClinicaPage({ params }: { params: Promise<{ id: 
           <Seccion numero={4} titulo="Cierre del tratamiento" descripcion="Completalo solo cuando termine el tratamiento. Mientras tanto, la historia queda en curso.">
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="fechaCierre" className="text-gray-200">Fecha de cierre</Label>
+                <Label htmlFor="fechaCierre" className="text-texto-2">Fecha de cierre</Label>
                 <Input id="fechaCierre" type="date" value={form.fechaCierre} onChange={(e) => cambiar("fechaCierre", e.target.value)} className={estiloCampo} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="motivoCierre" className="text-gray-200">Motivo</Label>
+                <Label htmlFor="motivoCierre" className="text-texto-2">Motivo</Label>
                 <select
                   id="motivoCierre"
                   value={form.motivoCierre}
@@ -354,7 +354,7 @@ export default function HistoriaClinicaPage({ params }: { params: Promise<{ id: 
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="epicrisis" className="text-gray-200">Epicrisis</Label>
+              <Label htmlFor="epicrisis" className="text-texto-2">Epicrisis</Label>
               <Textarea
                 id="epicrisis"
                 rows={4}
@@ -367,15 +367,15 @@ export default function HistoriaClinicaPage({ params }: { params: Promise<{ id: 
             </div>
           </Seccion>
 
-          <div className="flex flex-wrap items-center justify-end gap-3 rounded-2xl border border-[#2A4A4A] bg-[#1D3434] p-4">
+          <div className="flex flex-wrap items-center justify-end gap-3 rounded-2xl border border-borde bg-card p-4">
             {mensaje && (
-              <p className={`mr-auto flex items-center gap-2 text-sm ${mensaje.tipo === "ok" ? "text-emerald-300" : "text-amber-300"}`}>
+              <p className={`mr-auto flex items-center gap-2 text-sm ${mensaje.tipo === "ok" ? "text-exito" : "text-aviso"}`}>
                 {mensaje.tipo === "ok" ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
                 {mensaje.texto}
               </p>
             )}
-            {!mensaje && cambios && <p className="mr-auto text-sm text-gray-400">Hay cambios sin guardar.</p>}
-            <Button type="submit" disabled={guardando} className="bg-[#F1C77A] text-[#1D3434] hover:bg-opacity-80">
+            {!mensaje && cambios && <p className="mr-auto text-sm text-tenue">Hay cambios sin guardar.</p>}
+            <Button type="submit" disabled={guardando} className="bg-primary text-primary-foreground hover:bg-opacity-80">
               {guardando ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
               {tieneHistoria ? "Guardar cambios" : "Abrir historia clínica"}
             </Button>

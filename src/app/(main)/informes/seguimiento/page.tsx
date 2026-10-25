@@ -62,14 +62,14 @@ export default function MisSeguimientosPage() {
 
         {cargando ? (
           <div className="flex justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-[#F1C77A]" />
+            <Loader2 className="h-8 w-8 animate-spin text-dorado" />
           </div>
         ) : error ? (
-          <p className="rounded-2xl border border-red-400/40 bg-red-500/10 p-6 text-center text-red-300">{error}</p>
+          <p className="rounded-2xl border border-red-400/40 bg-red-500/10 p-6 text-center text-peligro">{error}</p>
         ) : seguimientos.length === 0 ? (
-          <div className="rounded-2xl p-8 text-center" style={{ backgroundColor: "#1D3434" }}>
-            <ClipboardCheck className="mx-auto mb-4 h-12 w-12 text-[#F1C77A]" />
-            <p className="text-gray-300">
+          <div className="rounded-2xl p-8 text-center" style={{ backgroundColor: "var(--card)" }}>
+            <ClipboardCheck className="mx-auto mb-4 h-12 w-12 text-dorado" />
+            <p className="text-suave">
               Todavía no tenés informes. Cuando tu psicólogo/a te comparta uno después de una sesión, te va a llegar un
               aviso y lo vas a ver acá.
             </p>
@@ -114,35 +114,35 @@ function TarjetaSeguimiento({
   }
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-[#2A4A4A]" style={{ backgroundColor: "#1D3434" }}>
+    <section className="overflow-hidden rounded-2xl border border-borde" style={{ backgroundColor: "var(--card)" }}>
       <button
         type="button"
         onClick={onAlternar}
         aria-expanded={abierto}
-        className="flex w-full items-center justify-between gap-4 p-5 text-left transition-colors hover:bg-white/5"
+        className="flex w-full items-center justify-between gap-4 p-5 text-left transition-colors hover:bg-foreground/5"
       >
         <div className="min-w-0">
-          <p className="font-semibold capitalize text-white">Sesión del {fechaSesion(s.fechaSesion)}</p>
-          <p className="mt-0.5 text-sm text-gray-400">
+          <p className="font-semibold capitalize text-foreground">Sesión del {fechaSesion(s.fechaSesion)}</p>
+          <p className="mt-0.5 text-sm text-tenue">
             {s.psicologo ?? "Tu psicólogo/a"}
             {pendientes > 0 && (
-              <span className="ml-2 rounded-full bg-[#F1C77A]/15 px-2 py-0.5 text-xs font-semibold text-[#F1C77A]">
+              <span className="ml-2 rounded-full bg-primary/15 px-2 py-0.5 text-xs font-semibold text-dorado">
                 {pendientes} {pendientes === 1 ? "actividad sin responder" : "actividades sin responder"}
               </span>
             )}
           </p>
         </div>
-        <ChevronDown className={cn("h-5 w-5 shrink-0 text-gray-400 transition-transform", abierto && "rotate-180")} />
+        <ChevronDown className={cn("h-5 w-5 shrink-0 text-tenue transition-transform", abierto && "rotate-180")} />
       </button>
 
       {abierto && (
-        <div className="space-y-6 border-t border-gray-700 p-5">
+        <div className="space-y-6 border-t border-borde p-5">
           <Bloque titulo="Lo que trabajamos en la sesión" texto={s.resumen} />
 
           {s.actividades.length > 0 && (
             <div>
-              <h3 className="mb-1 font-semibold text-white">Actividades hasta la próxima sesión</h3>
-              <p className="mb-3 text-sm text-gray-400">Contale a tu psicólogo/a si pudiste hacerlas. Lo va a ver antes de la próxima sesión.</p>
+              <h3 className="mb-1 font-semibold text-foreground">Actividades hasta la próxima sesión</h3>
+              <p className="mb-3 text-sm text-tenue">Contale a tu psicólogo/a si pudiste hacerlas. Lo va a ver antes de la próxima sesión.</p>
               <ol className="space-y-3">
                 {s.actividades.map((a, i) => (
                   <ActividadParaResponder key={a.id} numero={i + 1} actividad={a} onRespondida={onRespondida} />
@@ -154,16 +154,16 @@ function TarjetaSeguimiento({
           {s.pautas && <Bloque titulo="Pautas y recomendaciones" texto={s.pautas} />}
           {s.avances && <Bloque titulo="Avances y logros" texto={s.avances} destacado />}
 
-          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-gray-700 pt-4">
-            <p className="flex items-center gap-2 text-sm text-gray-300">
-              <CalendarClock className="h-4 w-4 text-[#F1C77A]" />
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-borde pt-4">
+            <p className="flex items-center gap-2 text-sm text-suave">
+              <CalendarClock className="h-4 w-4 text-dorado" />
               Próxima sesión: {s.proximaSesion ? fechaHora(s.proximaSesion) : "a coordinar"}
             </p>
             <Button
               variant="outline"
               onClick={descargar}
               disabled={descargando}
-              className="border-[#F1C77A] text-[#F1C77A] hover:bg-[#F1C77A]/10"
+              className="border-dorado text-dorado hover:bg-primary/10"
             >
               {descargando ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
               Descargar PDF
@@ -220,7 +220,7 @@ function ActividadParaResponder({
       aria-pressed={respuesta === valor}
       className={cn(
         "flex h-9 items-center gap-1.5 rounded-full border px-4 text-sm transition-colors",
-        respuesta === valor ? activa : "border-gray-600 text-gray-300 hover:border-[#F1C77A]/70",
+        respuesta === valor ? activa : "border-borde-fuerte text-suave hover:border-dorado/70",
       )}
     >
       <Icono className="h-4 w-4" />
@@ -229,19 +229,19 @@ function ActividadParaResponder({
   )
 
   return (
-    <li className="rounded-xl border border-gray-700 bg-[#152A2A] p-4">
-      <p className="text-gray-200">
-        <span className="mr-2 font-semibold text-[#F1C77A]">{numero}.</span>
+    <li className="rounded-xl border border-borde bg-background p-4">
+      <p className="text-texto-2">
+        <span className="mr-2 font-semibold text-dorado">{numero}.</span>
         {actividad.descripcion}
       </p>
       <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="¿Pudiste hacerla?">
-        {opcion("HECHA", "La hice", Check, "border-emerald-500 bg-emerald-500/15 font-semibold text-emerald-300")}
-        {opcion("NO_PUDE", "No pude", X, "border-orange-400 bg-orange-400/15 font-semibold text-orange-300")}
+        {opcion("HECHA", "La hice", Check, "border-emerald-500 bg-emerald-500/15 font-semibold text-exito")}
+        {opcion("NO_PUDE", "No pude", X, "border-orange-400 bg-orange-400/15 font-semibold text-naranja")}
       </div>
       {respuesta && (
         <div className="mt-3 space-y-2">
-          <label htmlFor={`comentario-${actividad.id}`} className="flex items-center gap-2 text-sm text-gray-300">
-            <MessageSquare className="h-4 w-4 text-[#F1C77A]" />
+          <label htmlFor={`comentario-${actividad.id}`} className="flex items-center gap-2 text-sm text-suave">
+            <MessageSquare className="h-4 w-4 text-dorado" />
             Comentario para tu psicólogo/a (opcional)
           </label>
           <Textarea
@@ -251,17 +251,17 @@ function ActividadParaResponder({
             value={comentario}
             onChange={(e) => setComentario(e.target.value)}
             placeholder={respuesta === "HECHA" ? "Ej: Me ayudó mucho antes de dormir." : "Ej: No encontré el momento durante la semana."}
-            className="border-gray-600 bg-[#1D3434] text-white focus:border-[#F1C77A]"
+            className="border-borde-fuerte bg-card text-foreground focus:border-dorado"
           />
           <div className="flex items-center justify-end gap-3">
             {actividad.fechaRespuesta && sinCambios && (
-              <span className="text-xs text-gray-400">Enviado el {format(parseISO(actividad.fechaRespuesta), "d/MM HH:mm")}</span>
+              <span className="text-xs text-tenue">Enviado el {format(parseISO(actividad.fechaRespuesta), "d/MM HH:mm")}</span>
             )}
             <Button
               onClick={enviar}
               disabled={guardando || sinCambios}
               size="sm"
-              style={{ backgroundColor: "#F1C77A", color: "#1D3434" }}
+              style={{ backgroundColor: "var(--primary)", color: "var(--primary-foreground)" }}
             >
               {guardando && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {actividad.respuesta ? "Actualizar respuesta" : "Enviar respuesta"}
@@ -276,11 +276,11 @@ function ActividadParaResponder({
 function Bloque({ titulo, texto, destacado = false }: { titulo: string; texto: string; destacado?: boolean }) {
   return (
     <div>
-      <h3 className="mb-2 font-semibold text-white">{titulo}</h3>
+      <h3 className="mb-2 font-semibold text-foreground">{titulo}</h3>
       <p
         className={cn(
           "whitespace-pre-wrap rounded-lg border p-3",
-          destacado ? "border-[#F1C77A]/40 bg-[#F1C77A]/10 text-gray-100" : "border-gray-700 bg-[#152A2A] text-gray-300",
+          destacado ? "border-dorado/40 bg-primary/10 text-texto-2" : "border-borde bg-background text-suave",
         )}
       >
         {texto}

@@ -93,8 +93,8 @@ export default function UsuariosPage() {
 
   if (status === 'loading') {
     return (
-      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: '#152A2A' }}>
-        <div className="text-white text-lg">Cargando...</div>
+      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: "var(--background)" }}>
+        <div className="text-foreground text-lg">Cargando...</div>
       </div>
     );
   }
@@ -125,12 +125,12 @@ export default function UsuariosPage() {
           </div>
         ) : (
           <div className="text-center mt-12">
-            <div className="p-8 rounded-2xl max-w-md mx-auto" style={{ backgroundColor: '#1D3434' }}>
-              <Users className="w-16 h-16 mx-auto mb-6" style={{ color: '#F1C77A' }}/>
-              <h3 className="text-2xl font-semibold text-white mb-4">
+            <div className="p-8 rounded-2xl max-w-md mx-auto" style={{ backgroundColor: "var(--card)" }}>
+              <Users className="w-16 h-16 mx-auto mb-6" style={{ color: "var(--dorado)" }}/>
+              <h3 className="text-2xl font-semibold text-foreground mb-4">
                 Sin Acciones Disponibles en Usuarios
               </h3>
-              <p className="text-gray-300">
+              <p className="text-suave">
                 No tenés los permisos necesarios para usar el módulo de usuarios. 
                 Si creés que es un error, consultá con el administrador del sistema.
               </p>

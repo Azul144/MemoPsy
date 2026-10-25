@@ -88,7 +88,7 @@ export default function Testimonios() {
             type="button"
             onClick={() => irA(actual - 1)}
             aria-label="Opinión anterior"
-            className="flex h-12 w-12 items-center justify-center rounded-full border border-white/15 text-crema transition-colors hover:border-primary hover:text-primary"
+            className="flex h-12 w-12 items-center justify-center rounded-full border border-foreground/15 text-crema transition-colors hover:border-primary hover:text-dorado"
           >
             <ChevronLeft className="h-5 w-5" />
           </button>
@@ -116,10 +116,10 @@ export default function Testimonios() {
           <figure
             key={t.nombre}
             className={`flex w-[85%] shrink-0 snap-start flex-col rounded-3xl border p-8 transition-colors duration-500 sm:w-[26rem] ${
-              i === actual ? "border-primary/50 bg-card" : "border-white/10 bg-card/60"
+              i === actual ? "border-primary/50 bg-card" : "border-foreground/10 bg-card/60"
             }`}
           >
-            <span aria-hidden className="titulo text-6xl leading-none text-primary/80">“</span>
+            <span aria-hidden className="titulo text-6xl leading-none text-dorado/80">“</span>
             <blockquote className="mt-2 flex-1 leading-relaxed text-crema/90">{t.texto}</blockquote>
             <figcaption className="mt-6 flex items-center gap-4">
               <span className="flex h-12 w-12 items-center justify-center rounded-full bg-primary font-bold text-primary-foreground">
@@ -143,7 +143,7 @@ export default function Testimonios() {
             onClick={() => irA(i)}
             aria-label={`Ver opinión de ${t.nombre}`}
             aria-current={i === actual}
-            className={`h-2.5 rounded-full transition-all duration-300 ${i === actual ? "w-8 bg-primary" : "w-2.5 bg-white/25 hover:bg-white/50"}`}
+            className={`h-2.5 rounded-full transition-all duration-300 ${i === actual ? "w-8 bg-primary" : "w-2.5 bg-foreground/25 hover:bg-foreground/50"}`}
           />
         ))}
       </div>

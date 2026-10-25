@@ -42,7 +42,7 @@ export default function Contacto() {
 
       <div className="mx-auto mt-12 grid max-w-6xl gap-10 md:grid-cols-2">
         {/* Foto */}
-        <div className="relative min-h-72 overflow-hidden rounded-[2rem] border border-white/10">
+        <div className="relative min-h-72 overflow-hidden rounded-[2rem] border border-foreground/10">
           <Image
             src="/assets/reunion1.jpg"
             alt="Reunión de trabajo entre profesionales"
@@ -63,7 +63,7 @@ export default function Contacto() {
           <input name="Telefono" type="tel" placeholder="Número de teléfono" required className="campo" />
           <input name="Motivo" placeholder="Motivo de consulta" required className="campo" />
 
-          <label htmlFor="fecha" className="text-sm text-white/80">Fecha y hora preferida</label>
+          <label htmlFor="fecha" className="text-sm text-foreground/80">Fecha y hora preferida</label>
           <input id="fecha" name="Fecha" type="datetime-local" required className="campo" />
 
           <button
@@ -75,10 +75,10 @@ export default function Contacto() {
           </button>
 
           {estado === "ok" && (
-            <p className="text-center text-primary">¡Enviado! Pronto nos pondremos en contacto.</p>
+            <p className="text-center text-dorado">¡Enviado! Pronto nos pondremos en contacto.</p>
           )}
           {estado === "error" && (
-            <p className="text-center text-red-300">No se pudo enviar. Probá de nuevo en unos minutos.</p>
+            <p className="text-center text-peligro">No se pudo enviar. Probá de nuevo en unos minutos.</p>
           )}
         </form>
       </div>

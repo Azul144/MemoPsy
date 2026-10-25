@@ -19,13 +19,13 @@ export default function EncabezadoPagina({
   children?: React.ReactNode; // botones extra a la derecha
 }) {
   return (
-    <section className="relative mb-8 overflow-hidden rounded-[2rem] border border-white/10 bg-card px-8 py-9 text-left sm:px-10">
+    <section className="relative mb-8 overflow-hidden rounded-[2rem] border border-foreground/10 bg-card px-8 py-9 text-left sm:px-10">
       <FondoAnimado />
       <div className="relative flex flex-wrap items-end justify-between gap-6">
         <div>
           <Link
             href={volverA}
-            className="entrar inline-flex items-center gap-2 text-sm text-crema/65 transition-colors hover:text-primary"
+            className="entrar inline-flex items-center gap-2 text-sm text-crema/65 transition-colors hover:text-dorado"
           >
             <ArrowLeft className="h-4 w-4" />
             {textoVolver}

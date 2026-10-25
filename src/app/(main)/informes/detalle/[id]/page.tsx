@@ -146,9 +146,9 @@ export default function DetalleInformePage() {
 
   if (loadingPermissions || isLoadingData) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-4" style={{ backgroundColor: '#152A2A' }}>
-        <Loader2 className="h-16 w-16 animate-spin text-[#F1C77A] mb-4" />
-        <TypographyP className="text-white">Cargando datos...</TypographyP>
+      <div className="flex flex-col items-center justify-center min-h-screen p-4" style={{ backgroundColor: "var(--background)" }}>
+        <Loader2 className="h-16 w-16 animate-spin text-dorado mb-4" />
+        <TypographyP className="text-foreground">Cargando datos...</TypographyP>
       </div>
     );
   }
@@ -163,10 +163,10 @@ export default function DetalleInformePage() {
         <EncabezadoPagina titulo="Detalle de la nota" volverA="/informes/lista" textoVolver="Volver a las notas clínicas" />
 
         {pageError && (
-            <Card className="border-red-400/40 bg-red-500/10 text-red-300 max-w-3xl mx-auto">
+            <Card className="border-red-400/40 bg-red-500/10 text-peligro max-w-3xl mx-auto">
             <CardHeader>
                 <CardTitle className="flex items-center">
-                <AlertTriangle className="mr-2 h-6 w-6 text-red-400" /> Error al Cargar el Informe
+                <AlertTriangle className="mr-2 h-6 w-6 text-peligro" /> Error al Cargar el Informe
                 </CardTitle>
             </CardHeader>
             <CardContent>
@@ -177,51 +177,51 @@ export default function DetalleInformePage() {
         )}
 
         {!pageError && !informe && !isLoadingData && ( // Should only show if not loading and no error, but informe is still null
-            <Card style={{ backgroundColor: '#1D3434', borderColor: '#2A4A4A' }} className="max-w-3xl mx-auto text-center">
+            <Card style={{ backgroundColor: "var(--card)", borderColor: "var(--borde)" }} className="max-w-3xl mx-auto text-center">
             <CardHeader>
-                <CardTitle className="text-[#F1C77A]">Nota no disponible</CardTitle>
+                <CardTitle className="text-dorado">Nota no disponible</CardTitle>
             </CardHeader>
             <CardContent>
-                <TypographyP className="text-gray-300">No se pudo cargar la información del informe.</TypographyP>
+                <TypographyP className="text-suave">No se pudo cargar la información del informe.</TypographyP>
             </CardContent>
             </Card>
         )}
 
         {informe && (
-          <Card className="shadow-lg max-w-3xl mx-auto" style={{ backgroundColor: '#1D3434', borderColor: '#2A4A4A' }}>
-            <CardHeader className="p-6 border-b border-gray-700">
+          <Card className="shadow-lg max-w-3xl mx-auto" style={{ backgroundColor: "var(--card)", borderColor: "var(--borde)" }}>
+            <CardHeader className="p-6 border-b border-borde">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-start gap-4">
                     {/* Ícono en recuadro, del alto de la primera línea del título */}
-                    <span className="mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#F1C77A]/15 lg:mt-1 lg:h-14 lg:w-14">
-                        <PageIcon className="h-6 w-6 text-[#F1C77A] lg:h-8 lg:w-8" />
+                    <span className="mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary/15 lg:mt-1 lg:h-14 lg:w-14">
+                        <PageIcon className="h-6 w-6 text-dorado lg:h-8 lg:w-8" />
                     </span>
-                    <TypographyH1 className="text-3xl font-semibold text-white">{informe.titulo}</TypographyH1>
+                    <TypographyH1 className="text-3xl font-semibold text-foreground">{informe.titulo}</TypographyH1>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   <Button onClick={descargarPdf} disabled={descargandoPdf} variant="outline"
-                      className="border-[#F1C77A] text-[#F1C77A] hover:bg-[#F1C77A]/10">
+                      className="border-dorado text-dorado hover:bg-primary/10">
                       {descargandoPdf ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
                       Descargar PDF
                   </Button>
                   {canEdit && (
                       <Button onClick={() => router.push(`/informes/editar/${informe.id}`)}
-                          className="bg-[#F1C77A] text-[#1D3434] hover:bg-opacity-80">
+                          className="bg-primary text-primary-foreground hover:bg-opacity-80">
                           <Edit className="mr-2 h-4 w-4" /> Editar nota
                       </Button>
                   )}
                 </div>
               </div>
-              <CardDescription className="text-gray-400 mt-2">
-                N.º de nota: <TypographyMuted className="text-gray-500">{informe.id}</TypographyMuted>
+              <CardDescription className="text-tenue mt-2">
+                N.º de nota: <TypographyMuted className="text-tenue">{informe.id}</TypographyMuted>
               </CardDescription>
             </CardHeader>
             <CardContent className="p-6 space-y-6">
               <div>
-                <Label htmlFor="contenido" className="text-lg font-medium text-gray-200">Contenido de la nota</Label>
+                <Label htmlFor="contenido" className="text-lg font-medium text-texto-2">Contenido de la nota</Label>
                 <div 
                   id="contenido" 
-                  className="mt-2 p-4 border rounded-md bg-[#152A2A] border-gray-700 whitespace-pre-wrap min-h-[150px] text-gray-300"
+                  className="mt-2 p-4 border rounded-md bg-background border-borde whitespace-pre-wrap min-h-[150px] text-suave"
                 >
                   {informe.contenido}
                 </div>
@@ -229,10 +229,10 @@ export default function DetalleInformePage() {
 
               {informe.etiquetas && informe.etiquetas.trim() && (
                 <div>
-                  <Label className="text-lg font-medium text-gray-200">Etiquetas</Label>
+                  <Label className="text-lg font-medium text-texto-2">Etiquetas</Label>
                   <div className="mt-2 flex flex-wrap gap-2">
                     {informe.etiquetas.split(',').map((e) => e.trim()).filter(Boolean).map((etiqueta, i) => (
-                      <Badge key={i} className="text-sm px-3 py-1 bg-[#F1C77A] !text-[#1D3434] hover:bg-[#F1C77A]/90">
+                      <Badge key={i} className="text-sm px-3 py-1 bg-primary !text-primary-foreground hover:bg-primary/90">
                         {etiqueta}
                       </Badge>
                     ))}
@@ -242,45 +242,45 @@ export default function DetalleInformePage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-1">
-                  <div className="flex items-center text-gray-300">
-                    <CalendarDays className="mr-2 h-5 w-5 text-[#F1C77A]" />
-                    <Label className="font-semibold text-gray-200">Fecha:</Label>
+                  <div className="flex items-center text-suave">
+                    <CalendarDays className="mr-2 h-5 w-5 text-dorado" />
+                    <Label className="font-semibold text-texto-2">Fecha:</Label>
                   </div>
-                  <TypographyP className="ml-7 text-gray-300">{new Date(informe.fechaCreacion).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</TypographyP>
+                  <TypographyP className="ml-7 text-suave">{new Date(informe.fechaCreacion).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</TypographyP>
                 </div>
 
                 <div className="space-y-1">
-                  <div className="flex items-center text-gray-300">
-                    <User className="mr-2 h-5 w-5 text-[#F1C77A]" />
-                    <Label className="font-semibold text-gray-200">Psicólogo:</Label>
+                  <div className="flex items-center text-suave">
+                    <User className="mr-2 h-5 w-5 text-dorado" />
+                    <Label className="font-semibold text-texto-2">Psicólogo:</Label>
                   </div>
-                  <TypographyP className="ml-7 text-gray-300">{informe.psicologo?.nombre || 'No especificado'}</TypographyP>
+                  <TypographyP className="ml-7 text-suave">{informe.psicologo?.nombre || 'No especificado'}</TypographyP>
                 </div>
 
                 <div className="space-y-1 md:col-span-2">
-                  <div className="flex items-center text-gray-300">
-                    {informe.esPrivado ? <Lock className="mr-2 h-5 w-5 text-red-500" /> : <Unlock className="mr-2 h-5 w-5 text-green-500" />}
-                    <Label className="font-semibold text-gray-200">Privacidad:</Label>
+                  <div className="flex items-center text-suave">
+                    {informe.esPrivado ? <Lock className="mr-2 h-5 w-5 text-peligro" /> : <Unlock className="mr-2 h-5 w-5 text-exito" />}
+                    <Label className="font-semibold text-texto-2">Privacidad:</Label>
                   </div>
-                  <TypographyP className="ml-7 text-gray-300">{informe.esPrivado ? 'Privada: solo la ves vos. El paciente ve únicamente su informe de seguimiento.' : 'Compartida con los pacientes asociados'}</TypographyP>
+                  <TypographyP className="ml-7 text-suave">{informe.esPrivado ? 'Privada: solo la ves vos. El paciente ve únicamente su informe de seguimiento.' : 'Compartida con los pacientes asociados'}</TypographyP>
                 </div>
               </div>
               
               <div>
-                <div className="flex items-center text-gray-300 mb-2">
-                    <Users className="mr-2 h-5 w-5 text-[#F1C77A]" />
-                    <Label className="text-lg font-medium text-gray-200">Pacientes asociados:</Label>
+                <div className="flex items-center text-suave mb-2">
+                    <Users className="mr-2 h-5 w-5 text-dorado" />
+                    <Label className="text-lg font-medium text-texto-2">Pacientes asociados:</Label>
                 </div>
                 {informe.pacientes && informe.pacientes.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
                     {informe.pacientes.map(paciente => (
-                      <Badge key={paciente.id} className="text-sm px-3 py-1 bg-primary !text-primary-foreground hover:bg-primary/90 text-white">
+                      <Badge key={paciente.id} className="text-sm px-3 py-1 bg-primary !text-primary-foreground hover:bg-primary/90 text-foreground">
                         {paciente.nombre} {paciente.apellido} (DNI: {paciente.dni || 'N/A'})
                       </Badge>
                     ))}
                   </div>
                 ) : (
-                  <TypographyP className="ml-7 text-gray-400">Ninguno</TypographyP>
+                  <TypographyP className="ml-7 text-tenue">Ninguno</TypographyP>
                 )}
               </div>
             </CardContent>

@@ -142,7 +142,7 @@ export default function DictadoVoz({ onTexto, disabled }: DictadoVozProps) {
 
   if (!soportado) {
     return (
-      <p className="flex items-start gap-2 text-sm text-gray-400">
+      <p className="flex items-start gap-2 text-sm text-tenue">
         <MicOff className="mt-0.5 h-4 w-4 shrink-0" />
         Este navegador no permite dictar por voz. Podés escribir a mano, o abrir MemoPsy en Chrome o Edge para usar el dictado.
       </p>
@@ -159,22 +159,22 @@ export default function DictadoVoz({ onTexto, disabled }: DictadoVozProps) {
           onClick={grabando ? detener : iniciar}
           className={cn(
             grabando
-              ? "bg-red-600 text-white hover:bg-red-700"
-              : "bg-[#F1C77A] text-[#1D3434] hover:bg-opacity-80"
+              ? "bg-red-600 text-[#ffffff] hover:bg-red-700"
+              : "bg-primary text-primary-foreground hover:bg-opacity-80"
           )}
         >
           {grabando ? <Square className="mr-2 h-4 w-4" /> : <Mic className="mr-2 h-4 w-4" />}
           {grabando ? "Detener dictado" : "Dictar"}
         </Button>
         {grabando && (
-          <span className="text-sm text-gray-300">
+          <span className="text-sm text-suave">
             <span className="mr-2 inline-block h-2 w-2 animate-pulse rounded-full bg-red-500" />
             {parcial || "Escuchando..."}
           </span>
         )}
       </div>
       {aviso && (
-        <p className="flex items-start gap-2 text-sm text-amber-300">
+        <p className="flex items-start gap-2 text-sm text-aviso">
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
           {aviso}
         </p>

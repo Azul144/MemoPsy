@@ -297,8 +297,8 @@ export default function EditarPerfilPage() { // Renamed component
   // Updated loading condition
   if (status === "loading" || hasPermissionPage === null || (hasPermissionPage === true && isLoadingProfile)) {
     return (
-      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: "#152A2A" }}>
-        <div className="text-white text-lg">Cargando...</div>
+      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: "var(--background)" }}>
+        <div className="text-foreground text-lg">Cargando...</div>
       </div>
     )
   }
@@ -307,11 +307,11 @@ export default function EditarPerfilPage() { // Renamed component
     return (
       <div className="min-h-screen">
         <main className="mx-auto w-full max-w-6xl px-6 py-10 text-center">
-          <AlertCircle className="w-16 h-16 mx-auto mb-6 text-red-500" />
-          <h1 className="text-3xl font-bold text-red-500 mb-4">Acceso Denegado</h1>
+          <AlertCircle className="w-16 h-16 mx-auto mb-6 text-peligro" />
+          <h1 className="text-3xl font-bold text-peligro mb-4">Acceso Denegado</h1>
           {/* Display profileError first if it exists (e.g. permission denied), then form error */}
-          <p className="text-gray-300 mb-6">{profileError || error || "No tenés los permisos necesarios para entrar a esta página."}</p>
-          <Button onClick={() => router.push("/perfiles")} style={{ backgroundColor: "#F1C77A", color: "#1D3434" }}>
+          <p className="text-suave mb-6">{profileError || error || "No tenés los permisos necesarios para entrar a esta página."}</p>
+          <Button onClick={() => router.push("/perfiles")} style={{ backgroundColor: "var(--primary)", color: "var(--primary-foreground)" }}>
             Volver a Perfiles
           </Button>
         </main>
@@ -328,35 +328,35 @@ export default function EditarPerfilPage() { // Renamed component
 
       <main className="mx-auto w-full max-w-6xl px-6 py-10">
         <EncabezadoPagina titulo={<>Editar Perfil {/* Changed Title */}</>} descripcion={<>Actualiza los detalles y permisos del perfil. {/* Changed Description */}</>} volverA="/perfiles" textoVolver="Volver a Perfiles" />
-        <Card className="max-w-4xl mx-auto" style={{ backgroundColor: "#1D3434", borderColor: "#2A4A4A" }}>
+        <Card className="max-w-4xl mx-auto" style={{ backgroundColor: "var(--card)", borderColor: "var(--borde)" }}>
 
           <CardContent>
             {success && (
               <Alert className="mb-6 border-green-500 bg-green-900 bg-opacity-30">
-                <CheckCircle className="h-4 w-4 text-green-400" />
-                <AlertDescription className="text-green-300">{success}</AlertDescription>
+                <CheckCircle className="h-4 w-4 text-exito" />
+                <AlertDescription className="text-exito">{success}</AlertDescription>
               </Alert>
             )}
 
             {error && ( // For form submission errors
               <Alert className="mb-6 border-red-500 bg-red-500/10 bg-opacity-30">
-                <AlertCircle className="h-4 w-4 text-red-400" />
-                <AlertDescription className="text-red-300">{error}</AlertDescription>
+                <AlertCircle className="h-4 w-4 text-peligro" />
+                <AlertDescription className="text-peligro">{error}</AlertDescription>
               </Alert>
             )}
 
             {/* Alert for profile loading errors - displayed if profileError is set and no form submission error is active */}
             {profileError && !error && (
               <Alert className="mb-6 border-red-500 bg-red-500/10 bg-opacity-30">
-                <AlertCircle className="h-4 w-4 text-red-400" />
-                <AlertDescription className="text-red-300">{profileError}</AlertDescription>
+                <AlertCircle className="h-4 w-4 text-peligro" />
+                <AlertDescription className="text-peligro">{profileError}</AlertDescription>
               </Alert>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <Label htmlFor="nombre" className="text-gray-200 font-medium">
+                  <Label htmlFor="nombre" className="text-texto-2 font-medium">
                     Nombre del Perfil *
                   </Label>
                   <Input
@@ -365,14 +365,14 @@ export default function EditarPerfilPage() { // Renamed component
                     value={formData.nombre}
                     onChange={handleChange}
                     required
-                    className="bg-[#2A4242] text-white border-gray-600 focus:ring-teal-500 focus:border-teal-500 mt-2"
+                    className="bg-superficie text-foreground border-borde-fuerte focus:ring-teal-500 focus:border-teal-500 mt-2"
                     placeholder="Ej: Secretaría, Coordinación"
                   />
-                  {fieldErrors.nombre && <p className="text-red-400 text-sm mt-1">{fieldErrors.nombre}</p>}
+                  {fieldErrors.nombre && <p className="text-peligro text-sm mt-1">{fieldErrors.nombre}</p>}
                 </div>
 
                 <div>
-                  <Label htmlFor="descripcion" className="text-gray-200 font-medium">
+                  <Label htmlFor="descripcion" className="text-texto-2 font-medium">
                     Descripción *
                   </Label>
                   <Textarea
@@ -381,45 +381,45 @@ export default function EditarPerfilPage() { // Renamed component
                     value={formData.descripcion}
                     onChange={handleChange}
                     required
-                    className="bg-[#2A4242] text-white border-gray-600 focus:ring-teal-500 focus:border-teal-500 mt-2 h-24"
+                    className="bg-superficie text-foreground border-borde-fuerte focus:ring-teal-500 focus:border-teal-500 mt-2 h-24"
                     placeholder="Describe las responsabilidades y alcance de este perfil..."
                   />
-                  {fieldErrors.descripcion && <p className="text-red-400 text-sm mt-1">{fieldErrors.descripcion}</p>}
+                  {fieldErrors.descripcion && <p className="text-peligro text-sm mt-1">{fieldErrors.descripcion}</p>}
                 </div>
               </div>
 
               <div className="space-y-4 pt-4">
                 <div className="flex items-center mb-4">
-                  <KeyRound className="w-6 h-6 mr-3 text-teal-400" />
-                  <h3 className="text-xl font-semibold text-gray-100">Asignar Permisos</h3>
-                  <span className="ml-auto text-sm text-gray-400">
+                  <KeyRound className="w-6 h-6 mr-3 text-info" />
+                  <h3 className="text-xl font-semibold text-texto-2">Asignar Permisos</h3>
+                  <span className="ml-auto text-sm text-tenue">
                     {selectedPermisoIds.size} permisos seleccionados
                   </span>
                 </div>
 
                 {isLoadingPermisos && (
                   <div className="text-center py-8">
-                    <div className="text-gray-300">Cargando permisos disponibles...</div>
+                    <div className="text-suave">Cargando permisos disponibles...</div>
                   </div>
                 )}
 
                 {errorPermisos && (
                   <Alert className="border-red-500 bg-red-500/10 bg-opacity-30">
-                    <AlertCircle className="h-4 w-4 text-red-400" />
-                    <AlertDescription className="text-red-300">{errorPermisos}</AlertDescription>
+                    <AlertCircle className="h-4 w-4 text-peligro" />
+                    <AlertDescription className="text-peligro">{errorPermisos}</AlertDescription>
                   </Alert>
                 )}
 
                 {!isLoadingPermisos && !errorPermisos && Object.keys(groupedPermisos).length === 0 && (
-                  <div className="text-center py-8 text-gray-400">No hay permisos disponibles para asignar.</div>
+                  <div className="text-center py-8 text-tenue">No hay permisos disponibles para asignar.</div>
                 )}
 
                 {Object.entries(groupedPermisos).map(([modulo, permisosDelModulo]) => (
-                  <Card key={modulo} className="bg-[#152B2B] border-gray-700 shadow-sm">
+                  <Card key={modulo} className="bg-background border-borde shadow-sm">
                     <CardHeader className="pb-3 pt-4 px-4">
-                      <CardTitle className="text-lg font-medium flex items-center" style={{ color: "#F1C77A" }}>
+                      <CardTitle className="text-lg font-medium flex items-center" style={{ color: "var(--dorado)" }}>
                         Módulo - {modulo}
-                        <span className="ml-auto text-sm text-gray-400">
+                        <span className="ml-auto text-sm text-tenue">
                           {permisosDelModulo.filter((p) => selectedPermisoIds.has(p.id)).length}/
                           {permisosDelModulo.length}
                         </span>
@@ -429,23 +429,23 @@ export default function EditarPerfilPage() { // Renamed component
                       {permisosDelModulo.map((permiso) => (
                         <div
                           key={permiso.id}
-                          className="flex items-start space-x-3 p-2 rounded-md hover:bg-[#2A4242] transition-colors"
+                          className="flex items-start space-x-3 p-2 rounded-md hover:bg-superficie transition-colors"
                         >
                           <Checkbox
                             id={`permiso-${permiso.id}`}
                             checked={selectedPermisoIds.has(permiso.id)}
                             onCheckedChange={(checked) => handlePermisoChange(permiso.id, Boolean(checked))}
-                            className="border-gray-500 data-[state=checked]:bg-primary !text-primary-foreground data-[state=checked]:border-teal-600 mt-1"
+                            className="border-borde-fuerte data-[state=checked]:bg-primary !text-primary-foreground data-[state=checked]:border-teal-600 mt-1"
                           />
                           <div className="flex-1">
                             <Label
                               htmlFor={`permiso-${permiso.id}`}
-                              className="text-gray-300 text-sm cursor-pointer select-none font-medium leading-tight"
+                              className="text-suave text-sm cursor-pointer select-none font-medium leading-tight"
                             >
                               {permiso.nombre}
                             </Label>
                             {permiso.descripcion && (
-                              <p className="text-xs text-gray-500 mt-1 leading-tight">{permiso.descripcion}</p>
+                              <p className="text-xs text-tenue mt-1 leading-tight">{permiso.descripcion}</p>
                             )}
                           </div>
                         </div>
@@ -457,18 +457,18 @@ export default function EditarPerfilPage() { // Renamed component
 
               {fieldErrors.general && (
                 <Alert className="border-red-500 bg-red-500/10 bg-opacity-30">
-                  <AlertCircle className="h-4 w-4 text-red-400" />
-                  <AlertDescription className="text-red-300">{fieldErrors.general}</AlertDescription>
+                  <AlertCircle className="h-4 w-4 text-peligro" />
+                  <AlertDescription className="text-peligro">{fieldErrors.general}</AlertDescription>
                 </Alert>
               )}
 
-              <div className="flex flex-col sm:flex-row justify-between items-center pt-6 gap-4 border-t border-gray-700">
+              <div className="flex flex-col sm:flex-row justify-between items-center pt-6 gap-4 border-t border-borde">
                 <div className="flex gap-3">
                   <Button
                     type="button"
                     variant="outline"
                     onClick={() => router.push("/perfiles")}
-                    className="text-gray-300 border-gray-600 hover:bg-[#2A4242]"
+                    className="text-suave border-borde-fuerte hover:bg-superficie"
                   >
                     Cancelar
                   </Button>
@@ -476,7 +476,7 @@ export default function EditarPerfilPage() { // Renamed component
                     type="button"
                     variant="outline"
                     onClick={resetForm}
-                    className="text-gray-300 border-gray-600 hover:bg-[#2A4242]"
+                    className="text-suave border-borde-fuerte hover:bg-superficie"
                     disabled={isLoading || isLoadingProfile || true} // Disabled "Limpiar" button as per instruction
                   >
                     Limpiar
@@ -486,7 +486,7 @@ export default function EditarPerfilPage() { // Renamed component
                 <Button
                   type="submit"
                   disabled={isLoading || isLoadingPermisos || isLoadingProfile} // Consider isLoadingProfile too
-                  style={{ backgroundColor: "#F1C77A", color: "#1D3434" }}
+                  style={{ backgroundColor: "var(--primary)", color: "var(--primary-foreground)" }}
                   className="font-semibold py-3 px-8 rounded-lg transition-colors duration-300 flex items-center justify-center min-w-[200px]"
                 >
                   <ShieldCheck className="w-5 h-5 mr-2" /> {/* Changed Icon */}

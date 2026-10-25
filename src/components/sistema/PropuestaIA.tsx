@@ -67,48 +67,48 @@ export default function PropuestaIA({ texto, onAceptar, disabled }: PropuestaIAP
         variant="outline"
         disabled={disabled || cargando || !configurada || !texto.trim()}
         onClick={pedirPropuesta}
-        className="border-[#F1C77A] text-[#F1C77A] hover:bg-[#F1C77A] hover:text-[#1D3434]"
+        className="border-dorado text-dorado hover:bg-primary hover:text-primary-foreground"
       >
         {cargando ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
         {cargando ? "Ordenando..." : "Ordenar con IA"}
       </Button>
 
       {configurada === false ? (
-        <p className="flex items-start gap-2 text-sm text-gray-400">
+        <p className="flex items-start gap-2 text-sm text-tenue">
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
           La IA no está configurada en este servidor. Podés ordenar la nota a mano.
         </p>
       ) : (
         // Ley 25.326: el profesional tiene que saber que el texto sale del sistema antes de usarla
-        <p className="flex items-start gap-2 text-xs text-gray-400">
-          <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-[#F1C77A]" />
+        <p className="flex items-start gap-2 text-xs text-tenue">
+          <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-dorado" />
           Al usar la IA, el texto de la nota se envía a un servicio externo (Anthropic) para ordenarlo. No se guarda en
           MemoPsy hasta que lo aceptes. Evitá incluir nombre, DNI u otros datos que identifiquen al paciente.
         </p>
       )}
 
       {error && (
-        <p className="flex items-start gap-2 text-sm text-amber-300">
+        <p className="flex items-start gap-2 text-sm text-aviso">
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
           {error}
         </p>
       )}
 
       {propuesta !== null && (
-        <div className="space-y-3 rounded-md border border-[#F1C77A]/40 bg-[#152A2A] p-4">
-          <p className="text-sm text-gray-300">
+        <div className="space-y-3 rounded-md border border-dorado/40 bg-background p-4">
+          <p className="text-sm text-suave">
             Revisá la propuesta antes de usarla. Si la aceptás, reemplaza el contenido y lo podés seguir editando.
           </p>
           <div className="grid gap-3 md:grid-cols-2">
             <div className="space-y-1">
-              <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Tu texto</p>
-              <div className="max-h-72 overflow-auto whitespace-pre-wrap rounded-md border border-gray-700 p-3 text-sm text-gray-300">
+              <p className="text-xs font-semibold uppercase tracking-wide text-tenue">Tu texto</p>
+              <div className="max-h-72 overflow-auto whitespace-pre-wrap rounded-md border border-borde p-3 text-sm text-suave">
                 {original}
               </div>
             </div>
             <div className="space-y-1">
-              <p className="text-xs font-semibold uppercase tracking-wide text-[#F1C77A]">Propuesta de la IA</p>
-              <div className="max-h-72 overflow-auto whitespace-pre-wrap rounded-md border border-[#F1C77A]/60 p-3 text-sm text-white">
+              <p className="text-xs font-semibold uppercase tracking-wide text-dorado">Propuesta de la IA</p>
+              <div className="max-h-72 overflow-auto whitespace-pre-wrap rounded-md border border-dorado/60 p-3 text-sm text-foreground">
                 {propuesta}
               </div>
             </div>
@@ -119,12 +119,12 @@ export default function PropuestaIA({ texto, onAceptar, disabled }: PropuestaIAP
               size="sm"
               variant="outline"
               onClick={() => setPropuesta(null)}
-              className="border-gray-500 text-gray-300 hover:bg-gray-700 hover:text-white"
+              className="border-borde-fuerte text-suave hover:bg-superficie hover:text-foreground"
             >
               <X className="mr-2 h-4 w-4" />
               Descartar
             </Button>
-            <Button type="button" size="sm" onClick={aceptar} className="bg-[#F1C77A] text-[#1D3434] hover:bg-opacity-80">
+            <Button type="button" size="sm" onClick={aceptar} className="bg-primary text-primary-foreground hover:bg-opacity-80">
               <Check className="mr-2 h-4 w-4" />
               Usar esta versión
             </Button>

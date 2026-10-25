@@ -51,14 +51,14 @@ export default function OlvidePasswordPage() {
 
         {mensaje ? (
           <div className="mt-6">
-            <Mail className="h-10 w-10 text-primary" aria-hidden="true" />
-            <p role="status" className="mt-3 text-white/90">{mensaje}</p>
-            <p className="mt-2 text-sm text-white/70">Revisá también la carpeta de spam. El enlace vence en 30 minutos.</p>
-            <Link href="/login" className="mt-6 inline-block text-primary underline">Volver al inicio de sesión</Link>
+            <Mail className="h-10 w-10 text-dorado" aria-hidden="true" />
+            <p role="status" className="mt-3 text-foreground/90">{mensaje}</p>
+            <p className="mt-2 text-sm text-foreground/70">Revisá también la carpeta de spam. El enlace vence en 30 minutos.</p>
+            <Link href="/login" className="mt-6 inline-block text-dorado underline">Volver al inicio de sesión</Link>
           </div>
         ) : (
           <>
-            <p className="mt-2 mb-6 text-sm text-white/80">
+            <p className="mt-2 mb-6 text-sm text-foreground/80">
               Escribí el email de tu cuenta y te mandamos un enlace para elegir una contraseña nueva.
             </p>
             <form onSubmit={enviar} className="space-y-4" noValidate>
@@ -76,7 +76,7 @@ export default function OlvidePasswordPage() {
                 />
               </div>
 
-              {error && <p role="alert" className="text-sm text-red-300">{error}</p>}
+              {error && <p role="alert" className="text-sm text-peligro">{error}</p>}
 
               <Button type="submit" className="w-full" disabled={cargando}>
                 {cargando && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -84,7 +84,7 @@ export default function OlvidePasswordPage() {
               </Button>
             </form>
             <p className="mt-6 text-sm">
-              <Link href="/login" className="text-primary underline">Volver al inicio de sesión</Link>
+              <Link href="/login" className="text-dorado underline">Volver al inicio de sesión</Link>
             </p>
           </>
         )}

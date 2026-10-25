@@ -458,8 +458,8 @@ export default function EditarUsuarioPage() {
 
   if (isLoadingData && status !== "loading") {
     return (
-      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: "#152A2A" }}>
-        <div className="text-white text-lg">Cargando datos del usuario...</div>
+      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: "var(--background)" }}>
+        <div className="text-foreground text-lg">Cargando datos del usuario...</div>
       </div>
     )
   }
@@ -468,12 +468,12 @@ export default function EditarUsuarioPage() {
     return (
       <div className="min-h-screen">
         <main className="mx-auto w-full max-w-6xl px-6 py-10 text-center">
-          <AlertCircle className="w-16 h-16 mx-auto mb-6 text-red-500" />
-          <h1 className="text-3xl font-bold text-red-500 mb-4">Acceso Denegado</h1>
-          <p className="text-gray-300 mb-6">{error || "No tenés permiso para editar este usuario."}</p>
+          <AlertCircle className="w-16 h-16 mx-auto mb-6 text-peligro" />
+          <h1 className="text-3xl font-bold text-peligro mb-4">Acceso Denegado</h1>
+          <p className="text-suave mb-6">{error || "No tenés permiso para editar este usuario."}</p>
           <Button
             onClick={() => router.push("/usuarios/listar")}
-            style={{ backgroundColor: "#F1C77A", color: "#1D3434" }}
+            style={{ backgroundColor: "var(--primary)", color: "var(--primary-foreground)" }}
           >
             Volver a la Lista
           </Button>
@@ -486,12 +486,12 @@ export default function EditarUsuarioPage() {
     return (
       <div className="min-h-screen">
         <main className="mx-auto w-full max-w-6xl px-6 py-10 text-center">
-          <AlertCircle className="w-16 h-16 mx-auto mb-6 text-red-500" />
-          <h1 className="text-3xl font-bold text-red-500 mb-4">Error al Cargar Usuario</h1>
-          <p className="text-gray-300 mb-6">{error}</p>
+          <AlertCircle className="w-16 h-16 mx-auto mb-6 text-peligro" />
+          <h1 className="text-3xl font-bold text-peligro mb-4">Error al Cargar Usuario</h1>
+          <p className="text-suave mb-6">{error}</p>
           <Button
             onClick={() => router.push("/usuarios/listar")}
-            style={{ backgroundColor: "#F1C77A", color: "#1D3434" }}
+            style={{ backgroundColor: "var(--primary)", color: "var(--primary-foreground)" }}
           >
             Volver a la Lista
           </Button>
@@ -506,16 +506,16 @@ export default function EditarUsuarioPage() {
       {/* Main Content */}
       <main className="mx-auto w-full max-w-6xl px-6 py-10">
         <EncabezadoPagina titulo={<>{pageTitle}</>} descripcion="Actualice los datos del usuario y asigne perfiles según sea necesario." volverA="/usuarios" textoVolver="Volver a Usuarios" />
-        <Card className="max-w-2xl mx-auto" style={{ backgroundColor: "#1D3434", borderColor: "#2A4A4A" }}>
+        <Card className="max-w-2xl mx-auto" style={{ backgroundColor: "var(--card)", borderColor: "var(--borde)" }}>
           <CardContent>
             {isLoadingData && userActionPermissions.canEdit ? (
-              <div className="text-center text-gray-300 py-10">Cargando datos del usuario...</div>
+              <div className="text-center text-suave py-10">Cargando datos del usuario...</div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Personal Info */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="nombre" className="text-gray-200">
+                    <Label htmlFor="nombre" className="text-texto-2">
                       Nombre
                     </Label>
                     <Input
@@ -523,12 +523,12 @@ export default function EditarUsuarioPage() {
                       name="nombre"
                       value={formData.nombre}
                       onChange={handleChange}
-                      className="bg-[#2A4242] mt-1"
+                      className="bg-superficie mt-1"
                     />
-                    {fieldErrors.nombre && <p className="text-red-500 text-xs mt-1">{fieldErrors.nombre}</p>}
+                    {fieldErrors.nombre && <p className="text-peligro text-xs mt-1">{fieldErrors.nombre}</p>}
                   </div>
                   <div>
-                    <Label htmlFor="apellido" className="text-gray-200">
+                    <Label htmlFor="apellido" className="text-texto-2">
                       Apellido
                     </Label>
                     <Input
@@ -536,14 +536,14 @@ export default function EditarUsuarioPage() {
                       name="apellido"
                       value={formData.apellido}
                       onChange={handleChange}
-                      className="bg-[#2A4242] mt-1"
+                      className="bg-superficie mt-1"
                     />
-                    {fieldErrors.apellido && <p className="text-red-500 text-xs mt-1">{fieldErrors.apellido}</p>}
+                    {fieldErrors.apellido && <p className="text-peligro text-xs mt-1">{fieldErrors.apellido}</p>}
                   </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="dni" className="text-gray-200">
+                    <Label htmlFor="dni" className="text-texto-2">
                       DNI
                     </Label>
                     <Input
@@ -551,12 +551,12 @@ export default function EditarUsuarioPage() {
                       name="dni"
                       value={formData.dni}
                       onChange={handleChange}
-                      className="bg-[#2A4242] mt-1"
+                      className="bg-superficie mt-1"
                     />
-                    {fieldErrors.dni && <p className="text-red-500 text-xs mt-1">{fieldErrors.dni}</p>}
+                    {fieldErrors.dni && <p className="text-peligro text-xs mt-1">{fieldErrors.dni}</p>}
                   </div>
                   <div>
-                    <Label htmlFor="fechaNacimiento" className="text-gray-200">
+                    <Label htmlFor="fechaNacimiento" className="text-texto-2">
                       Fecha de Nacimiento
                     </Label>
                     <Input
@@ -565,16 +565,16 @@ export default function EditarUsuarioPage() {
                       type="date"
                       value={formData.fechaNacimiento}
                       onChange={handleChange}
-                      className="bg-[#2A4242] mt-1"
+                      className="bg-superficie mt-1"
                       style={{ colorScheme: "dark" }}
                     />
                     {fieldErrors.fechaNacimiento && (
-                      <p className="text-red-500 text-xs mt-1">{fieldErrors.fechaNacimiento}</p>
+                      <p className="text-peligro text-xs mt-1">{fieldErrors.fechaNacimiento}</p>
                     )}
                   </div>
                 </div>
                 <div>
-                  <Label htmlFor="telefono" className="text-gray-200">
+                  <Label htmlFor="telefono" className="text-texto-2">
                     Celular
                   </Label>
                   <Input
@@ -585,18 +585,18 @@ export default function EditarUsuarioPage() {
                     value={formData.telefono}
                     onChange={handleChange}
                     placeholder="3704 123456"
-                    className="bg-[#2A4242] mt-1"
+                    className="bg-superficie mt-1"
                   />
                   {fieldErrors.telefono ? (
-                    <p className="text-red-500 text-xs mt-1">{fieldErrors.telefono}</p>
+                    <p className="text-peligro text-xs mt-1">{fieldErrors.telefono}</p>
                   ) : (
-                    <p className="text-gray-400 text-xs mt-1">Opcional. Dato de contacto del paciente.</p>
+                    <p className="text-tenue text-xs mt-1">Opcional. Dato de contacto del paciente.</p>
                   )}
                 </div>
 
                 {/* Account Info */}
                 <div>
-                  <Label htmlFor="email" className="text-gray-200">
+                  <Label htmlFor="email" className="text-texto-2">
                     Email (No editable)
                   </Label>
                   <Input
@@ -605,7 +605,7 @@ export default function EditarUsuarioPage() {
                     type="email"
                     value={formData.email}
                     readOnly
-                    className="bg-[#152B2B] mt-1 text-gray-400"
+                    className="bg-background mt-1 text-tenue"
                   />
                 </div>
 
@@ -614,9 +614,9 @@ export default function EditarUsuarioPage() {
                     id="activo"
                     checked={formData.activo}
                     onCheckedChange={handleSwitchChange}
-                    className="data-[state=checked]:bg-primary !text-primary-foreground data-[state=unchecked]:bg-[#2B4243]"
+                    className="data-[state=checked]:bg-primary !text-primary-foreground data-[state=unchecked]:bg-superficie"
                   />
-                  <Label htmlFor="activo" className="text-gray-200">
+                  <Label htmlFor="activo" className="text-texto-2">
                     Usuario {formData.activo ? "Activo" : "Inactivo"}
                   </Label>
                 </div>
@@ -628,12 +628,12 @@ export default function EditarUsuarioPage() {
                       checked={isPsicologo}
                       onCheckedChange={handlePsicologoToggle}
                       disabled={hasExistingPsicologoData}
-                      className="data-[state=checked]:bg-primary !text-primary-foreground data-[state=unchecked]:bg-[#2B4243] disabled:opacity-50"
+                      className="data-[state=checked]:bg-primary !text-primary-foreground data-[state=unchecked]:bg-superficie disabled:opacity-50"
                     />
-                    <Label htmlFor="isPsicologo" className="text-gray-200 flex items-center">
-                      <Brain className="w-5 h-5 mr-2 text-teal-400" /> Psicólogo
+                    <Label htmlFor="isPsicologo" className="text-texto-2 flex items-center">
+                      <Brain className="w-5 h-5 mr-2 text-info" /> Psicólogo
                       {hasExistingPsicologoData && (
-                        <span className="text-xs text-yellow-400 ml-2">
+                        <span className="text-xs text-aviso ml-2">
                           (No se puede desactivar - datos existentes)
                         </span>
                       )}
@@ -646,12 +646,12 @@ export default function EditarUsuarioPage() {
                       checked={isPaciente}
                       onCheckedChange={handlePacienteToggle}
                       disabled={hasExistingPacienteData}
-                      className="data-[state=checked]:bg-primary !text-primary-foreground data-[state=unchecked]:bg-[#2B4243] disabled:opacity-50"
+                      className="data-[state=checked]:bg-primary !text-primary-foreground data-[state=unchecked]:bg-superficie disabled:opacity-50"
                     />
-                    <Label htmlFor="isPaciente" className="text-gray-200 flex items-center">
+                    <Label htmlFor="isPaciente" className="text-texto-2 flex items-center">
                       <Activity className="w-5 h-5 mr-2 text-lime-400" /> Paciente
                       {hasExistingPacienteData && (
-                        <span className="text-xs text-yellow-400 ml-2">
+                        <span className="text-xs text-aviso ml-2">
                           (No se puede desactivar - datos existentes)
                         </span>
                       )}
@@ -662,7 +662,7 @@ export default function EditarUsuarioPage() {
                 {isPsicologo && (
                   <div className="pl-8 space-y-4 transition-all duration-300 ease-in-out">
                     <div>
-                      <Label htmlFor="numeroLicencia" className="text-gray-200">
+                      <Label htmlFor="numeroLicencia" className="text-texto-2">
                         Número de Licencia
                       </Label>
                       <Input
@@ -670,14 +670,14 @@ export default function EditarUsuarioPage() {
                         name="numeroLicencia"
                         value={formData.numeroLicencia}
                         onChange={handleChange}
-                        className="bg-[#2A4242] mt-1"
+                        className="bg-superficie mt-1"
                       />
                       {fieldErrors.numeroLicencia && (
-                        <p className="text-red-500 text-xs mt-1">{fieldErrors.numeroLicencia}</p>
+                        <p className="text-peligro text-xs mt-1">{fieldErrors.numeroLicencia}</p>
                       )}
                     </div>
                     <div>
-                      <Label htmlFor="especialidad" className="text-gray-200">
+                      <Label htmlFor="especialidad" className="text-texto-2">
                         Especialidad
                       </Label>
                       <Select
@@ -685,10 +685,10 @@ export default function EditarUsuarioPage() {
                         value={formData.especialidad}
                         onValueChange={handleEspecialidadChange}
                       >
-                        <SelectTrigger id="especialidad" className="bg-[#2A4242] border-gray-600 text-gray-200 mt-1">
+                        <SelectTrigger id="especialidad" className="bg-superficie border-borde-fuerte text-texto-2 mt-1">
                           <SelectValue placeholder="Elegí una especialidad" />
                         </SelectTrigger>
-                        <SelectContent className="bg-[#152B2B] border-gray-600">
+                        <SelectContent className="bg-background border-borde-fuerte">
                           {/* Si el psicólogo tiene cargada una especialidad que no está en la lista, se conserva */}
                           {[
                             ...(formData.especialidad &&
@@ -700,7 +700,7 @@ export default function EditarUsuarioPage() {
                             <SelectItem
                               key={esp}
                               value={esp}
-                              className="text-gray-200 cursor-pointer hover:!bg-teal-700/60 hover:!text-amber-200 focus:!bg-teal-700/60 focus:!text-amber-200 data-[state=checked]:!text-amber-300"
+                              className="text-texto-2 cursor-pointer hover:!bg-teal-700/60 hover:!text-aviso focus:!bg-teal-700/60 focus:!text-aviso data-[state=checked]:!text-aviso"
                             >
                               {esp}
                             </SelectItem>
@@ -708,7 +708,7 @@ export default function EditarUsuarioPage() {
                         </SelectContent>
                       </Select>
                       {fieldErrors.especialidad && (
-                        <p className="text-red-500 text-xs mt-1">{fieldErrors.especialidad}</p>
+                        <p className="text-peligro text-xs mt-1">{fieldErrors.especialidad}</p>
                       )}
                     </div>
                   </div>
@@ -717,7 +717,7 @@ export default function EditarUsuarioPage() {
                 {isPaciente && (
                   <div className="pl-8 space-y-4 transition-all duration-300 ease-in-out">
                     <div>
-                      <Label htmlFor="selectedObraSocialId" className="text-gray-200">
+                      <Label htmlFor="selectedObraSocialId" className="text-texto-2">
                         Obra Social
                       </Label>
                       <Select 
@@ -725,14 +725,14 @@ export default function EditarUsuarioPage() {
                         value={selectedObraSocialId || ""} 
                         onValueChange={handleObraSocialSelectChange}
                       >
-                        <SelectTrigger className="bg-[#2A4242] border-gray-600 text-gray-200 mt-1">
+                        <SelectTrigger className="bg-superficie border-borde-fuerte text-texto-2 mt-1">
                           <SelectValue 
                             placeholder={isLoadingObrasSociales ? "Cargando..." : "Elegí la obra social"}
                           />
                         </SelectTrigger>
-                        <SelectContent className="bg-[#152B2B] border-gray-600">
+                        <SelectContent className="bg-background border-borde-fuerte">
                           {obrasSocialesList.length === 0 ? (
-                            <SelectItem value="no-options" disabled className="text-gray-400">
+                            <SelectItem value="no-options" disabled className="text-tenue">
                               No hay obras sociales disponibles
                             </SelectItem>
                           ) : (
@@ -740,7 +740,7 @@ export default function EditarUsuarioPage() {
                               <SelectItem
                                 key={obra.id}
                                 value={obra.id}
-                                className="text-gray-200 cursor-pointer hover:!bg-teal-700/60 hover:!text-amber-200 focus:!bg-teal-700/60 focus:!text-amber-200 data-[state=checked]:!text-amber-300"
+                                className="text-texto-2 cursor-pointer hover:!bg-teal-700/60 hover:!text-aviso focus:!bg-teal-700/60 focus:!text-aviso data-[state=checked]:!text-aviso"
                               >
                                 {obra.nombre.trim().toLowerCase() === "particular"
                                   ? "Particular (sin obra social)"
@@ -751,37 +751,37 @@ export default function EditarUsuarioPage() {
                         </SelectContent>
                       </Select>
                       {obrasSocialesList.find((o) => o.id === selectedObraSocialId)?.nombre.trim().toLowerCase() === "particular" && (
-                        <p className="text-amber-300 text-xs mt-1">
+                        <p className="text-aviso text-xs mt-1">
                           Paciente particular: abona la sesión en efectivo o por QR del psicólogo.
                         </p>
                       )}
                       {fieldErrors.selectedObraSocialId && (
-                        <p className="text-red-500 text-xs mt-1">{fieldErrors.selectedObraSocialId}</p>
+                        <p className="text-peligro text-xs mt-1">{fieldErrors.selectedObraSocialId}</p>
                       )}
                     </div>
                   </div>
                 )}
                 {/* Profile Selection */}
                 <div className="space-y-2">
-                  <Label className="text-gray-200">Perfiles de Usuario</Label>
+                  <Label className="text-texto-2">Perfiles de Usuario</Label>
                   {isLoadingProfiles ? (
-                    <p className="text-gray-400">Cargando perfiles...</p>
+                    <p className="text-tenue">Cargando perfiles...</p>
                   ) : availableProfiles.length === 0 ? (
-                    <p className="text-gray-400">No hay perfiles disponibles.</p>
+                    <p className="text-tenue">No hay perfiles disponibles.</p>
                   ) : (
-                    <div className="space-y-2 rounded-md border border-gray-700 p-4 max-h-60 overflow-y-auto">
+                    <div className="space-y-2 rounded-md border border-borde p-4 max-h-60 overflow-y-auto">
                       {availableProfiles.map((perfil) => (
                         <div key={perfil.id} className="flex items-center space-x-2">
                           <Checkbox
                             id={`perfil-${perfil.id}`}
                             checked={selectedProfileIds.includes(perfil.id)}
                             onCheckedChange={(checked) => handleProfileSelectionChange(perfil.id, !!checked)}
-                            className="data-[state=checked]:bg-primary !text-primary-foreground border-gray-600"
+                            className="data-[state=checked]:bg-primary !text-primary-foreground border-borde-fuerte"
                           />
-                          <Label htmlFor={`perfil-${perfil.id}`} className="text-gray-300 font-normal">
+                          <Label htmlFor={`perfil-${perfil.id}`} className="text-suave font-normal">
                             {perfil.nombre}
                             {perfil.descripcion && (
-                              <span className="text-xs text-gray-400 ml-2">({perfil.descripcion})</span>
+                              <span className="text-xs text-tenue ml-2">({perfil.descripcion})</span>
                             )}
                           </Label>
                         </div>
@@ -791,7 +791,7 @@ export default function EditarUsuarioPage() {
                 </div>
 
                 {error && Object.keys(fieldErrors).length === 0 && (
-                  <p className="text-red-500 text-sm text-center bg-red-500/10 bg-opacity-30 p-3 rounded-md">{error}</p>
+                  <p className="text-peligro text-sm text-center bg-red-500/10 bg-opacity-30 p-3 rounded-md">{error}</p>
                 )}
 
                 <CardFooter className="flex justify-end pt-6">
@@ -799,11 +799,11 @@ export default function EditarUsuarioPage() {
                     type="button"
                     variant="outline"
                     onClick={() => router.push("/usuarios/listar")}
-                    className="mr-3 text-gray-300 border-gray-600 hover:bg-[#2A4242]"
+                    className="mr-3 text-suave border-borde-fuerte hover:bg-superficie"
                   >
                     Cancelar
                   </Button>
-                  <Button type="submit" disabled={isSubmitting} className="bg-primary !text-primary-foreground hover:bg-primary/90 text-white">
+                  <Button type="submit" disabled={isSubmitting} className="bg-primary !text-primary-foreground hover:bg-primary/90 text-foreground">
                     {isSubmitting ? "Guardando..." : "Guardar Cambios"}
                   </Button>
                 </CardFooter>

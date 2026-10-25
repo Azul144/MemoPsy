@@ -20,7 +20,7 @@ export default function InputPassword({ className, disabled, ...props }: Omit<Co
         aria-label={visible ? "Ocultar contraseña" : "Mostrar contraseña"}
         aria-pressed={visible}
         title={visible ? "Ocultar contraseña" : "Mostrar contraseña"}
-        className="absolute inset-y-0 right-0 flex w-10 items-center justify-center rounded-r-md text-gray-300 transition-colors hover:text-primary focus-visible:text-primary focus-visible:outline-none disabled:opacity-50"
+        className="absolute inset-y-0 right-0 flex w-10 items-center justify-center rounded-r-md text-suave transition-colors hover:text-dorado focus-visible:text-dorado focus-visible:outline-none disabled:opacity-50"
       >
         {visible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
       </button>

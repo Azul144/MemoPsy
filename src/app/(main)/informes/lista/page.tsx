@@ -434,9 +434,9 @@ function ListaInformes() {
   // Render Logic
   if (status === 'loading' || loadingPermissions || hasPermissionToViewPage === null) {
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen p-4" style={{ backgroundColor: '#152A2A' }}>
-            <Loader2 className="h-16 w-16 animate-spin text-[#F1C77A] mb-4" />
-            <TypographyP className="text-white">Cargando...</TypographyP>
+        <div className="flex flex-col items-center justify-center min-h-screen p-4" style={{ backgroundColor: "var(--background)" }}>
+            <Loader2 className="h-16 w-16 animate-spin text-dorado mb-4" />
+            <TypographyP className="text-foreground">Cargando...</TypographyP>
         </div>
     );
   }
@@ -445,11 +445,11 @@ function ListaInformes() {
     return (
       <div className="min-h-screen flex flex-col">
         <main className="mx-auto w-full max-w-6xl px-6 py-10 flex-grow flex items-center justify-center">
-            <div className="text-center p-8 rounded-2xl max-w-md mx-auto" style={{ backgroundColor: '#1D3434' }}>
-                <AlertTriangle className="w-16 h-16 mx-auto mb-6 text-red-500" />
-                <TypographyH1 className="mb-4 text-white">Acceso Denegado</TypographyH1>
-                <TypographyP className="text-gray-300">No tiene permisos para ver esta lista de informes.</TypographyP>
-                <Button onClick={() => router.push('/')} className="mt-6 bg-[#F1C77A] text-[#1D3434] hover:bg-opacity-80">Volver al Inicio</Button>
+            <div className="text-center p-8 rounded-2xl max-w-md mx-auto" style={{ backgroundColor: "var(--card)" }}>
+                <AlertTriangle className="w-16 h-16 mx-auto mb-6 text-peligro" />
+                <TypographyH1 className="mb-4 text-foreground">Acceso Denegado</TypographyH1>
+                <TypographyP className="text-suave">No tiene permisos para ver esta lista de informes.</TypographyP>
+                <Button onClick={() => router.push('/')} className="mt-6 bg-primary text-primary-foreground hover:bg-opacity-80">Volver al Inicio</Button>
             </div>
         </main>
       </div>
@@ -460,49 +460,49 @@ function ListaInformes() {
     <Pagination>
       <PaginationContent>
         <PaginationItem>
-          <PaginationPrevious href="#" onClick={(e) => { e.preventDefault(); onPageChange(pagination.currentPage - 1); }} className={cn("hover:bg-[#2A4A4A] hover:text-white", pagination.currentPage === 1 && "pointer-events-none opacity-50 text-gray-500")} />
+          <PaginationPrevious href="#" onClick={(e) => { e.preventDefault(); onPageChange(pagination.currentPage - 1); }} className={cn("hover:bg-superficie hover:text-foreground", pagination.currentPage === 1 && "pointer-events-none opacity-50 text-tenue")} />
         </PaginationItem>
         {[...Array(pagination.totalPages)].map((_, i) => (
           <PaginationItem key={i}>
             <PaginationLink href="#" onClick={(e) => { e.preventDefault(); onPageChange(i + 1);}} isActive={pagination.currentPage === i + 1}
-              className={cn("hover:text-[#F1C77A] hover:bg-[#2A4A4A]", pagination.currentPage === i+1 && "bg-[#F1C77A] text-[#1D3434] border-[#F1C77A] hover:bg-opacity-80 hover:text-[#1D3434]")}
+              className={cn("hover:text-dorado hover:bg-superficie", pagination.currentPage === i+1 && "bg-primary text-primary-foreground border-dorado hover:bg-opacity-80 hover:text-primary-foreground")}
             >
               {i + 1}
             </PaginationLink>
           </PaginationItem>
         ))}
         <PaginationItem>
-          <PaginationNext href="#" onClick={(e) => { e.preventDefault(); onPageChange(pagination.currentPage + 1); }} className={cn("hover:bg-[#2A4A4A] hover:text-white", pagination.currentPage === pagination.totalPages && "pointer-events-none opacity-50 text-gray-500")} />
+          <PaginationNext href="#" onClick={(e) => { e.preventDefault(); onPageChange(pagination.currentPage + 1); }} className={cn("hover:bg-superficie hover:text-foreground", pagination.currentPage === pagination.totalPages && "pointer-events-none opacity-50 text-tenue")} />
         </PaginationItem>
       </PaginationContent>
     </Pagination>
   );
   
   const SortableHeader = ({ columnId, label, sorting, onSortChange }: { columnId: string, label: string, sorting: SortingState, onSortChange: (columnId: string) => void }) => (
-    <TableHead onClick={() => onSortChange(columnId)} className="cursor-pointer hover:bg-[#2A4A4A] text-gray-200">
+    <TableHead onClick={() => onSortChange(columnId)} className="cursor-pointer hover:bg-superficie text-texto-2">
       {label} {sorting.sortBy === columnId && (sorting.sortOrder === 'asc' ? '▲' : '▼')}
     </TableHead>
   );
 
   const renderInformesTable = (informes: Informe[], isLoading: boolean, error: string | null, userRole: 'psicologo' | 'paciente') => (
     <>
-      {isLoading && <div className="flex justify-center items-center py-10"><Loader2 className="h-10 w-10 animate-spin text-[#F1C77A]" /> <TypographyP className="ml-3 text-gray-300">Cargando informes...</TypographyP></div>}
-      {error && <div className="p-4 bg-red-500/10 text-red-300 border border-red-400/40 rounded-md flex items-center"><AlertTriangle className="h-5 w-5 mr-2 text-red-400" /> <TypographyP>{error}</TypographyP></div>}
+      {isLoading && <div className="flex justify-center items-center py-10"><Loader2 className="h-10 w-10 animate-spin text-dorado" /> <TypographyP className="ml-3 text-suave">Cargando informes...</TypographyP></div>}
+      {error && <div className="p-4 bg-red-500/10 text-peligro border border-red-400/40 rounded-md flex items-center"><AlertTriangle className="h-5 w-5 mr-2 text-peligro" /> <TypographyP>{error}</TypographyP></div>}
       
       {!isLoading && !error && informes.length === 0 && (
-        <Card className="mt-6" style={{ backgroundColor: '#1D3434', borderColor: '#2A4A4A' }}>
+        <Card className="mt-6" style={{ backgroundColor: "var(--card)", borderColor: "var(--borde)" }}>
           <CardContent className="pt-10 pb-10 text-center">
-            <MainModuleIcon className="mx-auto h-16 w-16 text-gray-500 mb-4" />
-            <TypographyP className="text-gray-400">No se encontraron informes que coincidan con los criterios actuales.</TypographyP>
+            <MainModuleIcon className="mx-auto h-16 w-16 text-tenue mb-4" />
+            <TypographyP className="text-tenue">No se encontraron informes que coincidan con los criterios actuales.</TypographyP>
           </CardContent>
         </Card>
       )}
 
       {!isLoading && !error && informes.length > 0 && (
-        <Card style={{ backgroundColor: '#1D3434', borderColor: '#2A4A4A' }}>
+        <Card style={{ backgroundColor: "var(--card)", borderColor: "var(--borde)" }}>
           <CardContent className="p-0">
             <Table>
-              <TableHeader className="bg-[#2A4A4A]">
+              <TableHeader className="bg-superficie">
                 <TableRow>
                   <SortableHeader 
                     columnId="titulo" 
@@ -518,29 +518,29 @@ function ListaInformes() {
                     onSortChange={userRole === 'psicologo' ? handleSortChangePsicologo : handleSortChangePaciente}
                   />
                   {userRole === 'psicologo' && (
-                    <TableHead className="text-gray-200">Pacientes</TableHead>
+                    <TableHead className="text-texto-2">Pacientes</TableHead>
                   )}
                   {userRole === 'paciente' && (
-                    <TableHead className="text-gray-200">Psicólogo</TableHead>
+                    <TableHead className="text-texto-2">Psicólogo</TableHead>
                   )}
-                  <TableHead className="text-gray-200">Privacidad</TableHead>
-                  <TableHead className="text-gray-200 text-center">Acciones</TableHead>
+                  <TableHead className="text-texto-2">Privacidad</TableHead>
+                  <TableHead className="text-texto-2 text-center">Acciones</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {informes.map((informe) => (
-                  <TableRow key={informe.id} className="hover:bg-[#2A4A4A] border-gray-600">
-                    <TableCell className="text-white font-medium">
+                  <TableRow key={informe.id} className="hover:bg-superficie border-borde-fuerte">
+                    <TableCell className="text-foreground font-medium">
                       {informe.titulo}
                       {informe.etiquetas && informe.etiquetas.trim() && (
                         <div className="mt-1 flex flex-wrap gap-1">
                           {informe.etiquetas.split(',').map((e) => e.trim()).filter(Boolean).map((etq, i) => (
-                            <Badge key={i} className="bg-[#F1C77A]/20 text-[#F1C77A] text-xs font-normal">{etq}</Badge>
+                            <Badge key={i} className="bg-primary/20 text-dorado text-xs font-normal">{etq}</Badge>
                           ))}
                         </div>
                       )}
                     </TableCell>
-                    <TableCell className="text-gray-300">
+                    <TableCell className="text-suave">
                       {new Date(informe.fechaCreacion).toLocaleDateString('es-ES', {
                         year: 'numeric',
                         month: 'long',
@@ -549,31 +549,31 @@ function ListaInformes() {
                     </TableCell>
                     
                     {userRole === 'psicologo' && (
-                      <TableCell className="text-gray-300">
+                      <TableCell className="text-suave">
                         {informe.pacientes && informe.pacientes.length > 0 ? (
                           <div className="flex flex-wrap gap-1">
                             {informe.pacientes.map((paciente, index) => (
-                              <Badge key={index} variant="secondary" className="text-xs bg-[#F1C77A] text-[#1D3434]">
+                              <Badge key={index} variant="secondary" className="text-xs bg-primary text-primary-foreground">
                                 {paciente.nombre}
                                 {paciente.dni && ` (${paciente.dni})`}
                               </Badge>
                             ))}
                           </div>
                         ) : (
-                          <TypographySmall className="text-gray-500">Sin pacientes</TypographySmall>
+                          <TypographySmall className="text-tenue">Sin pacientes</TypographySmall>
                         )}
                       </TableCell>
                     )}
                     
                     {userRole === 'paciente' && (
-                      <TableCell className="text-gray-300">
+                      <TableCell className="text-suave">
                         {informe.psicologo ? (
-                          <Badge variant="outline" className="text-xs border-[#F1C77A] text-[#F1C77A]">
+                          <Badge variant="outline" className="text-xs border-dorado text-dorado">
                             <Brain className="w-3 h-3 mr-1" />
                             {informe.psicologo.nombre}
                           </Badge>
                         ) : (
-                          <TypographySmall className="text-gray-500">Sin asignar</TypographySmall>
+                          <TypographySmall className="text-tenue">Sin asignar</TypographySmall>
                         )}
                       </TableCell>
                     )}
@@ -600,7 +600,7 @@ function ListaInformes() {
                           size="sm"
                           variant="outline"
                           onClick={() => router.push(`/informes/detalle/${informe.id}`)}
-                          className="border-[#F1C77A] text-[#F1C77A] hover:bg-[#F1C77A] hover:text-[#1D3434]"
+                          className="border-dorado text-dorado hover:bg-primary hover:text-primary-foreground"
                         >
                           <Eye className="w-4 h-4" />
                         </Button>
@@ -609,7 +609,7 @@ function ListaInformes() {
                             size="sm"
                             variant="outline"
                             onClick={() => router.push(`/informes/editar/${informe.id}`)}
-                            className="border-green-500 text-green-400 hover:bg-primary/90 hover:text-white"
+                            className="border-green-500 text-exito hover:bg-primary/90 hover:text-foreground"
                           >
                             <Edit className="w-4 h-4" />
                           </Button>
@@ -636,20 +636,20 @@ function ListaInformes() {
         {/* Psychologist View */}
         {userRoles.isPsicologo && (
           <div className="mb-8">
-            <Card className="mb-6" style={{ backgroundColor: '#1D3434', borderColor: '#2A4A4A' }}>
+            <Card className="mb-6" style={{ backgroundColor: "var(--card)", borderColor: "var(--borde)" }}>
               <CardHeader>
-                <CardTitle className="text-white flex items-center">
-                  <Brain className="w-6 h-6 mr-2 text-[#F1C77A]" />
+                <CardTitle className="text-foreground flex items-center">
+                  <Brain className="w-6 h-6 mr-2 text-dorado" />
                   Vista del Psicólogo
                 </CardTitle>
-                <CardDescription className="text-gray-400">
+                <CardDescription className="text-tenue">
                   Notas creadas por vos para tus pacientes
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 {/* Patient Filter */}
                 <div className="mb-6">
-                  <Label htmlFor="paciente-filter" className="text-gray-300 mb-2 block">
+                  <Label htmlFor="paciente-filter" className="text-suave mb-2 block">
                     Filtrar por Paciente
                   </Label>
                   <div className="flex gap-2">
@@ -662,29 +662,29 @@ function ListaInformes() {
                           setIsPacienteSearchPopoverOpen(true);
                         }}
                         placeholder="Buscar paciente por nombre..."
-                        className="bg-[#152A2A] border-gray-600 text-white placeholder-gray-400"
+                        className="bg-background border-borde-fuerte text-foreground placeholder-gray-400"
                         onFocus={() => setIsPacienteSearchPopoverOpen(true)}
                       />
                       
                       {isPacienteSearchPopoverOpen && (pacienteSearchResults.length > 0 || isPacienteSearchLoading) && (
-                        <div className="absolute z-10 w-full mt-1 bg-[#1D3434] border border-gray-600 rounded-md shadow-lg max-h-48 overflow-y-auto">
+                        <div className="absolute z-10 w-full mt-1 bg-card border border-borde-fuerte rounded-md shadow-lg max-h-48 overflow-y-auto">
                           {isPacienteSearchLoading ? (
                             <div className="p-3 text-center">
-                              <Loader2 className="h-4 w-4 animate-spin text-[#F1C77A] mx-auto" />
+                              <Loader2 className="h-4 w-4 animate-spin text-dorado mx-auto" />
                             </div>
                           ) : (
                             pacienteSearchResults.map((paciente) => (
                               <button
                                 key={paciente.id}
                                 onClick={() => handlePacienteFilterSelect(paciente)}
-                                className="w-full px-3 py-2 text-left hover:bg-[#2A4A4A] text-white text-sm"
+                                className="w-full px-3 py-2 text-left hover:bg-superficie text-foreground text-sm"
                               >
                                 <div className="flex items-center">
-                                  <User className="w-4 h-4 mr-2 text-[#F1C77A]" />
+                                  <User className="w-4 h-4 mr-2 text-dorado" />
                                   <div>
                                     <div className="font-medium">{paciente.nombreCompleto}</div>
                                     {paciente.persona?.dni && (
-                                      <div className="text-xs text-gray-400">DNI: {paciente.persona.dni}</div>
+                                      <div className="text-xs text-tenue">DNI: {paciente.persona.dni}</div>
                                     )}
                                   </div>
                                 </div>
@@ -697,7 +697,7 @@ function ListaInformes() {
                     
                     <Button
                       onClick={handleApplyGeneralSearch}
-                      className="bg-[#F1C77A] text-[#1D3434] hover:bg-opacity-80"
+                      className="bg-primary text-primary-foreground hover:bg-opacity-80"
                     >
                       <Search className="w-4 h-4" />
                     </Button>
@@ -706,7 +706,7 @@ function ListaInformes() {
                       <Button
                         onClick={clearPacienteFilter}
                         variant="outline"
-                        className="border-red-500 text-red-400 hover:bg-red-500 hover:text-white"
+                        className="border-red-500 text-peligro hover:bg-red-500 hover:text-[#ffffff]"
                       >
                         <XCircle className="w-4 h-4" />
                       </Button>
@@ -715,7 +715,7 @@ function ListaInformes() {
                   
                   {/* Filtro por etiqueta (RF 2.1) */}
                   <div className="mt-4">
-                    <Label htmlFor="etiqueta-filter" className="text-gray-300 mb-2 block">
+                    <Label htmlFor="etiqueta-filter" className="text-suave mb-2 block">
                       Filtrar por Etiqueta
                     </Label>
                     <Input
@@ -724,13 +724,13 @@ function ListaInformes() {
                       onChange={(e) => setEtiquetaInput(e.target.value)}
                       onKeyDown={(e) => { if (e.key === 'Enter') handleApplyGeneralSearch(); }}
                       placeholder="Ej: ansiedad, seguimiento..."
-                      className="bg-[#152A2A] border-gray-600 text-white placeholder-gray-400"
+                      className="bg-background border-borde-fuerte text-foreground placeholder-gray-400"
                     />
                   </div>
 
                   {/* Búsqueda por palabra clave (RF 2.1): en el título, el texto y las etiquetas */}
                   <div className="mt-4">
-                    <Label htmlFor="palabra-filter" className="text-gray-300 mb-2 block">
+                    <Label htmlFor="palabra-filter" className="text-suave mb-2 block">
                       Buscar por palabra clave
                     </Label>
                     <Input
@@ -739,13 +739,13 @@ function ListaInformes() {
                       onChange={(e) => setPalabraInput(e.target.value)}
                       onKeyDown={(e) => { if (e.key === 'Enter') handleApplyGeneralSearch(); }}
                       placeholder="Busca en el título y el texto de la nota..."
-                      className="bg-[#152A2A] border-gray-600 text-white placeholder-gray-400"
+                      className="bg-background border-borde-fuerte text-foreground placeholder-gray-400"
                     />
                   </div>
 
                   {selectedPacienteFilterPsicologo && (
                     <div className="mt-2">
-                      <Badge className="bg-[#F1C77A] text-[#1D3434]">
+                      <Badge className="bg-primary text-primary-foreground">
                         <UserCheck className="w-3 h-3 mr-1" />
                         Filtrando por: {selectedPacienteFilterPsicologo.nombreCompleto}
                       </Badge>
@@ -753,14 +753,14 @@ function ListaInformes() {
                   )}
                   {filtersPsicologo.etiquetaQuery && (
                     <div className="mt-2">
-                      <Badge className="bg-[#F1C77A] text-[#1D3434]">
+                      <Badge className="bg-primary text-primary-foreground">
                         Etiqueta: {filtersPsicologo.etiquetaQuery}
                       </Badge>
                     </div>
                   )}
                   {filtersPsicologo.palabraQuery && (
                     <div className="mt-2">
-                      <Badge className="bg-[#F1C77A] text-[#1D3434]">
+                      <Badge className="bg-primary text-primary-foreground">
                         Palabra clave: {filtersPsicologo.palabraQuery}
                       </Badge>
                     </div>
@@ -769,13 +769,13 @@ function ListaInformes() {
 
                 {/* Results Summary */}
                 <div className="mb-4 flex items-center justify-between">
-                  <TypographyP className="text-gray-300">
-                    {paginationPsicologo.totalItems} informe(s) encontrado(s)
+                  <TypographyP className="text-suave">
+                    {paginationPsicologo.totalItems} {paginationPsicologo.totalItems === 1 ? "nota encontrada" : "notas encontradas"}
                   </TypographyP>
                   
                   <Button
                     onClick={() => router.push('/informes/registrar')}
-                    className="bg-primary !text-primary-foreground text-white hover:bg-primary/90"
+                    className="bg-primary !text-primary-foreground text-foreground hover:bg-primary/90"
                   >
                     <PlusCircle className="w-4 h-4 mr-2" />
                     Nueva nota
@@ -799,20 +799,20 @@ function ListaInformes() {
         {/* Patient View */}
         {userRoles.isPaciente && (
           <div className="mb-8">
-            <Card className="mb-6" style={{ backgroundColor: '#1D3434', borderColor: '#2A4A4A' }}>
+            <Card className="mb-6" style={{ backgroundColor: "var(--card)", borderColor: "var(--borde)" }}>
               <CardHeader>
-                <CardTitle className="text-white flex items-center">
-                  <User className="w-6 h-6 mr-2 text-[#F1C77A]" />
+                <CardTitle className="text-foreground flex items-center">
+                  <User className="w-6 h-6 mr-2 text-dorado" />
                   Vista del Paciente
                 </CardTitle>
-                <CardDescription className="text-gray-400">
+                <CardDescription className="text-tenue">
                   Informes que te compartieron tus psicólogos
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 {/* Results Summary */}
                 <div className="mb-4">
-                  <TypographyP className="text-gray-300">
+                  <TypographyP className="text-suave">
                     {paginationPaciente.totalItems} informe(s) disponible(s)
                   </TypographyP>
                 </div>
@@ -833,10 +833,10 @@ function ListaInformes() {
 
         {/* No Role Message */}
         {!userRoles.isPsicologo && !userRoles.isPaciente && (
-          <Card style={{ backgroundColor: '#1D3434', borderColor: '#2A4A4A' }}>
+          <Card style={{ backgroundColor: "var(--card)", borderColor: "var(--borde)" }}>
             <CardContent className="pt-10 pb-10 text-center">
-              <AlertTriangle className="mx-auto h-16 w-16 text-yellow-500 mb-4" />
-              <TypographyP className="text-gray-400">
+              <AlertTriangle className="mx-auto h-16 w-16 text-aviso mb-4" />
+              <TypographyP className="text-tenue">
                 No se ha asignado un perfil específico a su cuenta. Contacte al administrador.
               </TypographyP>
             </CardContent>

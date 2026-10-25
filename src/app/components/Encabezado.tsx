@@ -17,19 +17,19 @@ export default function Encabezado() {
   const [abierto, setAbierto] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/10 bg-background/80 backdrop-blur-md">
+    <header className="sticky top-0 z-50 border-b border-foreground/10 bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
 
         {/* Logo */}
         <a href="#inicio" className="flex items-center gap-3">
           <Image src="/assets/logopng.png" alt="Logo de MemoPsy" width={36} height={44} />
-          <span className="titulo text-2xl font-semibold text-primary">MemoPsy</span>
+          <span className="titulo text-2xl font-semibold text-dorado">MemoPsy</span>
         </a>
 
         {/* Menú de computadora */}
         <nav className="hidden gap-8 lg:flex">
           {links.map((link) => (
-            <a key={link.href} href={link.href} className="text-crema/85 transition-colors hover:text-primary">
+            <a key={link.href} href={link.href} className="text-crema/85 transition-colors hover:text-dorado">
               {link.texto}
             </a>
           ))}
@@ -37,7 +37,7 @@ export default function Encabezado() {
 
         {/* Botones de computadora */}
         <div className="hidden items-center gap-3 lg:flex">
-          <a href="#contacto" className="rounded-full border border-primary/70 px-5 py-2 font-semibold text-primary transition-colors hover:bg-primary/10">
+          <a href="#contacto" className="rounded-full border border-primary/70 px-5 py-2 font-semibold text-dorado transition-colors hover:bg-primary/10">
             Pedir demostración
           </a>
           <Link href="/login" className="rounded-full bg-primary px-5 py-2 font-semibold text-primary-foreground">
@@ -50,7 +50,7 @@ export default function Encabezado() {
           type="button"
           onClick={() => setAbierto(!abierto)}
           aria-label={abierto ? "Cerrar menú" : "Abrir menú"}
-          className="flex h-11 w-11 items-center justify-center rounded-md border border-white/15 text-white lg:hidden"
+          className="flex h-11 w-11 items-center justify-center rounded-md border border-foreground/15 text-foreground lg:hidden"
         >
           {abierto ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
@@ -58,13 +58,13 @@ export default function Encabezado() {
 
       {/* Menú desplegable del celular */}
       {abierto && (
-        <nav className="flex flex-col border-t border-white/10 px-6 py-3 lg:hidden">
+        <nav className="flex flex-col border-t border-foreground/10 px-6 py-3 lg:hidden">
           {links.map((link) => (
             <a
               key={link.href}
               href={link.href}
               onClick={() => setAbierto(false)}
-              className="py-3 text-white/90 hover:text-primary"
+              className="py-3 text-foreground/90 hover:text-dorado"
             >
               {link.texto}
             </a>
@@ -73,7 +73,7 @@ export default function Encabezado() {
             <a
               href="#contacto"
               onClick={() => setAbierto(false)}
-              className="flex-1 rounded-full border border-primary py-3 text-center font-semibold text-primary"
+              className="flex-1 rounded-full border border-primary py-3 text-center font-semibold text-dorado"
             >
               Demostración
             </a>

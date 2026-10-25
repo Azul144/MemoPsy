@@ -20,11 +20,11 @@ interface Notificacion {
 const INTERVALO_MS = 60_000;
 
 const ICONOS: Record<string, { icono: typeof Bell; color: string }> = {
-  CANCELACION: { icono: CalendarX, color: "text-red-300" },
-  REPROGRAMACION: { icono: RefreshCw, color: "text-orange-300" },
-  RECORDATORIO: { icono: CalendarClock, color: "text-primary" },
-  SEGUIMIENTO: { icono: ClipboardCheck, color: "text-primary" },
-  RESPUESTA_ACTIVIDAD: { icono: MessageSquare, color: "text-emerald-300" },
+  CANCELACION: { icono: CalendarX, color: "text-peligro" },
+  REPROGRAMACION: { icono: RefreshCw, color: "text-naranja" },
+  RECORDATORIO: { icono: CalendarClock, color: "text-dorado" },
+  SEGUIMIENTO: { icono: ClipboardCheck, color: "text-dorado" },
+  RESPUESTA_ACTIVIDAD: { icono: MessageSquare, color: "text-exito" },
 };
 
 function haceCuanto(fechaIso: string): string {
@@ -98,19 +98,19 @@ export default function CampanaNotificaciones() {
         onClick={alternar}
         aria-expanded={abierto}
         aria-label={sinLeer > 0 ? `Notificaciones: ${sinLeer} sin leer` : "Notificaciones"}
-        className="relative flex h-10 w-10 items-center justify-center rounded-full border border-white/15 text-crema transition-colors hover:border-primary/60"
+        className="relative flex h-10 w-10 items-center justify-center rounded-full border border-foreground/15 text-crema transition-colors hover:border-primary/60"
       >
         <Bell className="h-5 w-5" />
         {sinLeer > 0 && (
-          <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-xs font-bold text-white">
+          <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-xs font-bold text-[#ffffff]">
             {sinLeer > 9 ? "9+" : sinLeer}
           </span>
         )}
       </button>
 
       {abierto && (
-        <div className="absolute right-0 top-12 z-50 w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-white/10 bg-card text-crema shadow-2xl shadow-black/40">
-          <div className="border-b border-white/10 px-4 py-3">
+        <div className="absolute right-0 top-12 z-50 w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-foreground/10 bg-card text-crema shadow-2xl shadow-black/40">
+          <div className="border-b border-foreground/10 px-4 py-3">
             <p className="font-semibold">Notificaciones</p>
           </div>
           {notificaciones.length === 0 ? (
@@ -122,7 +122,7 @@ export default function CampanaNotificaciones() {
                 return (
                   <li
                     key={n.id}
-                    className={`flex gap-3 border-b border-white/5 px-4 py-3 last:border-0 ${n.leida ? "" : "bg-primary/10"}`}
+                    className={`flex gap-3 border-b border-foreground/5 px-4 py-3 last:border-0 ${n.leida ? "" : "bg-primary/10"}`}
                   >
                     <Icono className={`mt-0.5 h-5 w-5 shrink-0 ${color}`} />
                     <div className="min-w-0">

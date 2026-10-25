@@ -199,8 +199,8 @@ export default function ListarUsuariosPage() {
   // Loading state for initial permission check
   if (status === "loading" && isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: "#152A2A" }}>
-        <div className="text-white text-lg">Cargando...</div>
+      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: "var(--background)" }}>
+        <div className="text-foreground text-lg">Cargando...</div>
       </div>
     )
   }
@@ -210,10 +210,10 @@ export default function ListarUsuariosPage() {
     return (
       <div className="min-h-screen">
         <main className="mx-auto w-full max-w-6xl px-6 py-10 text-center">
-          <AlertCircle className="w-16 h-16 mx-auto mb-6 text-red-500" />
-          <h1 className="text-3xl font-bold text-red-500 mb-4">Acceso Denegado</h1>
-          <p className="text-gray-300 mb-6">{error || "No tenés permiso para ver esta página."}</p>
-          <Button onClick={() => router.push("/welcome")} style={{ backgroundColor: "#F1C77A", color: "#1D3434" }}>
+          <AlertCircle className="w-16 h-16 mx-auto mb-6 text-peligro" />
+          <h1 className="text-3xl font-bold text-peligro mb-4">Acceso Denegado</h1>
+          <p className="text-suave mb-6">{error || "No tenés permiso para ver esta página."}</p>
+          <Button onClick={() => router.push("/welcome")} style={{ backgroundColor: "var(--primary)", color: "var(--primary-foreground)" }}>
             Volver al Inicio
           </Button>
         </main>
@@ -230,7 +230,7 @@ export default function ListarUsuariosPage() {
           {userActionPermissions.canRegister && (
             <Button
               onClick={navigateToRegister}
-              style={{ backgroundColor: "#F1C77A", color: "#1D3434" }}
+              style={{ backgroundColor: "var(--primary)", color: "var(--primary-foreground)" }}
               className="flex items-center"
             >
               <PlusCircle className="w-5 h-5 mr-2" /> Registrar usuario
@@ -238,44 +238,44 @@ export default function ListarUsuariosPage() {
           )}
         </EncabezadoPagina>
 
-        <div className="mb-6 flex items-center bg-[#152B2B] p-3 rounded-lg shadow">
-          <Search className="text-gray-400 mr-3 w-5 h-5" />
+        <div className="mb-6 flex items-center bg-background p-3 rounded-lg shadow">
+          <Search className="text-tenue mr-3 w-5 h-5" />
           <Input
             type="text"
             placeholder="Buscar por nombre, apellido, email, DNI, especialidad o obra social..."
             value={searchTerm}
             onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
-            className="w-full bg-transparent text-white border-none focus:ring-0 placeholder-gray-400"
+            className="w-full bg-transparent text-foreground border-none focus:ring-0 placeholder-gray-400"
           />
         </div>
 
         {isLoading && userActionPermissions.canView ? (
-          <div className="flex flex-col items-center justify-center min-h-screen p-4" style={{ backgroundColor: '#152A2A' }}>
-            <Loader2 className="h-16 w-16 animate-spin text-[#F1C77A] mb-4" />
-            <TypographyP className="text-white">Cargando...</TypographyP>
+          <div className="flex flex-col items-center justify-center min-h-screen p-4" style={{ backgroundColor: "var(--background)" }}>
+            <Loader2 className="h-16 w-16 animate-spin text-dorado mb-4" />
+            <TypographyP className="text-foreground">Cargando...</TypographyP>
           </div>
         ) : error ? (
-          <div className="text-center text-red-400 py-10 bg-red-500/10 bg-opacity-30 p-4 rounded-md">
+          <div className="text-center text-peligro py-10 bg-red-500/10 bg-opacity-30 p-4 rounded-md">
             <AlertCircle className="w-8 h-8 mx-auto mb-2" /> {error}
           </div>
         ) : !filteredUsers.length ? (
-          <div className="text-center text-gray-400 py-10 bg-[#152B2B] p-6 rounded-md">
+          <div className="text-center text-tenue py-10 bg-background p-6 rounded-md">
             No se encontraron usuarios que coincidan con la búsqueda o no hay usuarios registrados.
           </div>
         ) : (
-          <div className="overflow-x-auto rounded-lg shadow" style={{ backgroundColor: "#1D3434" }}>
+          <div className="overflow-x-auto rounded-lg shadow" style={{ backgroundColor: "var(--card)" }}>
             <Table>
               <TableHeader>
-                <TableRow className="border-b border-gray-700">
-                  <TableHead className="text-white font-semibold">Nombre Completo</TableHead>
-                  <TableHead className="text-white font-semibold">Email</TableHead>
-                  <TableHead className="text-white font-semibold">DNI</TableHead>
-                  <TableHead className="text-white font-semibold">Tipo de Usuario</TableHead>
-                  <TableHead className="text-white font-semibold">Especialidad</TableHead>
-                  <TableHead className="text-white font-semibold">Nro. Licencia</TableHead>
-                  <TableHead className="text-white font-semibold">Obra Social</TableHead>
-                  <TableHead className="text-white font-semibold">Estado</TableHead>
-                  <TableHead className="text-white font-semibold text-right">Acciones</TableHead>
+                <TableRow className="border-b border-borde">
+                  <TableHead className="text-foreground font-semibold">Nombre Completo</TableHead>
+                  <TableHead className="text-foreground font-semibold">Email</TableHead>
+                  <TableHead className="text-foreground font-semibold">DNI</TableHead>
+                  <TableHead className="text-foreground font-semibold">Tipo de Usuario</TableHead>
+                  <TableHead className="text-foreground font-semibold">Especialidad</TableHead>
+                  <TableHead className="text-foreground font-semibold">Nro. Licencia</TableHead>
+                  <TableHead className="text-foreground font-semibold">Obra Social</TableHead>
+                  <TableHead className="text-foreground font-semibold">Estado</TableHead>
+                  <TableHead className="text-foreground font-semibold text-right">Acciones</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -286,12 +286,12 @@ export default function ListarUsuariosPage() {
                   if (tiposUsuario.length === 0) tiposUsuario.push("Usuario")
 
                   return (
-                    <TableRow key={user.id} className="border-b border-gray-700 hover:bg-[#152B2B] transition-colors">
-                      <TableCell className="text-gray-200">
+                    <TableRow key={user.id} className="border-b border-borde hover:bg-background transition-colors">
+                      <TableCell className="text-texto-2">
                         {user.persona ? `${user.persona.nombre} ${user.persona.apellido}` : "Sin datos personales"}
                       </TableCell>
-                      <TableCell className="text-gray-300">{user.email}</TableCell>
-                      <TableCell className="text-gray-300">{user.persona?.dni || "N/A"}</TableCell>
+                      <TableCell className="text-suave">{user.email}</TableCell>
+                      <TableCell className="text-suave">{user.persona?.dni || "N/A"}</TableCell>
                       <TableCell>
                         {tiposUsuario.map((tipo, index) => (
                           <Badge
@@ -299,21 +299,21 @@ export default function ListarUsuariosPage() {
                             variant="outline"
                             className={`mr-1 mb-1 ${
                               tipo === "Psicólogo"
-                                ? "border-teal-500 text-teal-300"
+                                ? "border-teal-500 text-info"
                                 : tipo === "Paciente"
                                   ? "border-lime-500 text-lime-300"
-                                  : "border-gray-500 text-gray-300"
+                                  : "border-borde-fuerte text-suave"
                             }`}
                           >
                             {tipo}
                           </Badge>
                         ))}
                       </TableCell>
-                      <TableCell className="text-gray-300">{user.psicologo?.especialidad || "N/A"}</TableCell>
-                      <TableCell className="text-gray-300">{user.psicologo?.numeroLicencia || "N/A"}</TableCell>
-                      <TableCell className="text-gray-300">{user.paciente?.obraSocial?.nombre || "N/A"}</TableCell>
+                      <TableCell className="text-suave">{user.psicologo?.especialidad || "N/A"}</TableCell>
+                      <TableCell className="text-suave">{user.psicologo?.numeroLicencia || "N/A"}</TableCell>
+                      <TableCell className="text-suave">{user.paciente?.obraSocial?.nombre || "N/A"}</TableCell>
                       <TableCell>
-                        <Badge style={{ backgroundColor: user.activo ? "#2E7D32" : "#C62828", color: "white" }}>
+                        <Badge style={{ backgroundColor: user.activo ? "#2E7D32" : "#C62828", color: "#ffffff" }}>
                           {user.activo ? "Activo" : "Inactivo"}
                         </Badge>
                       </TableCell>
@@ -322,7 +322,7 @@ export default function ListarUsuariosPage() {
                           <DropdownMenuTrigger asChild>
                             <Button
                               variant="ghost"
-                              className="h-8 w-8 p-0 text-gray-300 hover:text-white hover:bg-[#2A4242]"
+                              className="h-8 w-8 p-0 text-suave hover:text-foreground hover:bg-superficie"
                             >
                               <span className="sr-only">Abrir menú</span>
                               <MoreVertical className="h-4 w-4" />
@@ -330,12 +330,12 @@ export default function ListarUsuariosPage() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent
                             align="end"
-                            style={{ backgroundColor: "#152A2A", borderColor: "#2A4A4A" }}
+                            style={{ backgroundColor: "var(--background)", borderColor: "var(--borde)" }}
                           >
                             {userActionPermissions.canEdit && (
                               <DropdownMenuItem
                                 onClick={() => handleEdit(user.id)}
-                                className="text-gray-300 hover:bg-[#2A4242] focus:bg-[#2A4242] focus:text-white"
+                                className="text-suave hover:bg-superficie focus:bg-superficie focus:text-foreground"
                               >
                                 <Edit3 className="mr-2 h-4 w-4" /> Editar
                               </DropdownMenuItem>
@@ -343,7 +343,7 @@ export default function ListarUsuariosPage() {
                             {userActionPermissions.canToggleStatus && (
                               <DropdownMenuItem
                                 onClick={() => handleToggleStatus(user.id, user.activo)}
-                                className={`text-gray-300 hover:bg-[#2A4242] focus:bg-[#2A4242] focus:text-white ${
+                                className={`text-suave hover:bg-superficie focus:bg-superficie focus:text-foreground ${
                                   user.activo
                                     ? "hover:!bg-red-700 focus:!bg-red-700"
                                     : "hover:!bg-green-700 focus:!bg-green-700"
@@ -358,7 +358,7 @@ export default function ListarUsuariosPage() {
                               </DropdownMenuItem>
                             )}
                             {!userActionPermissions.canEdit && !userActionPermissions.canToggleStatus && (
-                              <DropdownMenuItem disabled className="text-gray-500">
+                              <DropdownMenuItem disabled className="text-tenue">
                                 Sin acciones
                               </DropdownMenuItem>
                             )}

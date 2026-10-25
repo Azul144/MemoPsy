@@ -253,9 +253,9 @@ export default function RegistrarInformePage() {
 
   if (status === 'loading' || loadingPermissions || hasPagePermission === null) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-4" style={{ backgroundColor: '#152A2A' }}>
-        <Loader2 className="h-16 w-16 animate-spin text-[#F1C77A] mb-4" />
-        <TypographyP className="text-white">Cargando...</TypographyP>
+      <div className="flex flex-col items-center justify-center min-h-screen p-4" style={{ backgroundColor: "var(--background)" }}>
+        <Loader2 className="h-16 w-16 animate-spin text-dorado mb-4" />
+        <TypographyP className="text-foreground">Cargando...</TypographyP>
       </div>
     );
   }
@@ -264,11 +264,11 @@ export default function RegistrarInformePage() {
     return (
       <div className="min-h-screen flex flex-col">
         <main className="mx-auto w-full max-w-6xl px-6 py-10 flex-grow flex items-center justify-center">
-            <div className="text-center p-8 rounded-2xl max-w-md mx-auto" style={{ backgroundColor: '#1D3434' }}>
-                <AlertCircle className="w-16 h-16 mx-auto mb-6 text-red-500" />
-                <TypographyH1 className="mb-4 text-white">Acceso Denegado</TypographyH1>
-                <TypographyP className="text-gray-300">No tiene los permisos necesarios para registrar informes.</TypographyP>
-                <Button onClick={() => router.push('/informes')} className="mt-6 bg-[#F1C77A] text-[#1D3434] hover:bg-opacity-80">
+            <div className="text-center p-8 rounded-2xl max-w-md mx-auto" style={{ backgroundColor: "var(--card)" }}>
+                <AlertCircle className="w-16 h-16 mx-auto mb-6 text-peligro" />
+                <TypographyH1 className="mb-4 text-foreground">Acceso Denegado</TypographyH1>
+                <TypographyP className="text-suave">No tiene los permisos necesarios para registrar informes.</TypographyP>
+                <Button onClick={() => router.push('/informes')} className="mt-6 bg-primary text-primary-foreground hover:bg-opacity-80">
                     Volver a Informes
                 </Button>
             </div>
@@ -284,74 +284,74 @@ export default function RegistrarInformePage() {
       <main className="mx-auto w-full max-w-6xl px-6 py-10">
         <EncabezadoPagina titulo="Registrar nota clínica" descripcion="Completá los datos de la sesión y asociá la nota a uno o más pacientes." volverA="/informes" textoVolver="Volver a Informes" />
 
-        <Card className="max-w-2xl mx-auto" style={{ backgroundColor: '#1D3434', borderColor: '#2A4A4A' }}>
+        <Card className="max-w-2xl mx-auto" style={{ backgroundColor: "var(--card)", borderColor: "var(--borde)" }}>
           <CardHeader>
-            <CardTitle className="text-2xl text-[#F1C77A]">Datos de la nota</CardTitle>
-            <CardDescription className="text-gray-400">Completá todos los campos obligatorios.</CardDescription>
+            <CardTitle className="text-2xl text-dorado">Datos de la nota</CardTitle>
+            <CardDescription className="text-tenue">Completá todos los campos obligatorios.</CardDescription>
           </CardHeader>
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-6">
               {formErrors.general && (
-                <div className="p-3 bg-red-500/10 text-red-300 border border-red-400/40 rounded-md flex items-center">
-                  <AlertCircle className="h-5 w-5 mr-2 text-red-400" />
+                <div className="p-3 bg-red-500/10 text-peligro border border-red-400/40 rounded-md flex items-center">
+                  <AlertCircle className="h-5 w-5 mr-2 text-peligro" />
                   <p>{formErrors.general}</p>
                 </div>
               )}
               <div className="space-y-2">
-                <Label htmlFor="titulo" className="text-gray-200">Título</Label>
+                <Label htmlFor="titulo" className="text-texto-2">Título</Label>
                 <Input
                   id="titulo" name="titulo" value={formData.titulo} onChange={handleInputChange}
                   placeholder="Ej: Informe de Progreso Trimestral"
-                  className={cn("bg-[#152A2A] text-white border-gray-600 focus:border-[#F1C77A]", formErrors.titulo && "border-red-500")}
+                  className={cn("bg-background text-foreground border-borde-fuerte focus:border-dorado", formErrors.titulo && "border-red-500")}
                 />
-                {formErrors.titulo && <TypographySmall className="text-red-400">{formErrors.titulo}</TypographySmall>}
+                {formErrors.titulo && <TypographySmall className="text-peligro">{formErrors.titulo}</TypographySmall>}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="contenido" className="text-gray-200">Contenido</Label>
+                <Label htmlFor="contenido" className="text-texto-2">Contenido</Label>
                 <Textarea
                   id="contenido" name="contenido" value={formData.contenido} onChange={handleInputChange}
                   placeholder="Escribí o dictá lo trabajado en la sesión..." rows={8}
-                  className={cn("bg-[#152A2A] text-white border-gray-600 focus:border-[#F1C77A]", formErrors.contenido && "border-red-500")}
+                  className={cn("bg-background text-foreground border-borde-fuerte focus:border-dorado", formErrors.contenido && "border-red-500")}
                 />
-                {formErrors.contenido && <TypographySmall className="text-red-400">{formErrors.contenido}</TypographySmall>}
+                {formErrors.contenido && <TypographySmall className="text-peligro">{formErrors.contenido}</TypographySmall>}
                 <DictadoVoz onTexto={agregarDictado} disabled={isSubmitting} />
                 <PropuestaIA texto={formData.contenido} onAceptar={usarPropuestaIA} disabled={isSubmitting} />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="etiquetas" className="text-gray-200">Etiquetas</Label>
+                <Label htmlFor="etiquetas" className="text-texto-2">Etiquetas</Label>
                 <Input
                   id="etiquetas" name="etiquetas" value={formData.etiquetas} onChange={handleInputChange}
                   placeholder="Ej: ansiedad, seguimiento, primera consulta"
-                  className="bg-[#152A2A] text-white border-gray-600 focus:border-[#F1C77A]"
+                  className="bg-background text-foreground border-borde-fuerte focus:border-dorado"
                 />
-                <TypographySmall className="text-gray-400">Separá las etiquetas con comas. Sirven para categorizar y buscar la nota.</TypographySmall>
+                <TypographySmall className="text-tenue">Separá las etiquetas con comas. Sirven para categorizar y buscar la nota.</TypographySmall>
               </div>
 
-              <p className="flex items-start gap-2 rounded-md border border-gray-700 bg-[#152A2A] p-3 text-sm text-gray-300">
-                  <Lock className="mt-0.5 h-4 w-4 shrink-0 text-[#F1C77A]" />
+              <p className="flex items-start gap-2 rounded-md border border-borde bg-background p-3 text-sm text-suave">
+                  <Lock className="mt-0.5 h-4 w-4 shrink-0 text-dorado" />
                   La nota clínica es privada: solo la ves vos. Lo que quieras compartir con el paciente lo cargás después en su informe de seguimiento.
                 </p>
 
               <div className="space-y-2">
-                <Label htmlFor="pacienteSearch" className="text-gray-200">Pacientes asociados</Label>
+                <Label htmlFor="pacienteSearch" className="text-texto-2">Pacientes asociados</Label>
 
                 <div className={cn(
-                  "min-h-10 p-2 rounded-md border bg-[#152A2A] text-white w-full",
-                  formErrors.pacientesIds ? "border-red-500" : "border-gray-600"
+                  "min-h-10 p-2 rounded-md border bg-background text-foreground w-full",
+                  formErrors.pacientesIds ? "border-red-500" : "border-borde-fuerte"
                 )}>
                   {/* Selected Pacientes */}
                   <div className="flex flex-wrap gap-2 mb-2">
                     {selectedPacientes.map(paciente => (
-                      <Badge key={paciente.id} className="bg-[#F1C77A] text-[#1D3434] hover:bg-[#e0b66e] text-sm font-medium">
+                      <Badge key={paciente.id} className="bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-medium">
                         {paciente.persona?.nombreCompleto || paciente.nombreCompleto}
                         <button
                           type="button"
                           className="ml-1 rounded-full outline-none"
                           onClick={() => handleRemovePaciente(paciente.id)}
                         >
-                          <X className="h-3 w-3 text-[#1D3434] hover:text-red-500" />
+                          <X className="h-3 w-3 text-primary-foreground hover:text-peligro" />
                         </button>
                       </Badge>
                     ))}
@@ -386,18 +386,18 @@ export default function RegistrarInformePage() {
                       //onFocus={() => {
                       //  if (pacienteSearchQuery.length > 1) setIsPacientePopoverOpen(true)
                       //}}
-                      className="bg-transparent border-0 text-white placeholder:text-gray-400 focus:ring-0 focus:outline-none p-0 w-full"
+                      className="bg-transparent border-0 text-foreground placeholder:text-tenue focus:ring-0 focus:outline-none p-0 w-full"
                     />
 
                     {isPacientePopoverOpen && (
-                      <div className="absolute z-50 w-full mt-1 bg-[#1D3434] border border-gray-600 rounded-md shadow-lg max-h-60 overflow-auto">
+                      <div className="absolute z-50 w-full mt-1 bg-card border border-borde-fuerte rounded-md shadow-lg max-h-60 overflow-auto">
                         {isPacienteSearchLoading ? (
-                          <div className="p-4 text-center text-sm text-gray-400">Buscando...</div>
+                          <div className="p-4 text-center text-sm text-tenue">Buscando...</div>
                         ) : pacienteSearchResults.length > 0 ? (
                           pacienteSearchResults.map((paciente) => (
                             <div
                               key={paciente.id}
-                              className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-[#152A2A] text-white border-b border-gray-700 last:border-b-0"
+                              className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-background text-foreground border-b border-borde last:border-b-0"
                               onMouseDown={(e) => { e.preventDefault(); handleSelectPaciente(paciente); }}
                             >
                               <Check
@@ -410,7 +410,7 @@ export default function RegistrarInformePage() {
                             </div>
                           ))
                         ) : (
-                          <div className="p-4 text-center text-sm text-gray-400">
+                          <div className="p-4 text-center text-sm text-tenue">
                             {pacienteSearchQuery.length > 1
                               ? "No se encontraron pacientes."
                               : "No tenés pacientes con sesiones aún. Escribí un nombre, apellido o DNI para buscar."}
@@ -422,18 +422,18 @@ export default function RegistrarInformePage() {
                 </div>
 
                 {formErrors.pacientesIds && (
-                  <TypographySmall className="text-red-400">{formErrors.pacientesIds}</TypographySmall>
+                  <TypographySmall className="text-peligro">{formErrors.pacientesIds}</TypographySmall>
                 )}
               </div>
 
             </CardContent>
-            <CardFooter className="flex justify-end space-x-3 pt-6 border-t border-gray-700 mt-6">
+            <CardFooter className="flex justify-end space-x-3 pt-6 border-t border-borde mt-6">
               <Button type="button" variant="outline" onClick={() => router.push('/informes')}
-                className="border-[#F1C77A] text-[#F1C77A] hover:bg-[#F1C77A] hover:text-[#1D3434]">
+                className="border-dorado text-dorado hover:bg-primary hover:text-primary-foreground">
                 Cancelar
               </Button>
               <Button type="submit" disabled={isSubmitting} 
-                className="bg-[#F1C77A] text-[#1D3434] hover:bg-opacity-80">
+                className="bg-primary text-primary-foreground hover:bg-opacity-80">
                 {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FilePlus className="mr-2 h-4 w-4" />}
                 Guardar nota
               </Button>
