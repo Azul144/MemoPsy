@@ -19,7 +19,7 @@ export default function Funciones() {
             {/* Mini nota */}
             <div className="mt-8 rounded-2xl border border-foreground/10 bg-background/70 p-5 transition-transform duration-500 group-hover:-translate-y-1">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-crema">Sesión 12 · Tomás A.</span>
+                <span className="text-sm font-semibold text-crema">Sesión 12 · Camila R.</span>
                 <span className="flex items-center gap-1.5 rounded-full bg-emerald-400/15 px-3 py-1 text-xs font-medium text-exito">
                   <Lock className="h-3 w-3" /> Cifrada
                 </span>
@@ -45,9 +45,9 @@ export default function Funciones() {
             {/* Mini calendario */}
             <div className="mt-8 space-y-2.5">
               {[
-                { hora: "09:00", nombre: "Sofía R.", libre: false },
+                { hora: "09:00", nombre: "Camila R.", libre: false },
                 { hora: "10:00", nombre: "Libre", libre: true },
-                { hora: "11:00", nombre: "Tomás A.", libre: false },
+                { hora: "11:00", nombre: "Valentina S.", libre: false },
               ].map((turno) => (
                 <div
                   key={turno.hora}
