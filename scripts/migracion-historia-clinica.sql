@@ -38,4 +38,4 @@ CREATE TABLE IF NOT EXISTS historia_clinica (
   UNIQUE KEY uq_historia_paciente_psicologo (paciente_id, psicologo_id),
   CONSTRAINT historia_clinica_ibfk_paciente FOREIGN KEY (paciente_id) REFERENCES paciente (id),
   CONSTRAINT historia_clinica_ibfk_psicologo FOREIGN KEY (psicologo_id) REFERENCES psicologo (id)
-);
+) ENGINE = InnoDB;

@@ -17,8 +17,9 @@ CREATE TABLE `actividad_seguimiento` (
   `comentario` text,
   `fecha_respuesta` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `idx_actividad_seguimiento` (`seguimiento_id`,`orden`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  KEY `idx_actividad_seguimiento` (`seguimiento_id`,`orden`),
+  CONSTRAINT `actividad_seguimiento_ibfk_seguimiento` FOREIGN KEY (`seguimiento_id`) REFERENCES `informe_seguimiento` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `auditoria` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -35,7 +36,7 @@ CREATE TABLE `auditoria` (
   KEY `idx_auditoria_usuario` (`usuario_id`),
   KEY `idx_auditoria_modulo` (`modulo`),
   KEY `idx_auditoria_accion` (`accion`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `estado` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -71,8 +72,10 @@ CREATE TABLE `historia_clinica` (
   `fecha_actualizacion` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_historia_paciente_psicologo` (`paciente_id`,`psicologo_id`),
-  KEY `historia_clinica_ibfk_psicologo` (`psicologo_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  KEY `historia_clinica_ibfk_psicologo` (`psicologo_id`),
+  CONSTRAINT `historia_clinica_ibfk_paciente` FOREIGN KEY (`paciente_id`) REFERENCES `paciente` (`id`),
+  CONSTRAINT `historia_clinica_ibfk_psicologo` FOREIGN KEY (`psicologo_id`) REFERENCES `psicologo` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `horario_disponible` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -81,8 +84,9 @@ CREATE TABLE `horario_disponible` (
   `hora_inicio` time NOT NULL,
   `hora_fin` time NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `idx_horario_psicologo` (`psicologo_id`,`dia_semana`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  KEY `idx_horario_psicologo` (`psicologo_id`,`dia_semana`),
+  CONSTRAINT `horario_disponible_ibfk_psicologo` FOREIGN KEY (`psicologo_id`) REFERENCES `psicologo` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `informe` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -106,8 +110,9 @@ CREATE TABLE `informe_seguimiento` (
   `fecha_creacion` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `fecha_actualizacion` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_seguimiento_informe` (`informe_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  UNIQUE KEY `uq_seguimiento_informe` (`informe_id`),
+  CONSTRAINT `informe_seguimiento_ibfk_informe` FOREIGN KEY (`informe_id`) REFERENCES `informe` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `medio_de_pago` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -138,8 +143,10 @@ CREATE TABLE `notificacion` (
   `fecha` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `idx_notificacion_usuario` (`usuario_id`,`leida`,`fecha`),
-  KEY `idx_notificacion_sesion` (`sesion_id`,`tipo`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  KEY `idx_notificacion_sesion` (`sesion_id`,`tipo`),
+  CONSTRAINT `notificacion_ibfk_sesion` FOREIGN KEY (`sesion_id`) REFERENCES `sesion` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `notificacion_ibfk_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuario` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `obra_social` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -234,8 +241,10 @@ CREATE TABLE `recordatorio_enviado` (
   `canal` varchar(20) NOT NULL,
   `fecha` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`sesion_id`,`usuario_id`,`canal`),
-  KEY `recordatorio_enviado_ibfk_usuario` (`usuario_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  KEY `recordatorio_enviado_ibfk_usuario` (`usuario_id`),
+  CONSTRAINT `recordatorio_enviado_ibfk_sesion` FOREIGN KEY (`sesion_id`) REFERENCES `sesion` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `recordatorio_enviado_ibfk_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuario` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `sesion` (
   `id` int NOT NULL AUTO_INCREMENT,

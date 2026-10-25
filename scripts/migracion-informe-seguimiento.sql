@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS informe_seguimiento (
   PRIMARY KEY (id),
   UNIQUE KEY uq_seguimiento_informe (informe_id),
   CONSTRAINT informe_seguimiento_ibfk_informe FOREIGN KEY (informe_id) REFERENCES informe (id) ON DELETE CASCADE
-);
+) ENGINE = InnoDB;
 
 -- 2) Actividades para hacer hasta la próxima sesión, con la respuesta del paciente
 CREATE TABLE IF NOT EXISTS actividad_seguimiento (
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS actividad_seguimiento (
   PRIMARY KEY (id),
   KEY idx_actividad_seguimiento (seguimiento_id, orden),
   CONSTRAINT actividad_seguimiento_ibfk_seguimiento FOREIGN KEY (seguimiento_id) REFERENCES informe_seguimiento (id) ON DELETE CASCADE
-);
+) ENGINE = InnoDB;
 
 -- 3) La nota clínica es siempre privada: lo que se comparte con el paciente va en el informe de seguimiento
 UPDATE informe SET es_privado = 1 WHERE es_privado = 0 OR es_privado IS NULL;

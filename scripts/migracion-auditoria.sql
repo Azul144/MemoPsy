@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS auditoria (
   KEY idx_auditoria_usuario (usuario_id),
   KEY idx_auditoria_modulo (modulo),
   KEY idx_auditoria_accion (accion)
-);
+) ENGINE = InnoDB;
 
 -- 2) Módulo y permiso para consultar el registro
 INSERT INTO modulo (nombre)

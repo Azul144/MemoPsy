@@ -20,4 +20,4 @@ CREATE TABLE IF NOT EXISTS notificacion (
   KEY idx_notificacion_sesion (sesion_id, tipo),
   CONSTRAINT notificacion_ibfk_usuario FOREIGN KEY (usuario_id) REFERENCES usuario (id) ON DELETE CASCADE,
   CONSTRAINT notificacion_ibfk_sesion FOREIGN KEY (sesion_id) REFERENCES sesion (id) ON DELETE CASCADE
-);
+) ENGINE = InnoDB;

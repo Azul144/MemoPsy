@@ -11,4 +11,4 @@ CREATE TABLE IF NOT EXISTS horario_disponible (
   PRIMARY KEY (id),
   KEY idx_horario_psicologo (psicologo_id, dia_semana),
   CONSTRAINT horario_disponible_ibfk_psicologo FOREIGN KEY (psicologo_id) REFERENCES psicologo (id) ON DELETE CASCADE
-);
+) ENGINE = InnoDB;

@@ -13,4 +13,4 @@ CREATE TABLE IF NOT EXISTS recordatorio_enviado (
   PRIMARY KEY (sesion_id, usuario_id, canal),
   CONSTRAINT recordatorio_enviado_ibfk_sesion FOREIGN KEY (sesion_id) REFERENCES sesion (id) ON DELETE CASCADE,
   CONSTRAINT recordatorio_enviado_ibfk_usuario FOREIGN KEY (usuario_id) REFERENCES usuario (id) ON DELETE CASCADE
-);
+) ENGINE = InnoDB;
