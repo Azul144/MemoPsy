@@ -33,7 +33,9 @@ function armarEmail(turno: TurnoPendiente) {
       ? `<p>Para conectarte a la videollamada usá este enlace:<br><a href="${escapar(turno.enlace)}">${escapar(turno.enlace)}</a></p>`
       : "";
   return {
-    asunto: "Recordatorio de tu turno en MemoPsy",
+    // Con la fecha en el asunto, si el turno se reprograma el email nuevo no queda escondido
+    // en la misma conversación que el anterior
+    asunto: `Recordatorio: tu turno del ${fechaTurno(new Date(turno.inicio))} en MemoPsy`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 480px;">
         <h2 style="color: #1D3434;">Recordatorio de turno</h2>

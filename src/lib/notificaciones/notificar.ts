@@ -133,9 +133,22 @@ interface UsuarioConRol {
   pacienteId?: string | null;
 }
 
+// Pedidos en curso por usuario: la campana y la página piden a la vez, y sin esto los dos
+// veían el turno sin avisar y creaban el mismo recordatorio dos veces
+const enCurso = new Map<number, Promise<void>>();
+
 // RF 3.3 - Crea los recordatorios de los turnos de las próximas 24 horas que todavía no se avisaron
 export async function generarRecordatorios(usuario: UsuarioConRol): Promise<void> {
   if (!usuario.psicologoId && !usuario.pacienteId) return;
+  const usuarioId = Number(usuario.id);
+  const anterior = enCurso.get(usuarioId);
+  if (anterior) return anterior;
+  const pedido = crearRecordatorios(usuario).finally(() => enCurso.delete(usuarioId));
+  enCurso.set(usuarioId, pedido);
+  return pedido;
+}
+
+async function crearRecordatorios(usuario: UsuarioConRol): Promise<void> {
   try {
     const dataSource = await initializeDatabase();
     const manager = dataSource.manager;
