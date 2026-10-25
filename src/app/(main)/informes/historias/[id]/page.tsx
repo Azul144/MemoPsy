@@ -367,7 +367,7 @@ export default function HistoriaClinicaPage({ params }: { params: Promise<{ id: 
             </div>
           </Seccion>
 
-          <div className="sticky bottom-4 z-10 flex flex-wrap items-center justify-end gap-3 rounded-2xl border border-[#2A4A4A] bg-[#1D3434]/95 p-4 backdrop-blur">
+          <div className="flex flex-wrap items-center justify-end gap-3 rounded-2xl border border-[#2A4A4A] bg-[#1D3434] p-4">
             {mensaje && (
               <p className={`mr-auto flex items-center gap-2 text-sm ${mensaje.tipo === "ok" ? "text-emerald-300" : "text-amber-300"}`}>
                 {mensaje.tipo === "ok" ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
