@@ -1,5 +1,6 @@
 import Encabezado from "@/app/components/Encabezado";
 import Portada from "@/app/components/Portada";
+import Cifras from "@/app/components/Cifras";
 import Funciones from "@/app/components/Funciones";
 import Modulos from "@/app/components/Modulos";
 import Contacto from "@/app/components/Contacto";
@@ -14,6 +15,7 @@ export default function Home() {
       <Encabezado />
       <main className="min-h-screen bg-background text-foreground">
         <Portada />
+        <Cifras />
         <Funciones />
         <Modulos />
         <Testimonios />

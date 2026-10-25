@@ -112,6 +112,22 @@
   color-scheme: light;
 }
 
+/* Sección en crema dentro de la portada oscura: corta el verde de punta a punta.
+   Vuelve a declarar los colores que usan los componentes, así no hace falta tocar sus clases */
+.seccion-crema {
+  --background: #F6EFE2;
+  --foreground: #173030;
+  --card: #FFFFFF;
+  --primary: #1D4A48;
+  --primary-foreground: #FFFFFF;
+  --border: #E6DCC8;
+  --crema: #173030;
+  --dorado: #1D5E5B; /* Acento petróleo, el mismo del modo claro del sistema */
+  --superficie: #FBF7EF;
+  --exito: #1A6B43;
+  color-scheme: light;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -213,6 +229,22 @@ footer {
   font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1.1;
+}
+
+/* ---------- Velo petróleo de las fotos ----------
+   Baja un poco el color y les pone un tinte del petróleo de la marca,
+   para que las fotos de distintos bancos se vean como una sola serie */
+.foto-velo img {
+  filter: saturate(0.82) contrast(1.03);
+}
+.foto-velo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #1D4A48;
+  mix-blend-mode: soft-light;
+  opacity: 0.55;
+  pointer-events: none;
 }
 
 /* ---------- Animaciones de la portada ---------- */

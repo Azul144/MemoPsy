@@ -20,6 +20,9 @@ const MENSAJES_ERROR: Record<string, string> = {
   CODIGO_INVALIDO: "El código no es correcto. Revisá tu app de autenticación.",
 };
 
+// Etiquetas en crema suave: así resalta lo que se escribe en el campo y no la etiqueta
+const ETIQUETA = { color: "color-mix(in srgb, var(--crema) 75%, transparent)" };
+
 export default function LoginPage() {
   const router = useRouter();
 
@@ -73,10 +76,11 @@ export default function LoginPage() {
 
         {paso === "credenciales" ? (
           <>
-            <h1 className="mt-4 mb-6 titulo text-3xl text-crema">Iniciar sesión</h1>
-            <form onSubmit={ingresar} className="space-y-4">
+            <h1 className="mt-4 titulo text-3xl text-crema">Iniciar sesión</h1>
+            <p className="mt-2 mb-7 text-crema/70">Ingresá con tu cuenta de MemoPsy.</p>
+            <form onSubmit={ingresar} className="space-y-5">
               <div>
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email" style={ETIQUETA}>Email</Label>
                 <Input
                   id="email"
                   type="email"
@@ -89,7 +93,13 @@ export default function LoginPage() {
                 />
               </div>
               <div>
-                <Label htmlFor="password">Contraseña</Label>
+                {/* El enlace para recuperar la contraseña va en la misma línea que la etiqueta */}
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password" style={ETIQUETA}>Contraseña</Label>
+                  <Link href="/olvide-password" className="text-sm text-dorado hover:underline">
+                    ¿La olvidaste?
+                  </Link>
+                </div>
                 <InputPassword
                   id="password"
                   autoComplete="current-password"
@@ -103,17 +113,11 @@ export default function LoginPage() {
 
               {error && <p role="alert" className="text-sm text-peligro">{error}</p>}
 
-              <Button type="submit" className="w-full" disabled={cargando}>
+              <Button type="submit" className="mt-2 h-12 w-full text-base" disabled={cargando}>
                 {cargando && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Ingresar
               </Button>
             </form>
-
-            <p className="mt-6 text-sm">
-              <Link href="/olvide-password" className="text-dorado underline">
-                ¿Olvidaste tu contraseña?
-              </Link>
-            </p>
           </>
         ) : (
           <>

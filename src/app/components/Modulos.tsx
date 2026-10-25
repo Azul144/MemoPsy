@@ -41,37 +41,39 @@ export default function Modulos() {
   return (
     <section id="modulos" className="relative overflow-hidden bg-superficie px-6 py-24">
       <FondoAnimado intensidad="suave" />
-      <div className="relative mx-auto max-w-2xl text-center">
-        <h2 className="titulo text-4xl text-crema sm:text-5xl">Cuatro módulos, un solo sistema</h2>
-        <p className="mt-4 text-lg text-crema/75">
+      {/* Encabezado centrado, acompaña la grilla simétrica de 2x2 */}
+      <div className="relative mx-auto max-w-3xl text-center">
+        <h2 className="titulo text-4xl text-balance text-crema sm:text-5xl">Cuatro módulos, un solo sistema</h2>
+        <p className="mx-auto mt-4 max-w-xl text-lg text-balance text-crema/75">
           Cada módulo resuelve una parte de la gestión del consultorio y comparte la misma base segura.
         </p>
       </div>
 
-      <div className="relative mx-auto mt-20 flex max-w-6xl flex-col gap-20 lg:gap-28">
-        {modulos.map((modulo, i) => (
-          <article key={modulo.titulo} className="grid items-center gap-10 md:grid-cols-2 md:gap-16">
-            {/* En los módulos pares la foto va a la derecha */}
-            <div
-              className={`relative aspect-[4/3] overflow-hidden rounded-[2rem] border border-foreground/10 ${
-                i % 2 === 1 ? "md:order-2" : ""
-              }`}
-            >
+      {/* Grilla de 2x2: foto arriba y texto abajo en cada tarjeta */}
+      <div className="relative mx-auto mt-14 grid max-w-6xl gap-6 md:grid-cols-2">
+        {modulos.map((modulo) => (
+          <article
+            key={modulo.titulo}
+            className="group overflow-hidden rounded-[2rem] border border-foreground/10 bg-card"
+          >
+            <div className="foto-velo relative aspect-[16/9] overflow-hidden">
               <Image
                 src={modulo.foto}
                 alt={modulo.alt}
                 fill
                 sizes="(min-width: 768px) 45vw, 90vw"
-                className="object-cover transition-transform duration-700 hover:scale-105"
+                className="object-cover transition-transform duration-700 group-hover:scale-105"
               />
             </div>
 
-            <div>
-              <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/15">
-                <modulo.icono className="h-7 w-7 text-dorado" />
-              </span>
-              <h3 className="titulo mt-6 text-3xl text-crema sm:text-4xl">{modulo.titulo}</h3>
-              <p className="mt-4 max-w-md text-lg leading-relaxed text-crema/75">{modulo.texto}</p>
+            <div className="p-7">
+              <div className="flex items-center gap-3">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/15">
+                  <modulo.icono className="h-5 w-5 text-dorado" />
+                </span>
+                <h3 className="titulo text-2xl text-crema">{modulo.titulo}</h3>
+              </div>
+              <p className="mt-4 leading-relaxed text-crema/75">{modulo.texto}</p>
             </div>
           </article>
         ))}

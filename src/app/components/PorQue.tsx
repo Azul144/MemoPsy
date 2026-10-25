@@ -6,13 +6,14 @@ export default function PorQue() {
     <section id="por-que" className="relative overflow-hidden bg-superficie px-6 py-24">
       <FondoAnimado intensidad="suave" />
       <div className="relative mx-auto grid max-w-6xl items-center gap-12 overflow-hidden rounded-[2.5rem] border border-foreground/10 bg-background/70 lg:grid-cols-[1fr_1.2fr]">
-        <div className="relative min-h-80 lg:h-full">
+        <div className="foto-velo relative min-h-80 lg:h-full">
           <Image
-            src="/assets/consultorio2.jpg"
-            alt="Paciente sonriendo durante una sesión"
+            src="/assets/terapia33.jpg"
+            alt="Psicóloga tomando notas durante una sesión con su paciente"
             fill
-            sizes="(min-width: 1024px) 40vw, 100vw"
-            className="object-cover"
+            quality={85}
+            sizes="(min-width: 1024px) 45vw, 100vw"
+            className="object-cover object-[3%_center]"
           />
         </div>
 
@@ -20,23 +21,19 @@ export default function PorQue() {
           <h2 className="titulo text-4xl text-crema sm:text-5xl">¿Por qué MemoPsy?</h2>
 
           <p className="mt-6 text-lg leading-relaxed text-crema/85">
-            La historia clínica y las notas de cada sesión son el corazón del trabajo terapéutico: ahí
-            queda registrado cómo evoluciona cada paciente. Sin embargo, en muchos consultorios de la
-            Provincia de Formosa todavía se llevan en papel, en planillas o en aplicaciones que no fueron
-            pensadas para información de salud.
+            En muchos consultorios de la Provincia de Formosa las sesiones todavía se anotan en papel o en planillas
+            sueltas. Así se pierden detalles entre una sesión y otra, y la información sensible queda
+            sin protección.
           </p>
 
           <p className="mt-5 text-lg leading-relaxed text-crema/85">
-            MemoPsy ordena ese registro en un solo lugar: notas clínicas estructuradas y fáciles de
-            encontrar antes de cada sesión, la agenda de turnos y el material que el psicólogo decide
-            compartir con su paciente, para que el seguimiento no se corte entre una sesión y la otra.
+            MemoPsy reúne en un solo lugar la historia clínica, las notas de cada sesión, la agenda con
+            recordatorios y el material para el paciente, para que el seguimiento no se corte.
           </p>
 
           <p className="mt-5 text-lg leading-relaxed text-crema/85">
-            Y lo hace cuidando lo más sensible: las notas se guardan cifradas y cada rol ve solo lo que
-            le corresponde, con las garantías que pide la Ley 26.529 para la historia clínica digital y
-            la Ley 25.326 de Protección de Datos Personales, y respetando el ejercicio profesional que
-            regula la Ley 461 de la Provincia de Formosa.
+            Las notas se guardan cifradas, cada rol ve solo lo que le corresponde y cada acceso queda
+            registrado, como piden las leyes 25.326 y 26.529.
           </p>
 
           <a

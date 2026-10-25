@@ -16,7 +16,8 @@ const tarjetas = [
     icono: Lock,
     titulo: "Nota guardada",
     detalle: "Cifrada y visible solo para vos",
-    posicion: "right-2 top-1/2 lg:-right-4",
+    // En el celular no entra junto a la de abajo: se muestra desde tablet
+    posicion: "right-2 top-[64%] hidden sm:block lg:-right-4",
     retraso: "1s",
   },
   {
@@ -82,16 +83,16 @@ export default function Portada() {
         {/* Foto en forma de arco con las tarjetitas encima */}
         <div className="relative mx-auto w-full max-w-md lg:mr-0 lg:max-w-[30rem]">
           <div
-            className="entrar relative aspect-[4/5] overflow-hidden rounded-t-[999px] rounded-b-[2.5rem] border border-foreground/10 shadow-2xl shadow-black/40"
+            className="foto-velo entrar relative aspect-[4/5] overflow-hidden rounded-t-[999px] rounded-b-[2.5rem] border border-foreground/10 shadow-2xl shadow-black/40"
             style={{ animationDelay: "0.2s" }}
           >
             <Image
-              src="/assets/terapia.jpg"
-              alt="Una psicóloga conversa con su paciente en el consultorio"
+              src="/assets/portada.jpg"
+              alt="Una psicóloga toma notas mientras escucha a su paciente en el consultorio"
               fill
               priority
               sizes="(min-width: 1024px) 40vw, 90vw"
-              className="object-cover object-[30%_center]"
+              className="object-cover object-[55%_60%]"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-background/50 via-transparent to-transparent" />
           </div>

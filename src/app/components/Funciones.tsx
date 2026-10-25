@@ -3,7 +3,7 @@ import { Lock, FileText, CalendarDays, Bell, Mail } from "lucide-react";
 // Mosaico de funciones: cada tarjeta muestra una "mini pantalla" de lo que hace el sistema
 export default function Funciones() {
   return (
-    <section id="funciones" className="px-6 py-24">
+    <section id="funciones" className="seccion-crema bg-background px-6 py-24">
       <div className="mx-auto max-w-6xl">
         <h2 className="titulo max-w-2xl text-4xl text-crema sm:text-5xl">
           Todo lo que tu consultorio necesita, en una sola plataforma
