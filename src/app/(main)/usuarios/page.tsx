@@ -23,35 +23,19 @@ interface SubModuloConfig {
 const SUB_MODULOS_USUARIOS: SubModuloConfig[] = [
   {
     id: 'registrar_usuario',
-    nombre: 'Registrar Nuevo Usuario',
-    descripcion: 'Crear cuentas para nuevos usuarios en el sistema.',
+    nombre: 'Registrar usuario',
+    descripcion: 'Creá la cuenta de un profesional, un paciente o alguien del equipo.',
     icon: UserPlus,
-    ruta: '/usuarios/registrar', // Assuming routes under /usuarios for submodules
+    ruta: '/usuarios/registrar',
     permisoRequerido: 'Registrar Usuario',
   },
   {
     id: 'listar_usuarios',
-    nombre: 'Ver Lista de Usuarios',
-    descripcion: 'Consultar y navegar el listado de todos los usuarios.',
+    nombre: 'Usuarios',
+    descripcion: 'Consultá las cuentas, editá sus datos y su perfil, y activalas o desactivalas.',
     icon: List,
     ruta: '/usuarios/listar',
     permisoRequerido: 'Ver Usuarios',
-  },
-  {
-    id: 'editar_usuario_general',
-    nombre: 'Editar Usuarios',
-    descripcion: 'Modificar información y perfiles de usuarios existentes (desde la lista).',
-    icon: Edit3,
-    ruta: '/usuarios/listar', 
-    permisoRequerido: 'Editar Usuario',
-  },
-  {
-    id: 'gestionar_estado_usuario_general',
-    nombre: 'Activar/Desactivar Usuarios',
-    descripcion: 'Cambiar el estado de actividad de las cuentas de usuario (desde la lista).',
-    icon: UserCog, 
-    ruta: '/usuarios/listar', 
-    permisoRequerido: 'Eliminar Usuario',
   },
 ];
 
@@ -130,7 +114,7 @@ export default function UsuariosPage() {
 
       {/* Main Content for Usuarios */}
       <main className="mx-auto w-full max-w-6xl px-6 py-10">
-        <EncabezadoPagina titulo="Gestión de Usuarios" descripcion="Administra las cuentas y perfiles de los usuarios del sistema." volverA="/welcome" textoVolver="Volver al inicio" />
+        <EncabezadoPagina titulo="Gestión de Usuarios" descripcion="Cuentas de usuario y sus perfiles." volverA="/welcome" textoVolver="Volver al inicio" />
 
         {/* Cards Grid for Sub-modules */}
         {subModulosUsuariosPermitidos.length > 0 ? (
@@ -147,8 +131,8 @@ export default function UsuariosPage() {
                 Sin Acciones Disponibles en Usuarios
               </h3>
               <p className="text-gray-300">
-                No tienes los permisos necesarios para realizar acciones en el módulo de usuarios. 
-                Si crees que esto es un error, por favor contacta al administrador del sistema.
+                No tenés los permisos necesarios para usar el módulo de usuarios. 
+                Si creés que es un error, consultá con el administrador del sistema.
               </p>
             </div>
           </div>

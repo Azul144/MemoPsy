@@ -27,7 +27,7 @@ export class EstadoController {
         (permiso: any) => permiso.modulo.nombre === 'Estados' && permiso.accion.nombre === 'Ver'
       );
       if (!hasPermission) {
-        return NextResponse.json({ error: 'No tienes permisos para realizar esta acción' }, { status: 403 });
+        return NextResponse.json({ error: 'No tenés permisos para realizar esta acción' }, { status: 403 });
       }
 
       // EstadoService.getAllEstados() does not currently accept filters.
@@ -44,7 +44,7 @@ export class EstadoController {
       // Service throws generic Error, so we check message content for status
       let statusCode = 500;
       if (error.message?.includes('No autorizado')) statusCode = 401;
-      else if (error.message?.includes('No tienes permisos')) statusCode = 403;
+      else if (error.message?.includes('No tenés permisos')) statusCode = 403;
       return NextResponse.json({ success: false, error: error.message || 'Error interno del servidor' }, { status: statusCode });
     }
   }
@@ -60,7 +60,7 @@ export class EstadoController {
         (permiso: any) => permiso.modulo.nombre === 'Estados' && permiso.accion.nombre === 'Crear'
       );
       if (!hasPermission) {
-        return NextResponse.json({ error: 'No tienes permisos para realizar esta acción' }, { status: 403 });
+        return NextResponse.json({ error: 'No tenés permisos para realizar esta acción' }, { status: 403 });
       }
 
       const body = await request.json();
@@ -71,7 +71,7 @@ export class EstadoController {
       console.error('Error al crear estado:', error);
       let statusCode = 400; // Default to Bad Request
       if (error.message?.includes('No autorizado')) statusCode = 401;
-      else if (error.message?.includes('No tienes permisos')) statusCode = 403;
+      else if (error.message?.includes('No tenés permisos')) statusCode = 403;
       else if (error.message?.includes('Ya existe un estado con este nombre')) statusCode = 409; // Conflict
       else if (error.message?.toLowerCase().includes('errores de validación')) statusCode = 400; // Validation from DTO
       else if (error.message?.toLowerCase().includes('el nombre es requerido')) statusCode = 400;
@@ -91,7 +91,7 @@ export class EstadoController {
         (permiso: any) => permiso.modulo.nombre === 'Estados' && permiso.accion.nombre === 'Ver'
       );
       if (!hasPermission) {
-         return NextResponse.json({ error: 'No tienes permisos para realizar esta acción' }, { status: 403 });
+         return NextResponse.json({ error: 'No tenés permisos para realizar esta acción' }, { status: 403 });
       }
 
       const { id } = params;
@@ -105,7 +105,7 @@ export class EstadoController {
       console.error('Error al obtener estado:', error);
       let statusCode = 500;
       if (error.message?.includes('No autorizado')) statusCode = 401;
-      else if (error.message?.includes('No tienes permisos')) statusCode = 403;
+      else if (error.message?.includes('No tenés permisos')) statusCode = 403;
       else if (error.message?.includes('Estado no encontrado')) statusCode = 404;
       else if (error.message?.includes('El ID es requerido')) statusCode = 400;
       return NextResponse.json({ success: false, error: error.message || 'Error interno del servidor' }, { status: statusCode });
@@ -123,7 +123,7 @@ export class EstadoController {
         (permiso: any) => permiso.modulo.nombre === 'Estados' && permiso.accion.nombre === 'Editar'
       );
       if (!hasPermission) {
-        return NextResponse.json({ error: 'No tienes permisos para realizar esta acción' }, { status: 403 });
+        return NextResponse.json({ error: 'No tenés permisos para realizar esta acción' }, { status: 403 });
       }
 
       const { id } = params;
@@ -139,7 +139,7 @@ export class EstadoController {
       console.error('Error al actualizar estado:', error);
       let statusCode = 400; // Default to Bad Request
       if (error.message?.includes('No autorizado')) statusCode = 401;
-      else if (error.message?.includes('No tienes permisos')) statusCode = 403;
+      else if (error.message?.includes('No tenés permisos')) statusCode = 403;
       else if (error.message?.includes('Estado no encontrado')) statusCode = 404;
       else if (error.message?.includes('Ya existe un estado con este nombre')) statusCode = 409; // Conflict
       else if (error.message?.toLowerCase().includes('errores de validación')) statusCode = 400;
@@ -159,7 +159,7 @@ export class EstadoController {
         (permiso: any) => permiso.modulo.nombre === 'Estados' && permiso.accion.nombre === 'Eliminar'
       );
       if (!hasPermission) {
-        return NextResponse.json({ error: 'No tienes permisos para realizar esta acción' }, { status: 403 });
+        return NextResponse.json({ error: 'No tenés permisos para realizar esta acción' }, { status: 403 });
       }
 
       const { id } = params;
@@ -169,7 +169,7 @@ export class EstadoController {
       console.error('Error al eliminar estado:', error);
       let statusCode = 500;
       if (error.message?.includes('No autorizado')) statusCode = 401;
-      else if (error.message?.includes('No tienes permisos')) statusCode = 403;
+      else if (error.message?.includes('No tenés permisos')) statusCode = 403;
       else if (error.message?.includes('Estado no encontrado')) statusCode = 404;
       else if (error.message?.includes('El ID es requerido')) statusCode = 400;
       return NextResponse.json({ success: false, error: error.message || 'Error interno del servidor' }, { status: statusCode });

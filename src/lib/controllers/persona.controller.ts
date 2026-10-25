@@ -33,7 +33,7 @@ export class PersonaController {
       //   p => p.modulo.nombre === 'Personas' && p.accion.nombre === 'Ver'
       // );
       // if (!hasPermission) {
-      //   return NextResponse.json({ success: false, error: 'No tienes permisos para ver personas' }, { status: 403 });
+      //   return NextResponse.json({ success: false, error: 'No tenés permisos para ver personas' }, { status: 403 });
       // }
 
       const { searchParams } = new URL(request.url);
@@ -79,7 +79,7 @@ export class PersonaController {
       //   p => p.modulo.nombre === 'Personas' && p.accion.nombre === 'Crear'
       // );
       // if (!hasPermission) {
-      //   return NextResponse.json({ success: false, error: 'No tienes permisos para crear personas' }, { status: 403 });
+      //   return NextResponse.json({ success: false, error: 'No tenés permisos para crear personas' }, { status: 403 });
       // }
 
       const body = await request.json();
@@ -129,7 +129,7 @@ export class PersonaController {
       //   p => p.modulo.nombre === 'Personas' && p.accion.nombre === 'Ver'
       // );
       // if (!canViewOwn && !hasGeneralViewPermission) {
-      //   return NextResponse.json({ success: false, error: 'No tienes permisos para ver esta persona' }, { status: 403 });
+      //   return NextResponse.json({ success: false, error: 'No tenés permisos para ver esta persona' }, { status: 403 });
       // }
 
       const persona = await personaService.getPersonaById(id);
@@ -165,7 +165,7 @@ export class PersonaController {
       //   p => p.modulo.nombre === 'Personas' && p.accion.nombre === 'Editar'
       // );
       // if (!hasPermission) {
-      //   return NextResponse.json({ success: false, error: 'No tienes permisos para editar personas' }, { status: 403 });
+      //   return NextResponse.json({ success: false, error: 'No tenés permisos para editar personas' }, { status: 403 });
       // }
 
       const body = await request.json();
@@ -223,7 +223,7 @@ export class PersonaController {
       //   p => p.modulo.nombre === 'Personas' && p.accion.nombre === 'Eliminar'
       // );
       // if (!hasPermission) {
-      //   return NextResponse.json({ success: false, error: 'No tienes permisos para eliminar personas' }, { status: 403 });
+      //   return NextResponse.json({ success: false, error: 'No tenés permisos para eliminar personas' }, { status: 403 });
       // }
 
       const fueEliminada = await personaService.deletePersona(id);

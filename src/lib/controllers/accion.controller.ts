@@ -24,7 +24,7 @@ export class AccionController {
         (permiso: any) => permiso.modulo.nombre === 'Acciones' && permiso.accion.nombre === 'Ver'
       );
       if (!hasPermission) {
-        return NextResponse.json({ error: 'No tienes permisos para realizar esta acción' }, { status: 403 });
+        return NextResponse.json({ error: 'No tenés permisos para realizar esta acción' }, { status: 403 });
       }
 
       // const { searchParams } = new URL(request.url);
@@ -40,7 +40,7 @@ export class AccionController {
       console.error('Error al obtener acciones:', error);
       let statusCode = 500;
       if (error.message.includes('No autorizado')) statusCode = 401;
-      if (error.message.includes('No tienes permisos')) statusCode = 403;
+      if (error.message.includes('No tenés permisos')) statusCode = 403;
       return NextResponse.json({ success: false, error: error.message || 'Error interno del servidor' }, { status: statusCode });
     }
   }
@@ -56,7 +56,7 @@ export class AccionController {
         (permiso: any) => permiso.modulo.nombre === 'Acciones' && permiso.accion.nombre === 'Crear'
       );
       if (!hasPermission) {
-        return NextResponse.json({ error: 'No tienes permisos para realizar esta acción' }, { status: 403 });
+        return NextResponse.json({ error: 'No tenés permisos para realizar esta acción' }, { status: 403 });
       }
 
       const body = await request.json();
@@ -67,7 +67,7 @@ export class AccionController {
       console.error('Error al crear acción:', error);
       let statusCode = 400; // Default to Bad Request
       if (error.message.includes('No autorizado')) statusCode = 401;
-      else if (error.message.includes('No tienes permisos')) statusCode = 403;
+      else if (error.message.includes('No tenés permisos')) statusCode = 403;
       else if (error.message.includes('Ya existe una acción con el nombre')) statusCode = 409; // Conflict
       else if (error.message.includes('El nombre no puede estar vacío')) statusCode = 400; // Bad Request from model validation
       
@@ -86,7 +86,7 @@ export class AccionController {
         (permiso: any) => permiso.modulo.nombre === 'Acciones' && permiso.accion.nombre === 'Ver'
       );
       if (!hasPermission) {
-         return NextResponse.json({ error: 'No tienes permisos para realizar esta acción' }, { status: 403 });
+         return NextResponse.json({ error: 'No tenés permisos para realizar esta acción' }, { status: 403 });
       }
 
       const { id } = params;
@@ -99,7 +99,7 @@ export class AccionController {
       console.error('Error al obtener acción:', error);
       let statusCode = 500;
       if (error.message.includes('No autorizado')) statusCode = 401;
-      else if (error.message.includes('No tienes permisos')) statusCode = 403;
+      else if (error.message.includes('No tenés permisos')) statusCode = 403;
       else if (error.message.includes('no encontrada')) statusCode = 404; // From NotFoundException
       return NextResponse.json({ success: false, error: error.message || 'Error interno del servidor' }, { status: statusCode });
     }
@@ -116,7 +116,7 @@ export class AccionController {
         (permiso: any) => permiso.modulo.nombre === 'Acciones' && permiso.accion.nombre === 'Editar'
       );
       if (!hasPermission) {
-        return NextResponse.json({ error: 'No tienes permisos para realizar esta acción' }, { status: 403 });
+        return NextResponse.json({ error: 'No tenés permisos para realizar esta acción' }, { status: 403 });
       }
 
       const { id } = params;
@@ -132,7 +132,7 @@ export class AccionController {
       console.error('Error al actualizar acción:', error);
       let statusCode = 400; // Default to Bad Request
       if (error.message.includes('No autorizado')) statusCode = 401;
-      else if (error.message.includes('No tienes permisos')) statusCode = 403;
+      else if (error.message.includes('No tenés permisos')) statusCode = 403;
       else if (error.message.includes('no encontrada')) statusCode = 404; // From NotFoundException
       else if (error.message.includes('Ya existe otra acción con el nombre')) statusCode = 409; // Conflict
       else if (error.message.includes('El nombre no puede estar vacío')) statusCode = 400; // Bad Request from model validation
@@ -151,7 +151,7 @@ export class AccionController {
         (permiso: any) => permiso.modulo.nombre === 'Acciones' && permiso.accion.nombre === 'Eliminar'
       );
       if (!hasPermission) {
-        return NextResponse.json({ error: 'No tienes permisos para realizar esta acción' }, { status: 403 });
+        return NextResponse.json({ error: 'No tenés permisos para realizar esta acción' }, { status: 403 });
       }
 
       const { id } = params;
@@ -161,7 +161,7 @@ export class AccionController {
       console.error('Error al eliminar acción:', error);
       let statusCode = 500;
       if (error.message.includes('No autorizado')) statusCode = 401;
-      else if (error.message.includes('No tienes permisos')) statusCode = 403;
+      else if (error.message.includes('No tenés permisos')) statusCode = 403;
       else if (error.message.includes('no encontrada')) statusCode = 404; // From NotFoundException
       return NextResponse.json({ success: false, error: error.message || 'Error interno del servidor' }, { status: statusCode });
     }

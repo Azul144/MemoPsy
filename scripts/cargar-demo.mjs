@@ -91,16 +91,16 @@ if (existe.n > 0) {
 // ---------------------------------------------------------------- Datos
 const PSICOLOGOS = [
   { clave: "clinica", nombre: "Carla", apellido: "Benítez", dni: "29444111", nacimiento: "1984-05-20", email: "carla.benitez@demo.memopsy.test",
-    especialidad: "Psicología clínica", licencia: "MP 1234", existente: "psicologa@memopsy.test",
+    especialidad: "Psicología Clínica", licencia: "MP 1234", existente: "psicologa@memopsy.test",
     franjas: [["09:00", "12:00"], ["16:00", "19:00"]] },
   { clave: "infanto", nombre: "Lucía", apellido: "Ferreyra", dni: "31222333", nacimiento: "1988-02-11", email: "lucia.ferreyra@demo.memopsy.test",
-    especialidad: "Psicología infanto-juvenil", licencia: "MP 2045", franjas: [["14:00", "19:00"]] },
+    especialidad: "Psicología Infanto-Juvenil", licencia: "MP 2045", franjas: [["14:00", "19:00"]] },
   { clave: "neuro", nombre: "Diego", apellido: "Martínez", dni: "27555666", nacimiento: "1979-09-30", email: "diego.martinez@demo.memopsy.test",
     especialidad: "Neuropsicología", licencia: "MP 1987", franjas: [["08:00", "13:00"]] },
   { clave: "pareja", nombre: "Natalia", apellido: "Correa", dni: "32777888", nacimiento: "1987-12-03", email: "natalia.correa@demo.memopsy.test",
-    especialidad: "Terapia de pareja y familia", licencia: "MP 2210", franjas: [["17:00", "21:00"]] },
+    especialidad: "Terapia de Pareja", licencia: "MP 2210", franjas: [["17:00", "21:00"]] },
   { clave: "tcc", nombre: "Pablo", apellido: "Sánchez", dni: "30888999", nacimiento: "1983-07-14", email: "pablo.sanchez@demo.memopsy.test",
-    especialidad: "Terapia cognitivo-conductual", licencia: "MP 1876", franjas: [["10:00", "13:00"], ["15:00", "18:00"]] },
+    especialidad: "Terapia Cognitivo-Conductual", licencia: "MP 1876", franjas: [["10:00", "13:00"], ["15:00", "18:00"]] },
 ]
 
 // cuenta: false = sin usuario (por ejemplo, un niño: los turnos los maneja la recepción con la familia)
@@ -248,7 +248,7 @@ try {
     const existente = p.existente && (await uno(
       "SELECT u.id AS usuarioId, ps.id AS psicologoId FROM usuario u JOIN psicologo ps ON ps.persona_id = u.persona_id WHERE u.email = ?", [p.existente]))
     if (existente) {
-      await c.query("UPDATE psicologo SET especialidad = ? WHERE id = ?", [p.especialidad, existente.psicologoId])
+      await c.query("UPDATE psicologo SET especialidad = ?, numero_licencia = ? WHERE id = ?", [p.especialidad, p.licencia, existente.psicologoId])
       psicologos[p.clave] = { ...existente, nombre: (await uno("SELECT CONCAT(pe.nombre, ' ', pe.apellido) AS n FROM usuario u JOIN persona pe ON pe.id = u.persona_id WHERE u.id = ?", [existente.usuarioId])).n }
     } else {
       const personaId = await crearPersona(p.nombre, p.apellido, p.dni, p.nacimiento)

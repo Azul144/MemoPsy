@@ -61,7 +61,6 @@ INSERT INTO `perfil` (`id`, `nombre`, `descripcion`) VALUES
 (9, 'Psicólogo', 'Informes y Sesiones propias'),
 (12, 'Paciente', 'Puede visualizar informes de recordatorios proporcionados por sus psicólogos, así como visualizar sus sesiones programadas.'),
 (13, 'Recepcionista', 'Puede visualizar las sesiones, editarlas y asignarlas a Psicólogos y Pacientes.'),
-(15, 'Supervisor', 'supervisa psicologos'),
 (16, 'Auditor', 'Consulta el registro de auditoría en modo solo lectura');
 
 INSERT INTO `permiso` (`id`, `nombre`, `descripcion`, `modulo_id`, `accion_id`) VALUES
@@ -89,15 +88,12 @@ INSERT INTO `permiso` (`id`, `nombre`, `descripcion`, `modulo_id`, `accion_id`) 
 INSERT INTO `perfil_tiene_permiso` (`perfil_id`, `permiso_id`) VALUES
 (9, 3),
 (12, 3),
-(15, 3),
 (8, 5),
 (8, 6),
-(15, 6),
 (8, 7),
 (16, 7),
 (9, 11),
 (13, 11),
-(15, 11),
 (8, 20),
 (8, 37),
 (9, 49),

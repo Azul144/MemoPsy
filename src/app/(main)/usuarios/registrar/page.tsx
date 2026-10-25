@@ -397,7 +397,7 @@ export default function RegistrarUsuarioPage() {
       <div className="min-h-screen">
         <main className="mx-auto w-full max-w-6xl px-6 py-10 text-center">
           <h1 className="text-3xl font-bold text-red-500 mb-4">Acceso Denegado</h1>
-          <p className="text-gray-300 mb-6">No tienes los permisos necesarios para registrar nuevos usuarios.</p>
+          <p className="text-gray-300 mb-6">No tenés los permisos necesarios para registrar usuarios.</p>
           <Button onClick={() => router.push("/usuarios")} style={{ backgroundColor: "#F1C77A", color: "#1D3434" }}>
             Volver a Usuarios
           </Button>
@@ -416,7 +416,7 @@ export default function RegistrarUsuarioPage() {
 
       {/* Main Content */}
       <main className="mx-auto w-full max-w-6xl px-6 py-10">
-        <EncabezadoPagina titulo="Registrar Nuevo Usuario" descripcion="Complete los campos para crear una nueva cuenta en el sistema." volverA="/usuarios" textoVolver="Volver a Usuarios" />
+        <EncabezadoPagina titulo="Registrar usuario" descripcion="Completá los datos para crear la cuenta." volverA="/usuarios" textoVolver="Volver a Usuarios" />
         <Card className="max-w-2xl mx-auto" style={{ backgroundColor: "#1D3434", borderColor: "#2A4A4A" }}>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -609,7 +609,7 @@ export default function RegistrarUsuarioPage() {
                           id="especialidad"
                           className="w-full bg-[#2A4242] text-white border-gray-600 focus:ring-teal-500 focus:border-teal-500 data-[placeholder]:text-gray-400"
                         >
-                          <SelectValue placeholder="Seleccione una especialidad" />
+                          <SelectValue placeholder="Elegí una especialidad" />
                         </SelectTrigger>
                         <SelectContent style={{ backgroundColor: "#1D3434", borderColor: "#2A4A4A" }}>
                           {ESPECIALIDADES_PSICOLOGIA.map((esp) => (
@@ -655,7 +655,7 @@ export default function RegistrarUsuarioPage() {
                           className="w-full bg-[#2A4242] text-white border-gray-600 focus:ring-teal-500 focus:border-teal-500 data-[placeholder]:text-gray-400"
                         >
                           <SelectValue
-                            placeholder={isLoadingObrasSociales ? "Cargando obras sociales..." : "Seleccione una obra social"}
+                            placeholder={isLoadingObrasSociales ? "Cargando obras sociales..." : "Elegí una obra social"}
                           />
                         </SelectTrigger>
                         <SelectContent style={{ backgroundColor: "#1D3434", borderColor: "#2A4A4A" }}>

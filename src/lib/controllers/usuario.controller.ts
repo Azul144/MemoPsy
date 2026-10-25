@@ -67,7 +67,7 @@ export class UsuarioController {
 
       if (!hasPermission) {
         return NextResponse.json(
-          { error: 'No tienes permisos para realizar esta acción' },
+          { error: 'No tenés permisos para realizar esta acción' },
           { status: 403 }
         );
       }
@@ -121,7 +121,7 @@ export class UsuarioController {
 
       if (!hasPermission) {
         return NextResponse.json(
-          { error: 'No tienes permisos para realizar esta acción' },
+          { error: 'No tenés permisos para realizar esta acción' },
           { status: 403 }
         );
       }
@@ -170,7 +170,7 @@ export class UsuarioController {
 
       if (!canViewOwnProfile && !hasPermission) {
         return NextResponse.json(
-          { error: 'No tienes permisos para realizar esta acción' },
+          { error: 'No tenés permisos para realizar esta acción' },
           { status: 403 }
         );
       }
@@ -226,7 +226,7 @@ export class UsuarioController {
 
       if (!canEditOwnProfile && !hasPermission) {
         return NextResponse.json(
-          { error: 'No tienes permisos para realizar esta acción' },
+          { error: 'No tenés permisos para realizar esta acción' },
           { status: 403 }
         );
       }
@@ -287,7 +287,7 @@ export class UsuarioController {
 
       if (!hasPermission) {
         return NextResponse.json(
-          { error: 'No tienes permisos para realizar esta acción' },
+          { error: 'No tenés permisos para realizar esta acción' },
           { status: 403 }
         );
       }
@@ -297,7 +297,7 @@ export class UsuarioController {
       // No permitir que un usuario se elimine a sí mismo
       if (session.user.id === id) {
         return NextResponse.json(
-          { error: 'No puedes eliminar tu propia cuenta' },
+          { error: 'No podés eliminar tu propia cuenta' },
           { status: 400 }
         );
       }
@@ -350,7 +350,7 @@ export class UsuarioController {
 
       if (!hasPermission) {
         return NextResponse.json(
-          { error: 'No tienes permisos para realizar esta acción' },
+          { error: 'No tenés permisos para realizar esta acción' },
           { status: 403 }
         );
       }
@@ -360,7 +360,7 @@ export class UsuarioController {
       // No permitir que un usuario se desactive a sí mismo
       if (session.user.id === id) {
         return NextResponse.json(
-          { error: 'No puedes cambiar el estado de tu propia cuenta' },
+          { error: 'No podés cambiar el estado de tu propia cuenta' },
           { status: 400 }
         );
       }
@@ -412,7 +412,7 @@ export class UsuarioController {
       // Solo el propio usuario puede cambiar su contraseña
       if (session.user.id !== id) {
         return NextResponse.json(
-          { error: 'Solo puedes cambiar tu propia contraseña' },
+          { error: 'Solo podés cambiar tu propia contraseña' },
           { status: 403 }
         );
       }

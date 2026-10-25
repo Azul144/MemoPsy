@@ -35,7 +35,7 @@ export class PsicologoController {
       //   p => p.modulo.nombre === 'Psicologos' && p.accion.nombre === 'Crear'
       // );
       // if (!hasPermission) {
-      //   return NextResponse.json({ success: false, error: 'No tienes permisos para crear psicólogos' }, { status: 403 });
+      //   return NextResponse.json({ success: false, error: 'No tenés permisos para crear psicólogos' }, { status: 403 });
       // }
 
       const body = await request.json();
@@ -78,7 +78,7 @@ export class PsicologoController {
       //   p => p.modulo.nombre === 'Psicologos' && p.accion.nombre === 'Crear'
       // );
       // if (!hasPermission) {
-      //   return NextResponse.json({ success: false, error: 'No tienes permisos para crear psicólogos' }, { status: 403 });
+      //   return NextResponse.json({ success: false, error: 'No tenés permisos para crear psicólogos' }, { status: 403 });
       // }
 
       const body = await request.json();
@@ -128,7 +128,7 @@ export class PsicologoController {
       //   p => p.modulo.nombre === 'Psicologos' && p.accion.nombre === 'Ver'
       // );
       // if (!hasPermission) {
-      //   return NextResponse.json({ success: false, error: 'No tienes permisos para ver psicólogos' }, { status: 403 });
+      //   return NextResponse.json({ success: false, error: 'No tenés permisos para ver psicólogos' }, { status: 403 });
       // }
 
 

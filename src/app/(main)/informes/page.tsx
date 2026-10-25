@@ -31,16 +31,16 @@ interface SubModuloConfig {
 const SUB_MODULOS_INFORMES: SubModuloConfig[] = [
   {
     id: 'registrar_informe',
-    nombre: 'Registrar Nuevo Informe',
-    descripcion: 'Crear nuevos informes clínicos para pacientes.',
+    nombre: 'Registrar nota clínica',
+    descripcion: 'Escribí o dictá la nota de una sesión; la IA te ayuda a ordenarla.',
     icon: PlusSquare,
     ruta: '/informes/registrar',
     permisoRequerido: 'Registrar Informe',
   },
   {
     id: 'listar_informes',
-    nombre: 'Ver Lista de Informes',
-    descripcion: 'Consultar y gestionar el listado de informes existentes.',
+    nombre: 'Notas clínicas',
+    descripcion: 'Buscá tus notas por paciente, etiqueta o palabra clave.',
     icon: ListChecks,
     ruta: '/informes/lista',
     permisoRequerido: 'Ver Informes',
@@ -146,15 +146,15 @@ export default function GestionInformesPage() {
 
       {/* Main Content (structure identical to perfiles/page.tsx) */}
       <main className="mx-auto w-full max-w-6xl px-6 py-10">
-        <EncabezadoPagina titulo="Gestión de Informes" descripcion="Accede a las funciones de registro y consulta de informes." volverA="/welcome" textoVolver="Volver al inicio" />
+        <EncabezadoPagina titulo="Gestión de Informes" descripcion="Registrá y consultá notas clínicas, historias clínicas e informes de seguimiento." volverA="/welcome" textoVolver="Volver al inicio" />
 
         {status === 'authenticated' && subModulosInformesPermitidos.length === 0 && (
           <div className="flex flex-col items-center justify-center text-center p-8 rounded-2xl max-w-md mx-auto" style={{ backgroundColor: '#1D3434' }}>
             <FileText className="w-16 h-16 mx-auto mb-6" style={{ color: '#F1C77A' }} /> {/* Using FileText as a general icon for Informes module */}
             <h3 className="text-2xl font-semibold text-white mb-4">Sin Acciones Disponibles en Informes</h3>
             <TypographyP className="text-gray-300">
-              No tienes los permisos necesarios para realizar acciones en este módulo.
-              Si crees que esto es un error, por favor contacta al administrador del sistema.
+              No tenés los permisos necesarios para usar este módulo.
+              Si creés que es un error, consultá con el administrador del sistema.
             </TypographyP>
           </div>
         )}

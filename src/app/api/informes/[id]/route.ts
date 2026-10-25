@@ -234,34 +234,6 @@ async function manejarPUT(request: NextRequest, { params: paramsPromise }: { par
 //   // ... implementation ...
 // }
 
-/*
-import { NextRequest } from 'next/server';
-import { InformeController } from '@/lib/controllers/informe.controller'; // Adjust path if needed
-
-export async function GET(
-  request: NextRequest,
-  { params: paramsPromise }: { params: Promise<{ id: string }> }
-) {
-  const params = await paramsPromise;
-  return InformeController.getInformeById(request, { params });
-}
-
-export async function PUT(
-  request: NextRequest,
-  { params: paramsPromise }: { params: Promise<{ id: string }> }
-) {
-  const params = await paramsPromise;
-  return InformeController.updateInforme(request, { params });
-}
-
-export async function DELETE(
-  request: NextRequest,
-  { params: paramsPromise }: { params: Promise<{ id: string }> }
-) {
-  const params = await paramsPromise;
-  return InformeController.deleteInforme(request, { params });
-}
-  */
 
 // RF 1.4 - Registro de auditoría de esta ruta
 export const GET = conAuditoria(manejarGET, { modulo: "Informes", accion: "VER", detalle: "Consulta de una nota clínica" })

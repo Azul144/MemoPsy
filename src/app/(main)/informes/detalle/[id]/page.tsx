@@ -160,7 +160,7 @@ export default function DetalleInformePage() {
 
       {/* Main Content */}
       <main className="mx-auto w-full max-w-6xl px-6 py-10">
-        <EncabezadoPagina titulo="Detalle del informe" volverA="/informes/lista" textoVolver="Volver a la lista de informes" />
+        <EncabezadoPagina titulo="Detalle de la nota" volverA="/informes/lista" textoVolver="Volver a las notas clínicas" />
 
         {pageError && (
             <Card className="border-red-400/40 bg-red-500/10 text-red-300 max-w-3xl mx-auto">
@@ -179,7 +179,7 @@ export default function DetalleInformePage() {
         {!pageError && !informe && !isLoadingData && ( // Should only show if not loading and no error, but informe is still null
             <Card style={{ backgroundColor: '#1D3434', borderColor: '#2A4A4A' }} className="max-w-3xl mx-auto text-center">
             <CardHeader>
-                <CardTitle className="text-[#F1C77A]">Informe no Disponible</CardTitle>
+                <CardTitle className="text-[#F1C77A]">Nota no disponible</CardTitle>
             </CardHeader>
             <CardContent>
                 <TypographyP className="text-gray-300">No se pudo cargar la información del informe.</TypographyP>
@@ -207,18 +207,18 @@ export default function DetalleInformePage() {
                   {canEdit && (
                       <Button onClick={() => router.push(`/informes/editar/${informe.id}`)}
                           className="bg-[#F1C77A] text-[#1D3434] hover:bg-opacity-80">
-                          <Edit className="mr-2 h-4 w-4" /> Editar Informe
+                          <Edit className="mr-2 h-4 w-4" /> Editar nota
                       </Button>
                   )}
                 </div>
               </div>
               <CardDescription className="text-gray-400 mt-2">
-                ID del Informe: <TypographyMuted className="text-gray-500">{informe.id}</TypographyMuted>
+                N.º de nota: <TypographyMuted className="text-gray-500">{informe.id}</TypographyMuted>
               </CardDescription>
             </CardHeader>
             <CardContent className="p-6 space-y-6">
               <div>
-                <Label htmlFor="contenido" className="text-lg font-medium text-gray-200">Contenido del Informe</Label>
+                <Label htmlFor="contenido" className="text-lg font-medium text-gray-200">Contenido de la nota</Label>
                 <div 
                   id="contenido" 
                   className="mt-2 p-4 border rounded-md bg-[#152A2A] border-gray-700 whitespace-pre-wrap min-h-[150px] text-gray-300"
@@ -244,7 +244,7 @@ export default function DetalleInformePage() {
                 <div className="space-y-1">
                   <div className="flex items-center text-gray-300">
                     <CalendarDays className="mr-2 h-5 w-5 text-[#F1C77A]" />
-                    <Label className="font-semibold text-gray-200">Fecha de Creación:</Label>
+                    <Label className="font-semibold text-gray-200">Fecha:</Label>
                   </div>
                   <TypographyP className="ml-7 text-gray-300">{new Date(informe.fechaCreacion).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</TypographyP>
                 </div>
@@ -269,7 +269,7 @@ export default function DetalleInformePage() {
               <div>
                 <div className="flex items-center text-gray-300 mb-2">
                     <Users className="mr-2 h-5 w-5 text-[#F1C77A]" />
-                    <Label className="text-lg font-medium text-gray-200">Pacientes Asociados:</Label>
+                    <Label className="text-lg font-medium text-gray-200">Pacientes asociados:</Label>
                 </div>
                 {informe.pacientes && informe.pacientes.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
@@ -284,9 +284,6 @@ export default function DetalleInformePage() {
                 )}
               </div>
             </CardContent>
-            <CardFooter className="p-6 bg-[#152A2A] border-t border-gray-700 rounded-b-lg text-center mt-4">
-                <TypographySmall className="text-gray-500">Fin del detalle del informe.</TypographySmall>
-            </CardFooter>
           </Card>
         )}
 

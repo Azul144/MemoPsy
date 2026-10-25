@@ -2,7 +2,7 @@
 
 import { useState, useEffect, type ChangeEvent, type FormEvent } from "react"
 import { MODULOS_DISPONIBLES, type ModuloConfig } from "@/config/modulos";
-import { useSession, signOut } from "next-auth/react"
+import { useSession, signOut } from "next-auth/react"
 import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
 import EncabezadoPagina from "@/components/sistema/EncabezadoPagina";
 import { useRouter } from "next/navigation"
@@ -81,7 +81,7 @@ export default function RegistrarPerfilPage() {
         fetchPermisos()
       } else {
         setHasPermissionPage(false)
-        setError("No tienes permiso para registrar nuevos perfiles.")
+        setError("No tenés permiso para registrar perfiles.")
       }
 
       const filteredNavModules = MODULOS_DISPONIBLES.filter((module) =>
@@ -243,7 +243,7 @@ export default function RegistrarPerfilPage() {
         <main className="mx-auto w-full max-w-6xl px-6 py-10 text-center">
           <AlertCircle className="w-16 h-16 mx-auto mb-6 text-red-500" />
           <h1 className="text-3xl font-bold text-red-500 mb-4">Acceso Denegado</h1>
-          <p className="text-gray-300 mb-6">{error || "No tienes permiso para registrar nuevos perfiles."}</p>
+          <p className="text-gray-300 mb-6">{error || "No tenés permiso para registrar perfiles."}</p>
           <Button onClick={() => router.push("/perfiles")} style={{ backgroundColor: "#F1C77A", color: "#1D3434" }}>
             Volver a Perfiles
           </Button>
@@ -260,7 +260,7 @@ export default function RegistrarPerfilPage() {
     <div className="min-h-screen">
 
       <main className="mx-auto w-full max-w-6xl px-6 py-10">
-        <EncabezadoPagina titulo="Registrar Nuevo Perfil" descripcion="Crea un nuevo perfil definiendo su nombre, descripción y permisos asociados" volverA="/perfiles" textoVolver="Volver a Perfiles" />
+        <EncabezadoPagina titulo="Registrar perfil" descripcion="Definí el nombre, la descripción y los permisos del perfil." volverA="/perfiles" textoVolver="Volver a Perfiles" />
         <Card className="max-w-4xl mx-auto" style={{ backgroundColor: "#1D3434", borderColor: "#2A4A4A" }}>
 
           <CardContent>
@@ -291,7 +291,7 @@ export default function RegistrarPerfilPage() {
                     onChange={handleChange}
                     required
                     className="bg-[#2A4242] text-white border-gray-600 focus:ring-teal-500 focus:border-teal-500 mt-2"
-                    placeholder="Ej: Administrador, Paciente, Supervisor"
+                    placeholder="Ej: Secretaría, Coordinación"
                   />
                   {fieldErrors.nombre && <p className="text-red-400 text-sm mt-1">{fieldErrors.nombre}</p>}
                 </div>

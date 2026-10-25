@@ -2,7 +2,7 @@
 
 import { useState, useEffect, type ChangeEvent, type FormEvent } from "react"
 import { MODULOS_DISPONIBLES, type ModuloConfig } from "@/config/modulos";
-import { useSession, signOut } from "next-auth/react"
+import { useSession, signOut } from "next-auth/react"
 import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
 import EncabezadoPagina from "@/components/sistema/EncabezadoPagina";
 import { useRouter, useParams } from "next/navigation"
@@ -85,8 +85,8 @@ export default function EditarPerfilPage() { // Renamed component
         fetchPermisos() // This fetches all available permissions for the checkboxes
       } else {
         setHasPermissionPage(false)
-        // setError("No tienes permiso para editar perfiles.") // Old error state
-        setProfileError("No tienes permiso para editar perfiles.") // Use profileError for this
+        // setError("No tenés permiso para editar perfiles.") // Old error state
+        setProfileError("No tenés permiso para editar perfiles.") // Use profileError for this
         setIsLoadingProfile(false); // If no permission, stop profile loading
       }
 
@@ -310,7 +310,7 @@ export default function EditarPerfilPage() { // Renamed component
           <AlertCircle className="w-16 h-16 mx-auto mb-6 text-red-500" />
           <h1 className="text-3xl font-bold text-red-500 mb-4">Acceso Denegado</h1>
           {/* Display profileError first if it exists (e.g. permission denied), then form error */}
-          <p className="text-gray-300 mb-6">{profileError || error || "No tienes los permisos necesarios para acceder a esta página."}</p>
+          <p className="text-gray-300 mb-6">{profileError || error || "No tenés los permisos necesarios para entrar a esta página."}</p>
           <Button onClick={() => router.push("/perfiles")} style={{ backgroundColor: "#F1C77A", color: "#1D3434" }}>
             Volver a Perfiles
           </Button>
@@ -366,7 +366,7 @@ export default function EditarPerfilPage() { // Renamed component
                     onChange={handleChange}
                     required
                     className="bg-[#2A4242] text-white border-gray-600 focus:ring-teal-500 focus:border-teal-500 mt-2"
-                    placeholder="Ej: Administrador, Paciente, Supervisor"
+                    placeholder="Ej: Secretaría, Coordinación"
                   />
                   {fieldErrors.nombre && <p className="text-red-400 text-sm mt-1">{fieldErrors.nombre}</p>}
                 </div>

@@ -631,7 +631,7 @@ function ListaInformes() {
 
       {/* Main Content */}
       <main className="mx-auto w-full max-w-6xl px-6 py-10 flex-grow">
-        <EncabezadoPagina titulo="Lista de Informes" descripcion="Gestiona y visualiza los informes psicológicos" volverA="/informes" textoVolver="Volver a Informes" />
+        <EncabezadoPagina titulo="Notas clínicas" descripcion="Consultá y filtrá las notas clínicas de tus pacientes." volverA="/informes" textoVolver="Volver a Informes" />
 
         {/* Psychologist View */}
         {userRoles.isPsicologo && (
@@ -643,7 +643,7 @@ function ListaInformes() {
                   Vista del Psicólogo
                 </CardTitle>
                 <CardDescription className="text-gray-400">
-                  Informes creados por usted para sus pacientes
+                  Notas creadas por vos para tus pacientes
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -778,7 +778,7 @@ function ListaInformes() {
                     className="bg-primary !text-primary-foreground text-white hover:bg-primary/90"
                   >
                     <PlusCircle className="w-4 h-4 mr-2" />
-                    Nuevo Informe
+                    Nueva nota
                   </Button>
                 </div>
 
@@ -806,7 +806,7 @@ function ListaInformes() {
                   Vista del Paciente
                 </CardTitle>
                 <CardDescription className="text-gray-400">
-                  Informes creados para usted por sus psicólogos
+                  Informes que te compartieron tus psicólogos
                 </CardDescription>
               </CardHeader>
               <CardContent>

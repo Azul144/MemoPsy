@@ -27,7 +27,7 @@ export class ModalidadController {
         (permiso: any) => permiso.modulo.nombre === 'Modalidades' && permiso.accion.nombre === 'Ver'
       );
       if (!hasPermission) {
-        return NextResponse.json({ error: 'No tienes permisos para realizar esta acción' }, { status: 403 });
+        return NextResponse.json({ error: 'No tenés permisos para realizar esta acción' }, { status: 403 });
       }
 
       // ModalidadService.getAllModalidades() does not currently accept filters.
@@ -41,7 +41,7 @@ export class ModalidadController {
       console.error('Error al obtener modalidades:', error);
       let statusCode = 500;
       if (error.message?.includes('No autorizado')) statusCode = 401;
-      else if (error.message?.includes('No tienes permisos')) statusCode = 403;
+      else if (error.message?.includes('No tenés permisos')) statusCode = 403;
       return NextResponse.json({ success: false, error: error.message || 'Error interno del servidor' }, { status: statusCode });
     }
   }
@@ -57,7 +57,7 @@ export class ModalidadController {
         (permiso: any) => permiso.modulo.nombre === 'Modalidades' && permiso.accion.nombre === 'Crear'
       );
       if (!hasPermission) {
-        return NextResponse.json({ error: 'No tienes permisos para realizar esta acción' }, { status: 403 });
+        return NextResponse.json({ error: 'No tenés permisos para realizar esta acción' }, { status: 403 });
       }
 
       const body = await request.json();
@@ -68,7 +68,7 @@ export class ModalidadController {
       console.error('Error al crear modalidad:', error);
       let statusCode = 400; // Default to Bad Request
       if (error.message?.includes('No autorizado')) statusCode = 401;
-      else if (error.message?.includes('No tienes permisos')) statusCode = 403;
+      else if (error.message?.includes('No tenés permisos')) statusCode = 403;
       else if (error.message?.includes('Ya existe una modalidad con este nombre')) statusCode = 409; // Conflict
       else if (error.message?.toLowerCase().includes('errores de validación')) statusCode = 400; // Validation from DTO
       else if (error.message?.toLowerCase().includes('el nombre es requerido')) statusCode = 400;
@@ -88,7 +88,7 @@ export class ModalidadController {
         (permiso: any) => permiso.modulo.nombre === 'Modalidades' && permiso.accion.nombre === 'Ver'
       );
       if (!hasPermission) {
-         return NextResponse.json({ error: 'No tienes permisos para realizar esta acción' }, { status: 403 });
+         return NextResponse.json({ error: 'No tenés permisos para realizar esta acción' }, { status: 403 });
       }
 
       const { id } = params;
@@ -99,7 +99,7 @@ export class ModalidadController {
       console.error('Error al obtener modalidad:', error);
       let statusCode = 500;
       if (error.message?.includes('No autorizado')) statusCode = 401;
-      else if (error.message?.includes('No tienes permisos')) statusCode = 403;
+      else if (error.message?.includes('No tenés permisos')) statusCode = 403;
       else if (error.message?.includes('Modalidad no encontrada')) statusCode = 404;
       else if (error.message?.includes('El ID es requerido')) statusCode = 400;
       return NextResponse.json({ success: false, error: error.message || 'Error interno del servidor' }, { status: statusCode });
@@ -117,7 +117,7 @@ export class ModalidadController {
         (permiso: any) => permiso.modulo.nombre === 'Modalidades' && permiso.accion.nombre === 'Editar'
       );
       if (!hasPermission) {
-        return NextResponse.json({ error: 'No tienes permisos para realizar esta acción' }, { status: 403 });
+        return NextResponse.json({ error: 'No tenés permisos para realizar esta acción' }, { status: 403 });
       }
 
       const { id } = params;
@@ -130,7 +130,7 @@ export class ModalidadController {
       console.error('Error al actualizar modalidad:', error);
       let statusCode = 400; // Default to Bad Request
       if (error.message?.includes('No autorizado')) statusCode = 401;
-      else if (error.message?.includes('No tienes permisos')) statusCode = 403;
+      else if (error.message?.includes('No tenés permisos')) statusCode = 403;
       else if (error.message?.includes('Modalidad no encontrada')) statusCode = 404;
       else if (error.message?.includes('Ya existe una modalidad con este nombre')) statusCode = 409; // Conflict
       else if (error.message?.toLowerCase().includes('errores de validación')) statusCode = 400;
@@ -150,7 +150,7 @@ export class ModalidadController {
         (permiso: any) => permiso.modulo.nombre === 'Modalidades' && permiso.accion.nombre === 'Eliminar'
       );
       if (!hasPermission) {
-        return NextResponse.json({ error: 'No tienes permisos para realizar esta acción' }, { status: 403 });
+        return NextResponse.json({ error: 'No tenés permisos para realizar esta acción' }, { status: 403 });
       }
 
       const { id } = params;
@@ -160,7 +160,7 @@ export class ModalidadController {
       console.error('Error al eliminar modalidad:', error);
       let statusCode = 500;
       if (error.message?.includes('No autorizado')) statusCode = 401;
-      else if (error.message?.includes('No tienes permisos')) statusCode = 403;
+      else if (error.message?.includes('No tenés permisos')) statusCode = 403;
       else if (error.message?.includes('Modalidad no encontrada')) statusCode = 404;
       else if (error.message?.includes('El ID es requerido')) statusCode = 400;
       return NextResponse.json({ success: false, error: error.message || 'Error interno del servidor' }, { status: statusCode });

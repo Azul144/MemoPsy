@@ -282,12 +282,12 @@ export default function RegistrarInformePage() {
 
       {/* Main Content */}
       <main className="mx-auto w-full max-w-6xl px-6 py-10">
-        <EncabezadoPagina titulo="Registrar Nuevo Informe" descripcion="Complete el formulario para crear un nuevo informe sobre paciente/s." volverA="/informes" textoVolver="Volver a Informes" />
+        <EncabezadoPagina titulo="Registrar nota clínica" descripcion="Completá los datos de la sesión y asociá la nota a uno o más pacientes." volverA="/informes" textoVolver="Volver a Informes" />
 
         <Card className="max-w-2xl mx-auto" style={{ backgroundColor: '#1D3434', borderColor: '#2A4A4A' }}>
           <CardHeader>
-            <CardTitle className="text-2xl text-[#F1C77A]">Datos del Informe</CardTitle>
-            <CardDescription className="text-gray-400">Asegúrese de completar todos los campos requeridos.</CardDescription>
+            <CardTitle className="text-2xl text-[#F1C77A]">Datos de la nota</CardTitle>
+            <CardDescription className="text-gray-400">Completá todos los campos obligatorios.</CardDescription>
           </CardHeader>
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-6">
@@ -298,7 +298,7 @@ export default function RegistrarInformePage() {
                 </div>
               )}
               <div className="space-y-2">
-                <Label htmlFor="titulo" className="text-gray-200">Título del Informe</Label>
+                <Label htmlFor="titulo" className="text-gray-200">Título</Label>
                 <Input
                   id="titulo" name="titulo" value={formData.titulo} onChange={handleInputChange}
                   placeholder="Ej: Informe de Progreso Trimestral"
@@ -311,7 +311,7 @@ export default function RegistrarInformePage() {
                 <Label htmlFor="contenido" className="text-gray-200">Contenido</Label>
                 <Textarea
                   id="contenido" name="contenido" value={formData.contenido} onChange={handleInputChange}
-                  placeholder="Describa aquí los detalles del informe..." rows={8}
+                  placeholder="Escribí o dictá lo trabajado en la sesión..." rows={8}
                   className={cn("bg-[#152A2A] text-white border-gray-600 focus:border-[#F1C77A]", formErrors.contenido && "border-red-500")}
                 />
                 {formErrors.contenido && <TypographySmall className="text-red-400">{formErrors.contenido}</TypographySmall>}
@@ -326,7 +326,7 @@ export default function RegistrarInformePage() {
                   placeholder="Ej: ansiedad, seguimiento, primera consulta"
                   className="bg-[#152A2A] text-white border-gray-600 focus:border-[#F1C77A]"
                 />
-                <TypographySmall className="text-gray-400">Separá las etiquetas con comas. Sirven para categorizar y buscar el informe.</TypographySmall>
+                <TypographySmall className="text-gray-400">Separá las etiquetas con comas. Sirven para categorizar y buscar la nota.</TypographySmall>
               </div>
 
               <p className="flex items-start gap-2 rounded-md border border-gray-700 bg-[#152A2A] p-3 text-sm text-gray-300">
@@ -335,7 +335,7 @@ export default function RegistrarInformePage() {
                 </p>
 
               <div className="space-y-2">
-                <Label htmlFor="pacienteSearch" className="text-gray-200">Pacientes Asociados</Label>
+                <Label htmlFor="pacienteSearch" className="text-gray-200">Pacientes asociados</Label>
 
                 <div className={cn(
                   "min-h-10 p-2 rounded-md border bg-[#152A2A] text-white w-full",
@@ -435,7 +435,7 @@ export default function RegistrarInformePage() {
               <Button type="submit" disabled={isSubmitting} 
                 className="bg-[#F1C77A] text-[#1D3434] hover:bg-opacity-80">
                 {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FilePlus className="mr-2 h-4 w-4" />}
-                Guardar Informe
+                Guardar nota
               </Button>
             </CardFooter>
           </form>

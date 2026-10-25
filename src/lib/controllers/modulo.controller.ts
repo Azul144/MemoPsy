@@ -26,7 +26,7 @@ export class ModuloController {
         (permiso: any) => permiso.modulo.nombre === 'Modulos' && permiso.accion.nombre === 'Ver'
       );
       if (!hasPermission) {
-        return NextResponse.json({ error: 'No tienes permisos para realizar esta acción' }, { status: 403 });
+        return NextResponse.json({ error: 'No tenés permisos para realizar esta acción' }, { status: 403 });
       }
 
       // ModuloService.findAll() does not currently accept filters.
@@ -41,7 +41,7 @@ export class ModuloController {
       // Service throws custom exceptions which might have status code, or check message
       let statusCode = error.statusCode || 500;
       if (error.message?.includes('No autorizado')) statusCode = 401;
-      else if (error.message?.includes('No tienes permisos')) statusCode = 403;
+      else if (error.message?.includes('No tenés permisos')) statusCode = 403;
       return NextResponse.json({ success: false, error: error.message || 'Error interno del servidor' }, { status: statusCode });
     }
   }
@@ -57,7 +57,7 @@ export class ModuloController {
         (permiso: any) => permiso.modulo.nombre === 'Modulos' && permiso.accion.nombre === 'Crear'
       );
       if (!hasPermission) {
-        return NextResponse.json({ error: 'No tienes permisos para realizar esta acción' }, { status: 403 });
+        return NextResponse.json({ error: 'No tenés permisos para realizar esta acción' }, { status: 403 });
       }
 
       const body = await request.json();
@@ -68,7 +68,7 @@ export class ModuloController {
       console.error('Error al crear modulo:', error);
       let statusCode = error.statusCode || 400; // Default to Bad Request for service errors
       if (error.message?.includes('No autorizado')) statusCode = 401;
-      else if (error.message?.includes('No tienes permisos')) statusCode = 403;
+      else if (error.message?.includes('No tenés permisos')) statusCode = 403;
       // ConflictException from service has statusCode 409
       // BadRequestException from service has statusCode 400
       return NextResponse.json({ success: false, error: error.message || 'Error interno del servidor' }, { status: statusCode });
@@ -86,7 +86,7 @@ export class ModuloController {
         (permiso: any) => permiso.modulo.nombre === 'Modulos' && permiso.accion.nombre === 'Ver'
       );
       if (!hasPermission) {
-         return NextResponse.json({ error: 'No tienes permisos para realizar esta acción' }, { status: 403 });
+         return NextResponse.json({ error: 'No tenés permisos para realizar esta acción' }, { status: 403 });
       }
 
       const { id } = params;
@@ -97,7 +97,7 @@ export class ModuloController {
       console.error('Error al obtener modulo:', error);
       let statusCode = error.statusCode || 500; 
       if (error.message?.includes('No autorizado')) statusCode = 401;
-      else if (error.message?.includes('No tienes permisos')) statusCode = 403;
+      else if (error.message?.includes('No tenés permisos')) statusCode = 403;
       // NotFoundException from service has statusCode 404
       return NextResponse.json({ success: false, error: error.message || 'Error interno del servidor' }, { status: statusCode });
     }
@@ -114,7 +114,7 @@ export class ModuloController {
         (permiso: any) => permiso.modulo.nombre === 'Modulos' && permiso.accion.nombre === 'Editar'
       );
       if (!hasPermission) {
-        return NextResponse.json({ error: 'No tienes permisos para realizar esta acción' }, { status: 403 });
+        return NextResponse.json({ error: 'No tenés permisos para realizar esta acción' }, { status: 403 });
       }
 
       const { id } = params;
@@ -127,7 +127,7 @@ export class ModuloController {
       console.error('Error al actualizar modulo:', error);
       let statusCode = error.statusCode || 400;
       if (error.message?.includes('No autorizado')) statusCode = 401;
-      else if (error.message?.includes('No tienes permisos')) statusCode = 403;
+      else if (error.message?.includes('No tenés permisos')) statusCode = 403;
       // NotFoundException (404), ConflictException (409), BadRequestException (400) handled by error.statusCode
       return NextResponse.json({ success: false, error: error.message || 'Error interno del servidor' }, { status: statusCode });
     }
@@ -144,7 +144,7 @@ export class ModuloController {
         (permiso: any) => permiso.modulo.nombre === 'Modulos' && permiso.accion.nombre === 'Eliminar'
       );
       if (!hasPermission) {
-        return NextResponse.json({ error: 'No tienes permisos para realizar esta acción' }, { status: 403 });
+        return NextResponse.json({ error: 'No tenés permisos para realizar esta acción' }, { status: 403 });
       }
 
       const { id } = params;
@@ -155,7 +155,7 @@ export class ModuloController {
       console.error('Error al eliminar modulo:', error);
       let statusCode = error.statusCode || 500;
        if (error.message?.includes('No autorizado')) statusCode = 401;
-      else if (error.message?.includes('No tienes permisos')) statusCode = 403;
+      else if (error.message?.includes('No tenés permisos')) statusCode = 403;
       // NotFoundException (404) handled by error.statusCode
       return NextResponse.json({ success: false, error: error.message || 'Error interno del servidor' }, { status: statusCode });
     }

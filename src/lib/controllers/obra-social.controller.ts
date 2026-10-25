@@ -26,7 +26,7 @@ export class ObraSocialController {
         (permiso: any) => permiso.modulo.nombre === 'ObrasSociales' && permiso.accion.nombre === 'Ver'
       );
       if (!hasPermission) {
-        return NextResponse.json({ error: 'No tienes permisos para realizar esta acción' }, { status: 403 });
+        return NextResponse.json({ error: 'No tenés permisos para realizar esta acción' }, { status: 403 });
       }
 
       const { searchParams } = new URL(request.url);
@@ -44,7 +44,7 @@ export class ObraSocialController {
       console.error('Error al obtener obras sociales:', error);
       let statusCode = 500;
       if (error.message?.includes('No autorizado')) statusCode = 401;
-      else if (error.message?.includes('No tienes permisos')) statusCode = 403;
+      else if (error.message?.includes('No tenés permisos')) statusCode = 403;
       return NextResponse.json({ success: false, error: error.message || 'Error interno del servidor' }, { status: statusCode });
     }
   }
@@ -60,7 +60,7 @@ export class ObraSocialController {
         (permiso: any) => permiso.modulo.nombre === 'ObrasSociales' && permiso.accion.nombre === 'Crear'
       );
       if (!hasPermission) {
-        return NextResponse.json({ error: 'No tienes permisos para realizar esta acción' }, { status: 403 });
+        return NextResponse.json({ error: 'No tenés permisos para realizar esta acción' }, { status: 403 });
       }
 
       const body = await request.json();
@@ -71,7 +71,7 @@ export class ObraSocialController {
       console.error('Error al crear obra social:', error);
       let statusCode = 400; // Default to Bad Request
       if (error.message?.includes('No autorizado')) statusCode = 401;
-      else if (error.message?.includes('No tienes permisos')) statusCode = 403;
+      else if (error.message?.includes('No tenés permisos')) statusCode = 403;
       else if (error.message?.includes('Ya existe una obra social con el nombre')) statusCode = 409; // Conflict
       // Add other specific error message checks if needed, e.g., for validation errors from model
       
@@ -90,7 +90,7 @@ export class ObraSocialController {
         (permiso: any) => permiso.modulo.nombre === 'ObrasSociales' && permiso.accion.nombre === 'Ver'
       );
       if (!hasPermission) {
-         return NextResponse.json({ error: 'No tienes permisos para realizar esta acción' }, { status: 403 });
+         return NextResponse.json({ error: 'No tenés permisos para realizar esta acción' }, { status: 403 });
       }
 
       const { id } = params;
@@ -103,7 +103,7 @@ export class ObraSocialController {
       console.error('Error al obtener obra social:', error);
       let statusCode = 500;
       if (error.message?.includes('No autorizado')) statusCode = 401;
-      else if (error.message?.includes('No tienes permisos')) statusCode = 403;
+      else if (error.message?.includes('No tenés permisos')) statusCode = 403;
       // The service itself doesn't throw a specific "not found" error, it returns null.
       // So, the 404 is handled by the explicit check above.
       return NextResponse.json({ success: false, error: error.message || 'Error interno del servidor' }, { status: statusCode });
@@ -121,7 +121,7 @@ export class ObraSocialController {
         (permiso: any) => permiso.modulo.nombre === 'ObrasSociales' && permiso.accion.nombre === 'Editar'
       );
       if (!hasPermission) {
-        return NextResponse.json({ error: 'No tienes permisos para realizar esta acción' }, { status: 403 });
+        return NextResponse.json({ error: 'No tenés permisos para realizar esta acción' }, { status: 403 });
       }
 
       const { id } = params;
@@ -136,7 +136,7 @@ export class ObraSocialController {
       console.error('Error al actualizar obra social:', error);
       let statusCode = 400; // Default to Bad Request
       if (error.message?.includes('No autorizado')) statusCode = 401;
-      else if (error.message?.includes('No tienes permisos')) statusCode = 403;
+      else if (error.message?.includes('No tenés permisos')) statusCode = 403;
       else if (error.message?.includes('No se encontró una obra social con el ID')) statusCode = 404;
       else if (error.message?.includes('Ya existe una obra social con el nombre')) statusCode = 409; // Conflict
       return NextResponse.json({ success: false, error: error.message || 'Error interno del servidor' }, { status: statusCode });
@@ -154,7 +154,7 @@ export class ObraSocialController {
         (permiso: any) => permiso.modulo.nombre === 'ObrasSociales' && permiso.accion.nombre === 'Eliminar'
       );
       if (!hasPermission) {
-        return NextResponse.json({ error: 'No tienes permisos para realizar esta acción' }, { status: 403 });
+        return NextResponse.json({ error: 'No tenés permisos para realizar esta acción' }, { status: 403 });
       }
 
       const { id } = params;
@@ -167,7 +167,7 @@ export class ObraSocialController {
       console.error('Error al eliminar obra social:', error);
       let statusCode = 500;
       if (error.message?.includes('No autorizado')) statusCode = 401;
-      else if (error.message?.includes('No tienes permisos')) statusCode = 403;
+      else if (error.message?.includes('No tenés permisos')) statusCode = 403;
       else if (error.message?.includes('No se encontró una obra social con el ID')) statusCode = 404;
       return NextResponse.json({ success: false, error: error.message || 'Error interno del servidor' }, { status: statusCode });
     }

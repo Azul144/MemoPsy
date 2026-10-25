@@ -32,7 +32,7 @@ export class PacienteController {
       );
       if (!hasPermission) {
         // Consider if a psicologo should see a filtered list by default (complex for this generic endpoint)
-        return NextResponse.json({ error: 'No tienes permisos para ver la lista completa de pacientes.' }, { status: 403 });
+        return NextResponse.json({ error: 'No tenés permisos para ver la lista completa de pacientes.' }, { status: 403 });
       }
 
       const { searchParams } = new URL(request.url);
@@ -65,7 +65,7 @@ export class PacienteController {
         (permiso: any) => permiso.modulo.nombre === 'Pacientes' && permiso.accion.nombre === 'Crear'
       );
       if (!hasPermission) {
-        return NextResponse.json({ error: 'No tienes permisos para crear pacientes' }, { status: 403 });
+        return NextResponse.json({ error: 'No tenés permisos para crear pacientes' }, { status: 403 });
       }
 
       const body = await request.json();
@@ -77,7 +77,7 @@ export class PacienteController {
       console.error('Error al crear paciente:', error);
       let statusCode = 400;
       if (error.message?.includes('No autorizado')) statusCode = 401;
-      else if (error.message?.includes('No tienes permisos')) statusCode = 403;
+      else if (error.message?.includes('No tenés permisos')) statusCode = 403;
       else if (error.message?.includes('No se encontró una persona con el ID') || error.message?.includes('No se encontró una obra social con el ID')) statusCode = 404;
       else if (error.message?.includes('Esta persona ya está registrada como paciente')) statusCode = 409;
       
@@ -126,7 +126,7 @@ export class PacienteController {
       // For now, generic permission or being the patient themselves.
 
       if (!hasGenericViewPermission && !isSelf) {
-         return NextResponse.json({ error: 'No tienes permisos para ver este paciente' }, { status: 403 });
+         return NextResponse.json({ error: 'No tenés permisos para ver este paciente' }, { status: 403 });
       }
           
       return NextResponse.json({ success: true, data: paciente });
@@ -134,7 +134,7 @@ export class PacienteController {
       console.error('Error al obtener paciente:', error);
       let statusCode = 500;
       if (error.message?.includes('No autorizado')) statusCode = 401;
-      else if (error.message?.includes('No tienes permisos')) statusCode = 403;
+      else if (error.message?.includes('No tenés permisos')) statusCode = 403;
       // PacienteService.getPacienteById returns null if not found, handled above.
       return NextResponse.json({ success: false, error: error.message || 'Error interno del servidor' }, { status: statusCode });
     }
@@ -160,7 +160,7 @@ export class PacienteController {
       // Add isAssignedPsicologo if feasible later
 
       if (!hasGenericEditPermission && !isSelf) {
-        return NextResponse.json({ error: 'No tienes permisos para actualizar este paciente' }, { status: 403 });
+        return NextResponse.json({ error: 'No tenés permisos para actualizar este paciente' }, { status: 403 });
       }
 
       const body = await request.json();
@@ -175,7 +175,7 @@ export class PacienteController {
       console.error('Error al actualizar paciente:', error);
       let statusCode = 400;
       if (error.message?.includes('No autorizado')) statusCode = 401;
-      else if (error.message?.includes('No tienes permisos')) statusCode = 403;
+      else if (error.message?.includes('No tenés permisos')) statusCode = 403;
       else if (error.message?.includes('No se encontró un paciente con el ID')) statusCode = 404;
       else if (error.message?.includes('No se encontró una persona con el ID') || error.message?.includes('No se encontró una obra social con el ID')) statusCode = 404; // For linked entities
       else if (error.message?.includes('Esta persona ya está registrada como paciente')) statusCode = 409; // For unique constraints on update
@@ -194,7 +194,7 @@ export class PacienteController {
         (permiso: any) => permiso.modulo.nombre === 'Pacientes' && permiso.accion.nombre === 'Eliminar'
       );
       if (!hasPermission) {
-        return NextResponse.json({ error: 'No tienes permisos para eliminar pacientes' }, { status: 403 });
+        return NextResponse.json({ error: 'No tenés permisos para eliminar pacientes' }, { status: 403 });
       }
 
       const { id } = params;
@@ -207,125 +207,9 @@ export class PacienteController {
       console.error('Error al eliminar paciente:', error);
       let statusCode = 500;
       if (error.message?.includes('No autorizado')) statusCode = 401;
-      else if (error.message?.includes('No tienes permisos')) statusCode = 403;
+      else if (error.message?.includes('No tenés permisos')) statusCode = 403;
       else if (error.message?.includes('No se encontró un paciente con el ID')) statusCode = 404;
       return NextResponse.json({ success: false, error: error.message || 'Error interno del servidor' }, { status: statusCode });
     }
   }
 }
-
-/*
-// informe.controller.ts
-// PUT /api/informes/[id] - Actualizar informe
-static async updateInforme(request: NextRequest, { params }: { params: { id: string } }) {
-  try {
-    const session = await getServerSession(authConfig);
-    if (!session?.user || !session.user.persona) {
-      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
-    }
-
-    const { id } = params;
-    const informeToUpdate: InformeResponseDto = await informeService.findById(id);
-
-    // Get the psychologist by persona ID
-    const psicologo = await psicologoService.findByPersonaId(session.user.persona.id);
-    if (!psicologo) {
-      return NextResponse.json({ error: 'No es un psicólogo autorizado' }, { status: 401 });
-    }
-
-    const isOwnInforme = informeToUpdate.psicologo?.id === psicologo.id;
-    const hasGenericEditPermission = session.user.permisos?.some(
-      (permiso: any) => permiso.modulo.nombre === 'Informes' && permiso.accion.nombre === 'Editar'
-    );
-
-    if (!hasGenericEditPermission && !isOwnInforme) {
-      return NextResponse.json({ error: 'No tienes permisos para actualizar este informe' }, { status: 403 });
-    }
-
-    // Continue with update logic...
-    
-  } catch (error) {
-    console.error('Error updating informe:', error);
-    return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
-  }
-}
-
-// paciente.controller.ts
-// GET /api/pacientes/profile - Get patient profile
-static async getPatientProfile(request: NextRequest) {
-  try {
-    const session = await getServerSession(authConfig);
-    if (!session?.user || !session.user.persona) {
-      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
-    }
-
-    // Get the patient by persona ID
-    const paciente = await pacienteService.findByPersonaId(session.user.persona.id);
-    if (!paciente) {
-      return NextResponse.json({ error: 'No es un paciente autorizado' }, { status: 401 });
-    }
-
-    // Return patient data
-    return NextResponse.json({ paciente }, { status: 200 });
-    
-  } catch (error) {
-    console.error('Error getting patient profile:', error);
-    return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
-  }
-}
-
-// PUT /api/pacientes/[id] - Update patient
-static async updatePaciente(request: NextRequest, { params }: { params: { id: string } }) {
-  try {
-    const session = await getServerSession(authConfig);
-    if (!session?.user || !session.user.persona) {
-      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
-    }
-
-    const { id } = params;
-    const pacienteToUpdate = await pacienteService.findById(id);
-
-    // Get the patient by persona ID
-    const currentUserPaciente = await pacienteService.findByPersonaId(session.user.persona.id);
-    
-    const isOwnProfile = currentUserPaciente?.id === id;
-    const hasGenericEditPermission = session.user.permisos?.some(
-      (permiso: any) => permiso.modulo.nombre === 'Pacientes' && permiso.accion.nombre === 'Editar'
-    );
-
-    if (!hasGenericEditPermission && !isOwnProfile) {
-      return NextResponse.json({ error: 'No tienes permisos para actualizar este paciente' }, { status: 403 });
-    }
-
-    // Continue with update logic...
-    
-  } catch (error) {
-    console.error('Error updating paciente:', error);
-    return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
-  }
-}
-
-// Helper service methods you'll need to implement:
-
-// psicologoService.ts
-export class PsicologoService {
-  static async findByPersonaId(personaId: string): Promise<PsicologoEntity | null> {
-    const repository = AppDataSource.getRepository(PsicologoEntity);
-    return await repository.findOne({
-      where: { persona: { id: personaId } },
-      relations: ['persona']
-    });
-  }
-}
-
-// pacienteService.ts
-export class PacienteService {
-  static async findByPersonaId(personaId: string): Promise<PacienteEntity | null> {
-    const repository = AppDataSource.getRepository(PacienteEntity);
-    return await repository.findOne({
-      where: { persona: { id: personaId } },
-      relations: ['persona', 'obraSocial']
-    });
-  }
-}
-*/

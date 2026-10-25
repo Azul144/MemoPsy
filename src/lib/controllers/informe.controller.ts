@@ -57,13 +57,13 @@ export class InformeController {
       // Also, non-admin users should not see private reports of others.
       if (!hasGenericViewPermission) {
         if (!psicologo.id) { // User is not a psicologo or psicologoId is not in session
-             return NextResponse.json({ error: 'No tienes permisos para ver informes.' }, { status: 403 });
+             return NextResponse.json({ error: 'No tenés permisos para ver informes.' }, { status: 403 });
         }
         queryDto.psicologoId = psicologo.id; // Filter by psicologoId from session
         // Non-admins cannot see private reports of others, this is implicitly handled if psicologoId is set to self.
         // If they are querying for *another* psicologoId without generic view, it's forbidden.
         if (searchParams.get('psicologoId') && searchParams.get('psicologoId') !== psicologo.id) {
-            return NextResponse.json({ error: 'No tienes permisos para ver informes de otros psicólogos.' }, { status: 403 });
+            return NextResponse.json({ error: 'No tenés permisos para ver informes de otros psicólogos.' }, { status: 403 });
         }
       } else {
         // User has 'Informes/Ver' (e.g., an admin). They can see all informes.
@@ -100,7 +100,7 @@ export class InformeController {
         (permiso: any) => permiso.modulo.nombre === 'Informes' && permiso.accion.nombre === 'Crear'
       );
       if (!hasPermission) {
-        return NextResponse.json({ error: 'No tienes permisos para crear informes' }, { status: 403 });
+        return NextResponse.json({ error: 'No tenés permisos para crear informes' }, { status: 403 });
       }
 
       const body = await request.json();
@@ -117,7 +117,7 @@ export class InformeController {
             (p: any) => p.modulo.nombre === 'Informes' && p.accion.nombre === 'CrearParaOtros' // Example permission
         );
         if (!canCreateForOthers) {
-            return NextResponse.json({ error: 'No puedes crear informes para otros psicólogos.' }, { status: 403 });
+            return NextResponse.json({ error: 'No podés crear informes para otros psicólogos.' }, { status: 403 });
         }
       }
 
@@ -129,7 +129,7 @@ export class InformeController {
       console.error('Error al crear informe:', error);
       let statusCode = 400;
       if (error.message?.includes('No autorizado')) statusCode = 401;
-      else if (error.message?.includes('No tienes permisos')) statusCode = 403;
+      else if (error.message?.includes('No tenés permisos')) statusCode = 403;
       else if (error.message?.includes('El psicólogo especificado no existe')) statusCode = 404; // Not found for psicologoId
       else if (error.message?.toLowerCase().includes('unique constraint') || error.message?.toLowerCase().includes('ya existe')) statusCode = 409;
       return NextResponse.json({ success: false, error: error.message || 'Error interno del servidor' }, { status: statusCode });
@@ -160,14 +160,14 @@ export class InformeController {
       );
 
       if (!hasGenericViewPermission && !isOwnInforme) {
-         return NextResponse.json({ error: 'No tienes permisos para ver este informe' }, { status: 403 });
+         return NextResponse.json({ error: 'No tenés permisos para ver este informe' }, { status: 403 });
       }
       
       // If it's not their own informe, and it's private, they need special permission or role (e.g. admin)
       if (!isOwnInforme && informe.esPrivado && !hasGenericViewPermission) { // Re-check, hasGenericViewPermission might be too broad for private
         const canViewPrivateAll = session.user.permisos?.some( (p:any) => p.modulo.nombre === 'Informes' && p.accion.nombre === 'VerPrivadosTodos');
         if (!canViewPrivateAll) {
-            return NextResponse.json({ error: 'No tienes permisos para ver este informe privado' }, { status: 403 });
+            return NextResponse.json({ error: 'No tenés permisos para ver este informe privado' }, { status: 403 });
         }
       }
           
@@ -176,7 +176,7 @@ export class InformeController {
       console.error('Error al obtener informe:', error);
       let statusCode = 500;
       if (error.message?.includes('No autorizado')) statusCode = 401;
-      else if (error.message?.includes('No tienes permisos')) statusCode = 403;
+      else if (error.message?.includes('No tenés permisos')) statusCode = 403;
       else if (error.message?.includes('Informe no encontrado')) statusCode = 404;
       return NextResponse.json({ success: false, error: error.message || 'Error interno del servidor' }, { status: statusCode });
     }
@@ -205,7 +205,7 @@ export class InformeController {
       );
 
       if (!hasGenericEditPermission && !isOwnInforme) {
-        return NextResponse.json({ error: 'No tienes permisos para actualizar este informe' }, { status: 403 });
+        return NextResponse.json({ error: 'No tenés permisos para actualizar este informe' }, { status: 403 });
       }
 
       const body = await request.json();
@@ -217,7 +217,7 @@ export class InformeController {
             (p: any) => p.modulo.nombre === 'Informes' && p.accion.nombre === 'CambiarPropietario' // Example permission
         );
         if (!canChangeOwner) {
-            return NextResponse.json({ error: 'No tienes permisos para cambiar el psicólogo de este informe.' }, { status: 403 });
+            return NextResponse.json({ error: 'No tenés permisos para cambiar el psicólogo de este informe.' }, { status: 403 });
         }
       }
       
@@ -227,7 +227,7 @@ export class InformeController {
       console.error('Error al actualizar informe:', error);
       let statusCode = 400;
       if (error.message?.includes('No autorizado')) statusCode = 401;
-      else if (error.message?.includes('No tienes permisos')) statusCode = 403;
+      else if (error.message?.includes('No tenés permisos')) statusCode = 403;
       else if (error.message?.includes('Informe no encontrado')) statusCode = 404;
       else if (error.message?.includes('El psicólogo especificado no existe')) statusCode = 404;
       else if (error.message?.toLowerCase().includes('unique constraint') || error.message?.toLowerCase().includes('ya existe')) statusCode = 409;
@@ -257,7 +257,7 @@ export class InformeController {
       );
       
       if (!hasGenericDeletePermission && !isOwnInforme) {
-        return NextResponse.json({ error: 'No tienes permisos para eliminar este informe' }, { status: 403 });
+        return NextResponse.json({ error: 'No tenés permisos para eliminar este informe' }, { status: 403 });
       }
 
       await informeService.delete(id); 
@@ -266,7 +266,7 @@ export class InformeController {
       console.error('Error al eliminar informe:', error);
       let statusCode = 500;
       if (error.message?.includes('No autorizado')) statusCode = 401;
-      else if (error.message?.includes('No tienes permisos')) statusCode = 403;
+      else if (error.message?.includes('No tenés permisos')) statusCode = 403;
       else if (error.message?.includes('Informe no encontrado')) statusCode = 404;
       return NextResponse.json({ success: false, error: error.message || 'Error interno del servidor' }, { status: statusCode });
     }

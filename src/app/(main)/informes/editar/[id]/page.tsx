@@ -277,7 +277,7 @@ export default function EditarInformePage() {
             </div>
         ) : (
         <>
-            <EncabezadoPagina titulo="Editar Informe" descripcion={<>Modificando: <span className="font-semibold">&ldquo;{initialInformeTitle}&rdquo;</span></>} volverA="/informes" textoVolver="Volver a Informes" />
+            <EncabezadoPagina titulo="Editar nota clínica" descripcion={<>Modificando: <span className="font-semibold">&ldquo;{initialInformeTitle}&rdquo;</span></>} volverA="/informes" textoVolver="Volver a Informes" />
             
             <Card className="max-w-2xl mx-auto" style={{ backgroundColor: '#1D3434', borderColor: '#2A4A4A' }}>
             <CardHeader>
@@ -292,7 +292,7 @@ export default function EditarInformePage() {
                     </div>
                 )}
                 <div className="space-y-2">
-                    <Label htmlFor="titulo" className="text-gray-200">Título del Informe</Label>
+                    <Label htmlFor="titulo" className="text-gray-200">Título</Label>
                     <Input id="titulo" name="titulo" value={formData.titulo} onChange={handleInputChange} className={cn("bg-[#152A2A] text-white border-gray-600 focus:border-[#F1C77A]", formErrors.titulo && "border-red-500")} />
                     {formErrors.titulo && <TypographySmall className="text-red-400">{formErrors.titulo}</TypographySmall>}
                 </div>
@@ -317,7 +317,7 @@ export default function EditarInformePage() {
                     </p>
 
                 <div className="space-y-2">
-                    <Label htmlFor="pacienteSearch" className="text-gray-200">Pacientes Asociados</Label>
+                    <Label htmlFor="pacienteSearch" className="text-gray-200">Pacientes asociados</Label>
                     <div ref={popoverRef}>
                     <Popover open={isPacientePopoverOpen} onOpenChange={setIsPacientePopoverOpen}>
                         <PopoverTrigger asChild>

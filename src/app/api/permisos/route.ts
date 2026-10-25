@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
 
     const userPermissions = session.user.permisos.map((p: any) => p.nombre)
     if (!userPermissions.includes("Registrar Perfil") && !userPermissions.includes("Editar Perfil")) {
-      return NextResponse.json({ message: "No tienes permiso para ver permisos" }, { status: 403 })
+      return NextResponse.json({ message: "No tenés permiso para ver permisos" }, { status: 403 })
     }
 
     // Inicializar base de datos

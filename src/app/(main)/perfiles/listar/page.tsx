@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useMemo, type ChangeEvent } from "react"
 import { MODULOS_DISPONIBLES, type ModuloConfig } from "@/config/modulos";
-import { useSession, signOut } from "next-auth/react"
+import { useSession, signOut } from "next-auth/react"
+
 import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
 import EncabezadoPagina from "@/components/sistema/EncabezadoPagina";
 import { useRouter } from "next/navigation"
@@ -13,7 +14,8 @@ import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@
 import { Badge } from "@/components/ui/badge"
 import { TypographyP } from '@/components/ui/typography';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
-import { Users, Shield, Edit3, Trash2, MoreVertical, Search, AlertCircle, PlusCircle, Eye, Loader2 } from "lucide-react"
+import { Users, Shield, Edit3, Trash2, MoreVertical, Search, AlertCircle, PlusCircle, Eye, Loader2 } from "lucide-react"
+
 import { avisoExito, avisoError, confirmar } from "@/lib/avisos";
 
 
@@ -87,7 +89,7 @@ export default function ListarPerfilesPage() {
       setModulosPermitidos(filteredMainModules)
 
       if (!canViewPerfiles) {
-        setError("No tienes permiso para ver la lista de perfiles.")
+        setError("No tenés permiso para ver la lista de perfiles.")
         setIsLoading(false)
       }
     } else if (status === "authenticated" && !session?.user?.permisos) {
@@ -147,13 +149,9 @@ export default function ListarPerfilesPage() {
     router.push(`/perfiles/editar/${perfilId}`)
   }
 
-  const handleAssign = (perfilId: string) => {
-    router.push(`/perfiles/asignar/${perfilId}`)
-  }
-
   const handleDelete = async (perfilId: string, perfilNombre: string) => {
     if (
-      !await confirmar(`¿Estás seguro de que quieres eliminar el perfil "${perfilNombre}"? Esta acción no se puede deshacer.`)
+      !await confirmar(`¿Seguro que querés eliminar el perfil "${perfilNombre}"? No se puede deshacer.`)
     )
       return
 
@@ -201,7 +199,7 @@ export default function ListarPerfilesPage() {
         <main className="mx-auto w-full max-w-6xl px-6 py-10 text-center">
           <AlertCircle className="w-16 h-16 mx-auto mb-6 text-red-500" />
           <h1 className="text-3xl font-bold text-red-500 mb-4">Acceso Denegado</h1>
-          <p className="text-gray-300 mb-6">{error || "No tienes permiso para ver esta página."}</p>
+          <p className="text-gray-300 mb-6">{error || "No tenés permiso para ver esta página."}</p>
           <Button onClick={() => router.push("/perfiles")} style={{ backgroundColor: "#F1C77A", color: "#1D3434" }}>
             Volver a Perfiles
           </Button>
@@ -215,14 +213,14 @@ export default function ListarPerfilesPage() {
 
       {/* Main Content */}
       <main className="mx-auto w-full max-w-6xl px-6 py-10">
-        <EncabezadoPagina titulo="Lista de Perfiles" descripcion="Gestiona los perfiles del sistema y sus permisos asociados" volverA="/perfiles" textoVolver="Volver a Perfiles">
+        <EncabezadoPagina titulo="Perfiles" descripcion="Perfiles del sistema y los permisos de cada uno." volverA="/perfiles" textoVolver="Volver a Perfiles">
           {perfilActionPermissions.canRegister && (
             <Button
               onClick={navigateToRegister}
               style={{ backgroundColor: "#F1C77A", color: "#1D3434" }}
               className="flex items-center"
             >
-              <PlusCircle className="w-5 h-5 mr-2" /> Registrar Nuevo Perfil
+              <PlusCircle className="w-5 h-5 mr-2" /> Registrar perfil
             </Button>
           )}
         </EncabezadoPagina>
@@ -325,12 +323,6 @@ export default function ListarPerfilesPage() {
                             align="end"
                             style={{ backgroundColor: "#152A2A", borderColor: "#2A4A4A" }}
                           >
-                            {/*<DropdownMenuItem
-                              onClick={() => router.push(`/perfiles/ver/${perfil.id}`)}
-                              className="text-gray-300 hover:bg-[#2A4242] focus:bg-[#2A4242] focus:text-white"
-                            >
-                               <Eye className="mr-2 h-4 w-4" /> Ver Detalles 
-                            </DropdownMenuItem>*/}
                             {perfilActionPermissions.canEdit && (
                               <DropdownMenuItem
                                 onClick={() => handleEdit(perfil.id)}

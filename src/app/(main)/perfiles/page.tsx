@@ -24,24 +24,24 @@ interface SubModuloConfig {
 const SUB_MODULOS_PERFILES: SubModuloConfig[] = [
   {
     id: 'registrar_perfil',
-    nombre: 'Registrar Nuevo Perfil',
-    descripcion: 'Crear nuevos perfiles de usuario.',
-    icon: UserPlus, // Using UserPlus, could be ShieldPlus if more appropriate
+    nombre: 'Registrar perfil',
+    descripcion: 'Creá un perfil y elegí qué permisos tiene.',
+    icon: UserPlus,
     ruta: '/perfiles/registrar',
     permisoRequerido: 'Registrar Perfil',
   },
   {
     id: 'listar_perfiles',
-    nombre: 'Ver Lista de Perfiles',
-    descripcion: 'Consultar y navegar el listado de todos los perfiles.',
+    nombre: 'Perfiles',
+    descripcion: 'Consultá los perfiles y sus permisos, editalos o eliminalos.',
     icon: List,
     ruta: '/perfiles/listar',
     permisoRequerido: 'Ver Perfiles',
   },
   {
-    id: 'editar_usuario_general',
-    nombre: 'Editar Usuarios',
-    descripcion: 'Modificar información y perfiles de usuarios existentes (desde la lista).',
+    id: 'asignar_perfil',
+    nombre: 'Asignar perfil a un usuario',
+    descripcion: 'Desde la lista de usuarios, editá la cuenta y elegí su perfil.',
     icon: Edit3,
     ruta: '/usuarios/listar', 
     permisoRequerido: 'Editar Usuario',
@@ -122,7 +122,7 @@ export default function PerfilesPage() {
 
       {/* Main Content for Perfiles */}
       <main className="mx-auto w-full max-w-6xl px-6 py-10">
-        <EncabezadoPagina titulo="Gestión de Perfiles" descripcion="Administra los perfiles de usuario y sus permisos asociados en el sistema." volverA="/welcome" textoVolver="Volver al inicio" />
+        <EncabezadoPagina titulo="Gestión de Perfiles" descripcion="Perfiles de usuario y los permisos de cada uno." volverA="/welcome" textoVolver="Volver al inicio" />
 
         {/* Cards Grid for Sub-modules */}
         {subModulosPerfilesPermitidos.length > 0 ? (
@@ -139,8 +139,8 @@ export default function PerfilesPage() {
                 Sin Acciones Disponibles en Perfiles
               </h3>
               <p className="text-gray-300">
-                No tienes los permisos necesarios para realizar acciones en el módulo de perfiles. 
-                Si crees que esto es un error, por favor contacta al administrador del sistema.
+                No tenés los permisos necesarios para usar el módulo de perfiles. 
+                Si creés que es un error, consultá con el administrador del sistema.
               </p>
             </div>
           </div>

@@ -52,7 +52,7 @@ export class SesionController {
 
       // Example permission check
       // const hasPermission = session.user.permisos?.some(p => p.modulo.nombre === 'Sesiones' && p.accion.nombre === 'Crear');
-      // if (!hasPermission) return NextResponse.json({ success: false, error: 'No tienes permisos' }, { status: 403 });
+      // if (!hasPermission) return NextResponse.json({ success: false, error: 'No tenés permisos' }, { status: 403 });
 
       const body = await request.json();
       const createSesionDto = plainToClass(CreateSesionDto, body);
@@ -91,7 +91,7 @@ export class SesionController {
 
       // Example permission check
       // const hasPermission = session.user.permisos?.some(p => p.modulo.nombre === 'Sesiones' && p.accion.nombre === 'Ver');
-      // if (!hasPermission) return NextResponse.json({ success: false, error: 'No tienes permisos' }, { status: 403 });
+      // if (!hasPermission) return NextResponse.json({ success: false, error: 'No tenés permisos' }, { status: 403 });
 
       const { searchParams } = new URL(request.url);
       const queryParams = Object.fromEntries(searchParams.entries());

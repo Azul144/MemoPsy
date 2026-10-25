@@ -365,7 +365,7 @@ const handleUpdateSesion = async () => {
     } catch (error) {
         console.error("Error updating session:", error);
         setEditFormErrors({ general: "Error de conexión o del cliente." });
-        avisoError("Error al actualizar la sesión. Verifique su conexión e intente nuevamente.");
+        avisoError("No se pudo actualizar la sesión. Revisá la conexión y probá de nuevo.");
     } finally {
         setIsEditSubmitting(false);
     }
@@ -984,7 +984,7 @@ const handleUpdateSesion = async () => {
 
       {/* Main Content */}
       <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-10">
-        <EncabezadoPagina titulo="Gestión de Sesiones" descripcion="Administra las sesiones de terapia del sistema." volverA="/welcome" textoVolver="Volver al inicio" />
+        <EncabezadoPagina titulo="Gestión de Sesiones" descripcion="Turnos presenciales y por videollamada: agenda, estados y pagos." volverA="/welcome" textoVolver="Volver al inicio" />
 
         {puedeVerSesiones ? (
           <Tabs
@@ -1429,8 +1429,8 @@ const handleUpdateSesion = async () => {
               <CalendarIcon className="w-16 h-16 mx-auto mb-6" style={{ color: "#F1C77A" }} />
               <h3 className="text-2xl font-semibold text-white mb-4">Sin Acceso a Sesiones</h3>
               <p className="text-gray-300">
-                No tienes los permisos necesarios para ver las sesiones. Si crees que esto es un error, por favor
-                contacta al administrador del sistema.
+                No tenés los permisos necesarios para ver las sesiones. Si creés que es un error,
+                consultá con el administrador del sistema.
               </p>
             </div>
           </div>
