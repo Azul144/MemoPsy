@@ -44,30 +44,30 @@ export async function enviarRecordatoriosPorWhatsapp(): Promise<void> {
     const hasta = new Date(ahora.getTime() + HORAS_RECORDATORIO * 60 * 60 * 1000);
 
     const pendientes: TurnoPendiente[] = await dataSource.query(
-      `SELECT s.id AS sesionId, u.id AS usuarioId, pe.telefono, s.fecha_hora_inicio AS inicio,
+      `SELECT s.id_sesion AS sesionId, u.id_usuario AS usuarioId, pe.telefono, s.fecha_hora_inicio AS inicio,
               m.nombre AS modalidad, s.enlace_videollamada AS enlace,
               pp.nombre AS psicologoNombre, pp.apellido AS psicologoApellido
          FROM sesion s
-         JOIN estado e ON e.id = s.estado_id
-         LEFT JOIN modalidad m ON m.id = s.modalidad_id
-         JOIN psicologo ps ON ps.id = s.psicologo_id
-         JOIN persona pp ON pp.id = ps.persona_id
-         JOIN paciente_tiene_sesion pts ON pts.sesion_id = s.id
-         JOIN paciente pa ON pa.id = pts.paciente_id
-         JOIN persona pe ON pe.id = pa.persona_id
-         JOIN usuario u ON u.persona_id = pe.id AND u.activo = 1
+         JOIN estado e ON e.id_estado = s.id_estado
+         LEFT JOIN modalidad m ON m.id_modalidad = s.id_modalidad
+         JOIN psicologo ps ON ps.id_psicologo = s.id_psicologo
+         JOIN persona pp ON pp.id_persona = ps.id_persona
+         JOIN paciente_tiene_sesion pts ON pts.id_sesion = s.id_sesion
+         JOIN paciente pa ON pa.id_paciente = pts.id_paciente
+         JOIN persona pe ON pe.id_persona = pa.id_persona
+         JOIN usuario u ON u.id_persona = pe.id_persona AND u.activo = 1
         WHERE s.fecha_hora_inicio BETWEEN ? AND ?
           AND e.nombre NOT IN ('Cancelada', 'Finalizada')
           AND pe.telefono IS NOT NULL AND pe.telefono <> ''
           AND NOT EXISTS (SELECT 1 FROM recordatorio_enviado r
-                           WHERE r.sesion_id = s.id AND r.usuario_id = u.id AND r.canal = 'WHATSAPP')`,
+                           WHERE r.id_sesion = s.id_sesion AND r.id_usuario = u.id_usuario AND r.canal = 'WHATSAPP')`,
       [ahora, hasta],
     );
 
     for (const turno of pendientes) {
       // Se reserva antes de mandar, igual que con el email, para no mandar dos veces
       const reserva = await dataSource.query(
-        "INSERT IGNORE INTO recordatorio_enviado (sesion_id, usuario_id, canal) VALUES (?, ?, 'WHATSAPP')",
+        "INSERT IGNORE INTO recordatorio_enviado (id_sesion, id_usuario, canal) VALUES (?, ?, 'WHATSAPP')",
         [turno.sesionId, turno.usuarioId],
       );
       if (!reserva?.affectedRows) continue;
@@ -78,7 +78,7 @@ export async function enviarRecordatoriosPorWhatsapp(): Promise<void> {
         // Si el número no puede recibir (error 4xx) no se reintenta; si fue un corte, sí
         if (!(error instanceof WhatsappError && error.definitivo)) {
           await dataSource.query(
-            "DELETE FROM recordatorio_enviado WHERE sesion_id = ? AND usuario_id = ? AND canal = 'WHATSAPP'",
+            "DELETE FROM recordatorio_enviado WHERE id_sesion = ? AND id_usuario = ? AND canal = 'WHATSAPP'",
             [turno.sesionId, turno.usuarioId],
           );
         }

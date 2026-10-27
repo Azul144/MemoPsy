@@ -80,15 +80,15 @@ export async function GET(request: NextRequest) {
       const queryBuilder = informeRepository.createQueryBuilder('informe')
         .leftJoinAndSelect('informe.psicologo', 'psicologo')
         .leftJoinAndSelect('psicologo.persona', 'psicologoPersona')
-        .where('informe.psicologo_id = :psicologoId', { psicologoId: session.user.psicologoId });
+        .where('informe.id_psicologo = :psicologoId', { psicologoId: session.user.psicologoId });
 
       if (pacienteId) {
         queryBuilder
-          .innerJoin(PacienteTieneInformeEntity, 'pti', 'pti.informe_id = informe.id')
-          .andWhere('pti.paciente_id = :pacienteIdParam', { pacienteIdParam: pacienteId });
+          .innerJoin(PacienteTieneInformeEntity, 'pti', 'pti.id_informe = informe.id')
+          .andWhere('pti.id_paciente = :pacienteIdParam', { pacienteIdParam: pacienteId });
       } else if (pacienteSearch) {
         queryBuilder
-        .innerJoin(PacienteTieneInformeEntity, 'pti', 'pti.informe_id = informe.id')
+        .innerJoin(PacienteTieneInformeEntity, 'pti', 'pti.id_informe = informe.id')
         .innerJoin('pti.paciente', 'paciente')
         .innerJoin('paciente.persona', 'pacientePersona')
         .andWhere(
@@ -156,7 +156,7 @@ export async function GET(request: NextRequest) {
         .innerJoinAndSelect('pti.informe', 'informe')
         .leftJoinAndSelect('informe.psicologo', 'psicologo')
         .leftJoinAndSelect('psicologo.persona', 'psicologoPersona')
-        .where('pti.paciente_id = :pacienteId', { pacienteId: session.user.pacienteId })
+        .where('pti.id_paciente = :pacienteId', { pacienteId: session.user.pacienteId })
         .andWhere('informe.esPrivado = :esPrivado', { esPrivado: false });
 
       // For patient, effectiveSortBy might be 'fechaCreacion' (intended for informe) or 'informe.fechaCreacion'

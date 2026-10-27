@@ -117,7 +117,7 @@ export class UsuarioRepository {
   // Verificar si existe un usuario con una persona específica
   async existsByPersonaId(personaId: string, excludeId?: string): Promise<boolean> {
     const queryBuilder = this.repository.createQueryBuilder('usuario')
-      .where('usuario.persona_id = :personaId', { personaId });
+      .where('usuario.id_persona = :personaId', { personaId });
 
     if (excludeId) {
       queryBuilder.andWhere('usuario.id != :excludeId', { excludeId });

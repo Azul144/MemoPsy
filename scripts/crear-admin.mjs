@@ -28,16 +28,16 @@ const conexion = await mysql.createConnection({
 })
 
 try {
-  const [[perfil]] = await conexion.query("SELECT id FROM perfil WHERE nombre = 'Administrador'")
+  const [[perfil]] = await conexion.query("SELECT id_perfil AS id FROM perfil WHERE nombre = 'Administrador'")
   if (!perfil) throw new Error("No existe el perfil Administrador: falta cargar docker/mysql/02-catalogos.sql")
 
   await conexion.beginTransaction()
   const [persona] = await conexion.query("INSERT INTO persona (nombre, apellido, dni, fecha_nacimiento) VALUES (?, ?, ?, CURDATE())", [nombre, apellido, dni])
   const [usuario] = await conexion.query(
-    "INSERT INTO usuario (email, password, activo, ultimo_acceso, persona_id) VALUES (?, ?, 1, NOW(), ?)",
+    "INSERT INTO usuario (email, password, activo, ultimo_acceso, id_persona) VALUES (?, ?, 1, NOW(), ?)",
     [email, await bcrypt.hash(password, 12), persona.insertId],
   )
-  await conexion.query("INSERT INTO usuario_tiene_perfil (usuario_id, perfil_id) VALUES (?, ?)", [usuario.insertId, perfil.id])
+  await conexion.query("INSERT INTO usuario_tiene_perfil (id_usuario, id_perfil) VALUES (?, ?)", [usuario.insertId, perfil.id])
   await conexion.commit()
   console.log(`Administrador ${email} creado.`)
 } catch (error) {

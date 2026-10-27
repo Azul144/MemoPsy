@@ -61,11 +61,11 @@ const c = await mysql.createConnection({
 
 const id = async (sql, valores) => (await c.query(sql, valores))[0].insertId
 const uno = async (sql, valores) => (await c.query(sql, valores))[0][0]
-const perfilId = async (nombre) => (await uno("SELECT id FROM perfil WHERE nombre = ?", [nombre])).id
-const estadoId = async (nombre) => (await uno("SELECT id FROM estado WHERE nombre = ?", [nombre])).id
-const modalidadId = async (nombre) => (await uno("SELECT id FROM modalidad WHERE nombre = ?", [nombre])).id
-const obraSocialId = async (nombre) => (await uno("SELECT id FROM obra_social WHERE nombre = ?", [nombre])).id
-const medioId = async (descripcion) => (await uno("SELECT id FROM medio_de_pago WHERE descripcion = ?", [descripcion])).id
+const perfilId = async (nombre) => (await uno("SELECT id_perfil AS id FROM perfil WHERE nombre = ?", [nombre])).id
+const estadoId = async (nombre) => (await uno("SELECT id_estado AS id FROM estado WHERE nombre = ?", [nombre])).id
+const modalidadId = async (nombre) => (await uno("SELECT id_modalidad AS id FROM modalidad WHERE nombre = ?", [nombre])).id
+const obraSocialId = async (nombre) => (await uno("SELECT id_obra_social AS id FROM obra_social WHERE nombre = ?", [nombre])).id
+const medioId = async (descripcion) => (await uno("SELECT id_medio_de_pago AS id FROM medio_de_pago WHERE descripcion = ?", [descripcion])).id
 
 const credenciales = []
 async function crearPersona(nombre, apellido, dni, nacimiento) {
@@ -73,13 +73,13 @@ async function crearPersona(nombre, apellido, dni, nacimiento) {
 }
 async function crearCuenta(personaId, email, perfil) {
   const password = contrasena()
-  const usuarioId = await id("INSERT INTO usuario (persona_id, email, password, activo, ultimo_acceso) VALUES (?, ?, ?, 1, NOW())", [personaId, email, await bcrypt.hash(password, 12)])
-  await c.query("INSERT INTO usuario_tiene_perfil (usuario_id, perfil_id) VALUES (?, ?)", [usuarioId, await perfilId(perfil)])
+  const usuarioId = await id("INSERT INTO usuario (id_persona, email, password, activo, ultimo_acceso) VALUES (?, ?, ?, 1, NOW())", [personaId, email, await bcrypt.hash(password, 12)])
+  await c.query("INSERT INTO usuario_tiene_perfil (id_usuario, id_perfil) VALUES (?, ?)", [usuarioId, await perfilId(perfil)])
   credenciales.push(`${perfil.padEnd(14)} ${email} / ${password}`)
   return usuarioId
 }
 async function existeCuentaConPerfil(perfil) {
-  return Boolean(await uno("SELECT 1 FROM usuario u JOIN usuario_tiene_perfil up ON up.usuario_id = u.id JOIN perfil p ON p.id = up.perfil_id WHERE p.nombre = ? AND u.activo = 1 LIMIT 1", [perfil]))
+  return Boolean(await uno("SELECT 1 FROM usuario u JOIN usuario_tiene_perfil up ON up.id_usuario = u.id_usuario JOIN perfil p ON p.id_perfil = up.id_perfil WHERE p.nombre = ? AND u.activo = 1 LIMIT 1", [perfil]))
 }
 
 const [[existe]] = await c.query("SELECT COUNT(*) AS n FROM usuario WHERE email LIKE '%@demo.memopsy.test'")
@@ -240,26 +240,26 @@ try {
   if (!(await existeCuentaConPerfil("Auditor"))) {
     await crearCuenta(await crearPersona("Jorge", "Acosta", "25666777", "1976-01-20"), "auditor@demo.memopsy.test", "Auditor")
   }
-  const recepcion = await uno("SELECT u.id FROM usuario u JOIN usuario_tiene_perfil up ON up.usuario_id = u.id JOIN perfil p ON p.id = up.perfil_id WHERE p.nombre = 'Recepcionista' AND u.activo = 1 ORDER BY u.id LIMIT 1")
+  const recepcion = await uno("SELECT u.id_usuario AS id FROM usuario u JOIN usuario_tiene_perfil up ON up.id_usuario = u.id_usuario JOIN perfil p ON p.id_perfil = up.id_perfil WHERE p.nombre = 'Recepcionista' AND u.activo = 1 ORDER BY u.id_usuario LIMIT 1")
 
   // --- Psicólogos
   const psicologos = {}
   for (const p of PSICOLOGOS) {
     const existente = p.existente && (await uno(
-      "SELECT u.id AS usuarioId, ps.id AS psicologoId FROM usuario u JOIN psicologo ps ON ps.persona_id = u.persona_id WHERE u.email = ?", [p.existente]))
+      "SELECT u.id_usuario AS usuarioId, ps.id_psicologo AS psicologoId FROM usuario u JOIN psicologo ps ON ps.id_persona = u.id_persona WHERE u.email = ?", [p.existente]))
     if (existente) {
-      await c.query("UPDATE psicologo SET especialidad = ?, numero_licencia = ? WHERE id = ?", [p.especialidad, p.licencia, existente.psicologoId])
-      psicologos[p.clave] = { ...existente, nombre: (await uno("SELECT CONCAT(pe.nombre, ' ', pe.apellido) AS n FROM usuario u JOIN persona pe ON pe.id = u.persona_id WHERE u.id = ?", [existente.usuarioId])).n }
+      await c.query("UPDATE psicologo SET especialidad = ?, numero_licencia = ? WHERE id_psicologo = ?", [p.especialidad, p.licencia, existente.psicologoId])
+      psicologos[p.clave] = { ...existente, nombre: (await uno("SELECT CONCAT(pe.nombre, ' ', pe.apellido) AS n FROM usuario u JOIN persona pe ON pe.id_persona = u.id_persona WHERE u.id_usuario = ?", [existente.usuarioId])).n }
     } else {
       const personaId = await crearPersona(p.nombre, p.apellido, p.dni, p.nacimiento)
       const usuarioId = await crearCuenta(personaId, p.email, "Psicólogo")
-      const psicologoId = await id("INSERT INTO psicologo (persona_id, especialidad, numero_licencia) VALUES (?, ?, ?)", [personaId, p.especialidad, p.licencia])
+      const psicologoId = await id("INSERT INTO psicologo (id_persona, especialidad, numero_licencia) VALUES (?, ?, ?)", [personaId, p.especialidad, p.licencia])
       psicologos[p.clave] = { usuarioId, psicologoId, nombre: `${p.nombre} ${p.apellido}` }
     }
     // Franjas en las que acepta reprogramaciones (lunes a viernes)
     for (let dia = 1; dia <= 5; dia++) {
       for (const [desde, hasta] of p.franjas) {
-        await c.query("INSERT INTO horario_disponible (psicologo_id, dia_semana, hora_inicio, hora_fin) VALUES (?, ?, ?, ?)", [psicologos[p.clave].psicologoId, dia, desde, hasta])
+        await c.query("INSERT INTO horario_disponible (id_psicologo, dia_semana, hora_inicio, hora_fin) VALUES (?, ?, ?, ?)", [psicologos[p.clave].psicologoId, dia, desde, hasta])
       }
     }
   }
@@ -269,12 +269,12 @@ try {
   for (const p of PACIENTES) {
     const personaId = await crearPersona(p.nombre, p.apellido, p.dni, p.nacimiento)
     const usuarioId = p.cuenta === false ? null : await crearCuenta(personaId, `${p.nombre}.${p.apellido}@demo.memopsy.test`.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase(), "Paciente")
-    const pacienteId = await id("INSERT INTO paciente (persona_id, obra_social_id) VALUES (?, ?)", [personaId, await obraSocialId(p.obra)])
+    const pacienteId = await id("INSERT INTO paciente (id_persona, id_obra_social) VALUES (?, ?)", [personaId, await obraSocialId(p.obra)])
     pacientes[p.clave] = { pacienteId, usuarioId, psicologo: p.psicologo, nombre: `${p.nombre} ${p.apellido}` }
   }
   // Los pacientes que ya estaban cargados (por ejemplo, el de la cuenta de prueba) pasan a la psicóloga clínica
   const previos = (await c.query(
-    "SELECT pa.id AS pacienteId, u.id AS usuarioId, CONCAT(pe.nombre, ' ', pe.apellido) AS nombre FROM paciente pa JOIN persona pe ON pe.id = pa.persona_id LEFT JOIN usuario u ON u.persona_id = pe.id WHERE pa.id NOT IN (?)",
+    "SELECT pa.id_paciente AS pacienteId, u.id_usuario AS usuarioId, CONCAT(pe.nombre, ' ', pe.apellido) AS nombre FROM paciente pa JOIN persona pe ON pe.id_persona = pa.id_persona LEFT JOIN usuario u ON u.id_persona = pe.id_persona WHERE pa.id_paciente NOT IN (?)",
     [Object.values(pacientes).map((p) => p.pacienteId)]))[0]
   previos.forEach((p, i) => (pacientes[`previo${i}`] = { ...p, psicologo: "clinica" }))
 
@@ -287,13 +287,13 @@ try {
   async function turno(clavesPacientes, inicio, estado, modalidad, pago) {
     const psicologo = psicologos[pacientes[clavesPacientes[0]].psicologo]
     const sesionId = await id(
-      "INSERT INTO sesion (psicologo_id, fecha_hora_inicio, fecha_hora_fin, modalidad_id, estado_id, enlace_videollamada, estado_pago, medio_de_pago_id, monto, fecha_pago) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      "INSERT INTO sesion (id_psicologo, fecha_hora_inicio, fecha_hora_fin, id_modalidad, id_estado, enlace_videollamada, estado_pago, id_medio_de_pago, monto, fecha_pago) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
       [psicologo.psicologoId, formato(inicio), formato(masMinutos(inicio, 50)), modalidades[modalidad], await estadoId(estado),
         modalidad === "Remota" ? enlaceMeet() : null,
         pago ? "Pagado" : "Pendiente", pago ? medios[pago[0]] : null, pago ? pago[1] : null, pago ? formato(inicio) : null],
     )
     for (const clave of clavesPacientes) {
-      await c.query("INSERT INTO paciente_tiene_sesion (sesion_id, paciente_id) VALUES (?, ?)", [sesionId, pacientes[clave].pacienteId])
+      await c.query("INSERT INTO paciente_tiene_sesion (id_sesion, id_paciente) VALUES (?, ?)", [sesionId, pacientes[clave].pacienteId])
     }
     sesiones.push({ sesionId, clavesPacientes, inicio, estado })
     return sesionId
@@ -311,29 +311,29 @@ try {
   const notas = {}
   for (const [clave, titulo, contenido, etiquetas, dias, conSeguimiento] of NOTAS) {
     const paciente = pacientes[clave]
-    const informeId = await id("INSERT INTO informe (psicologo_id, titulo, contenido, etiquetas, fecha_creacion, es_privado) VALUES (?, ?, ?, ?, ?, 1)",
+    const informeId = await id("INSERT INTO informe (id_psicologo, titulo, contenido, etiquetas, fecha_creacion, es_privado) VALUES (?, ?, ?, ?, ?, 1)",
       [psicologos[paciente.psicologo].psicologoId, titulo, cifrar(contenido), etiquetas, formato(diaHabil(dias, 20))])
     // La nota de pareja queda asociada a los dos
     const asociados = clave === "ezequiel" ? ["ezequiel", "florencia"] : [clave]
     for (const a of asociados) {
-      await c.query("INSERT INTO paciente_tiene_informe (informe_id, paciente_id) VALUES (?, ?)", [informeId, pacientes[a].pacienteId])
+      await c.query("INSERT INTO paciente_tiene_informe (id_informe, id_paciente) VALUES (?, ?)", [informeId, pacientes[a].pacienteId])
     }
     if (conSeguimiento) notas[clave] = informeId
   }
 
   // --- Informes de seguimiento con actividades
   for (const [clave, s] of Object.entries(SEGUIMIENTOS)) {
-    const seguimientoId = await id("INSERT INTO informe_seguimiento (informe_id, resumen, pautas, avances) VALUES (?, ?, ?, ?)",
+    const seguimientoId = await id("INSERT INTO informe_seguimiento (id_informe, resumen, pautas, avances) VALUES (?, ?, ?, ?)",
       [notas[clave], cifrar(s.resumen), cifrar(s.pautas), cifrar(s.avances)])
     for (const [orden, [descripcion, respuesta, comentario]] of s.actividades.entries()) {
-      await c.query("INSERT INTO actividad_seguimiento (seguimiento_id, descripcion, orden, respuesta, comentario, fecha_respuesta) VALUES (?, ?, ?, ?, ?, ?)",
+      await c.query("INSERT INTO actividad_seguimiento (id_informe_seguimiento, descripcion, orden, respuesta, comentario, fecha_respuesta) VALUES (?, ?, ?, ?, ?, ?)",
         [seguimientoId, cifrar(descripcion), orden, respuesta, comentario ? cifrar(comentario) : null, respuesta ? formato(diaHabil(-1, 21)) : null])
     }
   }
 
   // --- Avisos en la campanita (solo fecha, hora y con quién: nunca contenido clínico)
   const aviso = (usuarioId, sesionId, tipo, titulo, mensaje) => usuarioId &&
-    c.query("INSERT INTO notificacion (usuario_id, sesion_id, tipo, titulo, mensaje) VALUES (?, ?, ?, ?, ?)", [usuarioId, sesionId, tipo, titulo, mensaje])
+    c.query("INSERT INTO notificacion (id_usuario, id_sesion, tipo, titulo, mensaje) VALUES (?, ?, ?, ?, ?)", [usuarioId, sesionId, tipo, titulo, mensaje])
   const reprogramado = sesiones.find((s) => s.estado === "Reprogramada")
   await aviso(psicologos.neuro.usuarioId, reprogramado.sesionId, "REPROGRAMACION", "Turno reprogramado", "Héctor Ramírez movió su turno a un horario de tus franjas disponibles.")
   await aviso(recepcion?.id, reprogramado.sesionId, "REPROGRAMACION", "Turno reprogramado", "Héctor Ramírez reprogramó su turno con Diego Martínez.")
@@ -348,7 +348,7 @@ try {
   // --- Algunos registros de auditoría de los últimos días (sin contenido clínico)
   const auditoria = []
   for (const [clave, p] of Object.entries(psicologos)) {
-    const email = (await uno("SELECT email FROM usuario WHERE id = ?", [p.usuarioId])).email
+    const email = (await uno("SELECT email FROM usuario WHERE id_usuario = ?", [p.usuarioId])).email
     auditoria.push([diaHabil(-3, 9), p.usuarioId, email, "LOGIN_OK", "Autenticación", String(p.usuarioId), null])
     auditoria.push([diaHabil(-3, 9, 5), p.usuarioId, email, "VER", "Informes", null, "Consulta de una nota clínica"])
     auditoria.push([diaHabil(-3, 9, 30), p.usuarioId, email, "CREAR", "Informes", null, "Alta de nota clínica"])
@@ -357,7 +357,7 @@ try {
   auditoria.push([diaHabil(-2, 8, 15), null, "desconocido@demo.memopsy.test", "LOGIN_FALLIDO", "Autenticación", null, "Contraseña incorrecta"])
   auditoria.push([diaHabil(-2, 10), pacientes.tomas.usuarioId, "tomas.fernandez@demo.memopsy.test", "ACCESO_DENEGADO", "Informes", null, "Intento sin permiso: crear en Informes"])
   for (const [fecha, usuarioId, email, accion, modulo, entidadId, detalle] of auditoria) {
-    await c.query("INSERT INTO auditoria (fecha, usuario_id, email, accion, modulo, entidad_id, detalle, ip) VALUES (?, ?, ?, ?, ?, ?, ?, '127.0.0.1')",
+    await c.query("INSERT INTO auditoria (fecha, id_usuario, email, accion, modulo, id_entidad, detalle, ip) VALUES (?, ?, ?, ?, ?, ?, ?, '127.0.0.1')",
       [formato(fecha), usuarioId, email, accion, modulo, entidadId, detalle])
   }
 

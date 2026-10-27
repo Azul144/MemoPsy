@@ -1,9 +1,12 @@
 // persona.entity.ts
-import { Column, Entity } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 import { BaseEntity } from "./base-entity";
 
 @Entity({ name: "persona" })
 export class PersonaEntity extends BaseEntity {
+  @PrimaryGeneratedColumn("increment", { type: "int", name: "id_persona" })
+  id: string;
+
   @Column({ name: "nombre" })
   nombre: string;
 

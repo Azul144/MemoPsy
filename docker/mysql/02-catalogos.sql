@@ -2,37 +2,37 @@
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
-INSERT INTO `accion` (`id`, `nombre`) VALUES
+INSERT INTO `accion` (`id_accion`, `nombre`) VALUES
 (3, 'Editar'),
 (5, 'Registrar'),
 (11, 'Ver'),
 (590, 'Eliminar'),
 (13140280, 'Asignar');
 
-INSERT INTO `estado` (`id`, `nombre`) VALUES
+INSERT INTO `estado` (`id_estado`, `nombre`) VALUES
 (4, 'Pendiente'),
 (5, 'Cancelada'),
 (6, 'Finalizada'),
 (7, 'Confirmada'),
 (8, 'Reprogramada');
 
-INSERT INTO `medio_de_pago` (`id`, `descripcion`) VALUES
+INSERT INTO `medio_de_pago` (`id_medio_de_pago`, `descripcion`) VALUES
 (1, 'Efectivo'),
 (2, 'QR del psicólogo'),
 (3, 'Obra social');
 
-INSERT INTO `modalidad` (`id`, `nombre`) VALUES
+INSERT INTO `modalidad` (`id_modalidad`, `nombre`) VALUES
 (3, 'Presencial'),
 (4, 'Remota');
 
-INSERT INTO `modulo` (`id`, `nombre`) VALUES
+INSERT INTO `modulo` (`id_modulo`, `nombre`) VALUES
 (3, 'Informes'),
 (5, 'Usuarios'),
 (10, 'Perfiles'),
 (17, 'Sesiones'),
 (79, 'Auditoría');
 
-INSERT INTO `obra_social` (`id`, `nombre`, `activo`) VALUES
+INSERT INTO `obra_social` (`id_obra_social`, `nombre`, `activo`) VALUES
 (1, 'IASEP', 1),
 (2, 'OSJERA', 1),
 (3, 'Particular', 1),
@@ -56,14 +56,14 @@ INSERT INTO `obra_social` (`id`, `nombre`, `activo`) VALUES
 (21, 'Federada Salud', 1),
 (22, 'Jerárquicos Salud', 1);
 
-INSERT INTO `perfil` (`id`, `nombre`, `descripcion`) VALUES
+INSERT INTO `perfil` (`id_perfil`, `nombre`, `descripcion`) VALUES
 (8, 'Administrador', 'Administrador con todos los permisos'),
 (9, 'Psicólogo', 'Informes y Sesiones propias'),
 (12, 'Paciente', 'Puede visualizar informes de recordatorios proporcionados por sus psicólogos, así como visualizar sus sesiones programadas.'),
 (13, 'Recepcionista', 'Puede visualizar las sesiones, editarlas y asignarlas a Psicólogos y Pacientes.'),
 (16, 'Auditor', 'Consulta el registro de auditoría en modo solo lectura');
 
-INSERT INTO `permiso` (`id`, `nombre`, `descripcion`, `modulo_id`, `accion_id`) VALUES
+INSERT INTO `permiso` (`id_permiso`, `nombre`, `descripcion`, `id_modulo`, `id_accion`) VALUES
 (3, 'Ver Informes', 'Ver la lista de informes de pacientes', 3, 11),
 (5, 'Editar Perfil', 'Editar un perfil', 10, 3),
 (6, 'Asignar Perfil', 'Asignar un perfil a un Usuario', 10, 13140280),
@@ -85,7 +85,7 @@ INSERT INTO `permiso` (`id`, `nombre`, `descripcion`, `modulo_id`, `accion_id`) 
 (773416, 'Registrar Pago', 'Ver y registrar el estado de pago de las sesiones', 17, 5),
 (773417, 'Ver Auditoría', 'Consultar el registro de accesos y modificaciones (solo lectura)', 79, 11);
 
-INSERT INTO `perfil_tiene_permiso` (`perfil_id`, `permiso_id`) VALUES
+INSERT INTO `perfil_tiene_permiso` (`id_perfil`, `id_permiso`) VALUES
 (9, 3),
 (12, 3),
 (8, 5),

@@ -19,7 +19,7 @@ export async function buscarSesionSuperpuesta(
     .getRepository(SesionEntity)
     .createQueryBuilder("s")
     .leftJoin("s.estado", "e")
-    .where("s.psicologo_id = :psicologoId", { psicologoId })
+    .where("s.id_psicologo = :psicologoId", { psicologoId })
     .andWhere("s.fecha_hora_inicio < :fin", { fin })
     .andWhere("s.fecha_hora_fin > :inicio", { inicio })
     .andWhere("(e.nombre IS NULL OR e.nombre <> 'Cancelada')")

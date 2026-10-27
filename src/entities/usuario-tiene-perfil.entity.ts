@@ -5,17 +5,17 @@ import { PerfilEntity } from "./perfil.entity";
 
 @Entity({ name: "usuario_tiene_perfil" })
 export class UsuarioTienePerfilEntity {
-  @PrimaryColumn({ name: "usuario_id" })
+  @PrimaryColumn({ name: "id_usuario" })
   usuarioId: string;
 
-  @PrimaryColumn({ name: "perfil_id" })
+  @PrimaryColumn({ name: "id_perfil" })
   perfilId: string;
 
   @ManyToOne(() => UsuarioEntity)
-  @JoinColumn({ name: "usuario_id" })
+  @JoinColumn({ name: "id_usuario" })
   usuario: UsuarioEntity;
 
   @ManyToOne(() => PerfilEntity)
-  @JoinColumn({ name: "perfil_id" })
+  @JoinColumn({ name: "id_perfil" })
   perfil: PerfilEntity;
 }

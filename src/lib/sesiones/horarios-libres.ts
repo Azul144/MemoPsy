@@ -70,11 +70,11 @@ export async function buscarHorariosLibres(
     .andWhere("(e.nombre IS NULL OR e.nombre <> 'Cancelada')")
   if (pacientesIds.length > 0) {
     consulta.andWhere(
-      "(s.psicologo_id = :psicologoId OR EXISTS (SELECT 1 FROM paciente_tiene_sesion pts WHERE pts.sesion_id = s.id AND pts.paciente_id IN (:...pacientesIds)))",
+      "(s.id_psicologo = :psicologoId OR EXISTS (SELECT 1 FROM paciente_tiene_sesion pts WHERE pts.id_sesion = s.id AND pts.id_paciente IN (:...pacientesIds)))",
       { psicologoId, pacientesIds },
     )
   } else {
-    consulta.andWhere("s.psicologo_id = :psicologoId", { psicologoId })
+    consulta.andWhere("s.id_psicologo = :psicologoId", { psicologoId })
   }
   const ocupados = await consulta.getMany()
 

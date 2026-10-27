@@ -1,12 +1,15 @@
 // informe.entity.ts
-import { Column, Entity, ManyToOne, JoinColumn, OneToMany } from "typeorm";
+import { Column, Entity, ManyToOne, JoinColumn, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { BaseEntity } from "./base-entity";
 import { PsicologoEntity } from "./psicologo.entity";
 import { columnaCifrada } from "../lib/auth/columna-cifrada";
 
 @Entity({ name: "informe" })
 export class InformeEntity extends BaseEntity {
-  //@Column({ name: "psicologo_id" })
+  @PrimaryGeneratedColumn("increment", { type: "int", name: "id_informe" })
+  id: string;
+
+  //@Column({ name: "id_psicologo" })
   //psicologoId: string;
 
   @Column({ name: "titulo" })
@@ -27,7 +30,7 @@ export class InformeEntity extends BaseEntity {
   esPrivado: boolean;
 
   @ManyToOne(() => PsicologoEntity)
-  @JoinColumn({ name: "psicologo_id" })
+  @JoinColumn({ name: "id_psicologo" })
   psicologo: PsicologoEntity;
 
   /*

@@ -1,5 +1,5 @@
 // sesion.entity.ts
-import { Column, Entity, ManyToOne, JoinColumn } from "typeorm";
+import { Column, Entity, ManyToOne, JoinColumn, PrimaryGeneratedColumn } from "typeorm";
 import { BaseEntity } from "./base-entity";
 import { PsicologoEntity } from "./psicologo.entity";
 import { ModalidadEntity } from "./modalidad.entity";
@@ -8,6 +8,9 @@ import { MedioDePagoEntity } from "./medio-de-pago.entity";
 
 @Entity({ name: "sesion" })
 export class SesionEntity extends BaseEntity {
+  @PrimaryGeneratedColumn("increment", { type: "int", name: "id_sesion" })
+  id: string;
+
   @Column({ name: "fecha_hora_inicio", type: "datetime" })
   fechaHoraInicio: Date;
 
@@ -15,15 +18,15 @@ export class SesionEntity extends BaseEntity {
   fechaHoraFin: Date;
 
   @ManyToOne(() => PsicologoEntity)
-  @JoinColumn({ name: "psicologo_id" })
+  @JoinColumn({ name: "id_psicologo" })
   psicologo: PsicologoEntity;
 
   @ManyToOne(() => ModalidadEntity)
-  @JoinColumn({ name: "modalidad_id" })
+  @JoinColumn({ name: "id_modalidad" })
   modalidad: ModalidadEntity;
 
   @ManyToOne(() => EstadoEntity)
-  @JoinColumn({ name: "estado_id" })
+  @JoinColumn({ name: "id_estado" })
   estado: EstadoEntity;
 
   // RF 3.4 - Enlace de Google Meet para sesiones remotas
@@ -35,7 +38,7 @@ export class SesionEntity extends BaseEntity {
   estadoPago: string;
 
   @ManyToOne(() => MedioDePagoEntity, { nullable: true })
-  @JoinColumn({ name: "medio_de_pago_id" })
+  @JoinColumn({ name: "id_medio_de_pago" })
   medioDePago: MedioDePagoEntity | null;
 
   @Column({ name: "monto", type: "decimal", precision: 10, scale: 2, nullable: true })

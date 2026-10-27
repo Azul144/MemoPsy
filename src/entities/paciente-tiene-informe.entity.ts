@@ -5,17 +5,17 @@ import { PacienteEntity } from "./paciente.entity";
 
 @Entity({ name: "paciente_tiene_informe" })
 export class PacienteTieneInformeEntity {
-  @PrimaryColumn({ name: "informe_id" })
+  @PrimaryColumn({ name: "id_informe" })
   informeId: string;
 
-  @PrimaryColumn({ name: "paciente_id" })
+  @PrimaryColumn({ name: "id_paciente" })
   pacienteId: string;
 
   @ManyToOne(() => InformeEntity)
-  @JoinColumn({ name: "informe_id" })
+  @JoinColumn({ name: "id_informe" })
   informe: InformeEntity;
 
   @ManyToOne(() => PacienteEntity)
-  @JoinColumn({ name: "paciente_id" })
+  @JoinColumn({ name: "id_paciente" })
   paciente: PacienteEntity;
 }

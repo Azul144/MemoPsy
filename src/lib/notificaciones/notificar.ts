@@ -43,17 +43,17 @@ interface Destinatario {
 // Usuarios activos del psicólogo y de los pacientes de un turno
 async function destinatariosDelTurno(manager: EntityManager, sesionId: string): Promise<Destinatario[]> {
   const filas: { usuarioId: number; rol: Destinatario["rol"] }[] = await manager.query(
-    `SELECT u.id AS usuarioId, 'psicologo' AS rol
+    `SELECT u.id_usuario AS usuarioId, 'psicologo' AS rol
        FROM sesion s
-       JOIN psicologo ps ON ps.id = s.psicologo_id
-       JOIN usuario u ON u.persona_id = ps.persona_id
-      WHERE s.id = ? AND u.activo = 1
+       JOIN psicologo ps ON ps.id_psicologo = s.id_psicologo
+       JOIN usuario u ON u.id_persona = ps.id_persona
+      WHERE s.id_sesion = ? AND u.activo = 1
      UNION
-     SELECT u.id, 'paciente'
+     SELECT u.id_usuario, 'paciente'
        FROM paciente_tiene_sesion pts
-       JOIN paciente pa ON pa.id = pts.paciente_id
-       JOIN usuario u ON u.persona_id = pa.persona_id
-      WHERE pts.sesion_id = ? AND u.activo = 1`,
+       JOIN paciente pa ON pa.id_paciente = pts.id_paciente
+       JOIN usuario u ON u.id_persona = pa.id_persona
+      WHERE pts.id_sesion = ? AND u.activo = 1`,
     [sesionId, sesionId],
   );
   return filas.map((f) => ({ usuarioId: Number(f.usuarioId), rol: f.rol }));
@@ -96,7 +96,7 @@ export async function notificarCambioDeTurno(cambio: CambioDeTurno): Promise<voi
     // El recordatorio que ya se mandó quedó viejo: si el turno sigue en pie, se vuelve a generar con el nuevo horario
     await manager.delete(NotificacionEntity, { sesionId: Number(sesionId), tipo: "RECORDATORIO" });
     // Lo mismo con el email y WhatsApp: si el turno sigue en pie, se vuelve a mandar con el horario nuevo
-    await manager.query("DELETE FROM recordatorio_enviado WHERE sesion_id = ?", [Number(sesionId)]);
+    await manager.query("DELETE FROM recordatorio_enviado WHERE id_sesion = ?", [Number(sesionId)]);
 
     const conQuien = await contraparte(manager, sesion);
     const quienCambia = cambio.usuarioQueCambia != null ? Number(cambio.usuarioQueCambia) : null;
@@ -157,15 +157,15 @@ async function crearRecordatorios(usuario: UsuarioConRol): Promise<void> {
     const hasta = new Date(ahora.getTime() + HORAS_RECORDATORIO * 60 * 60 * 1000);
 
     const pendientes: { id: number; rol: Destinatario["rol"] }[] = await manager.query(
-      `SELECT s.id, IF(s.psicologo_id = ?, 'psicologo', 'paciente') AS rol
+      `SELECT s.id_sesion AS id, IF(s.id_psicologo = ?, 'psicologo', 'paciente') AS rol
          FROM sesion s
-         JOIN estado e ON e.id = s.estado_id
+         JOIN estado e ON e.id_estado = s.id_estado
         WHERE s.fecha_hora_inicio BETWEEN ? AND ?
           AND e.nombre NOT IN ('Cancelada', 'Finalizada')
-          AND (s.psicologo_id = ?
-               OR EXISTS (SELECT 1 FROM paciente_tiene_sesion pts WHERE pts.sesion_id = s.id AND pts.paciente_id = ?))
+          AND (s.id_psicologo = ?
+               OR EXISTS (SELECT 1 FROM paciente_tiene_sesion pts WHERE pts.id_sesion = s.id_sesion AND pts.id_paciente = ?))
           AND NOT EXISTS (SELECT 1 FROM notificacion n
-                           WHERE n.usuario_id = ? AND n.sesion_id = s.id AND n.tipo = 'RECORDATORIO')`,
+                           WHERE n.id_usuario = ? AND n.id_sesion = s.id_sesion AND n.tipo = 'RECORDATORIO')`,
       [usuario.psicologoId ?? 0, ahora, hasta, usuario.psicologoId ?? 0, usuario.pacienteId ?? 0, usuarioId],
     );
     if (pendientes.length === 0) return;
@@ -205,10 +205,10 @@ export async function notificarPacientes(pacientesIds: (string | number)[], avis
   try {
     const dataSource = await initializeDatabase();
     const filas: { usuarioId: number }[] = await dataSource.query(
-      `SELECT u.id AS usuarioId
+      `SELECT u.id_usuario AS usuarioId
          FROM paciente pa
-         JOIN usuario u ON u.persona_id = pa.persona_id
-        WHERE pa.id IN (?) AND u.activo = 1`,
+         JOIN usuario u ON u.id_persona = pa.id_persona
+        WHERE pa.id_paciente IN (?) AND u.activo = 1`,
       [pacientesIds.map(Number)],
     );
     if (filas.length === 0) return;
@@ -226,10 +226,10 @@ export async function notificarPsicologo(psicologoId: string | number, aviso: Av
   try {
     const dataSource = await initializeDatabase();
     const filas: { usuarioId: number }[] = await dataSource.query(
-      `SELECT u.id AS usuarioId
+      `SELECT u.id_usuario AS usuarioId
          FROM psicologo ps
-         JOIN usuario u ON u.persona_id = ps.persona_id
-        WHERE ps.id = ? AND u.activo = 1`,
+         JOIN usuario u ON u.id_persona = ps.id_persona
+        WHERE ps.id_psicologo = ? AND u.activo = 1`,
       [Number(psicologoId)],
     );
     if (filas.length === 0) return;

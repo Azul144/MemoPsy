@@ -1,17 +1,20 @@
 // paciente.entity.ts
-import { Entity, ManyToOne, JoinColumn, OneToMany, OneToOne } from "typeorm";
+import { Entity, ManyToOne, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { BaseEntity } from "./base-entity";
 import type { PersonaEntity } from "./persona.entity";
 import { ObraSocialEntity } from "./obra-social.entity";
 
 @Entity({ name: "paciente" })
 export class PacienteEntity extends BaseEntity {
+  @PrimaryGeneratedColumn("increment", { type: "int", name: "id_paciente" })
+  id: string;
+
   @OneToOne("PersonaEntity")
-  @JoinColumn({ name: "persona_id" })
+  @JoinColumn({ name: "id_persona" })
   persona: PersonaEntity;
 
   @ManyToOne(() => ObraSocialEntity)
-  @JoinColumn({ name: "obra_social_id" })
+  @JoinColumn({ name: "id_obra_social" })
   obraSocial: ObraSocialEntity;
 
   /*
@@ -23,8 +26,8 @@ export class PacienteEntity extends BaseEntity {
   */
 }
 
-//@Column({ name: "persona_id" })
+//@Column({ name: "id_persona" })
   //personaId: string;
 
-  //@Column({ name: "obra_social_id" })
+  //@Column({ name: "id_obra_social" })
   //obraSocialId: string;

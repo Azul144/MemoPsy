@@ -27,15 +27,15 @@ export interface PacienteDeHistoria {
 // Pacientes que el psicólogo atiende (turnos o notas con él) o que ya tienen historia suya
 export async function pacientesDelPsicologo(ds: DataSource, psicologoId: string): Promise<PacienteDeHistoria[]> {
   const filas: any[] = await ds.query(
-    `SELECT pa.id AS pacienteId, pe.nombre, pe.apellido, pe.dni, os.nombre AS obraSocial,
-            hc.id AS historiaId, hc.fecha_actualizacion AS fechaActualizacion, hc.fecha_cierre AS fechaCierre
+    `SELECT pa.id_paciente AS pacienteId, pe.nombre, pe.apellido, pe.dni, os.nombre AS obraSocial,
+            hc.id_historia_clinica AS historiaId, hc.fecha_actualizacion AS fechaActualizacion, hc.fecha_cierre AS fechaCierre
        FROM paciente pa
-       JOIN persona pe ON pe.id = pa.persona_id
-       LEFT JOIN obra_social os ON os.id = pa.obra_social_id
-       LEFT JOIN historia_clinica hc ON hc.paciente_id = pa.id AND hc.psicologo_id = ?
-      WHERE hc.id IS NOT NULL
-         OR pa.id IN (SELECT pts.paciente_id FROM paciente_tiene_sesion pts JOIN sesion s ON s.id = pts.sesion_id WHERE s.psicologo_id = ?)
-         OR pa.id IN (SELECT pti.paciente_id FROM paciente_tiene_informe pti JOIN informe i ON i.id = pti.informe_id WHERE i.psicologo_id = ?)
+       JOIN persona pe ON pe.id_persona = pa.id_persona
+       LEFT JOIN obra_social os ON os.id_obra_social = pa.id_obra_social
+       LEFT JOIN historia_clinica hc ON hc.id_paciente = pa.id_paciente AND hc.id_psicologo = ?
+      WHERE hc.id_historia_clinica IS NOT NULL
+         OR pa.id_paciente IN (SELECT pts.id_paciente FROM paciente_tiene_sesion pts JOIN sesion s ON s.id_sesion = pts.id_sesion WHERE s.id_psicologo = ?)
+         OR pa.id_paciente IN (SELECT pti.id_paciente FROM paciente_tiene_informe pti JOIN informe i ON i.id_informe = pti.id_informe WHERE i.id_psicologo = ?)
       ORDER BY pe.apellido, pe.nombre`,
     [psicologoId, psicologoId, psicologoId],
   );
@@ -71,9 +71,9 @@ export interface HistoriaCompleta {
 // Sin esto, cualquier psicólogo vería los datos de cualquier paciente con solo cambiar el id.
 export async function atiendeAlPaciente(ds: DataSource, pacienteId: string, psicologoId: string): Promise<boolean> {
   const filas: any[] = await ds.query(
-    `SELECT 1 FROM historia_clinica WHERE paciente_id = ? AND psicologo_id = ?
-     UNION SELECT 1 FROM paciente_tiene_sesion pts JOIN sesion s ON s.id = pts.sesion_id WHERE pts.paciente_id = ? AND s.psicologo_id = ?
-     UNION SELECT 1 FROM paciente_tiene_informe pti JOIN informe i ON i.id = pti.informe_id WHERE pti.paciente_id = ? AND i.psicologo_id = ?
+    `SELECT 1 FROM historia_clinica WHERE id_paciente = ? AND id_psicologo = ?
+     UNION SELECT 1 FROM paciente_tiene_sesion pts JOIN sesion s ON s.id_sesion = pts.id_sesion WHERE pts.id_paciente = ? AND s.id_psicologo = ?
+     UNION SELECT 1 FROM paciente_tiene_informe pti JOIN informe i ON i.id_informe = pti.id_informe WHERE pti.id_paciente = ? AND i.id_psicologo = ?
      LIMIT 1`,
     [pacienteId, psicologoId, pacienteId, psicologoId, pacienteId, psicologoId],
   );
@@ -96,9 +96,9 @@ export async function cargarHistoria(ds: DataSource, pacienteId: string, psicolo
   const notas = await ds
     .getRepository(InformeEntity)
     .createQueryBuilder("i")
-    .innerJoin("paciente_tiene_informe", "pti", "pti.informe_id = i.id")
-    .where("pti.paciente_id = :pacienteId", { pacienteId })
-    .andWhere("i.psicologo_id = :psicologoId", { psicologoId })
+    .innerJoin("paciente_tiene_informe", "pti", "pti.id_informe = i.id")
+    .where("pti.id_paciente = :pacienteId", { pacienteId })
+    .andWhere("i.id_psicologo = :psicologoId", { psicologoId })
     .orderBy("i.fecha_creacion", "ASC")
     .getMany();
 

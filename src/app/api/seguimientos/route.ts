@@ -25,7 +25,7 @@ export async function GET() {
       .createQueryBuilder("s")
       .innerJoinAndSelect("s.informe", "i")
       .leftJoinAndSelect("s.actividades", "a")
-      .where("EXISTS (SELECT 1 FROM paciente_tiene_informe pti WHERE pti.informe_id = i.id AND pti.paciente_id = :pacienteId)", { pacienteId })
+      .where("EXISTS (SELECT 1 FROM paciente_tiene_informe pti WHERE pti.id_informe = i.id AND pti.id_paciente = :pacienteId)", { pacienteId })
       .orderBy("i.fechaCreacion", "DESC")
       .addOrderBy("a.orden", "ASC")
       .getMany()

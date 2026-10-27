@@ -31,13 +31,13 @@ export class PacienteTieneInformeRepository {
       .orderBy('informe.fechaCreacion', 'DESC');
 
     if (filters?.pacienteId) {
-      queryBuilder.andWhere('pti.paciente_id = :pacienteId', { 
+      queryBuilder.andWhere('pti.id_paciente = :pacienteId', { 
         pacienteId: filters.pacienteId 
       });
     }
 
     if (filters?.informeId) {
-      queryBuilder.andWhere('pti.informe_id = :informeId', { 
+      queryBuilder.andWhere('pti.id_informe = :informeId', { 
         informeId: filters.informeId 
       });
     }
@@ -180,13 +180,13 @@ export class PacienteTieneInformeRepository {
     }
 
     if (searchDto.pacienteId) {
-      queryBuilder.andWhere('pti.paciente_id = :pacienteId', { 
+      queryBuilder.andWhere('pti.id_paciente = :pacienteId', { 
         pacienteId: searchDto.pacienteId 
       });
     }
 
     if (searchDto.informeId) {
-      queryBuilder.andWhere('pti.informe_id = :informeId', { 
+      queryBuilder.andWhere('pti.id_informe = :informeId', { 
         informeId: searchDto.informeId 
       });
     }
@@ -248,13 +248,13 @@ export class PacienteTieneInformeRepository {
 
     // Aplicar filtros (reutilizamos la lógica de findAll)
     if (filters?.pacienteId) {
-      queryBuilder.andWhere('pti.paciente_id = :pacienteId', { 
+      queryBuilder.andWhere('pti.id_paciente = :pacienteId', { 
         pacienteId: filters.pacienteId 
       });
     }
 
     if (filters?.informeId) {
-      queryBuilder.andWhere('pti.informe_id = :informeId', { 
+      queryBuilder.andWhere('pti.id_informe = :informeId', { 
         informeId: filters.informeId 
       });
     }
@@ -290,14 +290,14 @@ export class PacienteTieneInformeRepository {
     // Pacientes únicos con informes
     const pacientesConInformesQuery = await this.repository
       .createQueryBuilder('pti')
-      .select('COUNT(DISTINCT pti.paciente_id)', 'count')
+      .select('COUNT(DISTINCT pti.id_paciente)', 'count')
       .getRawOne();
     const pacientesConInformes = parseInt(pacientesConInformesQuery.count);
 
     // Informes únicos asignados
     const informesAsignadosQuery = await this.repository
       .createQueryBuilder('pti')
-      .select('COUNT(DISTINCT pti.informe_id)', 'count')
+      .select('COUNT(DISTINCT pti.id_informe)', 'count')
       .getRawOne();
     const informesAsignados = parseInt(informesAsignadosQuery.count);
 

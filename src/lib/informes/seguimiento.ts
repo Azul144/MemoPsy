@@ -49,11 +49,11 @@ export async function proximaSesion(db: DataSource, psicologoId: string, pacient
     .getRepository(SesionEntity)
     .createQueryBuilder("s")
     .leftJoin("s.estado", "e")
-    .where("s.psicologo_id = :psicologoId", { psicologoId })
+    .where("s.id_psicologo = :psicologoId", { psicologoId })
     .andWhere("s.fecha_hora_inicio > :ahora", { ahora: new Date() })
     .andWhere("(e.nombre IS NULL OR e.nombre NOT IN ('Cancelada', 'Finalizada'))")
     .andWhere(
-      "EXISTS (SELECT 1 FROM paciente_tiene_sesion pts WHERE pts.sesion_id = s.id AND pts.paciente_id IN (:...pacientesIds))",
+      "EXISTS (SELECT 1 FROM paciente_tiene_sesion pts WHERE pts.id_sesion = s.id AND pts.id_paciente IN (:...pacientesIds))",
       { pacientesIds },
     )
     .orderBy("s.fecha_hora_inicio", "ASC")

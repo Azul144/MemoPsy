@@ -40,11 +40,11 @@ const conexion = await mysql.createConnection({
 try {
   await conexion.beginTransaction()
   for (const [tabla, columna] of COLUMNAS) {
-    const [filas] = await conexion.query(`SELECT id, \`${columna}\` AS valor FROM \`${tabla}\` WHERE \`${columna}\` IS NOT NULL`)
+    const [filas] = await conexion.query(`SELECT \`id_${tabla}\` AS id, \`${columna}\` AS valor FROM \`${tabla}\` WHERE \`${columna}\` IS NOT NULL`)
     let cifradas = 0
     for (const { id, valor } of filas) {
       if (FORMATO_CIFRADO.test(valor)) continue
-      await conexion.query(`UPDATE \`${tabla}\` SET \`${columna}\` = ? WHERE id = ?`, [cifrar(valor), id])
+      await conexion.query(`UPDATE \`${tabla}\` SET \`${columna}\` = ? WHERE \`id_${tabla}\` = ?`, [cifrar(valor), id])
       cifradas++
     }
     console.log(`${tabla}.${columna}: ${cifradas} cifradas de ${filas.length}`)

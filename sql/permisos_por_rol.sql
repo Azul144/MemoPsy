@@ -7,12 +7,12 @@ USE psicologia_db;
 -- 1) Borra los permisos actuales de los 5 roles del TIF
 DELETE ptp
 FROM perfil_tiene_permiso ptp
-JOIN perfil pf ON pf.id = ptp.perfil_id
+JOIN perfil pf ON pf.id_perfil = ptp.id_perfil
 WHERE pf.nombre IN ('Administrador', 'Psicólogo', 'Paciente', 'Recepcionista', 'Auditor');
 
 -- 2) Carga los permisos que le corresponden a cada rol
-INSERT INTO perfil_tiene_permiso (perfil_id, permiso_id)
-SELECT pf.id, pm.id
+INSERT INTO perfil_tiene_permiso (id_perfil, id_permiso)
+SELECT pf.id_perfil, pm.id_permiso
 FROM perfil pf
 JOIN permiso pm ON (
   -- Administrador: cuentas de usuario y perfiles. NO ve informes clínicos ni la agenda.
@@ -37,11 +37,11 @@ JOIN permiso pm ON (
 -- 3) Verificación: cuántos permisos quedó teniendo cada rol
 --    Esperado: Administrador 9 · Psicólogo 7 · Recepcionista 5 · Auditor 3 · Paciente 2
 SELECT pf.nombre AS rol,
-       COUNT(pm.id) AS cantidad,
+       COUNT(pm.id_permiso) AS cantidad,
        GROUP_CONCAT(pm.nombre ORDER BY pm.nombre SEPARATOR ', ') AS permisos
 FROM perfil pf
-LEFT JOIN perfil_tiene_permiso ptp ON ptp.perfil_id = pf.id
-LEFT JOIN permiso pm ON pm.id = ptp.permiso_id
+LEFT JOIN perfil_tiene_permiso ptp ON ptp.id_perfil = pf.id_perfil
+LEFT JOIN permiso pm ON pm.id_permiso = ptp.id_permiso
 WHERE pf.nombre IN ('Administrador', 'Psicólogo', 'Paciente', 'Recepcionista', 'Auditor')
-GROUP BY pf.id, pf.nombre
+GROUP BY pf.id_perfil, pf.nombre
 ORDER BY pf.nombre;

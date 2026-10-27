@@ -1,10 +1,13 @@
 // usuario.entity.ts
-import { Column, Entity, OneToOne, JoinColumn, OneToMany } from "typeorm";
+import { Column, Entity, OneToOne, JoinColumn, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { BaseEntity } from "./base-entity";
 import type { PersonaEntity } from "./persona.entity";
 
 @Entity({ name: "usuario" })
 export class UsuarioEntity extends BaseEntity {
+  @PrimaryGeneratedColumn("increment", { type: "int", name: "id_usuario" })
+  id: string;
+
   @Column({ name: "email" })
   email: string;
 
@@ -18,7 +21,7 @@ export class UsuarioEntity extends BaseEntity {
   ultimoAcceso: Date;
 
   @OneToOne("PersonaEntity")
-  @JoinColumn({ name: "persona_id" })
+  @JoinColumn({ name: "id_persona" })
   persona: PersonaEntity;
 
   @Column({ name: "mfa_habilitado", type: "tinyint", default: 0 })

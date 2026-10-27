@@ -25,13 +25,13 @@ export class PacienteRepository {
       .addOrderBy('persona.nombre', 'ASC');
 
     if (filters?.personaId) {
-      queryBuilder.andWhere('paciente.persona_id = :personaId', { 
+      queryBuilder.andWhere('paciente.id_persona = :personaId', { 
         personaId: filters.personaId 
       });
     }
 
     if (filters?.obraSocialId) {
-      queryBuilder.andWhere('paciente.obra_social_id = :obraSocialId', { 
+      queryBuilder.andWhere('paciente.id_obra_social = :obraSocialId', { 
         obraSocialId: filters.obraSocialId 
       });
     }
@@ -115,7 +115,7 @@ export class PacienteRepository {
     }
 
     if (searchDto.obraSocialId) {
-      queryBuilder.andWhere('paciente.obra_social_id = :obraSocialId', { 
+      queryBuilder.andWhere('paciente.id_obra_social = :obraSocialId', { 
         obraSocialId: searchDto.obraSocialId 
       });
     }
@@ -143,7 +143,7 @@ export class PacienteRepository {
   // Verificar si existe un paciente con una persona específica
   async existsByPersonaId(personaId: string, excludeId?: string): Promise<boolean> {
     const queryBuilder = this.repository.createQueryBuilder('paciente')
-      .where('paciente.persona_id = :personaId', { personaId });
+      .where('paciente.id_persona = :personaId', { personaId });
 
     if (excludeId) {
       queryBuilder.andWhere('paciente.id != :excludeId', { excludeId });
@@ -185,13 +185,13 @@ export class PacienteRepository {
       .addOrderBy('persona.nombre', 'ASC');
 
     if (filters?.personaId) {
-      queryBuilder.andWhere('paciente.persona_id = :personaId', { 
+      queryBuilder.andWhere('paciente.id_persona = :personaId', { 
         personaId: filters.personaId 
       });
     }
 
     if (filters?.obraSocialId) {
-      queryBuilder.andWhere('paciente.obra_social_id = :obraSocialId', { 
+      queryBuilder.andWhere('paciente.id_obra_social = :obraSocialId', { 
         obraSocialId: filters.obraSocialId 
       });
     }

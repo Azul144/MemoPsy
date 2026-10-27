@@ -1,6 +1,6 @@
 // actividad-seguimiento.entity.ts
 // RF 2.4 - Actividad acordada en sesión para hacer hasta la próxima, con la respuesta del paciente.
-import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { BaseEntity } from "./base-entity";
 import type { InformeSeguimientoEntity } from "./informe-seguimiento.entity";
 import { columnaCifrada } from "../lib/auth/columna-cifrada";
@@ -9,8 +9,11 @@ export type RespuestaActividad = "HECHA" | "NO_PUDE";
 
 @Entity({ name: "actividad_seguimiento" })
 export class ActividadSeguimientoEntity extends BaseEntity {
+  @PrimaryGeneratedColumn("increment", { type: "int", name: "id_actividad_seguimiento" })
+  id: string;
+
   @ManyToOne("InformeSeguimientoEntity", "actividades", { onDelete: "CASCADE" })
-  @JoinColumn({ name: "seguimiento_id" })
+  @JoinColumn({ name: "id_informe_seguimiento" })
   seguimiento: InformeSeguimientoEntity;
 
   // Descripción y comentario se guardan cifrados; por eso la columna es TEXT (el texto cifrado ocupa más)

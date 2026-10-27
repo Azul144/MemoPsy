@@ -89,19 +89,19 @@ export async function insertarHistoriasDemo(conexion, cifrar) {
   let cargadas = 0
   for (const h of HISTORIAS_DEMO) {
     const [[fila]] = await conexion.query(
-      `SELECT pa.id AS pacienteId, s.psicologo_id AS psicologoId, DATE(MIN(s.fecha_hora_inicio)) AS admision
+      `SELECT pa.id_paciente AS pacienteId, s.id_psicologo AS psicologoId, DATE(MIN(s.fecha_hora_inicio)) AS admision
          FROM paciente pa
-         JOIN persona pe ON pe.id = pa.persona_id
-         JOIN paciente_tiene_sesion pts ON pts.paciente_id = pa.id
-         JOIN sesion s ON s.id = pts.sesion_id
+         JOIN persona pe ON pe.id_persona = pa.id_persona
+         JOIN paciente_tiene_sesion pts ON pts.id_paciente = pa.id_paciente
+         JOIN sesion s ON s.id_sesion = pts.id_sesion
         WHERE pe.dni = ?
-        GROUP BY pa.id, s.psicologo_id
+        GROUP BY pa.id_paciente, s.id_psicologo
         ORDER BY COUNT(*) DESC
         LIMIT 1`,
       [h.dni],
     )
     if (!fila) continue
-    const [[existe]] = await conexion.query("SELECT id FROM historia_clinica WHERE paciente_id = ? AND psicologo_id = ?", [fila.pacienteId, fila.psicologoId])
+    const [[existe]] = await conexion.query("SELECT id_historia_clinica FROM historia_clinica WHERE id_paciente = ? AND id_psicologo = ?", [fila.pacienteId, fila.psicologoId])
     if (existe) continue
 
     const admision = fila.admision instanceof Date ? fila.admision.toISOString().slice(0, 10) : String(fila.admision).slice(0, 10)
@@ -110,7 +110,7 @@ export async function insertarHistoriasDemo(conexion, cifrar) {
     const columnas = ["estado_civil", "ocupacion", "escolaridad", "convivencia", "contacto_emergencia", "derivado_por", "motivo_consulta",
       "historia_problema", "antecedentes_personales", "antecedentes_familiares", "examen_mental", "evaluaciones", "impresion_diagnostica", "plan_tratamiento"]
     await conexion.query(
-      `INSERT INTO historia_clinica (paciente_id, psicologo_id, fecha_admision, ${columnas.join(", ")}, consentimiento_informado, fecha_consentimiento)
+      `INSERT INTO historia_clinica (id_paciente, id_psicologo, fecha_admision, ${columnas.join(", ")}, consentimiento_informado, fecha_consentimiento)
        VALUES (?, ?, ?, ${columnas.map(() => "?").join(", ")}, 1, ?)`,
       [fila.pacienteId, fila.psicologoId, admision, ...textos.map((t) => cifrar(h[t])), admision],
     )

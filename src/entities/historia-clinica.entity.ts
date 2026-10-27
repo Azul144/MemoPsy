@@ -2,7 +2,7 @@
 // Historia clínica del paciente (Ley 26.529, arts. 12 a 15): una por paciente y psicólogo tratante.
 // Guarda la admisión y el cierre; la evolución son las notas clínicas del mismo psicólogo y paciente.
 // Todos los textos se guardan cifrados.
-import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { BaseEntity } from "./base-entity";
 import { PacienteEntity } from "./paciente.entity";
 import { PsicologoEntity } from "./psicologo.entity";
@@ -15,12 +15,15 @@ const texto = (name: string) => ({ name, type: "text" as const, nullable: true, 
 
 @Entity({ name: "historia_clinica" })
 export class HistoriaClinicaEntity extends BaseEntity {
+  @PrimaryGeneratedColumn("increment", { type: "int", name: "id_historia_clinica" })
+  id: string;
+
   @ManyToOne(() => PacienteEntity)
-  @JoinColumn({ name: "paciente_id" })
+  @JoinColumn({ name: "id_paciente" })
   paciente: PacienteEntity;
 
   @ManyToOne(() => PsicologoEntity)
-  @JoinColumn({ name: "psicologo_id" })
+  @JoinColumn({ name: "id_psicologo" })
   psicologo: PsicologoEntity;
 
   @Column({ name: "fecha_admision", type: "date" })

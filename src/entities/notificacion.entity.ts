@@ -1,15 +1,18 @@
 // notificacion.entity.ts
 // RF 3.2 / RF 3.3 - Un aviso dentro de la plataforma para un usuario (cambio de turno o recordatorio).
-import { Column, Entity } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 import { BaseEntity } from "./base-entity";
 
 @Entity({ name: "notificacion" })
 export class NotificacionEntity extends BaseEntity {
+  @PrimaryGeneratedColumn("increment", { type: "int", name: "id_notificacion" })
+  id: string;
+
   // Destinatario del aviso
-  @Column({ name: "usuario_id", type: "int" })
+  @Column({ name: "id_usuario", type: "int" })
   usuarioId: number;
 
-  @Column({ name: "sesion_id", type: "int", nullable: true })
+  @Column({ name: "id_sesion", type: "int", nullable: true })
   sesionId: number | null;
 
   // REPROGRAMACION, CANCELACION, RECORDATORIO

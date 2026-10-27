@@ -1,11 +1,14 @@
 // horario-disponible.entity.ts
 // RF 4.3 - Franja semanal que el psicólogo habilita para que sus pacientes reprogramen turnos.
-import { Column, Entity } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 import { BaseEntity } from "./base-entity";
 
 @Entity({ name: "horario_disponible" })
 export class HorarioDisponibleEntity extends BaseEntity {
-  @Column({ name: "psicologo_id", type: "int" })
+  @PrimaryGeneratedColumn("increment", { type: "int", name: "id_horario_disponible" })
+  id: string;
+
+  @Column({ name: "id_psicologo", type: "int" })
   psicologoId: number;
 
   // 1 = lunes ... 5 = viernes

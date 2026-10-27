@@ -81,18 +81,18 @@ import { PermisoEntity } from "./permiso.entity";
 
 @Entity({ name: "perfil_tiene_permiso" })
 export class PerfilTienePermisoEntity {
-  @PrimaryColumn({ name: "perfil_id" })
+  @PrimaryColumn({ name: "id_perfil" })
   perfilId: string;
     
-  @PrimaryColumn({ name: "permiso_id" })
+  @PrimaryColumn({ name: "id_permiso" })
   permisoId: string;
 
   @ManyToOne(() => PerfilEntity)
-  @JoinColumn({ name: "perfil_id" })
+  @JoinColumn({ name: "id_perfil" })
   perfil: PerfilEntity;
 
   @ManyToOne(() => PermisoEntity)
-  @JoinColumn({ name: "permiso_id" })
+  @JoinColumn({ name: "id_permiso" })
   permiso: PermisoEntity;
 }
 */
