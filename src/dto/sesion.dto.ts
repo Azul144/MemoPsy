@@ -128,24 +128,3 @@ export class PaginatedSesionResponseDto {
     }
 }
 
-/*
-// DTO para estadísticas de sesiones
-export class SesionStatsDto {
-  total: number;
-  porEstado: { estado: string; count: number }[];
-  porModalidad: { modalidad: string; count: number }[];
-  porPsicologo: { psicologo: string; count: number }[];
-
-  constructor(data: {
-    total: number;
-    porEstado: { estado: string; count: number }[];
-    porModalidad: { modalidad: string; count: number }[];
-    porPsicologo: { psicologo: string; count: number }[];
-  }) {
-    this.total = data.total;
-    this.porEstado = data.porEstado;
-    this.porModalidad = data.porModalidad;
-    this.porPsicologo = data.porPsicologo;
-  }
-}
-*/

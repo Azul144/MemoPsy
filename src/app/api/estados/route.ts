@@ -1,11 +1,11 @@
 // src/app/api/estados/route.ts
-import { type NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
 import { getServerSession } from "next-auth/next"
 import { authConfig } from "@/lib/auth/auth-config"
 import { initializeDatabase } from "@/lib/database"
 import { EstadoEntity } from "@/entities"
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const session = await getServerSession(authConfig)
 
@@ -29,15 +29,3 @@ export async function GET(request: NextRequest) {
   }
 }
 
-/*
-import { NextRequest } from 'next/server';
-import { EstadoController } from '@/lib/controllers/estado.controller'; // Adjust path if needed
-
-export async function GET(request: NextRequest) {
-  return EstadoController.getAllEstados(request);
-}
-
-export async function POST(request: NextRequest) {
-  return EstadoController.createEstado(request);
-}
-*/

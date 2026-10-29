@@ -1,3 +1,6 @@
+// src/lib/auth/mfa.ts
+// Verificación en dos pasos (TOTP, RFC 6238): genera el secreto y el código QR, valida los códigos
+// de seis dígitos y maneja los códigos de recuperación de un solo uso.
 import { authenticator } from "otplib";
 import * as bcrypt from "bcrypt";
 import { randomBytes } from "crypto";
@@ -43,7 +46,6 @@ export async function usarCodigoRecuperacion(
   return null;
 }
 // ---------- Activación del MFA (paso L3) ----------
-
 
 // Crea el secreto del autenticador: lo devolvemos en claro (para el QR) y cifrado (para la base)
 export function generarSecretoMfa() {

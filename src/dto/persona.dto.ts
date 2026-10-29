@@ -1,5 +1,5 @@
 // dto/persona.dto.ts
-import { IsString, IsNotEmpty, IsUUID, IsOptional, MinLength, MaxLength, IsDateString, Matches } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, MinLength, MaxLength, IsDateString, Matches } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 // DTO para crear una persona

@@ -1,6 +1,8 @@
+// src/components/landing/PiePagina.tsx
+// Sitio público: pie de página con accesos directos, normas y datos de contacto.
 import Link from "next/link";
 import { MapPin, Phone, Mail, ShieldCheck, FileLock2, KeyRound } from "lucide-react";
-import LogoMemoPsy from "@/components/LogoMemoPsy"
+import LogoMemoPsy from "@/components/comunes/LogoMemoPsy"
 
 const contacto = [
   { icono: MapPin, texto: "Av. 25 de Mayo 450, Oficina 2, Formosa (P3600)" },

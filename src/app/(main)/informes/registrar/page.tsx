@@ -3,23 +3,19 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { MODULOS_DISPONIBLES, type ModuloConfig } from "@/config/modulos";
-import { useSession, signOut } from 'next-auth/react';
-import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
+import { useSession } from 'next-auth/react';
 import EncabezadoPagina from "@/components/sistema/EncabezadoPagina";
 import DictadoVoz from "@/components/sistema/DictadoVoz";
 import PropuestaIA from "@/components/sistema/PropuestaIA";
 import { useRouter } from 'next/navigation';
-import MemopsyLogo from '@/app/components/MemopsyLogo';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { TypographyH1, TypographyP, TypographySmall } from '@/components/ui/typography';
-import { FilePlus, Search, X, Check, Loader2, AlertCircle, Lock } from "lucide-react"
+import { FilePlus, X, Check, Loader2, AlertCircle, Lock } from "lucide-react"
 import { cn } from "@/lib/utils";
 
 // Interfaces
@@ -41,7 +37,6 @@ interface FormErrors {
   general?: string;
 }
 
-
 // This would ideally be a shared constant
 
 export default function RegistrarInformePage() {
@@ -49,9 +44,6 @@ export default function RegistrarInformePage() {
   const router = useRouter();
 
   // Navbar states
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [modulosPermitidos, setModulosPermitidos] = useState<ModuloConfig[]>([]);
-  const [nombreCompletoNav, setNombreCompletoNav] = useState('');
 
   // Form states
   const [formData, setFormData] = useState({
@@ -71,7 +63,6 @@ export default function RegistrarInformePage() {
   
   const [hasPagePermission, setHasPagePermission] = useState<boolean | null>(null);
   const [loadingPermissions, setLoadingPermissions] = useState(true);
-
 
   const popoverRef = useRef<HTMLDivElement>(null);
 
@@ -132,11 +123,6 @@ export default function RegistrarInformePage() {
       }
 
       // Navbar permissions
-      const filteredMainModules = MODULOS_DISPONIBLES.filter(module =>
-        module.permisosRequeridos.some(pr => userPermissions.includes(pr))
-      );
-      setModulosPermitidos(filteredMainModules);
-      setNombreCompletoNav(session.user.persona?.nombreCompleto || session.user.email || 'Usuario');
       setLoadingPermissions(false);
     }
   }, [session, status, router]);
@@ -166,11 +152,6 @@ export default function RegistrarInformePage() {
     }));
   }, [selectedPacientes]);
 
-
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-  const navigateToModule = (ruta: string) => { router.push(ruta); setIsMenuOpen(false); };
-  const handleLogout = async () => { await cerrarSesion(); };
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -178,7 +159,6 @@ export default function RegistrarInformePage() {
         setFormErrors(prev => ({ ...prev, [name]: undefined }));
     }
   };
-
 
   // Lo dictado se suma al final de lo que ya está escrito, nunca lo reemplaza.
   const agregarDictado = (texto: string) => {
@@ -204,8 +184,6 @@ export default function RegistrarInformePage() {
     setPacienteSearchResults([]); // Keep search results visible
     setIsPacientePopoverOpen(false); // Keep popover open for further selections
     
-    // Optional: You might want to clear the search query if the user should perform a new search for each new patient.
-    // If so, just keep setPacienteSearchQuery(''); and setPacienteSearchResults([]);
     // For now, let's keep it open and results visible to allow multiple selections from the same list.
     // The existing useEffect for handleClickOutside should handle closing when clicking away.
   };
@@ -364,11 +342,6 @@ export default function RegistrarInformePage() {
                       type="text"
                       placeholder="Buscar paciente por nombre, apellido o DNI..."
                       value={pacienteSearchQuery}
-                      //onChange={(e) => {
-                      //  setPacienteSearchQuery(e.target.value)
-                      //  if (!isPacientePopoverOpen && e.target.value.length > 1) {
-                      //    setIsPacientePopoverOpen(true)
-                      //  }
                       //}}
                       onChange={(e) => {
                         setPacienteSearchQuery(e.target.value);
@@ -383,8 +356,6 @@ export default function RegistrarInformePage() {
                             setIsPacientePopoverOpen(false);
                           }, 150);
                       }}
-                      //onFocus={() => {
-                      //  if (pacienteSearchQuery.length > 1) setIsPacientePopoverOpen(true)
                       //}}
                       className="bg-transparent border-0 text-foreground placeholder:text-tenue focus:ring-0 focus:outline-none p-0 w-full"
                     />

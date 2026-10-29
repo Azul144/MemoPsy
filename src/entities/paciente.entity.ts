@@ -1,5 +1,5 @@
 // paciente.entity.ts
-import { Entity, ManyToOne, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Entity, ManyToOne, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { BaseEntity } from "./base-entity";
 import type { PersonaEntity } from "./persona.entity";
 import { ObraSocialEntity } from "./obra-social.entity";
@@ -17,17 +17,5 @@ export class PacienteEntity extends BaseEntity {
   @JoinColumn({ name: "id_obra_social" })
   obraSocial: ObraSocialEntity;
 
-  /*
-  @OneToMany(() => PacienteTieneInformeEntity, pacienteTieneInforme => pacienteTieneInforme.paciente)
-  informes: PacienteTieneInformeEntity[];
-
-  @OneToMany(() => PacienteTieneSesionEntity, pacienteTieneSesion => pacienteTieneSesion.paciente)
-  sesiones: PacienteTieneSesionEntity[];
-  */
 }
 
-//@Column({ name: "id_persona" })
-  //personaId: string;
-
-  //@Column({ name: "id_obra_social" })
-  //obraSocialId: string;

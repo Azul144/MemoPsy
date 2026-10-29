@@ -12,38 +12,11 @@ import { PacienteEntity } from '@/entities/paciente.entity';
 import { AppDataSource } from '@/lib/database';
 import { In } from 'typeorm';
 
-//async function obtenerFechaDesdeInternet(): Promise<Date> {
-//  const res = await fetch('https://worldtimeapi.org/api/ip');
-//  const data = await res.json();
-//  return new Date(data.utc_datetime); // o data.datetime si prefieres hora local
-//}
-
 // Minúsculas y sin tildes, para que "ansiedad" encuentre "Ansiedad" y "sesion" encuentre "sesión"
 function normalizarTexto(texto: string): string {
   return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 }
 
-async function obtenerFechaDesdeInternet(retries = 3, delay = 1000): Promise<Date> {
-  for (let i = 0; i < retries; i++) {
-    try {
-      const res = await fetch('https://worldtimeapi.org/api/ip');
-      if (!res.ok) {
-        // Manejar errores HTTP (ej. 404, 500)
-        throw new Error(`HTTP error! status: ${res.status}`);
-      }
-      const data = await res.json();
-      return new Date(data.utc_datetime);
-    } catch (error) {
-      console.error(`Intento ${i + 1} fallido:`, error);
-      if (i < retries - 1) {
-        await new Promise(resolve => setTimeout(resolve, delay * (i + 1))); // Incrementa el delay
-      } else {
-        throw error; // Lanza el error si todos los reintentos fallan
-      }
-    }
-  }
-  throw new Error('Todos los reintentos para obtener la fecha fallaron.');
-}
 
 export async function GET(request: NextRequest) {
   try {
@@ -98,12 +71,7 @@ export async function GET(request: NextRequest) {
           { query: `%${pacienteSearch}%` }
         );
         // Error aqui puedes cambiar la consulta para que haga el join con "PacienteTieneInforme"
-        /*queryBuilder
-          .innerJoin('informe.pacientesInformes', 'pti')
-          .leftJoin('pti.paciente', 'paciente')
-          .leftJoin('paciente.persona', 'pacientePersona')
-          .andWhere('(pacientePersona.nombre LIKE :query OR pacientePersona.apellido LIKE :query OR pacientePersona.dni LIKE :query)', 
-                    { query: `%${pacienteSearch}%` });*/
+
       }
 
       // Filtro por etiqueta (RF 2.1): busca el texto dentro de la lista de etiquetas del informe.
@@ -229,7 +197,6 @@ async function manejarPOST(request: NextRequest) {
         return NextResponse.json({ message: 'pacientesIds debe ser un array de strings.' }, { status: 400 });
     }
 
-
     if (!AppDataSource.isInitialized) {
       await initializeDatabase();
     }
@@ -244,11 +211,6 @@ async function manejarPOST(request: NextRequest) {
     }
 
     const fechaCreacion = new Date();
-    //try {
-    //  fechaCreacion = await obtenerFechaDesdeInternet();
-    //} catch {
-    //  fechaCreacion = new Date();
-    //}
 
     const etiquetasNormalizadas = typeof etiquetas === 'string' && etiquetas.trim() ? etiquetas.trim() : null;
 
@@ -263,7 +225,6 @@ async function manejarPOST(request: NextRequest) {
 
     const informeGuardado = await informeRepository.save(nuevoInforme);
 
-    let ptiEntitiesGuardadas: PacienteTieneInformeEntity[] = [];
     if (pacientesIds && pacientesIds.length > 0) {
       const existingPacientes = await pacienteRepository.findBy({ id: In(pacientesIds) });
       if(existingPacientes.length !== pacientesIds.length){
@@ -277,7 +238,7 @@ async function manejarPOST(request: NextRequest) {
           paciente: { id: pacienteId } as PacienteEntity,
         })
       );
-      ptiEntitiesGuardadas = await pacienteTieneInformeRepository.save(ptiEntities);
+      await pacienteTieneInformeRepository.save(ptiEntities);
     }
     
     const informeCompleto = await informeRepository.findOne({
@@ -313,19 +274,6 @@ async function manejarPOST(request: NextRequest) {
     return NextResponse.json({ message: 'Error interno del servidor', error: error.message }, { status: 500 });
   }
 }
-
-/*
-import { NextRequest } from 'next/server';
-import { InformeController } from '@/lib/controllers/informe.controller';
-
-export async function GET(request: NextRequest) {
-  return InformeController.getAllInformes(request);
-}
-
-export async function POST(request: NextRequest) {
-  return InformeController.createInforme(request);
-}
-  */
 
 // RF 1.4 - Registro de auditoría de esta ruta
 export const POST = conAuditoria(manejarPOST, { modulo: "Informes", accion: "CREAR", detalle: "Alta de nota clínica" })

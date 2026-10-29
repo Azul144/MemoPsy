@@ -11,10 +11,7 @@ import { getServerSession } from "next-auth/next"
 import { authConfig } from "@/lib/auth/auth-config"
 import { initializeDatabase } from "@/lib/database"
 import { SesionEntity, PacienteTieneSesionEntity, PsicologoEntity, ModalidadEntity, EstadoEntity } from "@/entities"
-import { PacienteTieneSesion } from "@/models/paciente-tiene-sesion.model"
-import { Sesion } from "@/models/sesion.model"
-
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const session = await getServerSession(authConfig)
 

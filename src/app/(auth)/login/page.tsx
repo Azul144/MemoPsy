@@ -6,10 +6,10 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Loader2, ShieldCheck } from "lucide-react";
-import PantallaAcceso from "@/components/PantallaAcceso";
+import PantallaAcceso from "@/components/acceso/PantallaAcceso";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import InputPassword from "@/components/InputPassword";
+import InputPassword from "@/components/acceso/InputPassword";
 import { Label } from "@/components/ui/label";
 
 // Traduce los códigos de error del servidor a mensajes para el usuario

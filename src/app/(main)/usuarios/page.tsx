@@ -1,16 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { MODULOS_DISPONIBLES, type ModuloConfig } from "@/config/modulos";
-import { useSession, signOut } from 'next-auth/react';
-import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
+import { useSession } from 'next-auth/react';
+
 import EncabezadoPagina from "@/components/sistema/EncabezadoPagina";
 import TarjetaAccion from "@/components/sistema/TarjetaAccion";
 import { useRouter } from 'next/navigation';
-import MemopsyLogo from "@/app/components/MemopsyLogo";
-import { Button } from "@/components/ui/button";
-import { Users, UserPlus, List, Edit3, UserCog } from "lucide-react"
-
+import { Users, UserPlus, List } from "lucide-react"
 interface SubModuloConfig {
   id: string;
   nombre: string;
@@ -41,13 +37,9 @@ const SUB_MODULOS_USUARIOS: SubModuloConfig[] = [
 
 // Copied from app/(auth)/welcome/page.tsx and adapted for main navigation
 
-
-
 export default function UsuariosPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [modulosPermitidos, setModulosPermitidos] = useState<ModuloConfig[]>([]);
   const [subModulosUsuariosPermitidos, setSubModulosUsuariosPermitidos] = useState<SubModuloConfig[]>([]);
 
   useEffect(() => {
@@ -61,10 +53,6 @@ export default function UsuariosPage() {
       const userPermissions = session.user.permisos.map((p: any) => p.nombre);
 
       // Filter main modules for sidebar
-      const filteredMainModules = MODULOS_DISPONIBLES.filter(module =>
-        module.permisosRequeridos.some(pr => userPermissions.includes(pr))
-      );
-      setModulosPermitidos(filteredMainModules);
 
       // Filter sub-modules for Usuarios page cards
       const filteredSubModules = SUB_MODULOS_USUARIOS.filter(subModule =>
@@ -73,23 +61,6 @@ export default function UsuariosPage() {
       setSubModulosUsuariosPermitidos(filteredSubModules);
     }
   }, [session]);
-
-  const handleLogout = async () => {
-    await cerrarSesion();
-  };
-
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
-
-  const navigateToModule = (ruta: string) => {
-    router.push(ruta);
-    setIsMenuOpen(false); 
-  };
-
-  const navigateToSubModulo = (ruta: string) => {
-    router.push(ruta);
-  };
 
   if (status === 'loading') {
     return (
@@ -104,10 +75,6 @@ export default function UsuariosPage() {
     return null; 
   }
   
-  const nombreCompleto = session.user.persona
-    ? `${session.user.persona.nombre} ${session.user.persona.apellido}`
-    : session.user.email || 'Usuario';
-
 
   return (
     <div className="min-h-screen">

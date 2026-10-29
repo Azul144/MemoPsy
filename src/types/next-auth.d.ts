@@ -1,3 +1,5 @@
+// src/types/next-auth.d.ts
+// Amplía los tipos de NextAuth para que la sesión y el token incluyan la persona, los perfiles y los permisos.
 import "next-auth"
 
 declare module "next-auth" {

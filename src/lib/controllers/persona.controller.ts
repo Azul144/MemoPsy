@@ -1,4 +1,6 @@
-// lib/controllers/persona.controller.ts
+// src/lib/controllers/persona.controller.ts
+// Controlador de las personas (patrón Repositorio, apartado 8.4.2 del TIF).
+// Recibe el pedido desde la ruta de la API, controla la sesión y delega las reglas de negocio en PersonaService.
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth-config'; // Assuming this path is correct
@@ -29,12 +31,6 @@ export class PersonaController {
       }
 
       // Example permission check (adjust module and action names as needed)
-      // const hasPermission = session.user.permisos?.some(
-      //   p => p.modulo.nombre === 'Personas' && p.accion.nombre === 'Ver'
-      // );
-      // if (!hasPermission) {
-      //   return NextResponse.json({ success: false, error: 'No tenés permisos para ver personas' }, { status: 403 });
-      // }
 
       const { searchParams } = new URL(request.url);
       const filters = plainToClass(PersonaFiltersDto, Object.fromEntries(searchParams.entries()));
@@ -75,12 +71,6 @@ export class PersonaController {
       }
 
       // Example permission check
-      // const hasPermission = session.user.permisos?.some(
-      //   p => p.modulo.nombre === 'Personas' && p.accion.nombre === 'Crear'
-      // );
-      // if (!hasPermission) {
-      //   return NextResponse.json({ success: false, error: 'No tenés permisos para crear personas' }, { status: 403 });
-      // }
 
       const body = await request.json();
       const createPersonaDto = plainToClass(CreatePersonaDto, body);
@@ -124,13 +114,6 @@ export class PersonaController {
       }
 
       // Example permission check (users might be able to see their own persona data or need specific permission)
-      // const canViewOwn = session.user.personaId === id; // Hypothetical field
-      // const hasGeneralViewPermission = session.user.permisos?.some(
-      //   p => p.modulo.nombre === 'Personas' && p.accion.nombre === 'Ver'
-      // );
-      // if (!canViewOwn && !hasGeneralViewPermission) {
-      //   return NextResponse.json({ success: false, error: 'No tenés permisos para ver esta persona' }, { status: 403 });
-      // }
 
       const persona = await personaService.getPersonaById(id);
       if (!persona) {
@@ -161,12 +144,6 @@ export class PersonaController {
       }
 
       // Example permission check
-      // const hasPermission = session.user.permisos?.some(
-      //   p => p.modulo.nombre === 'Personas' && p.accion.nombre === 'Editar'
-      // );
-      // if (!hasPermission) {
-      //   return NextResponse.json({ success: false, error: 'No tenés permisos para editar personas' }, { status: 403 });
-      // }
 
       const body = await request.json();
       const updatePersonaDto = plainToClass(UpdatePersonaDto, body);
@@ -219,12 +196,6 @@ export class PersonaController {
       }
 
       // Example permission check
-      // const hasPermission = session.user.permisos?.some(
-      //   p => p.modulo.nombre === 'Personas' && p.accion.nombre === 'Eliminar'
-      // );
-      // if (!hasPermission) {
-      //   return NextResponse.json({ success: false, error: 'No tenés permisos para eliminar personas' }, { status: 403 });
-      // }
 
       const fueEliminada = await personaService.deletePersona(id);
       if (!fueEliminada) {

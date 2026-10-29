@@ -1,5 +1,5 @@
 // usuario.entity.ts
-import { Column, Entity, OneToOne, JoinColumn, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToOne, JoinColumn, PrimaryGeneratedColumn } from "typeorm";
 import { BaseEntity } from "./base-entity";
 import type { PersonaEntity } from "./persona.entity";
 

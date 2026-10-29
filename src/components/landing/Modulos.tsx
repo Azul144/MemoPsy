@@ -1,5 +1,7 @@
+// src/components/landing/Modulos.tsx
+// Sitio público: presentación de los cuatro módulos.
 import Image from "next/image";
-import FondoAnimado from "@/components/FondoAnimado";
+import FondoAnimado from "@/components/comunes/FondoAnimado";
 import { Users, Mic, Video, ShieldCheck } from "lucide-react";
 
 const modulos = [

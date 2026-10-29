@@ -120,7 +120,8 @@ export class InformeService {
         fechaCreacion: updateDto.fechaCreacion ? new Date(updateDto.fechaCreacion) : existingInforme.fechaCreacion
       };
 
-      const informeModel = new Informe({
+      // Se arma el modelo solo para validar los datos: el constructor lanza un error si no son válidos
+      new Informe({
         id: existingInforme.id,
         titulo: updatedData.titulo,
         contenido: updatedData.contenido,
@@ -232,12 +233,18 @@ export class InformeService {
         id: entity.psicologo.id,
         especialidad: entity.psicologo.especialidad,
         numeroLicencia: entity.psicologo.numeroLicencia,
-        persona: entity.psicologo.persona ? {
-          id: entity.psicologo.persona.id,
-          nombre: entity.psicologo.persona.nombre,
-          apellido: entity.psicologo.persona.apellido,
-          dni: entity.psicologo.persona.dni,
-          fechaNacimiento: entity.psicologo.persona.fechaNacimiento,
+        persona: entity.psicologo.persona ? {
+
+          id: entity.psicologo.persona.id,
+
+          nombre: entity.psicologo.persona.nombre,
+
+          apellido: entity.psicologo.persona.apellido,
+
+          dni: entity.psicologo.persona.dni,
+
+          fechaNacimiento: entity.psicologo.persona.fechaNacimiento,
+
         } : undefined,
       }) : undefined,
       //createdAt: entity.createdAt,

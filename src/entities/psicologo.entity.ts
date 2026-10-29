@@ -8,7 +8,6 @@ export class PsicologoEntity extends BaseEntity {
   @PrimaryGeneratedColumn("increment", { type: "int", name: "id_psicologo" })
   id: string;
 
-
   @Column({ name: "especialidad" })
   especialidad: string;
 

@@ -1,4 +1,6 @@
 // src/lib/controllers/obra-social.controller.ts
+// Controlador de las obras sociales (patrón Repositorio, apartado 8.4.2 del TIF).
+// Recibe el pedido desde la ruta de la API, controla la sesión y delega las reglas de negocio en ObraSocialService.
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth-config';

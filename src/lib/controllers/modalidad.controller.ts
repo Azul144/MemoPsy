@@ -1,11 +1,12 @@
 // src/lib/controllers/modalidad.controller.ts
+// Controlador de las modalidades de sesión (patrón Repositorio, apartado 8.4.2 del TIF).
+// Recibe el pedido desde la ruta de la API, controla la sesión y delega las reglas de negocio en ModalidadService.
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth-config';
 import { ModalidadService } from '@/services/modalidad.service';
 import { ModalidadRepository } from '@/repositories/modalidad.repository';
 import { initializeDatabase } from '@/lib/database';
-import { ModalidadEntity } from '@/entities/modalidad.entity';
 import { CreateModalidadDto, UpdateModalidadDto } from '@/dto/modalidad.dto';
 
 // Crea el servicio en el momento de usarlo, con la base ya conectada
@@ -17,7 +18,7 @@ async function obtenerServicio() {
 export class ModalidadController {
 
   // GET /api/modalidades - Obtener todas las modalidades
-  static async getAllModalidades(request: NextRequest) {
+  static async getAllModalidades() {
     try {
       const session = await getServerSession(authConfig);
       if (!session?.user) {
@@ -31,9 +32,6 @@ export class ModalidadController {
       }
 
       // ModalidadService.getAllModalidades() does not currently accept filters.
-      // const { searchParams } = new URL(request.url);
-      // const filters: any = {}; 
-      // if (searchParams.get('nombre')) { filters.nombre = searchParams.get('nombre'); }
       
       const modalidades = await (await obtenerServicio()).getAllModalidades();
       return NextResponse.json({ success: true, data: modalidades });

@@ -1,12 +1,12 @@
 // src/app/api/permisos/route.ts
-import { type NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authConfig } from "@/lib/auth/auth-config"
 import { initializeDatabase } from "@/lib/database"
 import { Permiso } from "@/models/permiso.model"
 
 // GET /api/permisos - Obtener lista de permisos disponibles
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const session = await getServerSession(authConfig)
 
@@ -55,13 +55,3 @@ export async function GET(request: NextRequest) {
   }
 }
 
-/*import { NextRequest } from 'next/server';
-import { PermisoController } from '@/lib/controllers/permiso.controller'; // Adjust path if needed
-
-export async function GET(request: NextRequest) {
-  return PermisoController.getAllPermisos(request);
-}
-
-export async function POST(request: NextRequest) {
-  return PermisoController.createPermiso(request);
-}*/

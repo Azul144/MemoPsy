@@ -1,14 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { MODULOS_DISPONIBLES, type ModuloConfig } from "@/config/modulos";
-import { useSession, signOut } from 'next-auth/react';
-import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
+import { useSession } from 'next-auth/react';
+
 import EncabezadoPagina from "@/components/sistema/EncabezadoPagina";
 import TarjetaAccion from "@/components/sistema/TarjetaAccion";
 import { useRouter } from 'next/navigation';
-import MemopsyLogo from "@/app/components/MemopsyLogo";
-import { Button } from "@/components/ui/button";
 import { TypographyP } from '@/components/ui/typography';
 import { Loader2, UserPlus, List, Edit3, Shield } from "lucide-react" // Added ShieldPlus, Settings2
 
@@ -52,12 +49,9 @@ const SUB_MODULOS_PERFILES: SubModuloConfig[] = [
 
 // This list is typically shared or fetched, here for structural context from usuarios/page.tsx
 
-
 export default function PerfilesPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [modulosPermitidos, setModulosPermitidos] = useState<ModuloConfig[]>([]);
   const [subModulosPerfilesPermitidos, setSubModulosPerfilesPermitidos] = useState<SubModuloConfig[]>([]);
 
   useEffect(() => {
@@ -70,34 +64,12 @@ export default function PerfilesPage() {
     if (session?.user?.permisos) {
       const userPermissions = session.user.permisos.map((p: any) => p.nombre);
 
-      const filteredMainModules = MODULOS_DISPONIBLES.filter(module =>
-        module.permisosRequeridos.some(pr => userPermissions.includes(pr))
-      );
-      setModulosPermitidos(filteredMainModules);
-
       const filteredSubModules = SUB_MODULOS_PERFILES.filter(subModule =>
         userPermissions.includes(subModule.permisoRequerido)
       );
       setSubModulosPerfilesPermitidos(filteredSubModules);
     }
   }, [session]);
-
-  const handleLogout = async () => {
-    await cerrarSesion();
-  };
-
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
-
-  const navigateToModule = (ruta: string) => {
-    router.push(ruta);
-    setIsMenuOpen(false); 
-  };
-
-  const navigateToSubModulo = (ruta: string) => {
-    router.push(ruta);
-  };
 
   if (status === 'loading') {
     return (
@@ -112,10 +84,6 @@ export default function PerfilesPage() {
     return null; 
   }
   
-  const nombreCompleto = session.user.persona
-    ? `${session.user.persona.nombre} ${session.user.persona.apellido}`
-    : session.user.email || 'Usuario';
-
 
   return (
     <div className="min-h-screen">

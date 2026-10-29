@@ -1,5 +1,5 @@
 // repositories/usuario.repository.ts
-import { Repository, DataSource, FindOptionsWhere, ILike } from 'typeorm';
+import { Repository, DataSource } from 'typeorm';
 import { UsuarioEntity } from '../entities/usuario.entity';
 import { UsuarioFiltersDto } from '../dto/usuario.dto';
 

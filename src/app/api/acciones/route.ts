@@ -3,8 +3,8 @@ import { NextRequest } from 'next/server';
 import { conAuditoria } from "@/lib/auditoria/con-auditoria"
 import { AccionController } from '@/lib/controllers/accion.controller'; // Adjust path if needed
 
-export async function GET(request: NextRequest) {
-  return AccionController.getAllAcciones(request);
+export async function GET() {
+  return AccionController.getAllAcciones();
 }
 
 async function manejarPOST(request: NextRequest) {

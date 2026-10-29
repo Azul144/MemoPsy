@@ -1,6 +1,6 @@
 // dto/informe.dto.ts
 import { IsString, IsNotEmpty, IsUUID, IsOptional, MinLength, MaxLength, IsBoolean, IsDateString } from 'class-validator';
-import { Type, Transform } from 'class-transformer';
+import { Transform } from 'class-transformer';
 import { PsicologoResponseDto } from '@/dto/psicologo.dto';
 
 // DTO para crear un informe
@@ -77,8 +77,6 @@ export class InformeResponseDto {
   fechaCreacion: Date;
   esPrivado: boolean;
   psicologo?: PsicologoResponseDto;
-  //createdAt: Date;
-  //updatedAt: Date;
 
   constructor(partial: Partial<InformeResponseDto>) {
     Object.assign(this, partial);

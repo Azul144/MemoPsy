@@ -17,7 +17,7 @@ type Props = {
 
 type Paso = "cargando" | "qr" | "codigos" | "error";
 
-export default function MfaSetupModal({ isOpen, onClose, onSuccess }: Props) {
+export default function ModalActivarMfa({ isOpen, onClose, onSuccess }: Props) {
   const [paso, setPaso] = useState<Paso>("cargando");
   const [qr, setQr] = useState("");
   const [secreto, setSecreto] = useState("");

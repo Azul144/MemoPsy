@@ -1,4 +1,6 @@
-// lib/controllers/psicologo.controller.ts
+// src/lib/controllers/psicologo.controller.ts
+// Controlador de los psicólogos (patrón Repositorio, apartado 8.4.2 del TIF).
+// Recibe el pedido desde la ruta de la API, controla la sesión y delega las reglas de negocio en PsicologoService.
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth-config';
@@ -31,12 +33,6 @@ export class PsicologoController {
       }
 
       // Example permission check (adjust as needed)
-      // const hasPermission = session.user.permisos?.some(
-      //   p => p.modulo.nombre === 'Psicologos' && p.accion.nombre === 'Crear'
-      // );
-      // if (!hasPermission) {
-      //   return NextResponse.json({ success: false, error: 'No tenés permisos para crear psicólogos' }, { status: 403 });
-      // }
 
       const body = await request.json();
       const createPsicologoDto = plainToClass(CreatePsicologoDto, body);
@@ -74,12 +70,6 @@ export class PsicologoController {
       }
 
       // Example permission check (adjust as needed)
-      // const hasPermission = session.user.permisos?.some(
-      //   p => p.modulo.nombre === 'Psicologos' && p.accion.nombre === 'Crear'
-      // );
-      // if (!hasPermission) {
-      //   return NextResponse.json({ success: false, error: 'No tenés permisos para crear psicólogos' }, { status: 403 });
-      // }
 
       const body = await request.json();
       // Ensure nested persona data is correctly transformed and validated
@@ -124,24 +114,6 @@ export class PsicologoController {
       }
 
       // Example permission check
-      // const hasPermission = session.user.permisos?.some(
-      //   p => p.modulo.nombre === 'Psicologos' && p.accion.nombre === 'Ver'
-      // );
-      // if (!hasPermission) {
-      //   return NextResponse.json({ success: false, error: 'No tenés permisos para ver psicólogos' }, { status: 403 });
-      // }
-
-
-      /*
-      const { searchParams } = new URL(request.url);
-      const queryParams = Object.fromEntries(searchParams.entries());
-      // Parse page and limit to numbers, provide defaults
-      queryParams.page = parseInt(queryParams.page || '1', 10);
-      queryParams.limit = parseInt(queryParams.limit || '10', 10);
-      
-      const queryDto = plainToClass(PsicologoQueryDto, queryParams, { enableImplicitConversion: true });
-
-      */
 
       const { searchParams } = new URL(request.url);
       const queryParams = Object.fromEntries(searchParams.entries());
@@ -187,8 +159,6 @@ export class PsicologoController {
       }
 
       // Example permission check (adjust as needed)
-      // const hasPermission = session.user.permisos?.some(p => p.modulo.nombre === 'Psicologos' && p.accion.nombre === 'Ver');
-      // if (!hasPermission) { ... }
 
       const psicologo = await psicologoService.findById(id);
       return NextResponse.json({ success: true, data: psicologo });
@@ -219,8 +189,6 @@ export class PsicologoController {
       }
 
       // Example permission check
-      // const hasPermission = session.user.permisos?.some(p => p.modulo.nombre === 'Psicologos' && p.accion.nombre === 'Editar');
-      // if (!hasPermission) { ... }
 
       const body = await request.json();
       const updatePsicologoDto = plainToClass(UpdatePsicologoDto, body);
@@ -267,14 +235,8 @@ export class PsicologoController {
       }
 
       // Example permission check
-      // const hasPermission = session.user.permisos?.some(p => p.modulo.nombre === 'Psicologos' && p.accion.nombre === 'Eliminar');
-      // if (!hasPermission) { ... }
       
       // Optional: Check if psicologo can be deleted (e.g., no active sessions)
-      // const canDeleteStatus = await psicologoService.canDelete(id);
-      // if (!canDeleteStatus.canDelete) {
-      //   return NextResponse.json({ success: false, error: canDeleteStatus.reason || 'No se puede eliminar el psicólogo' }, { status: 409 });
-      // }
 
       await psicologoService.delete(id);
       return NextResponse.json({ success: true, message: 'Psicólogo eliminado exitosamente' });
@@ -285,9 +247,6 @@ export class PsicologoController {
         return NextResponse.json({ success: false, error: error.message }, { status: 404 });
       }
       // Handle other specific deletion constraints if necessary
-      // if (error.message.includes('tiene sesiones activas')) {
-      //   return NextResponse.json({ success: false, error: error.message }, { status: 409 });
-      // }
       return NextResponse.json(
         { success: false, error: error.message || 'Error interno del servidor' },
         { status: 500 }

@@ -1,5 +1,7 @@
 "use client";
 
+// src/components/landing/Contacto.tsx
+// Sitio público: formulario para pedir una demostración.
 import { useState, type FormEvent } from "react";
 
 const pasos = [

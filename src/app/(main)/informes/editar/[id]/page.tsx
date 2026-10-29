@@ -3,14 +3,11 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { MODULOS_DISPONIBLES, type ModuloConfig } from "@/config/modulos";
-import { useSession, signOut } from 'next-auth/react';
-import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
+import { useSession } from 'next-auth/react';
 import EncabezadoPagina from "@/components/sistema/EncabezadoPagina";
 import DictadoVoz from "@/components/sistema/DictadoVoz";
 import PropuestaIA from "@/components/sistema/PropuestaIA";
 import { useRouter, useParams } from 'next/navigation';
-import MemopsyLogo from '@/app/components/MemopsyLogo';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -48,8 +45,6 @@ interface FormErrors {
   general?: string;
 }
 
-
-
 export default function EditarInformePage() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -57,9 +52,6 @@ export default function EditarInformePage() {
   const informeId = params?.id as string | undefined;
 
   // Navbar states
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [modulosPermitidos, setModulosPermitidos] = useState<ModuloConfig[]>([]);
-  const [nombreCompletoNav, setNombreCompletoNav] = useState('');
   const [loadingPermissions, setLoadingPermissions] = useState(true);
 
   // Form states
@@ -123,11 +115,6 @@ export default function EditarInformePage() {
     } else if (status === 'authenticated' && session?.user) {
         const userPermissions = session.user.permisos.map((p: any) => p.nombre);
         // Navbar permissions
-        const filteredMainModules = MODULOS_DISPONIBLES.filter(module =>
-            module.permisosRequeridos.some(pr => userPermissions.includes(pr))
-        );
-        setModulosPermitidos(filteredMainModules);
-        setNombreCompletoNav(session.user.persona?.nombreCompleto || session.user.email || 'Usuario');
         setLoadingPermissions(false);
 
         // Page content and specific permissions
@@ -189,16 +176,11 @@ export default function EditarInformePage() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [popoverRef]);
 
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-  const navigateToModule = (ruta: string) => { router.push(ruta); setIsMenuOpen(false); };
-  const handleLogout = async () => { await cerrarSesion(); };
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
     if (formErrors[name as keyof FormErrors]) setFormErrors(prev => ({ ...prev, [name]: undefined }));
   };
-
 
   // Lo dictado se suma al final de lo que ya está escrito, nunca lo reemplaza.
   const agregarDictado = (texto: string) => {

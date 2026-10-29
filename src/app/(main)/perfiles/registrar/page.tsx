@@ -1,22 +1,17 @@
 "use client"
 
 import { useState, useEffect, type ChangeEvent, type FormEvent } from "react"
-import { MODULOS_DISPONIBLES, type ModuloConfig } from "@/config/modulos";
-import { useSession, signOut } from "next-auth/react"
-import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
+import { useSession } from "next-auth/react"
 import EncabezadoPagina from "@/components/sistema/EncabezadoPagina";
 import { useRouter } from "next/navigation"
-import MemopsyLogo from "@/app/components/MemopsyLogo"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { ShieldPlus, AlertCircle, KeyRound, CheckCircle } from "lucide-react"
-
-
 
 interface PerfilFormData {
   nombre: string
@@ -49,7 +44,6 @@ export default function RegistrarPerfilPage() {
     descripcion: "",
   })
 
-  const [allPermisosList, setAllPermisosList] = useState<PermisoFromAPI[]>([])
   const [groupedPermisos, setGroupedPermisos] = useState<GroupedPermisos>({})
   const [selectedPermisoIds, setSelectedPermisoIds] = useState<Set<string>>(new Set())
   const [isLoadingPermisos, setIsLoadingPermisos] = useState(false)
@@ -59,8 +53,6 @@ export default function RegistrarPerfilPage() {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [modulosPermitidosNav, setModulosPermitidosNav] = useState<ModuloConfig[]>([])
   const [hasPermissionPage, setHasPermissionPage] = useState<boolean | null>(null)
 
   useEffect(() => {
@@ -84,10 +76,6 @@ export default function RegistrarPerfilPage() {
         setError("No tenés permiso para registrar perfiles.")
       }
 
-      const filteredNavModules = MODULOS_DISPONIBLES.filter((module) =>
-        module.permisosRequeridos.some((pr) => userPermissions.includes(pr)),
-      )
-      setModulosPermitidosNav(filteredNavModules)
     } else if (status === "authenticated" && !session?.user?.permisos) {
       setHasPermissionPage(false)
       setError("No se pudieron verificar los permisos del usuario.")
@@ -105,7 +93,6 @@ export default function RegistrarPerfilPage() {
       }
 
       const permisos: PermisoFromAPI[] = await response.json()
-      setAllPermisosList(permisos)
 
       const grouped = permisos.reduce((acc, permiso) => {
         const modulo = permiso.modulo || "General"
@@ -193,7 +180,7 @@ export default function RegistrarPerfilPage() {
         throw new Error(errorData.message || "Error al registrar el perfil.")
       }
 
-      const result = await response.json()
+      await response.json()
       setSuccess(
         `Perfil "${perfilDataToSend.nombre}" registrado exitosamente con ${perfilDataToSend.permisos.length} permisos.`,
       )
@@ -222,13 +209,6 @@ export default function RegistrarPerfilPage() {
     setSuccess(null)
   }
 
-  const handleLogout = async () => await cerrarSesion()
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen)
-  const navigateToModule = (ruta: string) => {
-    router.push(ruta)
-    setIsMenuOpen(false)
-  }
-
   if (status === "loading" || hasPermissionPage === null) {
     return (
       <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: "var(--background)" }}>
@@ -251,10 +231,6 @@ export default function RegistrarPerfilPage() {
       </div>
     )
   }
-
-  const nombreCompleto = session?.user?.persona
-    ? `${session.user.persona.nombre} ${session.user.persona.apellido}`
-    : session?.user?.email || "Usuario"
 
   return (
     <div className="min-h-screen">

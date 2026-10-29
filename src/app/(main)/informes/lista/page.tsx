@@ -1,22 +1,18 @@
 "use client";
 
-import { Suspense, useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { MODULOS_DISPONIBLES, type ModuloConfig } from "@/config/modulos";
-import { useSession, signOut } from 'next-auth/react';
-import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
+import { Suspense, useState, useEffect, useCallback, useRef } from 'react';
+import { useSession } from 'next-auth/react';
 import EncabezadoPagina from "@/components/sistema/EncabezadoPagina";
 import { useRouter, useSearchParams } from 'next/navigation';
-import MemopsyLogo from '@/app/components/MemopsyLogo';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from "@/components/ui/badge";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
-import { TypographyH1, TypographyH2, TypographyP, TypographySmall } from '@/components/ui/typography';
-import { Brain, Search, Filter, Edit, Eye, FileText as MainModuleIcon, User, Loader2, AlertTriangle, XCircle, Lock, Unlock, PlusCircle, UserCheck } from "lucide-react"
+import { TypographyH1, TypographyP, TypographySmall } from '@/components/ui/typography';
+import { Brain, Search, Edit, Eye, FileText as MainModuleIcon, User, Loader2, AlertTriangle, XCircle, Lock, Unlock, PlusCircle, UserCheck } from "lucide-react"
 import { cn } from "@/lib/utils";
 
 // Interfaces
@@ -50,8 +46,6 @@ interface SortingState {
   sortOrder: 'asc' | 'desc';
 }
 
-
-
 // Next pide envolver en <Suspense> a los componentes que leen la URL con useSearchParams
 export default function ListaInformesPage() {
   return (
@@ -67,9 +61,6 @@ function ListaInformes() {
   const searchParams = useSearchParams();
 
   // Navbar states
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [modulosPermitidos, setModulosPermitidos] = useState<ModuloConfig[]>([]);
-  const [nombreCompletoNav, setNombreCompletoNav] = useState('');
   const [loadingPermissions, setLoadingPermissions] = useState(true);
 
   // User role states
@@ -345,11 +336,6 @@ function ListaInformes() {
       }
 
       // Navbar permissions
-      const filteredMainModules = MODULOS_DISPONIBLES.filter(module =>
-        module.permisosRequeridos.some(pr => userPermisos.includes(pr))
-      );
-      setModulosPermitidos(filteredMainModules);
-      setNombreCompletoNav(session.user.persona?.nombreCompleto || session.user.email || 'Usuario');
       setLoadingPermissions(false);
     }
   }, [session, status, router, searchParams]);
@@ -426,10 +412,6 @@ function ListaInformes() {
     setFiltersPsicologo({ pacienteQuery: pacienteSearchInput, etiquetaQuery: etiquetaInput.trim(), palabraQuery: palabraInput.trim() });
     setPaginationPsicologo(prev => ({ ...prev, currentPage: 1 }));
   }
-
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-  const navigateToModule = (ruta: string) => { router.push(ruta); setIsMenuOpen(false); };
-  const handleLogout = async () => { await cerrarSesion(); };
 
   // Render Logic
   if (status === 'loading' || loadingPermissions || hasPermissionToViewPage === null) {

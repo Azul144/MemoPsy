@@ -243,7 +243,7 @@ async function manejarPOST(request: NextRequest) {
         persona: personaGuardada,
       })
 
-      const psicologoGuardado = await psicologoRepo.save(nuevoPsicologo)
+      await psicologoRepo.save(nuevoPsicologo)
     }
 
     // Procesar rol de paciente
@@ -269,7 +269,7 @@ async function manejarPOST(request: NextRequest) {
         obraSocial: obraSocial,
       })
 
-      const pacienteGuardado = await pacienteRepo.save(nuevoPaciente)
+      await pacienteRepo.save(nuevoPaciente)
     }
 
     // Confirmar transacción si todo está bien

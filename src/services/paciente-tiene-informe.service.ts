@@ -70,7 +70,8 @@ export class PacienteTieneInformeService {
           : undefined
       });
 
-      const relacionModel = new PacienteTieneInforme({
+      // Se arma el modelo solo para validar los datos: el constructor lanza un error si no son válidos
+      new PacienteTieneInforme({
         pacienteId: createDto.pacienteId,
         informeId: createDto.informeId,
         paciente: pacienteModel,
@@ -78,7 +79,7 @@ export class PacienteTieneInformeService {
       });
 
       // Crear la relación en el repositorio
-      const relacionEntity = await this.pacienteTieneInformeRepository.create({
+      await this.pacienteTieneInformeRepository.create({
         pacienteId: createDto.pacienteId,
         informeId: createDto.informeId
       });

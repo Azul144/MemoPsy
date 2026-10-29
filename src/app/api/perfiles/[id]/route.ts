@@ -9,7 +9,7 @@ import { Perfil } from "@/models/perfil.model"
 
 // GET /api/perfiles/[id] - Obtener perfil específico
 export async function GET(request: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
-  const params = await paramsPromise;
+  await paramsPromise;
   try {
     const session = await getServerSession(authConfig)
 
@@ -84,7 +84,7 @@ export async function GET(request: NextRequest, { params: paramsPromise }: { par
 
 // DELETE /api/perfiles/[id] - Eliminar perfil
 async function manejarDELETE(request: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
-  const params = await paramsPromise;
+  await paramsPromise;
   try {
     const session = await getServerSession(authConfig)
 
@@ -148,7 +148,7 @@ async function manejarDELETE(request: NextRequest, { params: paramsPromise }: { 
 
 // PUT /api/perfiles/[id] - Actualizar perfil
 async function manejarPUT(request: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
-  const params = await paramsPromise;
+  await paramsPromise;
   try {
     const session = await getServerSession(authConfig)
 
@@ -295,7 +295,6 @@ async function manejarPUT(request: NextRequest, { params: paramsPromise }: { par
     return NextResponse.json({ message: "Error interno del servidor" }, { status: 500 })
   }
 }
-
 
 // RF 1.4 - Registro de auditoría de esta ruta
 export const PUT = conAuditoria(manejarPUT, { modulo: "Perfiles", accion: "EDITAR", detalle: "Edición de perfil y sus permisos" })

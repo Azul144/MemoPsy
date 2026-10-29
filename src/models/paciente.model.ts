@@ -53,14 +53,5 @@ export class Paciente extends Base {
             // No incluimos relaciones aquí
         };
     }
-    /*toEntity(): PacienteEntity {
-        const entity = new PacienteEntity();
-        entity.id = this.id;
-        entity.persona = this._persona.toEntity();
-        entity.obraSocial = this._obraSocial.toEntity();
-        entity.informes = this._informes.map(informe => informe.toEntity());
-        entity.sesiones = this._sesiones.map(sesion => sesion.toEntity());
-        return entity;
-    }
-        */
+
 }

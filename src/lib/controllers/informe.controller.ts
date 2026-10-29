@@ -1,4 +1,6 @@
 // src/lib/controllers/informe.controller.ts
+// Controlador de las notas clínicas (informes) (patrón Repositorio, apartado 8.4.2 del TIF).
+// Recibe el pedido desde la ruta de la API, controla la sesión y delega las reglas de negocio en InformeService.
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth-config';
@@ -120,7 +122,6 @@ export class InformeController {
             return NextResponse.json({ error: 'No podés crear informes para otros psicólogos.' }, { status: 403 });
         }
       }
-
 
       const createInformeDto: CreateInformeDto = body;
       const nuevoInforme = await informeService.create(createInformeDto);

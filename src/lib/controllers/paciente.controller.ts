@@ -1,4 +1,6 @@
 // src/lib/controllers/paciente.controller.ts
+// Controlador de los pacientes (patrón Repositorio, apartado 8.4.2 del TIF).
+// Recibe el pedido desde la ruta de la API, controla la sesión y delega las reglas de negocio en PacienteService.
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth-config';
@@ -105,20 +107,9 @@ export class PacienteController {
       );
 
       // Get the patient by persona ID
-      //const paciente = await pacienteService.findByPersonaId(session.user.persona.id);
-      //if (!paciente) {
-      //  return NextResponse.json({ error: 'No es un paciente autorizado' }, { status: 401 });
-      //}
 
         // Check if the user is a psicologo and has access to the patient
-        // const psicologo = await psicologoService.findByPersonaId(session.user.persona.id);
-        // if (!psicologo) {
-        //   return NextResponse.json({ error: 'No es un psicólogo autorizado' }, { status: 401 });
-        // }
-        // const isAssignedPsicologo = paciente.psicologoId === psicologo.id; // Assuming paciente has psicologoId
-        // const isAssignedPsicologo = paciente.psicologoId === psicologo.id; // Assuming paciente has psicologoId
         // Check if the user is the patient themselves
-        // const isSelf = paciente.id === session.user.pacienteId; // Assuming paciente has id and session has pacienteId
 
       const userPaciente = await pacienteService.getPacienteByPersonaId(session.user.persona.id); 
       const isSelf = userPaciente && userPaciente.id === id; 

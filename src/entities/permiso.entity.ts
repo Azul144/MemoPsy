@@ -1,5 +1,5 @@
 // permiso.entity.ts
-import { Column, Entity, ManyToOne, JoinColumn, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, JoinColumn, PrimaryGeneratedColumn } from "typeorm";
 import { BaseEntity } from "./base-entity";
 import { ModuloEntity } from "./modulo.entity";
 import { AccionEntity } from "./accion.entity";

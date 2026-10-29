@@ -1,6 +1,5 @@
 // services/estado.service.ts
 import { validate } from 'class-validator';
-import { Estado } from '../models/estado.model';
 import { IEstadoRepository } from '../repositories/estado.repository';
 import { CreateEstadoDto, UpdateEstadoDto, EstadoResponseDto } from '../dto/estado.dto';
 

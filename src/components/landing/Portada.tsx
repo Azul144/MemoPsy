@@ -1,6 +1,8 @@
+// src/components/landing/Portada.tsx
+// Sitio público: portada con la propuesta de MemoPsy y los botones de demostración e inicio de sesión.
 import Image from "next/image";
 import Link from "next/link";
-import FondoAnimado from "@/components/FondoAnimado";
+import FondoAnimado from "@/components/comunes/FondoAnimado";
 import { CalendarClock, Lock, Mail, ShieldCheck, KeyRound } from "lucide-react";
 
 // Tarjetitas que "flotan" sobre la foto: muestran lo que hace el sistema

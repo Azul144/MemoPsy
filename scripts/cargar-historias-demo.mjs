@@ -1,5 +1,5 @@
 // Agrega las historias clínicas de demostración (datos FICTICIOS) a una base que ya tiene la demo cargada.
-// No toca las historias que ya existan. Antes, correr scripts/migracion-historia-clinica.sql.
+// No toca las historias que ya existan. Antes, correr scripts/migraciones/migracion-historia-clinica.sql.
 //   node --env-file=.env.local scripts/cargar-historias-demo.mjs
 //   docker compose exec app node scripts/cargar-historias-demo.mjs
 import { createCipheriv, randomBytes } from "node:crypto"
