@@ -5,7 +5,7 @@
 
 import { use, useEffect, useState } from "react";
 import Link from "next/link";
-import { AlertCircle, CheckCircle2, Download, Loader2, Lock, NotebookPen, Save } from "lucide-react";
+import { AlertCircle, CheckCircle2, Download, Flag, Loader2, Lock, NotebookPen, Save } from "lucide-react";
 import EncabezadoPagina from "@/components/sistema/EncabezadoPagina";
 import DictadoVoz from "@/components/sistema/DictadoVoz";
 import { Button } from "@/components/ui/button";
@@ -80,9 +80,9 @@ function formularioDesde(historia: DatosPagina["historia"]): Formulario {
 
 const estiloCampo = "bg-background text-foreground border-borde-fuerte focus:border-dorado";
 
-function Seccion({ numero, titulo, children, descripcion }: { numero: number; titulo: string; descripcion?: string; children: React.ReactNode }) {
+function Seccion({ id, numero, titulo, children, descripcion }: { id?: string; numero: number; titulo: string; descripcion?: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-2xl border border-borde bg-card p-6">
+    <section id={id} className="scroll-mt-24 rounded-2xl border border-borde bg-card p-6">
       <h2 className="text-xl font-semibold text-dorado">
         {numero}. {titulo}
       </h2>
@@ -190,6 +190,12 @@ export default function HistoriaClinicaPage({ params }: { params: Promise<{ id: 
   const tieneHistoria = Boolean(datos.historia);
   const edad = paciente.fechaNacimiento ? edadEn(paciente.fechaNacimiento) : null;
 
+  // Baja hasta el apartado 4 y deja el cursor en la fecha de cierre
+  const irAlCierre = () => {
+    document.getElementById("cierre")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    document.getElementById("fechaCierre")?.focus({ preventScroll: true });
+  };
+
   return (
     <div className="min-h-screen">
       <main className="mx-auto w-full max-w-4xl px-6 py-10">
@@ -199,6 +205,16 @@ export default function HistoriaClinicaPage({ params }: { params: Promise<{ id: 
           volverA="/informes/historias"
           textoVolver="Volver a Historias clínicas"
         >
+          {tieneHistoria && !datos.historia?.fechaCierre && (
+            <Button
+              variant="outline"
+              className="border-dorado text-dorado hover:bg-primary hover:text-primary-foreground"
+              onClick={irAlCierre}
+            >
+              <Flag className="mr-2 h-4 w-4" />
+              Cerrar tratamiento
+            </Button>
+          )}
           {tieneHistoria && (
             <Button asChild className="bg-primary text-primary-foreground hover:bg-opacity-80">
               <a href={`/api/historias-clinicas/${id}/pdf`}>
@@ -330,7 +346,7 @@ export default function HistoriaClinicaPage({ params }: { params: Promise<{ id: 
             </Button>
           </Seccion>
 
-          <Seccion numero={4} titulo="Cierre del tratamiento" descripcion="Completalo solo cuando termine el tratamiento. Mientras tanto, la historia queda en curso.">
+          <Seccion id="cierre" numero={4} titulo="Cierre del tratamiento" descripcion="Completalo solo cuando termine el tratamiento. Mientras tanto, la historia queda en curso.">
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="fechaCierre" className="text-texto-2">Fecha de cierre</Label>
