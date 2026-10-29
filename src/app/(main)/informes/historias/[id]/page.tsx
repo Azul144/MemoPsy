@@ -383,7 +383,8 @@ export default function HistoriaClinicaPage({ params }: { params: Promise<{ id: 
             </div>
           </Seccion>
 
-          <div className="flex flex-wrap items-center justify-end gap-3 rounded-2xl border border-borde bg-card p-4">
+          {/* Fija abajo de la pantalla: el botón y el aviso se ven desde cualquier apartado */}
+          <div className="sticky bottom-4 z-10 flex flex-wrap items-center justify-end gap-3 rounded-2xl border border-borde bg-card p-4 shadow-lg shadow-black/30">
             {mensaje && (
               <p className={`mr-auto flex items-center gap-2 text-sm ${mensaje.tipo === "ok" ? "text-exito" : "text-aviso"}`}>
                 {mensaje.tipo === "ok" ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
