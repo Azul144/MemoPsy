@@ -431,7 +431,7 @@ export class SesionService implements ISesionService {
     }
   }
 
-  async cancelSesion(id: string, reason?: string): Promise<void> {
+  async cancelSesion(id: string): Promise<void> {
     try {
       // Buscar un estado "Cancelada" 
       const allEstados = await this.estadoService.getAllEstados();

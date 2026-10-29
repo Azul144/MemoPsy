@@ -1,4 +1,5 @@
-// app/components/NextAuthProvider.tsx
+// src/components/proveedores/NextAuthProvider.tsx
+// Envuelve la aplicación con el SessionProvider de NextAuth, para que las pantallas puedan leer la sesión con useSession().
 'use client'; // ¡Importante! Este componente debe ser cliente
 
 import { SessionProvider } from 'next-auth/react';

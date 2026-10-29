@@ -1,10 +1,10 @@
-import { type NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
 import { getServerSession } from "next-auth/next"
 import { authConfig } from "@/lib/auth/auth-config"
 import { initializeDatabase } from "@/lib/database"
 import { ModalidadEntity } from "@/entities"
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const session = await getServerSession(authConfig)
 

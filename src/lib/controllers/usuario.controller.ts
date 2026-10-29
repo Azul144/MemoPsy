@@ -1,4 +1,6 @@
-// lib/controllers/usuario.controller.ts
+// src/lib/controllers/usuario.controller.ts
+// Controlador de las cuentas de usuario (patrón Repositorio, apartado 8.4.2 del TIF).
+// Recibe el pedido desde la ruta de la API, controla la sesión y delega las reglas de negocio en UsuarioService.
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth-config';
@@ -12,34 +14,9 @@ import {
 } from '@/dto/usuario.dto';
 import { AppDataSource, initializeDatabase } from '@/lib/database';
 import { UsuarioEntity } from '@/entities/usuario.entity';
-import { PersonaEntity } from '@/entities/persona.entity';
-import { PsicologoEntity } from '@/entities/psicologo.entity';
-import { PacienteEntity } from '@/entities/paciente.entity';
-import { ObraSocialEntity } from '@/entities/obra-social.entity';
 import { PerfilEntity } from '@/entities/perfil.entity'; // Added
 import { UsuarioTienePerfilEntity } from '@/entities/usuario-tiene-perfil.entity'; // Added
 
-// Placeholder for DTOs if not formally defined in dto files for this step
-interface PersonaPatchDto {
-  nombre?: string;
-  apellido?: string;
-  dni?: string;
-  fecha_nacimiento?: string;
-}
-interface PsicologoPatchDto {
-  especialidad?: string;
-  numeroLicencia?: string;
-}
-interface PacientePatchDto {
-  idObraSocial?: string | null; // string from form, might need parsing to number
-}
-interface PatchUsuarioPayloadDto {
-  email?: string; // Assuming email might not be editable this way or handled carefully
-  activo?: boolean;
-  persona?: PersonaPatchDto;
-  psicologo?: PsicologoPatchDto | null; // Can be null to remove psicologo role
-  paciente?: PacientePatchDto | null;   // Can be null to remove paciente role
-}
 
 // Inicializar servicios (esto debería venir de tu contenedor de dependencias)
 const usuarioRepository = new UsuarioRepository(AppDataSource);
@@ -440,7 +417,7 @@ export class UsuarioController {
   }
 
   // GET /api/usuarios/me - Obtener datos del usuario actual
-  static async getCurrentUser(request: NextRequest) {
+  static async getCurrentUser() {
     try {
       const session = await getServerSession(authConfig);
       

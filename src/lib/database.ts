@@ -1,4 +1,5 @@
-// lib/database.ts
+// src/lib/database.ts
+// Conexión a MySQL con TypeORM: lista de entidades y una sola conexión compartida por toda la aplicación.
 import "reflect-metadata"
 import { DataSource } from "typeorm"
 import {

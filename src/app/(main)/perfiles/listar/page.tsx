@@ -1,24 +1,17 @@
 "use client"
 
 import { useState, useEffect, useMemo, type ChangeEvent } from "react"
-import { MODULOS_DISPONIBLES, type ModuloConfig } from "@/config/modulos";
-import { useSession, signOut } from "next-auth/react"
-
-import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
+import { useSession } from "next-auth/react"
 import EncabezadoPagina from "@/components/sistema/EncabezadoPagina";
 import { useRouter } from "next/navigation"
-import MemopsyLogo from "@/app/components/MemopsyLogo"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { TypographyP } from '@/components/ui/typography';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
-import { Users, Shield, Edit3, Trash2, MoreVertical, Search, AlertCircle, PlusCircle, Eye, Loader2 } from "lucide-react"
-
+import { Users, Shield, Edit3, Trash2, MoreVertical, Search, AlertCircle, PlusCircle, Loader2 } from "lucide-react"
 import { avisoExito, avisoError, confirmar } from "@/lib/avisos";
-
-
 
 interface PerfilActionPermissions {
   canView: boolean
@@ -51,8 +44,6 @@ export default function ListarPerfilesPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [modulosPermitidos, setModulosPermitidos] = useState<ModuloConfig[]>([])
 
   const [perfilActionPermissions, setPerfilActionPermissions] = useState<PerfilActionPermissions>({
     canView: false,
@@ -83,11 +74,6 @@ export default function ListarPerfilesPage() {
         canAssign: userPermissions.includes("Asignar Perfil"),
       })
 
-      const filteredMainModules = MODULOS_DISPONIBLES.filter((module) =>
-        module.permisosRequeridos.some((pr) => userPermissions.includes(pr)),
-      )
-      setModulosPermitidos(filteredMainModules)
-
       if (!canViewPerfiles) {
         setError("No tenés permiso para ver la lista de perfiles.")
         setIsLoading(false)
@@ -113,8 +99,8 @@ export default function ListarPerfilesPage() {
         try {
           const errorData = await response.json()
           errorMessage = errorData.message || errorMessage
-        } catch (e) {
-          /* Response was not JSON */
+        } catch {
+          /* La respuesta no era JSON */
         }
         throw new Error(errorMessage)
       }
@@ -172,17 +158,7 @@ export default function ListarPerfilesPage() {
     }
   }
 
-  const handleLogout = async () => await cerrarSesion()
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen)
-  const navigateToModule = (ruta: string) => {
-    router.push(ruta)
-    setIsMenuOpen(false)
-  }
   const navigateToRegister = () => router.push("/perfiles/registrar")
-
-  const nombreCompleto = session?.user?.persona
-    ? `${session.user.persona.nombre} ${session.user.persona.apellido}`
-    : session?.user?.email || "Usuario"
 
   const insigniasPermisos = (perfil: PerfilCompleto) => {
     const permisosPorModulo = perfil.permisos.reduce(

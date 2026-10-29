@@ -1,3 +1,5 @@
+// src/components/landing/Funciones.tsx
+// Sitio público: tarjetas con las funciones principales del sistema.
 import { Lock, FileText, CalendarDays, Bell, Mail } from "lucide-react";
 
 // Mosaico de funciones: cada tarjeta muestra una "mini pantalla" de lo que hace el sistema

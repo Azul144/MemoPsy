@@ -32,9 +32,6 @@ export class Psicologo extends Base {
     
     get numeroLicencia(): string { return this._numeroLicencia; }
     set numeroLicencia(value: string) {
-      //if (!this.validarFormatoLicencia(value)) {
-      //  throw new Error('Formato de licencia inválido');
-      //}
       if (!value || value.trim() === '') {
         throw new Error('El número de licencia no puede estar vacío');
       }

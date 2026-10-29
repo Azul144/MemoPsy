@@ -1,5 +1,5 @@
 // repositories/psicologo.repository.ts
-import { Repository, DataSource, FindManyOptions, FindOneOptions } from 'typeorm';
+import { Repository, DataSource } from 'typeorm';
 import { PsicologoEntity } from '../entities/psicologo.entity';
 import { PsicologoQueryDto } from '../dto/psicologo.dto';
 //import { AppDataSource } from '../lib/database';
@@ -109,7 +109,7 @@ export class PsicologoRepository {
     try {
       const result = await this.repository.delete(id);
       return (result.affected ?? 0) > 0;
-    } catch (error) {
+    } catch {
       return false;
     }
   }

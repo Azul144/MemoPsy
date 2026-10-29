@@ -1,6 +1,5 @@
 // services/modalidad.service.ts
 import { validate } from 'class-validator';
-import { Modalidad } from '../models/modalidad.model';
 import { IModalidadRepository } from '../repositories/modalidad.repository';
 import { CreateModalidadDto, UpdateModalidadDto, ModalidadResponseDto } from '../dto/modalidad.dto';
 

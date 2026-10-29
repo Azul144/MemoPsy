@@ -62,9 +62,6 @@ export class PsicologoResponseDto {
     this.persona = data.persona;
   }
 
-  //constructor(partial: Partial<PsicologoResponseDto>) {
-  //  Object.assign(this, partial);
-  //}
 }
 
 // DTO para consultas con filtros

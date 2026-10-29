@@ -185,7 +185,8 @@ export class PsicologoService {
         ...updateDto
       };
 
-      const psicologoModel = new Psicologo({
+      // Se arma el modelo solo para validar los datos: el constructor lanza un error si no son válidos
+      new Psicologo({
         id: existingPsicologo.id,
         especialidad: updatedData.especialidad,
         numeroLicencia: updatedData.numeroLicencia,
@@ -261,22 +262,5 @@ export class PsicologoService {
   }
 
   // Validar si un psicólogo puede ser eliminado (verificar dependencias)
-  /*
-  async canDelete(id: string): Promise<{ canDelete: boolean; reason?: string }> {
-    const psicologo = await this.psicologoRepository.findWithInformes(id);
-    if (!psicologo) {
-      return { canDelete: false, reason: 'Psicólogo no encontrado' };
-    }
 
-    // Verificar si tiene informes asociados
-    if (psicologo.informes && psicologo.informes.length > 0) {
-      return { 
-        canDelete: false, 
-        reason: `El psicólogo tiene ${psicologo.informes.length} informe(s) asociado(s)` 
-      };
-    }
-
-    return { canDelete: true };
-  }
-    */
 }

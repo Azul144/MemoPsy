@@ -1,5 +1,5 @@
 // repositories/informe.repository.ts
-import { Repository, DataSource, FindManyOptions, FindOneOptions, Between } from 'typeorm';
+import { Repository, DataSource, Between } from 'typeorm';
 import { InformeEntity } from '../entities/informe.entity';
 import { InformeQueryDto } from '../dto/informe.dto';
 //import { AppDataSource } from '../lib/database';
@@ -135,7 +135,7 @@ export class InformeRepository {
     try {
       const result = await this.repository.delete(id);
       return (result.affected ?? 0) > 0;
-    } catch (error) {
+    } catch {
       return false;
     }
   }

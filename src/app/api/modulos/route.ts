@@ -3,8 +3,8 @@ import { NextRequest } from 'next/server';
 import { conAuditoria } from "@/lib/auditoria/con-auditoria"
 import { ModuloController } from '@/lib/controllers/modulo.controller'; // Adjust path if needed
 
-export async function GET(request: NextRequest) {
-  return ModuloController.getAllModulos(request);
+export async function GET() {
+  return ModuloController.getAllModulos();
 }
 
 async function manejarPOST(request: NextRequest) {

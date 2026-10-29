@@ -1,4 +1,6 @@
 // src/lib/controllers/accion.controller.ts
+// Controlador de las acciones (patrón Repositorio, apartado 8.4.2 del TIF).
+// Recibe el pedido desde la ruta de la API, controla la sesión y delega las reglas de negocio en AccionService.
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth-config';
@@ -14,7 +16,7 @@ const accionService = new AccionService(accionRepository);
 export class AccionController {
 
   // GET /api/acciones - Obtener todas las acciones
-  static async getAllAcciones(request: NextRequest) {
+  static async getAllAcciones() {
     try {
       const session = await getServerSession(authConfig);
       if (!session?.user) {
@@ -27,12 +29,7 @@ export class AccionController {
         return NextResponse.json({ error: 'No tenés permisos para realizar esta acción' }, { status: 403 });
       }
 
-      // const { searchParams } = new URL(request.url);
       // AccionService.findAll() does not currently accept filters.
-      // const filters: any = {}; 
-      // if (searchParams.get('nombre')) {
-      //   filters.nombre = searchParams.get('nombre')!;
-      // }
       
       const acciones = await accionService.findAll(); // Changed from getAllAcciones(filters)
       return NextResponse.json({ success: true, data: acciones });

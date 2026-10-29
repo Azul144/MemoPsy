@@ -4,7 +4,7 @@
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { Loader2, Mail } from "lucide-react";
-import PantallaAcceso from "@/components/PantallaAcceso";
+import PantallaAcceso from "@/components/acceso/PantallaAcceso";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

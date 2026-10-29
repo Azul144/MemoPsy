@@ -1,4 +1,6 @@
 // src/lib/controllers/permiso.controller.ts
+// Controlador de los permisos (patrón Repositorio, apartado 8.4.2 del TIF).
+// Recibe el pedido desde la ruta de la API, controla la sesión y delega las reglas de negocio en PermisoService.
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth-config';
@@ -21,7 +23,7 @@ const permisoService = new PermisoService(permisoRepository, moduloRepository, a
 export class PermisoController {
 
   // GET /api/permisos - Obtener todos los permisos
-  static async getAllPermisos(request: NextRequest) {
+  static async getAllPermisos() {
     try {
       const session = await getServerSession(authConfig);
       if (!session?.user) {
@@ -35,11 +37,6 @@ export class PermisoController {
       }
 
       // PermisoService.findAll() does not currently accept a filter DTO.
-      // const { searchParams } = new URL(request.url);
-      // const filters: any = {}; 
-      // if (searchParams.get('nombre')) { filters.nombre = searchParams.get('nombre'); }
-      // if (searchParams.get('moduloId')) { filters.moduloId = searchParams.get('moduloId'); }
-      // if (searchParams.get('accionId')) { filters.accionId = searchParams.get('accionId'); }
       
       const permisos = await permisoService.findAll(); // Service method is findAll()
       return NextResponse.json({ success: true, data: permisos });

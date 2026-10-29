@@ -1,5 +1,8 @@
 "use client";
 
+// src/components/sistema/PropuestaIA.tsx
+// Botón «Ordenar con IA» (RF 2.3): pide la propuesta de estructura y la muestra al lado del texto original.
+// No reemplaza nada hasta que el psicólogo la acepta.
 import { useEffect, useState } from "react";
 import { AlertCircle, Check, Loader2, ShieldAlert, Sparkles, X } from "lucide-react";
 import { Button } from "@/components/ui/button";

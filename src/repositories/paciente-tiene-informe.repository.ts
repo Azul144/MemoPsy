@@ -214,7 +214,7 @@ export class PacienteTieneInformeRepository {
         informeId
       });
       return (result.affected ?? 0) > 0;
-    } catch (error) {
+    } catch {
       return false;
     }
   }

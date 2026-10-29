@@ -6,7 +6,6 @@ import { authConfig } from '@/lib/auth/auth-config'; // Assuming authConfig is i
 import { initializeDatabase } from '@/lib/database'; // Assuming db-initializer is in lib
 import { InformeEntity } from '@/entities/informe.entity';
 import { PacienteTieneInformeEntity } from '@/entities/paciente-tiene-informe.entity';
-import { PsicologoEntity } from '@/entities/psicologo.entity';
 import { PacienteEntity } from '@/entities/paciente.entity';
 import { AppDataSource } from '@/lib/database';
 import { In } from 'typeorm';
@@ -96,10 +95,6 @@ async function manejarGET(request: NextRequest, { params: paramsPromise }: { par
     // For example, an admin might have a specific role or different permission string.
     // For now, if it reaches here, it means the user has "Ver Informes" but isn't the psicologo owner or an authorized paciente.
     // A more specific check for an admin role could be added here if `session.user.roles` includes 'admin' for example.
-    // if (user.roles?.includes('Administrador')) { // Example, if roles are part of session
-    //   return NextResponse.json({ ...informe, pacientes });
-    // }
-
 
     return NextResponse.json({ message: "Acceso denegado a este informe específico" }, { status: 403 });
 
@@ -108,7 +103,6 @@ async function manejarGET(request: NextRequest, { params: paramsPromise }: { par
     return NextResponse.json({ message: 'Error interno del servidor' }, { status: 500 });
   }
 }
-
 
 async function manejarPUT(request: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
   const params = await paramsPromise;
@@ -229,10 +223,6 @@ async function manejarPUT(request: NextRequest, { params: paramsPromise }: { par
     return NextResponse.json({ message: 'Error interno del servidor', error: error.message }, { status: 500 });
   }
 }
-
-// export async function DELETE(request: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
-//   // ... implementation ...
-// }
 
 
 // RF 1.4 - Registro de auditoría de esta ruta

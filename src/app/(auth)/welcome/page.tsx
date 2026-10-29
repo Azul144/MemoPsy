@@ -3,20 +3,18 @@
 
 import { useState, useEffect } from 'react';
 import { MODULOS_DISPONIBLES, type ModuloConfig } from "@/config/modulos";
-import { useSession, signOut } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
 import { useRouter } from 'next/navigation';
-import FondoAnimado from "@/components/FondoAnimado";
+import FondoAnimado from "@/components/comunes/FondoAnimado";
 import CampanaNotificaciones from "@/components/sistema/CampanaNotificaciones";
 import BotonTema from "@/components/sistema/BotonTema";
 import { Button } from "@/components/ui/button";
 import { Menu, X, LogOut, HomeIcon, KeyRound, Loader2, ArrowRight, ShieldCheck, ShieldAlert } from "lucide-react"
-import MfaSetupModal from "@/components/mfa-setup-modal"; // Import the MFA setup modal
-import MfaDesactivarModal from "@/components/mfa-desactivar-modal";
+import ModalActivarMfa from "@/components/mfa/ModalActivarMfa";
+import ModalDesactivarMfa from "@/components/mfa/ModalDesactivarMfa";
 import toast from "react-hot-toast";
-import LogoMemoPsy from "@/components/LogoMemoPsy"
-
-
+import LogoMemoPsy from "@/components/comunes/LogoMemoPsy"
 
 export default function WelcomePage() {
   const { data: session, status, update: updateSession } = useSession(); // Added updateSession
@@ -29,9 +27,8 @@ export default function WelcomePage() {
   const [mfaEnabled, setMfaEnabled] = useState<boolean | null>(null); // null initially, then boolean
   const [loadingMfaStatus, setLoadingMfaStatus] = useState(true);
   const [mfaError, setMfaError] = useState<string | null>(null);
-  const [isTogglingMfa, setIsTogglingMfa] = useState(false);
+  const [isTogglingMfa] = useState(false);
   const [isDesactivarOpen, setIsDesactivarOpen] = useState(false);
-
 
   // Si el sistema la trajo acá porque intentó entrar a una sección sin permiso, se lo avisa
   useEffect(() => {
@@ -344,7 +341,7 @@ export default function WelcomePage() {
       {/* Ventanas de la verificación en dos pasos */}
       {session?.user && (
         <>
-          <MfaSetupModal
+          <ModalActivarMfa
             isOpen={isMfaModalOpen}
             onClose={() => {
               setIsMfaModalOpen(false);
@@ -352,7 +349,7 @@ export default function WelcomePage() {
             }}
             onSuccess={handleMfaSuccess}
           />
-          <MfaDesactivarModal
+          <ModalDesactivarMfa
             isOpen={isDesactivarOpen}
             onClose={() => setIsDesactivarOpen(false)}
             onSuccess={() => {

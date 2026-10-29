@@ -4,10 +4,8 @@ import { conAuditoria } from "@/lib/auditoria/con-auditoria"
 import { getServerSession } from "next-auth"
 import { authConfig } from "@/lib/auth/auth-config"
 import { initializeDatabase } from "@/lib/database"
-import { Perfil, PerfilTienePermiso, Permiso } from "@/models"
-
-// GET /api/perfiles - Obtener lista de perfiles
-export async function GET(request: NextRequest) {
+import { Perfil } from "@/models" // GET /api/perfiles - Obtener lista de perfiles
+export async function GET() {
   try {
     const session = await getServerSession(authConfig)
 
@@ -220,8 +218,6 @@ async function manejarPOST(request: NextRequest) {
     return NextResponse.json({ message: "Error interno del servidor" }, { status: 500 })
   }
 }
-
-
 
 // RF 1.4 - Registro de auditoría de esta ruta
 export const POST = conAuditoria(manejarPOST, { modulo: "Perfiles", accion: "CREAR", detalle: "Alta de perfil" })

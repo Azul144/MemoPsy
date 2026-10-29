@@ -2,16 +2,12 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { MODULOS_DISPONIBLES, type ModuloConfig } from "@/config/modulos";
-import { useSession, signOut } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 
-import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
 import EncabezadoPagina from "@/components/sistema/EncabezadoPagina";
 import TarjetaAccion from "@/components/sistema/TarjetaAccion";
 import { useRouter } from 'next/navigation';
-import MemopsyLogo from '@/app/components/MemopsyLogo';
-import { Button } from '@/components/ui/button';
-import { TypographyH1, TypographyP } from '@/components/ui/typography';
+import { TypographyP } from '@/components/ui/typography';
 import { FileText, PlusSquare, ListChecks, Loader2, ClipboardCheck, BookOpen } from "lucide-react"
 
 // Interfaces (identical to perfiles/page.tsx)
@@ -65,15 +61,11 @@ const SUB_MODULOS_INFORMES: SubModuloConfig[] = [
   },
 ];
 
-
 export default function GestionInformesPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
   // State variables (identical to perfiles/page.tsx)
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [modulosPermitidos, setModulosPermitidos] = useState<ModuloConfig[]>([]);
-  const [nombreCompleto, setNombreCompleto] = useState('');
   const [subModulosInformesPermitidos, setSubModulosInformesPermitidos] = useState<SubModuloConfig[]>([]);
   const [loadingPermissions, setLoadingPermissions] = useState(true); // To manage initial load
 
@@ -84,10 +76,6 @@ export default function GestionInformesPage() {
     } else if (status === 'authenticated' && session?.user) {
       const userPermissions = session.user.permisos.map((p: any) => p.nombre);
       
-      const filteredMainModules = MODULOS_DISPONIBLES.filter(module =>
-        module.permisosRequeridos.some(pr => userPermissions.includes(pr))
-      );
-      setModulosPermitidos(filteredMainModules);
 
       // Specific logic for Informes sub-modules
       const filteredSubModules = SUB_MODULOS_INFORMES.filter(subModule => {
@@ -108,7 +96,6 @@ export default function GestionInformesPage() {
       });
       setSubModulosInformesPermitidos(filteredSubModules);
       
-      setNombreCompleto(session.user.persona?.nombreCompleto || session.user.email || 'Usuario');
       setLoadingPermissions(false);
     } else if (status === 'loading') {
         setLoadingPermissions(true); // Ensure loading state while session is resolving
@@ -116,20 +103,6 @@ export default function GestionInformesPage() {
   }, [session, status, router]);
 
   // Utility functions (identical to perfiles/page.tsx)
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-
-  const navigateToModule = (ruta: string) => {
-    router.push(ruta);
-    setIsMenuOpen(false);
-  };
-
-  const navigateToSubModulo = (ruta: string) => {
-    router.push(ruta);
-  };
-
-  const handleLogout = async () => {
-    await cerrarSesion();
-  };
 
   // Loading state (identical to perfiles/page.tsx)
   if (loadingPermissions) { // Combines session loading and permission processing

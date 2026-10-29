@@ -3,7 +3,7 @@
 // y luces que se mueven de fondo (igual que el saludo del panel de bienvenida).
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import FondoAnimado from "@/components/FondoAnimado";
+import FondoAnimado from "@/components/comunes/FondoAnimado";
 
 export default function EncabezadoPagina({
   titulo,

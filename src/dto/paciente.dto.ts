@@ -28,21 +28,15 @@ export class UpdatePacienteDto {
 // DTO para la respuesta (lo que se devuelve al cliente)
 export class PacienteResponseDto {
   id: string;
-  //createdAt: Date;
-  //updatedAt: Date;
   persona: PersonaResponseDto;
   obraSocial: ObraSocialResponseDto;
 
   constructor(data: {
     id: string;
-    //createdAt: Date;
-    //updatedAt: Date;
     persona: PersonaResponseDto;
     obraSocial: ObraSocialResponseDto;
   }) {
     this.id = data.id;
-    //this.createdAt = data.createdAt;
-    //this.updatedAt = data.updatedAt;
     this.persona = data.persona;
     this.obraSocial = data.obraSocial;
   }

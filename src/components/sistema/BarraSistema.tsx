@@ -12,7 +12,7 @@ import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
 import { MODULOS_DISPONIBLES } from "@/config/modulos";
 import CampanaNotificaciones from "./CampanaNotificaciones";
 import BotonTema from "./BotonTema";
-import LogoMemoPsy from "@/components/LogoMemoPsy"
+import LogoMemoPsy from "@/components/comunes/LogoMemoPsy"
 
 export default function BarraSistema() {
   const { data: session } = useSession();

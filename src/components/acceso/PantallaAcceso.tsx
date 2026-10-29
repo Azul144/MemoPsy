@@ -5,8 +5,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ShieldCheck } from "lucide-react";
-import FondoAnimado from "@/components/FondoAnimado";
-import LogoMemoPsy from "@/components/LogoMemoPsy"
+import FondoAnimado from "@/components/comunes/FondoAnimado";
+import LogoMemoPsy from "@/components/comunes/LogoMemoPsy"
 
 export default function PantallaAcceso({ children }: { children: React.ReactNode }) {
   return (

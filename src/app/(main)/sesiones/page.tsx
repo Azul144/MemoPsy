@@ -1,11 +1,8 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { MODULOS_DISPONIBLES, type ModuloConfig } from "@/config/modulos";
-import { useSession, signOut } from "next-auth/react"
-import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
+import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
-import MemopsyLogo from "@/app/components/MemopsyLogo"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -88,18 +85,12 @@ interface Paciente {
   }
 }
 
-
-
 export default function SesionesPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [modulosPermitidos, setModulosPermitidos] = useState<ModuloConfig[]>([])
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [sesiones, setSesiones] = useState<Sesion[]>([])
-  const [psicologos, setPsicologos] = useState<Psicologo[]>([])
-  const [pacientes, setPacientes] = useState<Paciente[]>([])
   const [modalidades, setModalidades] = useState<any[]>([])
   const [estados, setEstados] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -382,10 +373,6 @@ const handleUpdateSesion = async () => {
       const userPermissions = session.user.permisos.map((p: any) => p.nombre)
       setPermisos(userPermissions)
 
-      const filteredMainModules = MODULOS_DISPONIBLES.filter((module) =>
-        module.permisosRequeridos.some((pr) => userPermissions.includes(pr)),
-      )
-      setModulosPermitidos(filteredMainModules)
     }
   }, [session])
 
@@ -603,19 +590,6 @@ const handleUpdateSesion = async () => {
       console.error("Error searching patients:", error)
       setSearchResults([])
     }
-  }
-
-  const handleLogout = async () => {
-    await cerrarSesion()
-  }
-
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen)
-  }
-
-  const navigateToModule = (ruta: string) => {
-    router.push(ruta)
-    setIsMenuOpen(false)
   }
 
   const handleSelectPsicologo = (psicologo: Psicologo) => {
@@ -963,13 +937,8 @@ const handleUpdateSesion = async () => {
     return null
   }
 
-  const nombreCompleto = session.user.persona
-    ? `${session.user.persona.nombre} ${session.user.persona.apellido}`
-    : session.user.email || "Usuario"
-
   const puedeRegistrarSesiones = permisos.includes("Registrar Sesión")
   const puedeVerSesiones = permisos.includes("Ver Sesiones")
-  const puedeAsignarProfesional = permisos.includes("Asignar Profesional")
 
   const defaultTabValue = puedeRegistrarSesiones
   ? "registrar"
@@ -990,7 +959,7 @@ const handleUpdateSesion = async () => {
           <Tabs
             defaultValue={defaultTabValue}
             className="w-full"
-            onValueChange={(value) => {
+            onValueChange={() => {
               // When changing tabs, we keep the same selected date
               // This ensures consistency across different views
             }}

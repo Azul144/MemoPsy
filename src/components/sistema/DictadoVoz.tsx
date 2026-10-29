@@ -1,5 +1,8 @@
 "use client";
 
+// src/components/sistema/DictadoVoz.tsx
+// Botón de dictado por voz (RF 2.2): usa la Web Speech API del navegador y suma el texto reconocido a la nota.
+// El audio nunca llega a MemoPsy: la transcripción la hace el navegador.
 import { useEffect, useRef, useState } from "react";
 import { AlertCircle, Mic, MicOff, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";

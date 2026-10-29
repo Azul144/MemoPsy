@@ -1,6 +1,4 @@
 // perfil.repository.ts
-//import { Injectable } from '@nestjs/common';
-//mport { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource, FindManyOptions, FindOneOptions } from 'typeorm';
 import { PerfilEntity } from '../entities/perfil.entity';
 

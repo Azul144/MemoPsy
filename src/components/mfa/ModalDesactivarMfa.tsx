@@ -15,7 +15,7 @@ type Props = {
   onSuccess: () => void;
 };
 
-export default function MfaDesactivarModal({ isOpen, onClose, onSuccess }: Props) {
+export default function ModalDesactivarMfa({ isOpen, onClose, onSuccess }: Props) {
   const [codigo, setCodigo] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [cargando, setCargando] = useState(false);

@@ -1,18 +1,14 @@
 "use client"
 
 import { useState, useEffect, type ChangeEvent, type FormEvent } from "react"
-import { MODULOS_DISPONIBLES, type ModuloConfig } from "@/config/modulos";
-import { useSession, signOut } from "next-auth/react"
-
-import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
+import { useSession } from "next-auth/react"
 import EncabezadoPagina from "@/components/sistema/EncabezadoPagina";
 import { useRouter } from "next/navigation"
-import MemopsyLogo from "@/app/components/MemopsyLogo"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { AYUDA_CELULAR, normalizarCelular } from "@/lib/telefono"
 import { Label } from "@/components/ui/label"
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
+import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Brain, UserPlusIcon } from "lucide-react"
 import { Switch } from "@/components/ui/switch"
@@ -25,11 +21,9 @@ import { ObraSocial } from "@/models/obra-social.model"
 import { ESPECIALIDADES_PSICOLOGIA } from "@/lib/especialidades"
 
 import { avisoExito } from "@/lib/avisos";
-import InputPassword from "@/components/InputPassword"
-import RequisitosPassword from "@/components/RequisitosPassword"
+import InputPassword from "@/components/acceso/InputPassword"
+import RequisitosPassword from "@/components/acceso/RequisitosPassword"
 import { validarPassword } from "@/lib/validaciones/password"
-
-
 
 // Remover esta línea:
 // const OBRAS_SOCIALES_MOCK: ObraSocial[] = [...]
@@ -86,8 +80,6 @@ export default function RegistrarUsuarioPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [modulosPermitidos, setModulosPermitidos] = useState<ModuloConfig[]>([])
   const [hasPermission, setHasPermission] = useState<boolean | null>(null)
 
   // State for Obras Sociales
@@ -113,10 +105,6 @@ export default function RegistrarUsuarioPage() {
         setHasPermission(false)
       }
 
-      const filteredMainModules = MODULOS_DISPONIBLES.filter((module) =>
-        module.permisosRequeridos.some((pr) => userPermissions.includes(pr)),
-      )
-      setModulosPermitidos(filteredMainModules)
     } else if (status === "authenticated" && !session?.user?.permisos) {
       setHasPermission(false)
       setError("No se pudieron verificar los permisos del usuario.")
@@ -373,16 +361,6 @@ export default function RegistrarUsuarioPage() {
     setError(null)
   }
 
-  const handleLogout = async () => {
-    await cerrarSesion()
-  }
-
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen)
-  const navigateToModule = (ruta: string) => {
-    router.push(ruta)
-    setIsMenuOpen(false)
-  }
-
   // Render states
   if (status === "loading" || hasPermission === null) {
     return (
@@ -407,9 +385,6 @@ export default function RegistrarUsuarioPage() {
   }
 
   // Main content if user has permission
-  const nombreCompleto = session?.user?.persona
-    ? `${session.user.persona.nombre} ${session.user.persona.apellido}`
-    : session?.user?.email || "Usuario"
 
   return (
     <div className="min-h-screen">

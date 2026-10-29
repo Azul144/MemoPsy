@@ -1,6 +1,6 @@
 // dto/usuario.dto.ts
-import { IsString, IsNotEmpty, IsUUID, IsOptional, MinLength, MaxLength, IsEmail, IsBoolean, IsDateString, Matches } from 'class-validator';
-import { Transform, Type } from 'class-transformer';
+import { IsString, IsNotEmpty, IsUUID, IsOptional, MinLength, MaxLength, IsEmail, IsBoolean, Matches } from 'class-validator';
+import { Transform } from 'class-transformer';
 import { PersonaResponseDto } from './persona.dto';
 
 // DTO para crear un usuario
@@ -89,8 +89,6 @@ export class UsuarioResponseDto {
   email: string;
   activo: boolean;
   ultimoAcceso: Date;
-  //createdAt: Date;
-  //updatedAt: Date;
   persona?: PersonaResponseDto;
 
   constructor(data: {
@@ -98,16 +96,12 @@ export class UsuarioResponseDto {
     email: string;
     activo: boolean;
     ultimoAcceso: Date;
-    //createdAt: Date;
-    //updatedAt: Date;
     persona?: PersonaResponseDto;
   }) {
     this.id = data.id;
     this.email = data.email;
     this.activo = data.activo;
     this.ultimoAcceso = data.ultimoAcceso;
-    //this.createdAt = data.createdAt;
-    //this.updatedAt = data.updatedAt;
     this.persona = data.persona;
   }
 }

@@ -1,5 +1,5 @@
 // modalidad.entity.ts
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 import { BaseEntity } from "./base-entity";
 
 @Entity({ name: "modalidad" })

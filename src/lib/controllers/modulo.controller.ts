@@ -1,4 +1,6 @@
 // src/lib/controllers/modulo.controller.ts
+// Controlador de los módulos del sistema (patrón Repositorio, apartado 8.4.2 del TIF).
+// Recibe el pedido desde la ruta de la API, controla la sesión y delega las reglas de negocio en ModuloService.
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth-config';
@@ -16,7 +18,7 @@ const moduloService = new ModuloService(moduloRepository);
 export class ModuloController {
 
   // GET /api/modulos - Obtener todos los modulos
-  static async getAllModulos(request: NextRequest) {
+  static async getAllModulos() {
     try {
       const session = await getServerSession(authConfig);
       if (!session?.user) {
@@ -30,9 +32,6 @@ export class ModuloController {
       }
 
       // ModuloService.findAll() does not currently accept filters.
-      // const { searchParams } = new URL(request.url);
-      // const filters: any = {}; 
-      // if (searchParams.get('nombre')) { filters.nombre = searchParams.get('nombre'); }
       
       const modulos = await moduloService.findAll(); // Service method is findAll() and takes no filters
       return NextResponse.json({ success: true, data: modulos });

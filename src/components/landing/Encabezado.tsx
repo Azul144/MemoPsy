@@ -1,9 +1,11 @@
 "use client";
 
+// src/components/landing/Encabezado.tsx
+// Sitio público: barra superior con el logo, los enlaces a cada sección y el acceso al sistema.
 import Link from "next/link";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
-import LogoMemoPsy from "@/components/LogoMemoPsy"
+import LogoMemoPsy from "@/components/comunes/LogoMemoPsy"
 
 const links = [
   { href: "#funciones", texto: "Funciones" },

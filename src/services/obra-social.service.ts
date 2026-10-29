@@ -129,10 +129,6 @@ export class ObraSocialService {
     }
 
     // Aquí podrías agregar validaciones adicionales, como verificar si tiene pacientes asociados
-    // Por ejemplo: const pacientesAsociados = await this.pacienteRepository.findByObraSocialId(id);
-    // if (pacientesAsociados.length > 0) {
-    //   throw new Error('No se puede eliminar una obra social que tiene pacientes asociados');
-    // }
 
     return await this.obraSocialRepository.delete(id);
   }

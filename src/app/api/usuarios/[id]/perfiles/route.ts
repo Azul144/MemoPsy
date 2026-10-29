@@ -1,5 +1,5 @@
 // src/app/api/usuarios/[id]/perfiles/route.ts
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { conAuditoria } from "@/lib/auditoria/con-auditoria"
 import { UsuarioController } from '@/lib/controllers/usuario.controller';
 

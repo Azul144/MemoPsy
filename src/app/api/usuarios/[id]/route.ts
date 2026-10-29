@@ -368,8 +368,6 @@ async function manejarDELETE(request: NextRequest, { params: paramsPromise }: { 
   }
 }
 
-
-
 // RF 1.4 - Registro de auditoría de esta ruta
 export const PUT = conAuditoria(manejarPUT, { modulo: "Usuarios", accion: "EDITAR", detalle: "Edición de datos del usuario" })
 export const DELETE = conAuditoria(manejarDELETE, { modulo: "Usuarios", accion: "ELIMINAR", detalle: "Baja de usuario" })

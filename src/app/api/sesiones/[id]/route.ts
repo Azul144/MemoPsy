@@ -115,7 +115,6 @@ export async function GET(request: NextRequest, { params: paramsPromise }: { par
   }
 }
 
-
 async function manejarPUT(request: NextRequest, { params: paramsPromise }: { params: Promise<{ id: string }> }) {
   const params = await paramsPromise;
   try {
@@ -242,7 +241,6 @@ async function manejarPUT(request: NextRequest, { params: paramsPromise }: { par
         }
         updatedSesionEntity = sesionEntity; // Keep a reference to the updated entity
     });
-
 
     if (!updatedSesionEntity) {
         // This case should ideally not be reached if transaction logic is correct

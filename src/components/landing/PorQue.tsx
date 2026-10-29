@@ -1,5 +1,7 @@
+// src/components/landing/PorQue.tsx
+// Sitio público: sección «¿Por qué MemoPsy?», con el problema que resuelve el sistema.
 import Image from "next/image";
-import FondoAnimado from "@/components/FondoAnimado";
+import FondoAnimado from "@/components/comunes/FondoAnimado";
 
 export default function PorQue() {
   return (

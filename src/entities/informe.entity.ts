@@ -1,5 +1,5 @@
 // informe.entity.ts
-import { Column, Entity, ManyToOne, JoinColumn, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, JoinColumn, PrimaryGeneratedColumn } from "typeorm";
 import { BaseEntity } from "./base-entity";
 import { PsicologoEntity } from "./psicologo.entity";
 import { columnaCifrada } from "../lib/auth/columna-cifrada";
@@ -8,9 +8,6 @@ import { columnaCifrada } from "../lib/auth/columna-cifrada";
 export class InformeEntity extends BaseEntity {
   @PrimaryGeneratedColumn("increment", { type: "int", name: "id_informe" })
   id: string;
-
-  //@Column({ name: "id_psicologo" })
-  //psicologoId: string;
 
   @Column({ name: "titulo" })
   titulo: string;

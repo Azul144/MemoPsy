@@ -27,21 +27,15 @@ export class UpdateObraSocialDto {
 // DTO para la respuesta (lo que se devuelve al cliente)
 export class ObraSocialResponseDto {
   id: string;
-  //createdAt: Date;
-  //updatedAt: Date;
   nombre: string;
   activo: boolean;
 
   constructor(data: {
     id: string;
-    //createdAt: Date;
-    //updatedAt: Date;
     nombre: string;
     activo: boolean;
   }) {
     this.id = data.id;
-    //this.createdAt = data.createdAt;
-    //this.updatedAt = data.updatedAt;
     this.nombre = data.nombre;
     this.activo = data.activo;
   }

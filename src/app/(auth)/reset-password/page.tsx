@@ -5,11 +5,11 @@ import { Suspense, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { CheckCircle2, Loader2 } from "lucide-react";
-import PantallaAcceso from "@/components/PantallaAcceso";
+import PantallaAcceso from "@/components/acceso/PantallaAcceso";
 import { Button } from "@/components/ui/button";
-import InputPassword from "@/components/InputPassword";
+import InputPassword from "@/components/acceso/InputPassword";
 import { Label } from "@/components/ui/label";
-import RequisitosPassword from "@/components/RequisitosPassword";
+import RequisitosPassword from "@/components/acceso/RequisitosPassword";
 import { validarPassword } from "@/lib/validaciones/password";
 
 // Next pide envolver en <Suspense> a los componentes que leen la URL con useSearchParams

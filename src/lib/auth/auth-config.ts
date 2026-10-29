@@ -1,4 +1,6 @@
 // src/lib/auth/auth-config.ts
+// Configuración de NextAuth: inicio de sesión con email y contraseña (verificarLogin), contenido del token JWT
+// (persona, perfiles y permisos) y registro de los ingresos en la auditoría.
 import { NextAuthOptions, User as NextAuthUser } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import {

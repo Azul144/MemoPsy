@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 // Plus Jakarta Sans para todo el sistema
 import "@fontsource-variable/plus-jakarta-sans";
 import "./globals.css";
-import NextAuthProvider from "@/app/components/NextAuthProvider";
+import NextAuthProvider from "@/components/proveedores/NextAuthProvider";
 import { Toaster } from "react-hot-toast";
 
 // Aplica el modo elegido (claro u oscuro) antes de dibujar, para que no parpadee al cargar

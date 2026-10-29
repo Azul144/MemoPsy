@@ -2,17 +2,14 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { MODULOS_DISPONIBLES, type ModuloConfig } from "@/config/modulos";
-import { useSession, signOut } from 'next-auth/react';
-import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
+import { useSession } from 'next-auth/react';
 import EncabezadoPagina from "@/components/sistema/EncabezadoPagina";
 import { useRouter, useParams } from 'next/navigation';
-import MemopsyLogo from '@/app/components/MemopsyLogo';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { TypographyH1, TypographyH2, TypographyP, TypographySmall, TypographyMuted } from '@/components/ui/typography';
+import { TypographyH1, TypographyP, TypographySmall, TypographyMuted } from '@/components/ui/typography';
 import { FileText as PageIcon, User, Users, CalendarDays, Lock, Unlock, Loader2, AlertTriangle, Edit, Download } from "lucide-react"
 import { avisoError } from "@/lib/avisos";
 import SeccionSeguimiento from "@/components/informes/SeccionSeguimiento";
@@ -41,8 +38,6 @@ interface InformeDetalle {
   pacientes: PacienteDetalle[];
 }
 
-
-
 export default function DetalleInformePage() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -50,11 +45,7 @@ export default function DetalleInformePage() {
   const id = params?.id as string | undefined;
 
   // Navbar states
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [modulosPermitidos, setModulosPermitidos] = useState<ModuloConfig[]>([]);
-  const [nombreCompletoNav, setNombreCompletoNav] = useState('');
   const [loadingPermissions, setLoadingPermissions] = useState(true);
-
 
   // Page specific states
   const [informe, setInforme] = useState<InformeDetalle | null>(null);
@@ -94,11 +85,6 @@ export default function DetalleInformePage() {
     } else if (status === 'authenticated' && session?.user) {
         // Navbar permissions
         const userPermissions = session.user.permisos.map((p: any) => p.nombre);;
-        const filteredMainModules = MODULOS_DISPONIBLES.filter(module =>
-            module.permisosRequeridos.some(pr => userPermissions.includes(pr))
-        );
-        setModulosPermitidos(filteredMainModules);
-        setNombreCompletoNav(session.user.persona?.nombreCompleto || session.user.email || 'Usuario');
         setLoadingPermissions(false); // Navbar permissions loaded
 
         // Page content fetching
@@ -138,11 +124,6 @@ export default function DetalleInformePage() {
         setIsLoadingData(true);
     }
   }, [id, status, session, router]);
-
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-  const navigateToModule = (ruta: string) => { router.push(ruta); setIsMenuOpen(false); };
-  const handleLogout = async () => { await cerrarSesion(); };
-
 
   if (loadingPermissions || isLoadingData) {
     return (

@@ -1,11 +1,12 @@
 // src/lib/controllers/estado.controller.ts
+// Controlador de los estados del turno (patrón Repositorio, apartado 8.4.2 del TIF).
+// Recibe el pedido desde la ruta de la API, controla la sesión y delega las reglas de negocio en EstadoService.
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authConfig } from '@/lib/auth/auth-config';
 import { EstadoService } from '@/services/estado.service';
 import { EstadoRepository } from '@/repositories/estado.repository';
 import { initializeDatabase } from '@/lib/database';
-import { EstadoEntity } from '@/entities/estado.entity';
 import { CreateEstadoDto, UpdateEstadoDto } from '@/dto/estado.dto';
 
 // Crea el servicio en el momento de usarlo, con la base ya conectada
@@ -17,7 +18,7 @@ async function obtenerServicio() {
 export class EstadoController {
 
   // GET /api/estados - Obtener todos los estados
-  static async getAllEstados(request: NextRequest) {
+  static async getAllEstados() {
     try {
       const session = await getServerSession(authConfig);
       if (!session?.user) {
@@ -31,11 +32,6 @@ export class EstadoController {
       }
 
       // EstadoService.getAllEstados() does not currently accept filters.
-      // const { searchParams } = new URL(request.url);
-      // const filters: any = {}; 
-      // if (searchParams.get('nombre')) {
-      //   filters.nombre = searchParams.get('nombre')!;
-      // }
       
       const estados = await (await obtenerServicio()).getAllEstados();
       return NextResponse.json({ success: true, data: estados });
@@ -97,9 +93,6 @@ export class EstadoController {
       const { id } = params;
       const estado = await (await obtenerServicio()).getEstadoById(id);
       // Service method throws error if not found, so an explicit check here might be redundant
-      // if (!estado) { 
-      //   return NextResponse.json({ success: false, error: 'Estado no encontrado' }, { status: 404 });
-      // }
       return NextResponse.json({ success: true, data: estado });
     } catch (error: any) {
       console.error('Error al obtener estado:', error);
@@ -131,9 +124,6 @@ export class EstadoController {
       const updateEstadoDto: UpdateEstadoDto = body;
       const estadoActualizado = await (await obtenerServicio()).updateEstado(id, updateEstadoDto);
       // Service method throws error if not found
-      // if (!estadoActualizado) {
-      //   return NextResponse.json({ success: false, error: 'Estado no encontrado para actualizar' }, { status: 404 });
-      // }
       return NextResponse.json({ success: true, data: estadoActualizado });
     } catch (error: any) {
       console.error('Error al actualizar estado:', error);

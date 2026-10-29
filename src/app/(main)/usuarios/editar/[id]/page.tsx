@@ -1,33 +1,18 @@
 "use client"
 
 import { useState, useEffect, type ChangeEvent, type FormEvent } from "react"
-import { MODULOS_DISPONIBLES, type ModuloConfig } from "@/config/modulos";
-import { useSession, signOut } from "next-auth/react"
-import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
+import { useSession } from "next-auth/react"
 import EncabezadoPagina from "@/components/sistema/EncabezadoPagina";
 import { useRouter, useParams } from "next/navigation"
-import MemopsyLogo from "@/app/components/MemopsyLogo"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { AYUDA_CELULAR, normalizarCelular } from "@/lib/telefono"
 import { Label } from "@/components/ui/label"
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
+import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { Checkbox } from "@/components/ui/checkbox"
-import {
-  Menu,
-  X,
-  Users,
-  Calendar,
-  FileText,
-  LogOut,
-  HomeIcon,
-  Shield,
-  Brain,
-  Activity,
-  AlertCircle,
-} from "lucide-react"
+import { Brain, Activity, AlertCircle } from "lucide-react"
 import { ObraSocial } from "@/models/obra-social.model"
 import { ESPECIALIDADES_PSICOLOGIA } from "@/lib/especialidades"
 import { avisoExito } from "@/lib/avisos";
@@ -38,12 +23,6 @@ interface Perfil {
   nombre: string
   descripcion?: string
 }
-
-//interface ObraSocial {
-//  id: string
-//  nombre: string
-//  activo: boolean
-//}
 
 interface PersonaDetails {
   id: string
@@ -86,8 +65,6 @@ interface UserFormData {
   especialidad: string
 }
 
-
-
 interface FieldErrors {
   email?: string
   nombre?: string
@@ -125,7 +102,7 @@ export default function EditarUsuarioPage() {
   // State for Obras Sociales
   const [obrasSocialesList, setObrasSocialesList] = useState<ObraSocial[]>([])
   const [selectedObraSocialId, setSelectedObraSocialId] = useState<string | null>(null)
-  const [isLoadingObrasSociales, setIsLoadingObrasSociales] = useState(false)
+  const [isLoadingObrasSociales] = useState(false)
 
   // State for Profiles
   const [availableProfiles, setAvailableProfiles] = useState<Perfil[]>([])
@@ -136,8 +113,6 @@ export default function EditarUsuarioPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [modulosPermitidos, setModulosPermitidos] = useState<ModuloConfig[]>([])
   const [userActionPermissions, setUserActionPermissions] = useState({ canEdit: false })
 
   const [hasExistingPsicologoData, setHasExistingPsicologoData] = useState(false)
@@ -160,10 +135,6 @@ export default function EditarUsuarioPage() {
         setIsLoadingData(false)
       }
 
-      const filteredMainModules = MODULOS_DISPONIBLES.filter((m) =>
-        m.permisosRequeridos.some((pr) => userPermissions.includes(pr)),
-      )
-      setModulosPermitidos(filteredMainModules)
     } else if (status === "authenticated" && !session?.user?.permisos) {
       setError("No se pudieron verificar los permisos.")
       setIsLoadingData(false)
@@ -444,17 +415,7 @@ export default function EditarUsuarioPage() {
     }
   }
 
-  const handleLogout = async () => await cerrarSesion()
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen)
-  const navigateToModule = (ruta: string) => {
-    router.push(ruta)
-    setIsMenuOpen(false)
-  }
-
   const pageTitle = formData.nombre ? `Editar Usuario: ${formData.nombre} ${formData.apellido}` : "Editar Usuario"
-  const currentUserName = session?.user?.persona
-    ? `${session.user.persona.nombre} ${session.user.persona.apellido}`
-    : session?.user?.email || "Usuario"
 
   if (isLoadingData && status !== "loading") {
     return (
