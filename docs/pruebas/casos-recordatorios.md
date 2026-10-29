@@ -1,7 +1,7 @@
 # Casos de prueba: recordatorios, avisos y enlace de videollamada
 
 Tarjeta #11 del tablero. Requerimientos RF 3.2 (avisos de cambios de turno), RF 3.3 (recordatorios) y RF 3.4 (enlace de videollamada), apartado 8.8.1 del TIF.
-Datos ficticios de la demo, sobre la instalación local. Turnos de prueba creados el domingo 25/10 para el lunes 26/10, entre la psicóloga Carla Benítez (`psicologa@memopsy.test`) y el paciente Tomás Acosta, que es la única cuenta con un email real (el de la autora), para poder ver el email que llega.
+Datos ficticios de la demo, sobre la instalación local. Turnos de prueba creados el domingo 25/10 para el lunes 26/10, entre la psicóloga Carla Benítez (`psicologa@memopsy.test`) y el paciente Azul Coronel, que es la única cuenta con un email real (el de la autora), para poder ver el email que llega.
 
 Los pedidos se hicieron a la API del sistema con la sesión de cada perfil (recepción, psicóloga y paciente), y los resultados se comprobaron en la base (`sesion`, `notificacion` y `recordatorio_enviado`).
 
@@ -22,20 +22,20 @@ Estado: ✅ pasa · ❌ falla · ⏳ pendiente
 
 | ID | Caso | Pasos | Resultado esperado | Resultado obtenido | Estado |
 |---|---|---|---|---|---|
-| CP-05 | Recordatorio en la campana | Tomás y Carla abren el sistema (campana) con el turno remoto de CP-01 dentro de las próximas 24 horas | A cada uno le aparece un recordatorio, con la contraparte, la fecha y la modalidad | Tomás: "Tenés turno con Carla Benítez el lun 26/10 a las 08:00 (remota)." Carla: "Tenés turno con Tomás Acosta el lun 26/10 a las 08:00 (remota)." | ✅ |
-| CP-06 | Sin recordatorios repetidos | Tomás abre la campana por segunda vez | No se crea otro recordatorio del mismo turno | Siguió habiendo uno solo por persona (2 sin leer antes y después) | ✅ |
+| CP-05 | Recordatorio en la campana | Azul y Carla abren el sistema (campana) con el turno remoto de CP-01 dentro de las próximas 24 horas | A cada uno le aparece un recordatorio, con la contraparte, la fecha y la modalidad | Azul: "Tenés turno con Carla Benítez el lun 26/10 a las 08:00 (remota)." Carla: "Tenés turno con Azul Coronel el lun 26/10 a las 08:00 (remota)." | ✅ |
+| CP-06 | Sin recordatorios repetidos | Azul abre la campana por segunda vez | No se crea otro recordatorio del mismo turno | Siguió habiendo uno solo por persona (2 sin leer antes y después) | ✅ |
 | CP-07 | Turnos fuera de las 24 horas | Turnos de CP-02 y CP-03 (lunes a la tarde, a más de 24 horas) | No generan recordatorio todavía | Sin recordatorios para las sesiones 67 y 68 | ✅ |
-| CP-08 | Cancelación | Recepción crea un turno (lun 07:00) y Carla lo cancela | Tomás recibe el aviso de cancelación; Carla no, porque lo canceló ella; el turno cancelado no genera recordatorio | Tomás: "Se canceló el turno con Carla Benítez del lun 26/10 a las 07:00." Ningún aviso para Carla ni recordatorio de la sesión 65 | ✅ |
-| CP-09 | Reprogramación por el paciente | Tomás reprograma el turno de CP-02 a uno de los horarios libres que ofrece el sistema | El turno pasa a «Reprogramada» y Carla recibe el aviso con el horario anterior y el nuevo | Pasó al mar 27/10 09:00, estado «Reprogramada»; Carla: "El turno con Tomás Acosta del lun 26/10 a las 16:00 pasó al mar 27/10 a las 09:00." | ✅ |
-| CP-10 | Reprogramar con menos de 24 horas | Tomás pide reprogramar el turno de CP-01 (faltan menos de 24 horas) | El sistema lo rechaza | HTTP 409: "Solo se puede reprogramar un turno con al menos 24 horas de anticipación." | ✅ |
+| CP-08 | Cancelación | Recepción crea un turno (lun 07:00) y Carla lo cancela | Azul recibe el aviso de cancelación; Carla no, porque lo canceló ella; el turno cancelado no genera recordatorio | Azul: "Se canceló el turno con Carla Benítez del lun 26/10 a las 07:00." Ningún aviso para Carla ni recordatorio de la sesión 65 | ✅ |
+| CP-09 | Reprogramación por el paciente | Azul reprograma el turno de CP-02 a uno de los horarios libres que ofrece el sistema | El turno pasa a «Reprogramada» y Carla recibe el aviso con el horario anterior y el nuevo | Pasó al mar 27/10 09:00, estado «Reprogramada»; Carla: "El turno con Azul Coronel del lun 26/10 a las 16:00 pasó al mar 27/10 a las 09:00." | ✅ |
+| CP-10 | Reprogramar con menos de 24 horas | Azul pide reprogramar el turno de CP-01 (faltan menos de 24 horas) | El sistema lo rechaza | HTTP 409: "Solo se puede reprogramar un turno con al menos 24 horas de anticipación." | ✅ |
 
 ## Recordatorio por email (RF 3.3)
 
 | ID | Caso | Pasos | Resultado esperado | Resultado obtenido | Estado |
 |---|---|---|---|---|---|
-| CP-11 | Email 24 horas antes | Turno remoto de CP-01 (lun 08:00); esperar la pasada automática | Le llega a Tomás un email con la psicóloga, la fecha, la hora, la modalidad y el enlace de Meet, sin datos clínicos | Enviado a las 12:04 del 25/10; la autora lo recibió con "lun 26/10 a las 08:00 (remota)" y el enlace de Meet (captura) | ✅ |
+| CP-11 | Email 24 horas antes | Turno remoto de CP-01 (lun 08:00); esperar la pasada automática | Le llega a Azul un email con la psicóloga, la fecha, la hora, la modalidad y el enlace de Meet, sin datos clínicos | Enviado a las 12:04 del 25/10; la autora lo recibió con "lun 26/10 a las 08:00 (remota)" y el enlace de Meet (captura) | ✅ |
 | CP-12 | Turnos que no deben recibir email | Pasada automática con el turno cancelado de CP-08, los de CP-02 y CP-03 (a más de 24 horas) y turnos de cuentas de demostración (`.test`) dentro de las 24 horas | No se manda email a ninguno | `recordatorio_enviado` quedó solo con la sesión 66 | ✅ |
-| CP-13 | Reenvío al cambiar el horario | Recepción mueve el turno de CP-11 de las 08:00 a las 09:00 | Se borra el registro del email anterior, se avisa a las dos partes en la campana y en la pasada siguiente llega un email nuevo con las 09:00 | Avisos de reprogramación a Tomás y a Carla; el email nuevo salió a las 12:14 con "lun 26/10 a las 09:00 (remota)" (captura). Gmail lo agrupó con el anterior porque tenían el mismo asunto: se agregó la fecha y la hora al asunto | ✅ |
+| CP-13 | Reenvío al cambiar el horario | Recepción mueve el turno de CP-11 de las 08:00 a las 09:00 | Se borra el registro del email anterior, se avisa a las dos partes en la campana y en la pasada siguiente llega un email nuevo con las 09:00 | Avisos de reprogramación a Azul y a Carla; el email nuevo salió a las 12:14 con "lun 26/10 a las 09:00 (remota)" (captura). Gmail lo agrupó con el anterior porque tenían el mismo asunto: se agregó la fecha y la hora al asunto | ✅ |
 | CP-14 | Sin emails repetidos | Esperar una pasada más después de CP-13 | No se vuelve a mandar el mismo recordatorio | Después de las pasadas de las 12:24 sigue habiendo un solo envío para la sesión 66 (el de las 12:14) | ✅ |
 | CP-15 | WhatsApp apagado | Pasadas de CP-11 y CP-13 con `RECORDATORIOS_WHATSAPP` comentado | No se envía nada por WhatsApp (queda como mejora futura, tarjeta #12) | Ningún registro con canal WHATSAPP para los turnos de prueba | ✅ |
 
