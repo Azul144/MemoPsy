@@ -2,9 +2,8 @@
 // Historias clínicas: los pacientes del psicólogo y el estado de su historia.
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { AlertCircle, BookOpen, Download, FileSignature, Loader2, Search } from "lucide-react";
 import EncabezadoPagina from "@/components/sistema/EncabezadoPagina";
 import { Badge } from "@/components/ui/badge";
@@ -22,11 +21,6 @@ interface PacienteDeHistoria {
   cerrada: boolean;
 }
 
-interface ResultadoBusqueda {
-  id: string;
-  persona: { nombre: string; apellido: string; dni?: string };
-}
-
 const fechaCorta = (iso: string) =>
   new Intl.DateTimeFormat("es-AR", { day: "2-digit", month: "2-digit", year: "numeric", timeZone: "America/Argentina/Buenos_Aires" }).format(new Date(iso));
 
@@ -37,16 +31,9 @@ function EstadoHistoria({ p }: { p: PacienteDeHistoria }) {
 }
 
 export default function HistoriasClinicasPage() {
-  const router = useRouter();
   const [pacientes, setPacientes] = useState<PacienteDeHistoria[] | null>(null);
   const [error, setError] = useState("");
   const [filtro, setFiltro] = useState("");
-
-  // Buscar un paciente que todavía no atiende (por ejemplo, la primera entrevista sin turno cargado)
-  const [busqueda, setBusqueda] = useState("");
-  const [resultados, setResultados] = useState<ResultadoBusqueda[]>([]);
-  const [buscando, setBuscando] = useState(false);
-  const temporizador = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     fetch("/api/historias-clinicas")
@@ -57,23 +44,6 @@ export default function HistoriasClinicasPage() {
       })
       .catch((e: Error) => setError(e.message));
   }, []);
-
-  useEffect(() => {
-    if (temporizador.current) clearTimeout(temporizador.current);
-    if (busqueda.trim().length < 2) {
-      setResultados([]);
-      return;
-    }
-    temporizador.current = setTimeout(async () => {
-      setBuscando(true);
-      try {
-        const r = await fetch(`/api/pacientes/buscar?q=${encodeURIComponent(busqueda.trim())}`);
-        setResultados(r.ok ? await r.json() : []);
-      } finally {
-        setBuscando(false);
-      }
-    }, 300);
-  }, [busqueda]);
 
   const filtrados = useMemo(() => {
     const t = filtro.trim().toLowerCase();
@@ -106,7 +76,6 @@ export default function HistoriasClinicasPage() {
         )}
 
         {pacientes && (
-          <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
             <section className="rounded-2xl border border-borde bg-card p-5">
               <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                 <h2 className="text-lg font-semibold text-dorado">Tus pacientes</h2>
@@ -124,7 +93,7 @@ export default function HistoriasClinicasPage() {
               {filtrados.length === 0 ? (
                 <p className="py-8 text-center text-sm text-tenue">
                   {pacientes.length === 0
-                    ? "Todavía no tenés pacientes con turnos o notas. Buscá uno a la derecha para abrir su historia."
+                    ? "Todavía no tenés pacientes con turnos o notas. Su historia se puede abrir cuando tengan al menos uno."
                     : "Ningún paciente coincide con el filtro."}
                 </p>
               ) : (
@@ -162,35 +131,6 @@ export default function HistoriasClinicasPage() {
                 </ul>
               )}
             </section>
-
-            <aside className="h-fit rounded-2xl border border-borde bg-card p-5">
-              <h2 className="mb-1 text-lg font-semibold text-dorado">Otro paciente</h2>
-              <p className="mb-3 text-sm text-tenue">Para abrir la historia de alguien que todavía no tiene turnos ni notas con vos.</p>
-              <Input
-                value={busqueda}
-                onChange={(e) => setBusqueda(e.target.value)}
-                placeholder="Nombre, apellido o DNI"
-                className="border-borde-fuerte bg-background text-foreground"
-              />
-              <div className="mt-2 space-y-1">
-                {buscando && <p className="text-sm text-tenue">Buscando...</p>}
-                {!buscando && busqueda.trim().length >= 2 && resultados.length === 0 && (
-                  <p className="text-sm text-tenue">No se encontraron pacientes.</p>
-                )}
-                {resultados.map((r) => (
-                  <button
-                    key={r.id}
-                    type="button"
-                    onClick={() => router.push(`/informes/historias/${r.id}`)}
-                    className="block w-full rounded-md px-3 py-2 text-left text-sm text-foreground hover:bg-background"
-                  >
-                    {r.persona.apellido}, {r.persona.nombre}
-                    {r.persona.dni ? <span className="text-tenue"> · DNI {r.persona.dni}</span> : null}
-                  </button>
-                ))}
-              </div>
-            </aside>
-          </div>
         )}
       </main>
     </div>

@@ -29,6 +29,7 @@ const BUSCA_PACIENTES = ["Registrar Sesión", "Editar Sesión", "Registrar Infor
 // ----- PÁGINAS -----
 export const REGLAS_PAGINAS: Regla[] = [
   { ruta: "/welcome", permisos: "cualquiera" },
+  { ruta: "/cuenta", permisos: "cualquiera" },
   { ruta: "/usuarios/registrar", permisos: ["Registrar Usuario"] },
   { ruta: "/usuarios/editar/[id]", permisos: ["Editar Usuario"] },
   { ruta: "/usuarios/listar", permisos: VER_USUARIOS },
@@ -54,7 +55,8 @@ export const REGLAS_PAGINAS: Regla[] = [
 export const REGLAS_API: Regla[] = [
   // Cuenta propia
   { ruta: "/api/auth/mfa", permisos: "cualquiera" },
-  { ruta: "/api/usuarios/me", metodos: ["GET"], permisos: "cualquiera" },
+  { ruta: "/api/usuarios/me", metodos: ["GET", "PUT"], permisos: "cualquiera" },
+  { ruta: "/api/usuarios/me/contrasena", metodos: ["POST"], permisos: "cualquiera" },
 
   // Usuarios
   { ruta: "/api/usuarios", metodos: ["GET"], permisos: VER_USUARIOS },

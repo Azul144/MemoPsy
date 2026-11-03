@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { HomeIcon, LogOut, Menu, X } from "lucide-react";
+import { HomeIcon, LogOut, Menu, UserRound, X } from "lucide-react";
 import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
 import { MODULOS_DISPONIBLES } from "@/config/modulos";
 import CampanaNotificaciones from "./CampanaNotificaciones";
@@ -94,6 +94,10 @@ export default function BarraSistema() {
                   <Link href="/welcome" className="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-foreground/5">
                     <HomeIcon className="h-5 w-5 text-crema/70" />
                     Inicio
+                  </Link>
+                  <Link href="/cuenta" className="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-foreground/5">
+                    <UserRound className="h-5 w-5 text-crema/70" />
+                    Mi cuenta
                   </Link>
                   {modulos.map((m) => (
                     <Link key={m.ruta} href={m.ruta} className="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-foreground/5">

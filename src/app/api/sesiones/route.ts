@@ -149,6 +149,12 @@ async function manejarPOST(request: NextRequest) {
     const body = await request.json()
     const { fechaHoraInicio, fechaHoraFin, psicologoId, modalidadId, estadoId, pacientesIds, enlaceVideollamada } = body
 
+    // Un psicólogo solo registra sus propios turnos (recepción puede registrar los de todos)
+    const alcance = alcanceSesiones(session.user)
+    if (alcance.tipo !== "todas" && (alcance.tipo !== "psicologo" || String(psicologoId) !== alcance.id)) {
+      return NextResponse.json({ error: "Solo podés registrar turnos a tu nombre." }, { status: 403 })
+    }
+
     // Validar que los campos requeridos estén presentes
     if (!psicologoId || !modalidadId || !estadoId) {
       return NextResponse.json(

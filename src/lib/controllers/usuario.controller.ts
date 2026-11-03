@@ -416,35 +416,6 @@ export class UsuarioController {
     }
   }
 
-  // GET /api/usuarios/me - Obtener datos del usuario actual
-  static async getCurrentUser() {
-    try {
-      const session = await getServerSession(authConfig);
-      
-      if (!session?.user) {
-        return NextResponse.json(
-          { error: 'No autorizado' },
-          { status: 401 }
-        );
-      }
-
-      return NextResponse.json({
-        success: true,
-        data: session.user
-      });
-
-    } catch (error: any) {
-      console.error('Error al obtener usuario actual:', error);
-      return NextResponse.json(
-        { 
-          success: false,
-          error: error.message || 'Error interno del servidor' 
-        },
-        { status: 500 }
-      );
-    }
-  }
-
   // GET /api/usuarios/[id]/perfiles - Perfiles asignados a un usuario
   // (el middleware ya verificó que tenga "Ver Usuarios", "Editar Usuario" o "Asignar Perfil")
   static async getUserProfiles(request: NextRequest, { params }: { params: { id: string } }) {

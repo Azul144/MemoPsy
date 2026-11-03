@@ -89,7 +89,7 @@ export async function verificarLogin(
   return usuario;
 }
 
-async function registrarIntentoFallido(repo: Repository<UsuarioEntity>, usuario: UsuarioEntity) {
+export async function registrarIntentoFallido(repo: Repository<UsuarioEntity>, usuario: UsuarioEntity) {
   const intentos = usuario.intentosFallidos + 1;
 
   if (intentos >= MAX_INTENTOS) {
