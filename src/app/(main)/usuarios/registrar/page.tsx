@@ -10,7 +10,7 @@ import { AYUDA_CELULAR, normalizarCelular } from "@/lib/telefono"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Brain, UserPlusIcon } from "lucide-react"
+import { Brain, UserCog, UserPlusIcon } from "lucide-react"
 import { Switch } from "@/components/ui/switch"
 
 // Importar modelos de dominio
@@ -76,6 +76,9 @@ export default function RegistrarUsuarioPage() {
 
   const [isPsicologo, setIsPsicologo] = useState(false)
   const [isPaciente, setIsPaciente] = useState(false)
+  const [esOtroPerfil, setEsOtroPerfil] = useState(false)
+  const [perfilId, setPerfilId] = useState("")
+  const [otrosPerfiles, setOtrosPerfiles] = useState<{ id: string; nombre: string }[]>([])
 
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -110,6 +113,24 @@ export default function RegistrarUsuarioPage() {
       setError("No se pudieron verificar los permisos del usuario.")
     }
   }, [session, status, router])
+
+  // Recepción, auditoría y administración no tienen ficha de psicólogo ni de paciente
+  useEffect(() => {
+    if (!esOtroPerfil || !hasPermission) return
+    fetch("/api/perfiles")
+      .then((res) => {
+        if (!res.ok) throw new Error()
+        return res.json()
+      })
+      .then((data: { id: string | number; nombre: string }[]) =>
+        setOtrosPerfiles(
+          data
+            .filter((p) => p.nombre !== "Psicólogo" && p.nombre !== "Paciente")
+            .map((p) => ({ id: String(p.id), nombre: p.nombre })),
+        ),
+      )
+      .catch(() => setFieldErrors((prev) => ({ ...prev, roleSelection: "No se pudieron cargar los perfiles." })))
+  }, [esOtroPerfil, hasPermission])
 
   // Fetch Obras Sociales when isPaciente is true
   useEffect(() => {
@@ -152,11 +173,24 @@ export default function RegistrarUsuarioPage() {
     }
   }
 
-  // Psicólogo y Paciente son excluyentes: activar uno apaga el otro
+  // Psicólogo, Paciente y Otro perfil son excluyentes: activar uno apaga los demás
+  const handleOtroPerfilToggle = (checked: boolean) => {
+    if (checked) {
+      setFieldErrors((prev) => ({ ...prev, roleSelection: undefined }))
+      handlePsicologoToggle(false)
+      handlePacienteToggle(false)
+    }
+    setEsOtroPerfil(checked)
+    if (!checked) setPerfilId("")
+  }
+
   const handlePsicologoToggle = (checked: boolean) => {
     if (checked) {
       setFieldErrors((prev) => ({ ...prev, roleSelection: undefined }))
-      handlePacienteToggle(false)
+      setIsPaciente(false)
+      setSelectedObraSocialId("")
+      setEsOtroPerfil(false)
+      setPerfilId("")
     }
     setIsPsicologo(checked)
     if (!checked) {
@@ -168,7 +202,10 @@ export default function RegistrarUsuarioPage() {
   const handlePacienteToggle = (checked: boolean) => {
     if (checked) {
       setFieldErrors((prev) => ({ ...prev, roleSelection: undefined }))
-      handlePsicologoToggle(false)
+      setIsPsicologo(false)
+      setFormData((prev) => ({ ...prev, numeroLicencia: "", especialidad: "" }))
+      setEsOtroPerfil(false)
+      setPerfilId("")
     }
     setIsPaciente(checked)
     if (!checked) {
@@ -231,8 +268,10 @@ export default function RegistrarUsuarioPage() {
       newErrors.telefono = AYUDA_CELULAR
     }
 
-    if (isPsicologo === isPaciente) {
-      newErrors.roleSelection = "Debe seleccionar si el usuario es Psicólogo o Paciente."
+    if (!isPsicologo && !isPaciente && !esOtroPerfil) {
+      newErrors.roleSelection = "Elegí si el usuario es Psicólogo, Paciente u otro perfil."
+    } else if (esOtroPerfil && !perfilId) {
+      newErrors.roleSelection = "Elegí el perfil del usuario."
     }
 
     // Validaciones específicas para psicólogo
@@ -293,6 +332,7 @@ export default function RegistrarUsuarioPage() {
         roles: {
           isPsicologo,
           isPaciente,
+          perfilId: esOtroPerfil ? perfilId : undefined,
         },
       }
 
@@ -329,7 +369,7 @@ export default function RegistrarUsuarioPage() {
       }
 
       // Mostrar mensaje de éxito con los datos guardados
-      avisoExito(`Usuario registrado correctamente como ${isPsicologo ? "Psicólogo" : "Paciente"}.`)
+      avisoExito(`Usuario registrado correctamente como ${isPsicologo ? "Psicólogo" : isPaciente ? "Paciente" : otrosPerfiles.find((p) => p.id === perfilId)?.nombre ?? "usuario"}.`)
 
       resetForm()
       router.push("/usuarios")
@@ -356,6 +396,8 @@ export default function RegistrarUsuarioPage() {
     })
     setIsPsicologo(false)
     setIsPaciente(false)
+    setEsOtroPerfil(false)
+    setPerfilId("")
     setSelectedObraSocialId("")
     setFieldErrors({})
     setError(null)
@@ -663,6 +705,32 @@ export default function RegistrarUsuarioPage() {
                         <p className="text-peligro text-sm">{fieldErrors.selectedObraSocialId}</p>
                       )}
                     </div>
+                  </div>
+                )}
+                <div className="flex items-center space-x-2 pt-2">
+                  <Switch id="esOtroPerfil" checked={esOtroPerfil} onCheckedChange={handleOtroPerfilToggle} />
+                  <Label htmlFor="esOtroPerfil" className="text-texto-2 flex items-center">
+                    <UserCog className="w-5 h-5 mr-2 text-dorado" /> Registrar con otro perfil (recepción, auditoría o administración)
+                  </Label>
+                </div>
+
+                {esOtroPerfil && (
+                  <div className="pl-8 space-y-2 transition-all duration-300 ease-in-out">
+                    <Label htmlFor="perfilId" className="text-suave">
+                      Perfil *
+                    </Label>
+                    <Select name="perfilId" value={perfilId} onValueChange={setPerfilId} required={esOtroPerfil}>
+                      <SelectTrigger id="perfilId" className="w-full bg-superficie text-foreground border-borde-fuerte">
+                        <SelectValue placeholder="Elegí un perfil" />
+                      </SelectTrigger>
+                      <SelectContent style={{ backgroundColor: "var(--card)", borderColor: "var(--borde)" }}>
+                        {otrosPerfiles.map((p) => (
+                          <SelectItem key={p.id} value={p.id} className="text-texto-2 cursor-pointer">
+                            {p.nombre}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 )}
                 {fieldErrors.roleSelection && <p role="alert" className="text-peligro text-sm">{fieldErrors.roleSelection}</p>}

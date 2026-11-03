@@ -2,7 +2,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { conAuditoria } from "@/lib/auditoria/con-auditoria"
 import { getRepository } from "@/lib/database"
-import { PersonaEntity, UsuarioEntity, PsicologoEntity, PacienteEntity, ObraSocialEntity, UsuarioTienePerfilEntity } from "@/entities"
+import { PersonaEntity, UsuarioEntity, PsicologoEntity, PacienteEntity, ObraSocialEntity, PerfilEntity, UsuarioTienePerfilEntity } from "@/entities"
 import * as bcrypt from "bcrypt";
 import { AYUDA_CELULAR, normalizarCelular } from "@/lib/telefono"
 
@@ -138,13 +138,14 @@ async function manejarPOST(request: NextRequest) {
       )
     }
 
-    // Todo usuario nuevo es psicólogo o paciente, nunca ambos ni ninguno
-    if (Boolean(roles?.isPsicologo) === Boolean(roles?.isPaciente)) {
+    // Todo usuario nuevo es psicólogo, paciente u otro perfil (recepción, auditoría, administración): uno solo
+    const elegidos = [roles?.isPsicologo, roles?.isPaciente, roles?.perfilId].filter(Boolean).length
+    if (elegidos !== 1) {
       await queryRunner.rollbackTransaction();
       return NextResponse.json(
         {
           message: "Debe seleccionar un rol",
-          errors: { roleSelection: "Debe seleccionar si el usuario es Psicólogo o Paciente." },
+          errors: { roleSelection: "Elegí si el usuario es Psicólogo, Paciente u otro perfil." },
         },
         { status: 400 },
       )
@@ -156,6 +157,8 @@ async function manejarPOST(request: NextRequest) {
     const psicologoRepo = queryRunner.manager.getRepository(PsicologoEntity)
     const pacienteRepo = queryRunner.manager.getRepository(PacienteEntity)
     const obraSocialRepo = queryRunner.manager.getRepository(ObraSocialEntity)
+    const perfilRepo = queryRunner.manager.getRepository(PerfilEntity)
+    const usuarioTienePerfilRepo = queryRunner.manager.getRepository(UsuarioTienePerfilEntity)
 
     // Validaciones de duplicados
     const [existingPersona, existingUser] = await Promise.all([
@@ -271,6 +274,20 @@ async function manejarPOST(request: NextRequest) {
 
       await pacienteRepo.save(nuevoPaciente)
     }
+
+    // RF 1.1 - El perfil se asigna en el alta. Psicólogo y Paciente necesitan su ficha, así que
+    // no se pueden elegir como "otro perfil".
+    const perfil = await perfilRepo.findOne({
+      where: roles.isPsicologo ? { nombre: "Psicólogo" } : roles.isPaciente ? { nombre: "Paciente" } : { id: String(roles.perfilId) },
+    })
+    if (!perfil || (roles.perfilId && ["Psicólogo", "Paciente"].includes(perfil.nombre))) {
+      await queryRunner.rollbackTransaction();
+      return NextResponse.json(
+        { message: "Perfil no válido", errors: { roleSelection: "El perfil elegido no es válido." } },
+        { status: 400 },
+      )
+    }
+    await usuarioTienePerfilRepo.save(usuarioTienePerfilRepo.create({ usuarioId: usuarioGuardado.id, perfilId: perfil.id }))
 
     // Confirmar transacción si todo está bien
     await queryRunner.commitTransaction();
