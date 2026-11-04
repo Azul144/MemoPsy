@@ -74,6 +74,31 @@ export const AppDataSource = new DataSource({
   subscribers: [],
 })
 
+// Hora de Argentina para NOW() y CURRENT_TIMESTAMP, igual que en la aplicación.
+// Las bases en la nube suelen usar UTC y no siempre dejan cambiar la zona global.
+const ZONA_HORARIA = "-03:00"
+
+function usarZonaHoraria(dataSource: DataSource) {
+  const pool = (dataSource.driver as any).pool
+  const fijarZona = (conexion: any, listo?: (error: Error | null) => void) =>
+    conexion.query("SET time_zone = ?", [ZONA_HORARIA], (error: Error | null) => listo?.(error))
+
+  // Las conexiones que el pool abra de acá en adelante
+  pool.on("connection", (conexion: any) => fijarZona(conexion))
+
+  // La que TypeORM ya abrió al inicializar
+  return new Promise<void>((resolve, reject) => {
+    pool.getConnection((error: Error | null, conexion: any) => {
+      if (error) return reject(error)
+      fijarZona(conexion, (errorZona) => {
+        conexion.release()
+        if (errorZona) reject(errorZona)
+        else resolve()
+      })
+    })
+  })
+}
+
 // Singleton para mantener la conexión
 let initialized = false
 
@@ -83,6 +108,7 @@ export async function initializeDatabase() {
       if (!AppDataSource.isInitialized) {
         console.log("Intentando inicializar la conexión a la base de datos...")
         await AppDataSource.initialize()
+        await usarZonaHoraria(AppDataSource)
         console.log("¡Data Source ha sido inicializado correctamente!")
       }
       initialized = true
