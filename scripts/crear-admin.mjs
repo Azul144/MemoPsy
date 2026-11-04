@@ -25,6 +25,7 @@ const conexion = await mysql.createConnection({
   user: process.env.DB_USERNAME || "root",
   password: process.env.DB_PASSWORD || "",
   database: process.env.DB_DATABASE || "psicologia_db",
+  ssl: process.env.DB_SSL_CA ? { ca: Buffer.from(process.env.DB_SSL_CA, "base64") } : undefined,
 })
 
 try {

@@ -38,6 +38,8 @@ export const AppDataSource = new DataSource({
   username: process.env.DB_USERNAME || "root",
   password: process.env.DB_PASSWORD || "",
   database: process.env.DB_DATABASE || "psicologia_db",
+  // Base en la nube: certificado de la autoridad (CA) en base64. Sin la variable, conexión local sin SSL.
+  ssl: process.env.DB_SSL_CA ? { ca: Buffer.from(process.env.DB_SSL_CA, "base64") } : undefined,
   synchronize: false,
   logging: true,
   //entities: [Persona, Permiso, Perfil, Usuario, Psicologo, Paciente, Recepcionista, Sesion, Informe, PerfilPermiso],
