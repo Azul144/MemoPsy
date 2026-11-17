@@ -2,7 +2,8 @@
 // Una imagen de la nota clínica.
 //  GET:    devuelve la imagen descifrada (autor; o paciente de la nota si está compartida).
 //  PATCH:  el autor cambia la descripción o si se comparte con el paciente.
-//  DELETE: el autor la borra.
+// No hay DELETE: la imagen integra la historia clínica, que se conserva al menos diez años
+// (Ley N.º 26.529). El psicólogo puede dejar de compartirla, pero no borrarla.
 import { type NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth/next"
 import { z } from "zod"
@@ -94,23 +95,6 @@ async function manejarPATCH(request: NextRequest, { params }: Contexto) {
   }
 }
 
-async function manejarDELETE(_request: NextRequest, { params }: Contexto) {
-  try {
-    const { id, imagenId } = await params
-    const r = await cargar(id, imagenId)
-    if (r.error) return r.error
-    const { dataSource, acceso, imagen } = r
-    if (!acceso.esAutor) {
-      return NextResponse.json({ error: "Solo el psicólogo autor puede borrar la imagen." }, { status: 403 })
-    }
-    await dataSource.getRepository(InformeImagenEntity).delete(imagen.id)
-    return NextResponse.json({ ok: true })
-  } catch (error) {
-    console.error("Error al borrar la imagen de la nota:", error)
-    return NextResponse.json({ error: "No se pudo borrar la imagen" }, { status: 500 })
-  }
-}
-
 // RF 1.4 - Registro de auditoría. La lectura de cada imagen no se registra una por una:
 // ya queda registrada la consulta de la nota y del listado de imágenes.
 export const GET = manejarGET
@@ -119,4 +103,3 @@ export const PATCH = conAuditoria(manejarPATCH, {
   accion: "EDITAR",
   detalle: (d) => (d?.imagen?.compartida ? "Imagen de la nota compartida con el paciente" : "Edición de imagen de una nota clínica"),
 })
-export const DELETE = conAuditoria(manejarDELETE, { modulo: "Informes", accion: "ELIMINAR", detalle: "Baja de imagen de una nota clínica" })

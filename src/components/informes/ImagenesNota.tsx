@@ -151,7 +151,8 @@ function TarjetaImagen({
   onDescripcion: (texto: string) => void
   onGuardarDescripcion?: () => void
   onCompartida: (valor: boolean) => void
-  onBorrar: () => void
+  // Solo antes de guardar la nota: una imagen guardada integra la historia clínica y no se borra
+  onBorrar?: () => void
   onAmpliar: () => void
 }) {
   return (
@@ -176,10 +177,14 @@ function TarjetaImagen({
             {compartida ? <Users className="h-4 w-4 text-exito" /> : <Lock className="h-4 w-4 text-tenue" />}
             {compartida ? "Compartida con el paciente" : "Solo para vos"}
           </label>
-          <Button type="button" variant="ghost" size="icon" disabled={ocupado} onClick={onBorrar}
-            className="text-peligro hover:bg-red-500/10" title="Quitar imagen" aria-label="Quitar imagen">
-            {ocupado ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
-          </Button>
+          {onBorrar ? (
+            <Button type="button" variant="ghost" size="icon" disabled={ocupado} onClick={onBorrar}
+              className="text-peligro hover:bg-red-500/10" title="Quitar imagen" aria-label="Quitar imagen">
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          ) : (
+            ocupado && <Loader2 className="h-4 w-4 animate-spin text-dorado" />
+          )}
         </div>
       </div>
     </li>
@@ -204,7 +209,8 @@ function Ampliada({ src, titulo, onCerrar }: { src: string | null; titulo: strin
 const Ayuda = () => (
   <p className="text-sm text-tenue">
     Dibujos de técnicas proyectivas, fotos de producciones del paciente o material de apoyo. Se guardan cifradas.
-    Las que marques como compartidas las ve el paciente en su informe de seguimiento.
+    Las que marques como compartidas las ve el paciente en su informe de seguimiento. Al guardar la nota, las imágenes
+    pasan a formar parte de la historia clínica y no se pueden borrar.
   </p>
 )
 
@@ -336,18 +342,11 @@ export function ImagenesNota({ informeId }: { informeId: string }) {
     }
   }
 
-  const borrar = async (imagen: ImagenGuardada) => {
-    if (!(await confirmar("¿Quitar esta imagen de la nota? No se puede deshacer.", "Sí, quitar"))) return
-    setOcupada(imagen.id)
-    try {
-      const res = await fetch(imagen.url, { method: "DELETE" })
-      if (!res.ok) throw new Error((await res.json().catch(() => null))?.error)
-      setImagenes((prev) => prev.filter((i) => i.id !== imagen.id))
-    } catch (e) {
-      avisoError((e as Error).message || "No se pudo quitar la imagen.")
-    } finally {
-      setOcupada(null)
-    }
+  // Antes de subir: una vez guardada, la imagen integra la historia clínica y no se puede borrar
+  const agregarConAviso = async (archivos: File[]) => {
+    const aviso =
+      "Una vez agregada, la imagen queda en la historia clínica y no se puede borrar (Ley 26.529). Después podés cambiar su descripción o dejar de compartirla. ¿Agregarla?"
+    if (await confirmar(aviso, "Sí, agregar")) await agregar(archivos)
   }
 
   if (cargando) return <Loader2 className="h-5 w-5 animate-spin text-dorado" />
@@ -371,14 +370,13 @@ export function ImagenesNota({ informeId }: { informeId: string }) {
                 if (texto !== (img.descripcion ?? "")) guardar(img, { descripcion: texto })
               }}
               onCompartida={(compartida) => guardar(img, { compartida })}
-              onBorrar={() => borrar(img)}
               onAmpliar={() => setAmpliada(img)}
             />
           ))}
         </ul>
       )}
       <div className="flex items-center gap-3">
-        <SelectorImagenes onElegidas={agregar} disabled={subiendo || imagenes.length >= MAX_IMAGENES} />
+        <SelectorImagenes onElegidas={agregarConAviso} disabled={subiendo || imagenes.length >= MAX_IMAGENES} />
         {subiendo && (
           <span className="flex items-center gap-2 text-sm text-tenue">
             <Loader2 className="h-4 w-4 animate-spin text-dorado" /> Subiendo...

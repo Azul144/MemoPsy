@@ -144,7 +144,7 @@ export const REGLAS_API: Regla[] = [
   { ruta: "/api/informes/[id]/imagenes", metodos: ["GET"], permisos: ["Ver Informes"] },
   { ruta: "/api/informes/[id]/imagenes", metodos: ["POST"], permisos: ["Registrar Informe", "Editar Informe"] },
   { ruta: "/api/informes/[id]/imagenes/[id]", metodos: ["GET"], permisos: ["Ver Informes"] },
-  { ruta: "/api/informes/[id]/imagenes/[id]", metodos: ["PATCH", "DELETE"], permisos: ["Registrar Informe", "Editar Informe"] },
+  { ruta: "/api/informes/[id]/imagenes/[id]", metodos: ["PATCH"], permisos: ["Registrar Informe", "Editar Informe"] },
   { ruta: "/api/informes/[id]", metodos: ["DELETE"], permisos: ["Eliminar Informe"] },
   // RF 2.4 - Informe de seguimiento para el paciente (las rutas validan además que sea el autor o un paciente de la nota)
   { ruta: "/api/informes/[id]/seguimiento", metodos: ["GET"], permisos: ["Ver Informes"] },
