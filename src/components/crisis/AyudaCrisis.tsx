@@ -4,7 +4,7 @@
 // se abre en su propia vista; en la computadora, al costado del mosaico.
 // Todo ocurre en el navegador: no se guarda ni se envía nada.
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import {
   ArrowLeft,
@@ -229,21 +229,30 @@ function Respiracion() {
     return () => clearInterval(t)
   }, [activa, vuelta])
 
-  // Con voz: indica cada cambio de fase, así se puede respirar con los ojos cerrados
+  // Con voz: indica cada cambio de fase, así se puede respirar con los ojos cerrados.
+  // La primera frase se dice en el mismo toque de «Empezar» (el iPhone solo deja hablar así);
+  // las siguientes, cuando cambia la fase.
+  const ultimaFase = useRef<"inhala" | "exhala" | null>(null)
+  const FRASE = { inhala: "Tomá aire por la nariz", exhala: "Soltalo despacio por la boca" } as const
+
   useEffect(() => {
-    if (!activa || !conVoz) return
-    decir(fase === "inhala" ? "Tomá aire por la nariz" : "Soltalo despacio por la boca")
-  }, [fase, activa, conVoz, vuelta, decir])
+    if (!activa || !conVoz || ultimaFase.current === fase) return
+    ultimaFase.current = fase
+    decir(FRASE[fase])
+  }, [fase, activa, conVoz, decir]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => () => callar(), [callar])
 
   const empezar = () => {
+    if (conVoz) decir(FRASE.inhala)
+    ultimaFase.current = "inhala"
     setEstado({ fase: "inhala", segundos: 4 })
     setVuelta((v) => v + 1)
     setActiva(true)
   }
   const pausar = () => {
     setActiva(false)
+    ultimaFase.current = null
     callar()
   }
 
@@ -308,12 +317,14 @@ function Sentidos() {
   const terminado = paso >= SENTIDOS.length
   const texto = terminado ? FIN_SENTIDOS : SENTIDOS[paso]
 
-  // Con voz: lee cada paso al llegar a él
-  useEffect(() => {
-    if (conVoz) decir(texto)
-  }, [conVoz, texto, decir])
-
   useEffect(() => () => callar(), [callar])
+
+  // Con voz: lee cada paso al tocar el botón (en el mismo toque, como pide el iPhone)
+  const siguiente = () => {
+    const nuevo = terminado ? 0 : paso + 1
+    setPaso(nuevo)
+    if (conVoz) decir(nuevo >= SENTIDOS.length ? FIN_SENTIDOS : SENTIDOS[nuevo])
+  }
 
   return (
     <div className="rounded-2xl border border-borde bg-card p-5">
@@ -327,7 +338,8 @@ function Sentidos() {
             activa={conVoz}
             onCambiar={(v) => {
               setConVoz(v)
-              if (!v) callar()
+              if (v) decir(texto)
+              else callar()
             }}
           />
         )}
@@ -340,7 +352,7 @@ function Sentidos() {
         <span className="text-sm text-crema/60">{terminado ? "" : `Paso ${paso + 1} de ${SENTIDOS.length}`}</span>
         <button
           type="button"
-          onClick={() => setPaso(terminado ? 0 : paso + 1)}
+          onClick={siguiente}
           className="rounded-full bg-primary px-6 py-2.5 font-semibold text-primary-foreground transition-opacity hover:opacity-90"
         >
           {terminado ? "Volver a empezar" : "Listo, siguiente"}

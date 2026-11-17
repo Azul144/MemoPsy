@@ -41,9 +41,14 @@ export function useVoz() {
     (texto: string, alTerminar?: () => void, alInterrumpir?: () => void) => {
       if (!soportada) return
       const turno = ++turnoActual
-      window.speechSynthesis.cancel()
+      const sintesis = window.speechSynthesis
+      // Solo se corta si algo está sonando: en Chrome de Android, cortar y hablar enseguida
+      // a veces hace que se descarte la frase nueva
+      if (sintesis.speaking || sintesis.pending) sintesis.cancel()
+      if (sintesis.paused) sintesis.resume()
       const frase = new SpeechSynthesisUtterance(texto)
-      frase.lang = voz?.lang ?? "es-AR"
+      // Sin una voz elegida se pide español de España, que traen casi todos los celulares
+      frase.lang = voz?.lang ?? "es-ES"
       if (voz) frase.voice = voz
       frase.rate = 0.9 // un poco más lento: tono tranquilo
       let avisado = false
@@ -61,16 +66,17 @@ export function useVoz() {
       }
       frase.onend = fin
       frase.onerror = fin
-      window.speechSynthesis.speak(frase)
-      // Sin voces instaladas el navegador no habla ni avisa: si no empezó en 2,5 s, se corta y se informa
+      sintesis.speak(frase)
+      // Sin voces instaladas el navegador no habla ni avisa. En el celular, la primera vez el lector
+      // de voz puede tardar en arrancar: se espera 8 s antes de cortar e informar.
       setTimeout(() => {
-        if (empezo || avisado || turno !== turnoActual || window.speechSynthesis.paused) return
+        if (empezo || avisado || turno !== turnoActual || sintesis.paused) return
         turnoActual++
-        window.speechSynthesis.cancel()
+        sintesis.cancel()
         setSinVoz(true)
         avisado = true
         alInterrumpir?.()
-      }, 2500)
+      }, 8000)
     },
     [soportada, voz],
   )
