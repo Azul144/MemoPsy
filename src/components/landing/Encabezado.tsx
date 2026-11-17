@@ -38,6 +38,9 @@ export default function Encabezado() {
 
         {/* Botones de computadora */}
         <div className="hidden items-center gap-3 lg:flex">
+          <Link href="/crisis" className="rounded-full border border-red-400/50 bg-red-500/15 px-4 py-2 text-sm font-semibold text-crema transition-colors hover:bg-red-500/25">
+            Ayuda en crisis
+          </Link>
           <a href="#contacto" className="rounded-full border border-primary/70 px-5 py-2 font-semibold text-dorado transition-colors hover:bg-primary/10">
             Pedir demostración
           </a>
@@ -70,6 +73,12 @@ export default function Encabezado() {
               {link.texto}
             </a>
           ))}
+          <Link
+            href="/crisis"
+            className="mt-2 rounded-full border border-red-400/50 bg-red-500/15 py-3 text-center font-semibold text-crema"
+          >
+            ¿Estás en crisis? Ayuda ahora
+          </Link>
           <div className="mt-2 flex gap-3 pb-2">
             <a
               href="#contacto"

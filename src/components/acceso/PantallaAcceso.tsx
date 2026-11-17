@@ -4,7 +4,7 @@
 // En el celular se ve solo el formulario.
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, ShieldCheck } from "lucide-react";
+import { ArrowLeft, HeartHandshake, ShieldCheck } from "lucide-react";
 import FondoAnimado from "@/components/comunes/FondoAnimado";
 import LogoMemoPsy from "@/components/comunes/LogoMemoPsy"
 
@@ -40,13 +40,23 @@ export default function PantallaAcceso({ children }: { children: React.ReactNode
       {/* Formulario */}
       <section className="relative flex flex-col overflow-hidden px-6 py-8 sm:px-12">
         <FondoAnimado intensidad="suave" />
-        <Link
-          href="/"
-          className="relative inline-flex w-fit items-center gap-2 text-sm text-crema/70 transition-colors hover:text-dorado"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Volver al inicio
-        </Link>
+        <div className="relative flex flex-wrap items-center justify-between gap-3">
+          <Link
+            href="/"
+            className="inline-flex w-fit items-center gap-2 text-sm text-crema/70 transition-colors hover:text-dorado"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Volver al inicio
+          </Link>
+          {/* Ayuda en crisis: pública, sin iniciar sesión, a cualquier hora */}
+          <Link
+            href="/crisis"
+            className="inline-flex items-center gap-2 rounded-full border border-red-400/50 bg-red-500/15 px-4 py-2 text-sm font-semibold text-crema transition-colors hover:bg-red-500/25"
+          >
+            <HeartHandshake className="h-4 w-4 text-peligro" aria-hidden="true" />
+            ¿Estás en crisis? Ayuda ahora
+          </Link>
+        </div>
 
         <div className="relative mx-auto flex w-full max-w-sm flex-1 flex-col justify-center py-10">
           <div className="entrar mb-8 flex items-center gap-3">
