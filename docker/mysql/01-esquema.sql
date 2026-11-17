@@ -101,6 +101,21 @@ CREATE TABLE `informe` (
   CONSTRAINT `informe_ibfk_1` FOREIGN KEY (`id_psicologo`) REFERENCES `psicologo` (`id_psicologo`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+CREATE TABLE `informe_imagen` (
+  `id_informe_imagen` int NOT NULL AUTO_INCREMENT,
+  `id_informe` int NOT NULL,
+  `nombre` varchar(255) NOT NULL,
+  `tipo_mime` varchar(50) NOT NULL,
+  `descripcion` text,
+  `datos` longblob NOT NULL,
+  `compartida` tinyint(1) NOT NULL DEFAULT '0',
+  `orden` int NOT NULL DEFAULT '0',
+  `fecha_creacion` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id_informe_imagen`),
+  KEY `idx_informe_imagen` (`id_informe`,`orden`),
+  CONSTRAINT `informe_imagen_ibfk_informe` FOREIGN KEY (`id_informe`) REFERENCES `informe` (`id_informe`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 CREATE TABLE `informe_seguimiento` (
   `id_informe_seguimiento` int NOT NULL AUTO_INCREMENT,
   `id_informe` int NOT NULL,

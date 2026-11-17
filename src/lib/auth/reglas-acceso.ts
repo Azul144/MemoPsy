@@ -140,6 +140,11 @@ export const REGLAS_API: Regla[] = [
   // RF 2.5 - PDF de la nota (la ruta valida además que sea el autor o un paciente asociado)
   { ruta: "/api/informes/[id]/pdf", metodos: ["GET"], permisos: ["Ver Informes"] },
   { ruta: "/api/informes/[id]", metodos: ["PUT"], permisos: ["Editar Informe"] },
+  // Imágenes de la nota (las rutas validan además que sea el autor, o un paciente de la nota si la imagen está compartida)
+  { ruta: "/api/informes/[id]/imagenes", metodos: ["GET"], permisos: ["Ver Informes"] },
+  { ruta: "/api/informes/[id]/imagenes", metodos: ["POST"], permisos: ["Registrar Informe", "Editar Informe"] },
+  { ruta: "/api/informes/[id]/imagenes/[id]", metodos: ["GET"], permisos: ["Ver Informes"] },
+  { ruta: "/api/informes/[id]/imagenes/[id]", metodos: ["PATCH", "DELETE"], permisos: ["Registrar Informe", "Editar Informe"] },
   { ruta: "/api/informes/[id]", metodos: ["DELETE"], permisos: ["Eliminar Informe"] },
   // RF 2.4 - Informe de seguimiento para el paciente (las rutas validan además que sea el autor o un paciente de la nota)
   { ruta: "/api/informes/[id]/seguimiento", metodos: ["GET"], permisos: ["Ver Informes"] },

@@ -9,6 +9,7 @@ import { authConfig } from "@/lib/auth/auth-config"
 import { initializeDatabase } from "@/lib/database"
 import { InformeEntity, PacienteTieneInformeEntity } from "@/entities"
 import { generarPdfInforme } from "@/lib/pdf/informe-pdf"
+import { imagenesParaPdf } from "@/lib/informes/imagenes"
 import { conAuditoria } from "@/lib/auditoria/con-auditoria"
 
 async function manejarGET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -66,6 +67,8 @@ async function manejarGET(_request: NextRequest, { params }: { params: Promise<{
           // El DNI solo va en la nota del profesional
           dni: vista === "psicologo" ? a.paciente.persona.dni : null,
         })),
+        // El paciente solo ve las imágenes que el psicólogo compartió
+        imagenes: await imagenesParaPdf(dataSource, informe.id, vista !== "psicologo"),
       },
       { vista, generadoPor: user.email ?? "MemoPsy" },
     )

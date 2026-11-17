@@ -40,6 +40,21 @@ export function descifrar(valorGuardado: string, variable: VariableClave = "MFA_
   return descifrado.toString("utf8");
 }
 
+// Archivos (imágenes de las notas): mismo cifrado, pero en binario para no agrandar el dato.
+// Se guarda como iv (12 bytes) + etiqueta (16 bytes) + cifrado.
+export function cifrarBytes(datos: Buffer, variable: VariableClave = "DATOS_ENCRYPTION_KEY"): Buffer {
+  const iv = randomBytes(12);
+  const cipher = createCipheriv(ALGORITMO, obtenerClave(variable), iv);
+  const cifrado = Buffer.concat([cipher.update(datos), cipher.final()]);
+  return Buffer.concat([iv, cipher.getAuthTag(), cifrado]);
+}
+
+export function descifrarBytes(guardado: Buffer, variable: VariableClave = "DATOS_ENCRYPTION_KEY"): Buffer {
+  const decipher = createDecipheriv(ALGORITMO, obtenerClave(variable), guardado.subarray(0, 12));
+  decipher.setAuthTag(guardado.subarray(12, 28));
+  return Buffer.concat([decipher.update(guardado.subarray(28)), decipher.final()]);
+}
+
 // "iv:etiqueta:cifrado" en base64: 12 bytes de iv (16 caracteres) y 16 de etiqueta (24 caracteres)
 const FORMATO_CIFRADO = /^[A-Za-z0-9+/]{16}:[A-Za-z0-9+/]{22}==:[A-Za-z0-9+/]*={0,2}$/;
 

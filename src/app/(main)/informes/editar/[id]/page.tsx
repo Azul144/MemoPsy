@@ -18,6 +18,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { TypographyH1, TypographyP, TypographySmall } from '@/components/ui/typography';
 import { FileEdit as PageIcon, Search, X, Loader2, AlertTriangle, Save, ArrowLeft, Lock } from "lucide-react"
 import { cn } from "@/lib/utils";
+import { ImagenesNota } from "@/components/informes/ImagenesNota";
 
 // Interfaces
 interface Paciente {
@@ -293,9 +294,17 @@ export default function EditarInformePage() {
                     <TypographySmall className="text-tenue">Separá las etiquetas con comas.</TypographySmall>
                 </div>
 
+                {informeId && (
+                  <div className="space-y-2">
+                    <Label className="text-texto-2">Imágenes</Label>
+                    <ImagenesNota informeId={informeId} />
+                    <TypographySmall className="text-tenue">Los cambios en las imágenes se guardan en el momento.</TypographySmall>
+                  </div>
+                )}
+
                 <p className="flex items-start gap-2 rounded-md border border-borde bg-background p-3 text-sm text-suave">
                       <Lock className="mt-0.5 h-4 w-4 shrink-0 text-dorado" />
-                      La nota clínica es privada: solo la ves vos. Lo que quieras compartir con el paciente lo cargás después en su informe de seguimiento.
+                      La nota clínica es privada: solo la ves vos, salvo las imágenes que marques como compartidas. Lo demás que quieras compartir con el paciente lo cargás en su informe de seguimiento.
                     </p>
 
                 <div className="space-y-2">

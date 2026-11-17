@@ -17,6 +17,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { TypographyH1, TypographyP, TypographySmall } from '@/components/ui/typography';
 import { FilePlus, X, Check, Loader2, AlertCircle, Lock } from "lucide-react"
 import { cn } from "@/lib/utils";
+import { ImagenesPendientes, subirImagen, type ImagenPendiente } from "@/components/informes/ImagenesNota";
+import { avisoError } from "@/lib/avisos";
 
 // Interfaces
 interface Paciente {
@@ -58,6 +60,7 @@ export default function RegistrarInformePage() {
   const [pacienteSearchResults, setPacienteSearchResults] = useState<Paciente[]>([]);
   const [isPacienteSearchLoading, setIsPacienteSearchLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [imagenes, setImagenes] = useState<ImagenPendiente[]>([]);
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [isPacientePopoverOpen, setIsPacientePopoverOpen] = useState(false);
   
@@ -215,6 +218,18 @@ export default function RegistrarInformePage() {
         body: JSON.stringify(formData),
       });
       if (response.status === 201) {
+        // Con la nota ya guardada, se suben las imágenes una por una
+        const nota = await response.json();
+        let fallidas = 0;
+        for (const imagen of imagenes) {
+          const r = await subirImagen(String(nota.id), imagen);
+          if (r.error) fallidas++;
+        }
+        if (fallidas > 0) {
+          avisoError(`La nota se guardó, pero ${fallidas === 1 ? 'una imagen no se pudo subir' : `${fallidas} imágenes no se pudieron subir`}. Podés agregarlas desde «Editar nota».`);
+          router.push(`/informes/detalle/${nota.id}`);
+          return;
+        }
         router.push('/informes/lista');
       } else {
         const errorData = await response.json();
@@ -307,9 +322,14 @@ export default function RegistrarInformePage() {
                 <TypographySmall className="text-tenue">Separá las etiquetas con comas. Sirven para categorizar y buscar la nota.</TypographySmall>
               </div>
 
+              <div className="space-y-2">
+                <Label className="text-texto-2">Imágenes (opcional)</Label>
+                <ImagenesPendientes value={imagenes} onChange={setImagenes} disabled={isSubmitting} />
+              </div>
+
               <p className="flex items-start gap-2 rounded-md border border-borde bg-background p-3 text-sm text-suave">
                   <Lock className="mt-0.5 h-4 w-4 shrink-0 text-dorado" />
-                  La nota clínica es privada: solo la ves vos. Lo que quieras compartir con el paciente lo cargás después en su informe de seguimiento.
+                  La nota clínica es privada: solo la ves vos, salvo las imágenes que marques como compartidas. Lo demás que quieras compartir con el paciente lo cargás después en su informe de seguimiento.
                 </p>
 
               <div className="space-y-2">

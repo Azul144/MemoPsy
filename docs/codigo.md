@@ -141,6 +141,7 @@ En una base que ya existía (por ejemplo, la de WampServer), las migraciones de 
 10. `migracion-historia-clinica.sql`
 11. `migracion-innodb.sql`
 12. `migracion-nomenclatura-ids.sql`
+13. `migracion-imagenes-informe.sql`
 
 `scripts/datos` tiene los datos iniciales: las obras sociales de Formosa y los permisos de cada rol.
 

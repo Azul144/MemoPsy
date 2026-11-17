@@ -4,6 +4,7 @@
 import { readFile } from "fs/promises";
 import path from "path";
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from "pdf-lib";
+import type { ImagenParaPdf } from "@/lib/informes/imagenes";
 
 export interface DatosInformePdf {
   id: string;
@@ -14,6 +15,7 @@ export interface DatosInformePdf {
   esPrivado: boolean;
   psicologo?: string | null;
   pacientes: { nombre: string; apellido: string; dni?: string | null }[];
+  imagenes?: ImagenParaPdf[];
 }
 
 export interface OpcionesPdf {
@@ -81,6 +83,44 @@ export function partirEnLineas(texto: string, fuente: PDFFont, tam: number, anch
     lineas.push(actual);
   }
   return lineas;
+}
+
+// Imágenes de la nota (dibujos, fotos): cada una ocupa el ancho útil, con su descripción debajo.
+// Si no entra en lo que queda de la página, pasa a la siguiente.
+export async function dibujarImagenes(
+  pdf: PDFDocument,
+  imagenes: ImagenParaPdf[],
+  normal: PDFFont,
+  estado: { pagina: PDFPage; y: number },
+) {
+  const ALTO_MAXIMO = 380;
+  for (const imagen of imagenes) {
+    let embebida;
+    try {
+      embebida = imagen.tipoMime === "image/png" ? await pdf.embedPng(imagen.bytes) : await pdf.embedJpg(imagen.bytes);
+    } catch {
+      continue; // una imagen dañada no impide generar el PDF
+    }
+    const escala = Math.min(ANCHO_UTIL / embebida.width, ALTO_MAXIMO / embebida.height, 1);
+    const ancho = embebida.width * escala;
+    const alto = embebida.height * escala;
+    const x = MARGEN + (ANCHO_UTIL - ancho) / 2;
+    const leyenda = imagen.descripcion?.trim()
+      ? partirEnLineas(soloImprimible(imagen.descripcion, normal), normal, 9.5, ANCHO_UTIL)
+      : [];
+    if (estado.y - alto - leyenda.length * 13 - 12 < MARGEN + PIE) {
+      estado.pagina = pdf.addPage([A4.ancho, A4.alto]);
+      estado.y = A4.alto - MARGEN;
+    }
+    estado.pagina.drawImage(embebida, { x, y: estado.y - alto, width: ancho, height: alto });
+    estado.pagina.drawRectangle({ x, y: estado.y - alto, width: ancho, height: alto, borderColor: LINEA, borderWidth: 0.6 });
+    estado.y -= alto + 14;
+    for (const linea of leyenda) {
+      if (linea) estado.pagina.drawText(linea, { x: MARGEN, y: estado.y, size: 9.5, font: normal, color: GRIS });
+      estado.y -= 13;
+    }
+    estado.y -= 12;
+  }
 }
 
 export async function generarPdfInforme(datos: DatosInformePdf, opciones: OpcionesPdf): Promise<Uint8Array> {
@@ -178,6 +218,18 @@ export async function generarPdfInforme(datos: DatosInformePdf, opciones: Opcion
     y -= 16;
   }
 
+  // ---- Imágenes ----
+  if (datos.imagenes?.length) {
+    y -= 10;
+    asegurarEspacio(40);
+    escribir("Imágenes", MARGEN, y, 12, negrita, VERDE);
+    y -= 22;
+    const estado = { pagina, y };
+    await dibujarImagenes(pdf, datos.imagenes, normal, estado);
+    pagina = estado.pagina;
+    y = estado.y;
+  }
+
   // ---- Pie en todas las páginas ----
   const paginas = pdf.getPages();
   const aviso = esPsicologo
@@ -209,6 +261,7 @@ export interface DatosSeguimientoPdf {
   pautas?: string | null;
   avances?: string | null;
   proximaSesion?: Date | string | null;
+  imagenes?: ImagenParaPdf[];
 }
 
 export async function generarPdfSeguimiento(datos: DatosSeguimientoPdf, generadoPor: string): Promise<Uint8Array> {
@@ -314,6 +367,14 @@ export async function generarPdfSeguimiento(datos: DatosSeguimientoPdf, generado
   if (datos.avances?.trim()) {
     seccion("Avances y logros");
     parrafo(datos.avances);
+  }
+
+  if (datos.imagenes?.length) {
+    seccion("Imágenes");
+    const estado = { pagina, y };
+    await dibujarImagenes(pdf, datos.imagenes, normal, estado);
+    pagina = estado.pagina;
+    y = estado.y;
   }
 
   // ---- Pie ----

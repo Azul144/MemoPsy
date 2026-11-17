@@ -10,6 +10,7 @@ import { initializeDatabase } from "@/lib/database"
 import { InformeSeguimientoEntity } from "@/entities"
 import { accesoAlInforme, proximaSesion, seguimientoParaEnviar } from "@/lib/informes/seguimiento"
 import { generarPdfSeguimiento } from "@/lib/pdf/informe-pdf"
+import { imagenesParaPdf } from "@/lib/informes/imagenes"
 
 async function manejarGET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -42,6 +43,8 @@ async function manejarGET(_request: NextRequest, { params }: { params: Promise<{
         pautas: datos.pautas,
         avances: datos.avances,
         proximaSesion: datos.proximaSesion,
+        // Solo las imágenes de la nota que el psicólogo marcó como compartidas
+        imagenes: await imagenesParaPdf(dataSource, acceso.informe.id, true),
       },
       session.user.email ?? "MemoPsy",
     )

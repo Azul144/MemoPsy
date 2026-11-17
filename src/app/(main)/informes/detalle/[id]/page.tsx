@@ -13,6 +13,7 @@ import { TypographyH1, TypographyP, TypographySmall, TypographyMuted } from '@/c
 import { FileText as PageIcon, User, Users, CalendarDays, Lock, Unlock, Loader2, AlertTriangle, Edit, Download } from "lucide-react"
 import { avisoError } from "@/lib/avisos";
 import SeccionSeguimiento from "@/components/informes/SeccionSeguimiento";
+import { GaleriaImagenes } from "@/components/informes/ImagenesNota";
 
 // Interfaces
 interface PsicologoDetalle {
@@ -207,6 +208,8 @@ export default function DetalleInformePage() {
                   {informe.contenido}
                 </div>
               </div>
+
+              <GaleriaImagenes informeId={informe.id} titulo="Imágenes" mostrarPrivacidad={canEdit} />
 
               {informe.etiquetas && informe.etiquetas.trim() && (
                 <div>

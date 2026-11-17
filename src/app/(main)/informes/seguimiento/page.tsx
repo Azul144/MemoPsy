@@ -19,6 +19,7 @@ import {
   type RespuestaActividad,
   type Seguimiento,
 } from "@/components/informes/tipos-seguimiento"
+import { GaleriaImagenes } from "@/components/informes/ImagenesNota"
 
 const fechaSesion = (iso: string) => format(parseISO(iso), "EEEE d 'de' MMMM", { locale: es })
 const fechaHora = (iso: string) => format(parseISO(iso), "EEEE d 'de' MMMM 'a las' HH:mm", { locale: es })
@@ -153,6 +154,8 @@ function TarjetaSeguimiento({
 
           {s.pautas && <Bloque titulo="Pautas y recomendaciones" texto={s.pautas} />}
           {s.avances && <Bloque titulo="Avances y logros" texto={s.avances} destacado />}
+
+          <GaleriaImagenes informeId={s.informeId} titulo="Imágenes que compartió tu psicólogo/a" />
 
           <div className="flex flex-wrap items-center justify-between gap-3 border-t border-borde pt-4">
             <p className="flex items-center gap-2 text-sm text-suave">
