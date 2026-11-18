@@ -39,6 +39,8 @@ export async function GET() {
     dni: usuario.persona.dni,
     telefono: usuario.persona.telefono ?? "",
     email: usuario.email,
+    // Fecha de la última foto de perfil (null = sin foto); la foto se pide a /api/usuarios/me/foto
+    fotoActualizada: usuario.persona.fotoActualizada ? new Date(usuario.persona.fotoActualizada).toISOString() : null,
   });
 }
 

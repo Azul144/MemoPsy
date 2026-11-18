@@ -22,4 +22,13 @@ export class PersonaEntity extends BaseEntity {
   // Celular para los recordatorios por WhatsApp, en formato internacional sin "+" (5493704123456)
   @Column({ name: "telefono", type: "varchar", length: 20, nullable: true })
   telefono?: string | null;
+
+  // Foto de perfil, cifrada (AES-256-GCM). select: false para que no viaje en la sesión ni en los listados:
+  // se lee solo desde /api/usuarios/me/foto.
+  @Column({ name: "foto", type: "mediumblob", nullable: true, select: false })
+  foto?: Buffer | null;
+
+  // Cuándo se cambió la foto por última vez (null = sin foto)
+  @Column({ name: "foto_actualizada", type: "datetime", nullable: true })
+  fotoActualizada?: Date | null;
 }

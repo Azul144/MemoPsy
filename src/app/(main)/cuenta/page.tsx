@@ -1,5 +1,5 @@
 // src/app/(main)/cuenta/page.tsx
-// RF 1.3 - Mi cuenta: cada usuario edita sus datos y cambia su contraseña.
+// RF 1.3 - Mi cuenta: cada usuario cambia su foto de perfil, edita sus datos y cambia su contraseña.
 "use client";
 
 import { type FormEvent, useEffect, useState } from "react";
@@ -7,6 +7,7 @@ import { Loader2 } from "lucide-react";
 import InputPassword from "@/components/acceso/InputPassword";
 import RequisitosPassword from "@/components/acceso/RequisitosPassword";
 import EncabezadoPagina from "@/components/sistema/EncabezadoPagina";
+import TarjetaFotoPerfil from "@/components/sistema/TarjetaFotoPerfil";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -106,7 +107,7 @@ export default function MiCuentaPage() {
       <main className="mx-auto w-full max-w-5xl px-6 py-10">
         <EncabezadoPagina
           titulo="Mi cuenta"
-          descripcion="Tus datos personales y tu contraseña."
+          descripcion="Tu foto, tus datos personales y tu contraseña."
           volverA="/welcome"
           textoVolver="Volver al inicio"
         />
@@ -118,6 +119,7 @@ export default function MiCuentaPage() {
           </div>
         ) : (
           <div className="grid gap-6 lg:grid-cols-2">
+            <TarjetaFotoPerfil />
             <form onSubmit={guardarDatos} className="space-y-4 rounded-2xl border border-borde bg-card p-5">
               <h2 className="text-lg font-semibold text-dorado">Mis datos</h2>
               <div className="space-y-1.5">

@@ -55,11 +55,14 @@
   --exito: #6EE7B7;
   --info: #7DD3FC;
   --naranja: #FDBA74;
+  --violeta: #C4B5FD; /* Iniciales del perfil Auditor */
   --luz-fondo: rgba(62, 124, 122, 0.3); /* Manchas de luz de los encabezados */
   --fondo-pestanas: rgba(0, 0, 0, 0.2); /* Barra de pestañas */
-  --logo-fondo: #F1C77A; /* Logo Ψ con chispa: cuadrado, trazo y punto */
-  --logo-trazo: #1D3434;
-  --logo-punto: #1D3434;
+  --logo-fondo: #F1C77A; /* Logo: cuaderno con la Ψ y las ondas de la voz sobre un cuadrado */
+  --logo-hoja: #FFFDF8; /* Hoja del cuaderno */
+  --logo-trazo: #1D4A48; /* Ψ */
+  --logo-onda-1: #1D4A48; /* Ondas de la voz, en dos tonos */
+  --logo-onda-2: #D9A441;
   --logo-memo: #F6EFE2; /* Nombre en dos tonos: "Memo" y "Psy" */
   --logo-psy: #F1C77A;
   color-scheme: dark;
@@ -102,11 +105,14 @@
   --exito: #1A6B43;
   --info: #1D5F8A;
   --naranja: #9A4A00;
+  --violeta: #5B3FA8;
   --luz-fondo: rgba(29, 94, 91, 0.18);
   --fondo-pestanas: #DCE8E6;
   --logo-fondo: #1D4A48;
-  --logo-trazo: #FFFFFF;
-  --logo-punto: #E2B864;
+  --logo-hoja: #FFFFFF;
+  --logo-trazo: #1D4A48;
+  --logo-onda-1: #1D4A48;
+  --logo-onda-2: #D9A441;
   --logo-memo: #173030;
   --logo-psy: #86621A;
   color-scheme: light;
@@ -145,6 +151,7 @@
   --color-exito: var(--exito);
   --color-info: var(--info);
   --color-naranja: var(--naranja);
+  --color-violeta: var(--violeta);
   --color-salvia: #7FB3A6;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);

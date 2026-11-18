@@ -81,7 +81,7 @@ function BarraTelefonos() {
       <div className="mx-auto flex w-full max-w-6xl items-center gap-2 px-4 py-3 sm:gap-3 sm:px-6">
         <Link href="/" aria-label="Ir a la portada de MemoPsy" className="mr-auto shrink-0">
           <span className="sm:hidden">
-            <IsotipoMemoPsy size={34} />
+            <IsotipoMemoPsy size={38} />
           </span>
           <span className="hidden sm:block">
             <LogoMemoPsy tamano="sm" />

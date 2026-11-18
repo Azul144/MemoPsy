@@ -237,6 +237,8 @@ CREATE TABLE `persona` (
   `dni` varchar(20) NOT NULL,
   `fecha_nacimiento` date NOT NULL,
   `telefono` varchar(20) DEFAULT NULL,
+  `foto` mediumblob,
+  `foto_actualizada` datetime DEFAULT NULL,
   PRIMARY KEY (`id_persona`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 

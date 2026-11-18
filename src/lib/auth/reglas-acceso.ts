@@ -57,6 +57,7 @@ export const REGLAS_API: Regla[] = [
   { ruta: "/api/auth/mfa", permisos: "cualquiera" },
   { ruta: "/api/usuarios/me", metodos: ["GET", "PUT"], permisos: "cualquiera" },
   { ruta: "/api/usuarios/me/contrasena", metodos: ["POST"], permisos: "cualquiera" },
+  { ruta: "/api/usuarios/me/foto", metodos: ["GET", "PUT", "DELETE"], permisos: "cualquiera" },
 
   // Usuarios
   { ruta: "/api/usuarios", metodos: ["GET"], permisos: VER_USUARIOS },

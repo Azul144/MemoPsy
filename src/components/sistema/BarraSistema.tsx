@@ -1,6 +1,6 @@
 // src/components/sistema/BarraSistema.tsx
 // Barra superior compartida por todas las pantallas internas del sistema:
-// logo, nombre de la persona, sus iniciales y un menú con los módulos que tiene permitidos.
+// logo, nombre de la persona, su foto de perfil (o sus iniciales) y un menú con los módulos que tiene permitidos.
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -13,6 +13,7 @@ import { MODULOS_DISPONIBLES } from "@/config/modulos";
 import CampanaNotificaciones from "./CampanaNotificaciones";
 import BotonTema from "./BotonTema";
 import LogoMemoPsy from "@/components/comunes/LogoMemoPsy"
+import FotoPerfil from "./FotoPerfil";
 
 export default function BarraSistema() {
   const { data: session } = useSession();
@@ -34,9 +35,13 @@ export default function BarraSistema() {
   const nombreCompleto = usuario?.persona
     ? `${usuario.persona.nombre} ${usuario.persona.apellido}`
     : usuario?.email ?? "";
-  const iniciales = usuario?.persona
-    ? `${usuario.persona.nombre?.[0] ?? ""}${usuario.persona.apellido?.[0] ?? ""}`
-    : (usuario?.email?.[0] ?? "·").toUpperCase();
+  const nombresPerfiles: string[] = (usuario?.perfiles ?? []).map((p: { nombre?: string }) => p?.nombre ?? "");
+  const datosFoto = {
+    nombre: usuario?.persona?.nombre,
+    apellido: usuario?.persona?.apellido,
+    email: usuario?.email ?? undefined,
+    perfiles: nombresPerfiles,
+  };
   const permisos: string[] = (usuario?.permisos ?? []).map((p: { nombre: string }) => p.nombre);
   // Cada módulo aparece si la persona tiene al menos uno de sus permisos (lista central en src/config/modulos.ts)
   const modulos = MODULOS_DISPONIBLES.filter((m) => m.permisosRequeridos.some((p) => permisos.includes(p)));
@@ -78,17 +83,18 @@ export default function BarraSistema() {
               aria-label={abierto ? "Cerrar menú" : "Abrir menú"}
               className="flex h-10 items-center gap-2 rounded-full border border-foreground/15 pl-1 pr-3 text-crema transition-colors hover:border-primary/60"
             >
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
-                {iniciales}
-              </span>
+              <FotoPerfil {...datosFoto} tamano={32} />
               {abierto ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
             </button>
   
             {abierto && (
               <div className="absolute right-0 top-12 z-50 w-72 overflow-hidden rounded-2xl border border-foreground/10 bg-card text-crema shadow-2xl shadow-black/40">
-                <div className="border-b border-foreground/10 p-4">
-                  <p className="font-semibold">{nombreCompleto}</p>
-                  <p className="text-sm text-crema/65">{usuario?.email}</p>
+                <div className="flex items-center gap-3 border-b border-foreground/10 p-4">
+                  <FotoPerfil {...datosFoto} tamano={44} />
+                  <div className="min-w-0">
+                    <p className="truncate font-semibold">{nombreCompleto}</p>
+                    <p className="truncate text-sm text-crema/65">{usuario?.email}</p>
+                  </div>
                 </div>
                 <div className="p-2">
                   <Link href="/welcome" className="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-foreground/5">

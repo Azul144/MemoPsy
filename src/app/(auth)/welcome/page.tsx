@@ -10,11 +10,12 @@ import FondoAnimado from "@/components/comunes/FondoAnimado";
 import CampanaNotificaciones from "@/components/sistema/CampanaNotificaciones";
 import BotonTema from "@/components/sistema/BotonTema";
 import { Button } from "@/components/ui/button";
-import { Menu, X, LogOut, HomeIcon, KeyRound, Loader2, ArrowRight, ShieldCheck, ShieldAlert } from "lucide-react"
+import { Menu, X, LogOut, HomeIcon, UserRound, KeyRound, Loader2, ArrowRight, ShieldCheck, ShieldAlert } from "lucide-react"
 import ModalActivarMfa from "@/components/mfa/ModalActivarMfa";
 import ModalDesactivarMfa from "@/components/mfa/ModalDesactivarMfa";
 import toast from "react-hot-toast";
 import LogoMemoPsy from "@/components/comunes/LogoMemoPsy"
+import FotoPerfil from "@/components/sistema/FotoPerfil";
 
 export default function WelcomePage() {
   const { data: session, status, update: updateSession } = useSession(); // Added updateSession
@@ -136,10 +137,13 @@ export default function WelcomePage() {
 
   const nombre = session.user.persona?.nombre ?? '';
   const nombreCompleto = session.user.persona ? `${session.user.persona.nombre} ${session.user.persona.apellido}` : session.user.email || 'Usuario';
-  const iniciales = session.user.persona
-    ? `${session.user.persona.nombre?.[0] ?? ''}${session.user.persona.apellido?.[0] ?? ''}`
-    : (session.user.email?.[0] ?? 'U').toUpperCase();
   const perfiles: string[] = (session.user.perfiles ?? []).map((p: any) => p?.nombre).filter(Boolean);
+  const datosFoto = {
+    nombre: session.user.persona?.nombre,
+    apellido: session.user.persona?.apellido,
+    email: session.user.email ?? undefined,
+    perfiles,
+  };
   const fecha = new Date().toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' });
   const hoy = fecha.charAt(0).toUpperCase() + fecha.slice(1); // "Lunes, 19 de octubre"
 
@@ -163,18 +167,19 @@ export default function WelcomePage() {
               aria-label={isMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
               className="flex h-10 items-center gap-2 rounded-full border border-foreground/15 pl-1 pr-3 transition-colors hover:border-primary/60"
             >
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
-                {iniciales}
-              </span>
+              <FotoPerfil {...datosFoto} tamano={32} />
               {isMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
             </button>
 
             {/* Menú desplegable */}
             {isMenuOpen && (
               <div className="absolute right-0 top-12 z-50 w-72 overflow-hidden rounded-2xl border border-foreground/10 bg-card shadow-2xl shadow-black/40">
-                <div className="border-b border-foreground/10 p-4">
-                  <p className="font-semibold">{nombreCompleto}</p>
-                  <p className="text-sm text-crema/65">{session.user.email}</p>
+                <div className="flex items-center gap-3 border-b border-foreground/10 p-4">
+                  <FotoPerfil {...datosFoto} tamano={44} />
+                  <div className="min-w-0">
+                    <p className="truncate font-semibold">{nombreCompleto}</p>
+                    <p className="truncate text-sm text-crema/65">{session.user.email}</p>
+                  </div>
                 </div>
                 <div className="p-2">
                   {modulosPermitidos.length > 0 ? (
@@ -204,6 +209,14 @@ export default function WelcomePage() {
                   >
                     <HomeIcon className="h-5 w-5 text-crema/70" />
                     Inicio
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => navigateToModule('/cuenta')}
+                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-foreground/5"
+                  >
+                    <UserRound className="h-5 w-5 text-crema/70" />
+                    Mi cuenta
                   </button>
                   <button
                     type="button"
@@ -285,9 +298,9 @@ export default function WelcomePage() {
           {/* Cuenta */}
           <aside className="entrar h-fit rounded-3xl border border-foreground/10 bg-card p-6" style={{ animationDelay: '0.5s' }}>
             <div className="flex items-center gap-4">
-              <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-primary text-lg font-bold text-primary-foreground">
-                {iniciales}
-              </span>
+              <button type="button" onClick={() => router.push('/cuenta')} aria-label="Cambiar mi foto de perfil" className="rounded-full">
+                <FotoPerfil {...datosFoto} tamano={56} />
+              </button>
               <div className="min-w-0">
                 <p className="truncate font-semibold">{nombreCompleto}</p>
                 <p className="truncate text-sm text-crema/65">{session.user.email}</p>
