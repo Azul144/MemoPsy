@@ -54,7 +54,8 @@ export const config = {
     "/informes/:path*",
     "/perfiles/:path*",
     "/auditoria/:path*",
-    "/api/((?!auth/).*)",
+    // /api/whatsapp/ queda afuera: la llama Twilio sin sesión y la ruta verifica su firma
+    "/api/((?!auth/|whatsapp/).*)",
     "/api/auth/mfa/:path*",
   ],
 };

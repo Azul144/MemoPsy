@@ -31,6 +31,7 @@ interface PersonaDetails {
   dni: string
   fechaNacimiento: string
   telefono?: string | null
+  whatsappAcepta?: boolean
 }
 
 interface UsuarioDetails {
@@ -61,6 +62,7 @@ interface UserFormData {
   dni: string
   fechaNacimiento: string
   telefono: string
+  whatsapp: boolean
   numeroLicencia: string
   especialidad: string
 }
@@ -92,6 +94,7 @@ export default function EditarUsuarioPage() {
     dni: "",
     fechaNacimiento: "",
     telefono: "",
+    whatsapp: false,
     numeroLicencia: "",
     especialidad: "",
   })
@@ -182,6 +185,7 @@ export default function EditarUsuarioPage() {
           dni: userData.persona.dni,
           fechaNacimiento: userData.persona.fechaNacimiento ? userData.persona.fechaNacimiento.split("T")[0] : "",
           telefono: userData.persona.telefono || "",
+          whatsapp: Boolean(userData.persona.whatsappAcepta),
           numeroLicencia: userData.psicologo?.numeroLicencia || "",
           especialidad: userData.psicologo?.especialidad || "",
         })
@@ -372,6 +376,7 @@ export default function EditarUsuarioPage() {
         dni: formData.dni,
         fechaNacimiento: formData.fechaNacimiento,
         telefono: formData.telefono.trim() || null,
+        whatsappAcepta: formData.whatsapp && formData.telefono.trim() !== "",
       },
       roles: {
         isPsicologo,
@@ -553,6 +558,20 @@ export default function EditarUsuarioPage() {
                   ) : (
                     <p className="text-tenue text-sm mt-1">Opcional. Dato de contacto del paciente.</p>
                   )}
+                  {formData.telefono.trim() !== "" && (
+                  <div className="flex items-start gap-3 pt-3">
+                    <Checkbox
+                      id="whatsapp"
+                      checked={formData.whatsapp}
+                      onCheckedChange={(marcado) => setFormData((previo) => ({ ...previo, whatsapp: Boolean(marcado) }))}
+                      className="mt-0.5 border-borde-fuerte"
+                    />
+                    <Label htmlFor="whatsapp" className="cursor-pointer text-sm font-normal leading-snug text-texto-2">
+                      La persona aceptó recibir por WhatsApp los recordatorios de sus turnos (por ejemplo, en el
+                      consentimiento firmado en el consultorio).
+                    </Label>
+                  </div>
+                )}
                 </div>
 
                 {/* Account Info */}

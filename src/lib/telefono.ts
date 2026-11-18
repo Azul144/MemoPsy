@@ -27,3 +27,10 @@ export function normalizarCelular(texto: unknown): string | null | undefined {
 
   return digitos.length === 10 ? `549${digitos}` : undefined;
 }
+
+// Consentimiento para recibir mensajes por WhatsApp (Ley 25.326): se guarda la fecha en que se aceptó.
+// Sin celular o sin la casilla marcada, no hay consentimiento. Si ya había aceptado, se conserva la fecha original.
+export function fechaAceptaWhatsapp(acepta: unknown, celular: string | null, anterior?: Date | null): Date | null {
+  if (!celular || acepta !== true) return null;
+  return anterior ?? new Date();
+}

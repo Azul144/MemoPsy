@@ -237,6 +237,7 @@ CREATE TABLE `persona` (
   `dni` varchar(20) NOT NULL,
   `fecha_nacimiento` date NOT NULL,
   `telefono` varchar(20) DEFAULT NULL,
+  `whatsapp_acepta` datetime DEFAULT NULL,
   `foto` mediumblob,
   `foto_actualizada` datetime DEFAULT NULL,
   PRIMARY KEY (`id_persona`)
@@ -314,6 +315,18 @@ CREATE TABLE `usuario_tiene_perfil` (
   CONSTRAINT `usuario_tiene_perfil_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`),
   CONSTRAINT `usuario_tiene_perfil_ibfk_2` FOREIGN KEY (`id_perfil`) REFERENCES `perfil` (`id_perfil`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `whatsapp_conversacion` (
+  `telefono` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id_sesion` int DEFAULT NULL,
+  `paso` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'INICIO',
+  `opciones` text COLLATE utf8mb4_unicode_ci,
+  `ultima_alerta` datetime DEFAULT NULL,
+  `actualizada` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`telefono`),
+  KEY `fk_whatsapp_conversacion_sesion` (`id_sesion`),
+  CONSTRAINT `fk_whatsapp_conversacion_sesion` FOREIGN KEY (`id_sesion`) REFERENCES `sesion` (`id_sesion`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 SET FOREIGN_KEY_CHECKS = 1;

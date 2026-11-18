@@ -12,6 +12,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Brain, UserCog, UserPlusIcon } from "lucide-react"
 import { Switch } from "@/components/ui/switch"
+import { Checkbox } from "@/components/ui/checkbox"
 
 // Importar modelos de dominio
 import { Usuario } from "@/models/usuario.model"
@@ -37,6 +38,7 @@ interface FormData {
   dni: string
   fecha_nacimiento: string
   telefono: string
+  whatsapp: boolean
   numeroLicencia: string
   especialidad: string
 }
@@ -70,6 +72,7 @@ export default function RegistrarUsuarioPage() {
     dni: "",
     fecha_nacimiento: "",
     telefono: "",
+    whatsapp: false,
     numeroLicencia: "",
     especialidad: "",
   })
@@ -327,7 +330,11 @@ export default function RegistrarUsuarioPage() {
 
       // Preparar datos para envío
       const registrationData: any = {
-        persona: { ...persona.toEntity(), telefono: formData.telefono.trim() || null },
+        persona: {
+          ...persona.toEntity(),
+          telefono: formData.telefono.trim() || null,
+          whatsappAcepta: formData.whatsapp && formData.telefono.trim() !== "",
+        },
         usuario: usuario.toEntity(),
         roles: {
           isPsicologo,
@@ -391,6 +398,7 @@ export default function RegistrarUsuarioPage() {
       dni: "",
       fecha_nacimiento: "",
       telefono: "",
+      whatsapp: false,
       numeroLicencia: "",
       especialidad: "",
     })
@@ -521,6 +529,20 @@ export default function RegistrarUsuarioPage() {
                   <p className="text-peligro text-sm">{fieldErrors.telefono}</p>
                 ) : (
                   <p className="text-tenue text-sm">Opcional. Dato de contacto del paciente.</p>
+                )}
+                {formData.telefono.trim() !== "" && (
+                  <div className="flex items-start gap-3 pt-1">
+                    <Checkbox
+                      id="whatsapp"
+                      checked={formData.whatsapp}
+                      onCheckedChange={(marcado) => setFormData((previo) => ({ ...previo, whatsapp: Boolean(marcado) }))}
+                      className="mt-0.5 border-borde-fuerte"
+                    />
+                    <Label htmlFor="whatsapp" className="cursor-pointer text-sm font-normal leading-snug text-texto-2">
+                      La persona aceptó recibir por WhatsApp los recordatorios de sus turnos (por ejemplo, en el
+                      consentimiento firmado en el consultorio).
+                    </Label>
+                  </div>
                 )}
               </div>
 

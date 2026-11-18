@@ -1,11 +1,12 @@
 // src/components/sistema/CampanaNotificaciones.tsx
 // RF 3.2 / RF 3.3 - Campanita de la barra superior: muestra los avisos de turnos
-// (reprogramados, cancelados y recordatorios) y cuántos hay sin leer.
+// (reprogramados, cancelados, confirmados y recordatorios), los avisos urgentes de crisis
+// que llegan por WhatsApp y cuántos hay sin leer.
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { Bell, CalendarClock, CalendarX, ClipboardCheck, MessageSquare, RefreshCw } from "lucide-react";
+import { Bell, CalendarCheck, CalendarClock, CalendarX, ClipboardCheck, LifeBuoy, MessageSquare, RefreshCw } from "lucide-react";
 
 interface Notificacion {
   id: string;
@@ -25,6 +26,8 @@ const ICONOS: Record<string, { icono: typeof Bell; color: string }> = {
   RECORDATORIO: { icono: CalendarClock, color: "text-dorado" },
   SEGUIMIENTO: { icono: ClipboardCheck, color: "text-dorado" },
   RESPUESTA_ACTIVIDAD: { icono: MessageSquare, color: "text-exito" },
+  CONFIRMACION: { icono: CalendarCheck, color: "text-exito" },
+  CRISIS: { icono: LifeBuoy, color: "text-peligro" },
 };
 
 function haceCuanto(fechaIso: string): string {

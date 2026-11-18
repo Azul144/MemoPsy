@@ -2,7 +2,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { conAuditoria } from "@/lib/auditoria/con-auditoria"
 import { getRepository, getDataSource } from "@/lib/database"
-import { AYUDA_CELULAR, normalizarCelular } from "@/lib/telefono"
+import { AYUDA_CELULAR, fechaAceptaWhatsapp, normalizarCelular } from "@/lib/telefono"
 import {
   PersonaEntity,
   UsuarioEntity,
@@ -103,6 +103,7 @@ export async function GET(request: NextRequest, { params: paramsPromise }: { par
         dni: usuario.persona.dni,
         fechaNacimiento: formatDateToISO(usuario.persona.fechaNacimiento),
         telefono: usuario.persona.telefono,
+        whatsappAcepta: Boolean(usuario.persona.whatsappAcepta),
       },
       psicologo: psicologoData,
       paciente: pacienteData,
@@ -189,6 +190,7 @@ async function manejarPUT(request: NextRequest, { params: paramsPromise }: { par
       dni: persona.dni,
       fechaNacimiento: new Date(persona.fechaNacimiento),
       telefono,
+      whatsappAcepta: fechaAceptaWhatsapp(persona.whatsappAcepta ?? Boolean(usuarioExistente?.persona?.whatsappAcepta), telefono, usuarioExistente?.persona?.whatsappAcepta),
     })
 
     // Actualizar datos de usuario

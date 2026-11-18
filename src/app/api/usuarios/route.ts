@@ -4,7 +4,7 @@ import { conAuditoria } from "@/lib/auditoria/con-auditoria"
 import { getRepository } from "@/lib/database"
 import { PersonaEntity, UsuarioEntity, PsicologoEntity, PacienteEntity, ObraSocialEntity, PerfilEntity, UsuarioTienePerfilEntity } from "@/entities"
 import * as bcrypt from "bcrypt";
-import { AYUDA_CELULAR, normalizarCelular } from "@/lib/telefono"
+import { AYUDA_CELULAR, fechaAceptaWhatsapp, normalizarCelular } from "@/lib/telefono"
 
 import { getDataSource } from "@/lib/database" // Importar el DataSource
 
@@ -199,6 +199,7 @@ async function manejarPOST(request: NextRequest) {
       dni: persona.dni,
       fechaNacimiento: new Date(persona.fechaNacimiento),
       telefono,
+      whatsappAcepta: fechaAceptaWhatsapp(persona.whatsappAcepta, telefono),
     })
 
     const personaGuardada = await personaRepo.save(nuevaPersona)

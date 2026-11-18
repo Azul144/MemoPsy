@@ -9,6 +9,7 @@ import RequisitosPassword from "@/components/acceso/RequisitosPassword";
 import EncabezadoPagina from "@/components/sistema/EncabezadoPagina";
 import TarjetaFotoPerfil from "@/components/sistema/TarjetaFotoPerfil";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { avisoError, avisoExito } from "@/lib/avisos";
@@ -21,6 +22,8 @@ interface DatosCuenta {
   dni: string;
   telefono: string;
   email: string;
+  esPaciente: boolean;
+  whatsapp: boolean;
 }
 
 export default function MiCuentaPage() {
@@ -61,6 +64,7 @@ export default function MiCuentaPage() {
           apellido: datos.apellido,
           email: datos.email,
           telefono: datos.telefono,
+          whatsapp: datos.whatsapp && datos.telefono.trim() !== "",
           passwordActual: cambiaEmail ? passwordParaEmail : undefined,
         }),
       });
@@ -139,6 +143,20 @@ export default function MiCuentaPage() {
                 <Label htmlFor="telefono" className="text-texto-2">Celular (opcional)</Label>
                 <Input id="telefono" value={datos.telefono} onChange={(e) => setDatos({ ...datos, telefono: e.target.value })} className="border-borde-fuerte bg-background text-foreground" />
                 <p className="text-sm text-tenue">{AYUDA_CELULAR}</p>
+                {datos.esPaciente && datos.telefono.trim() !== "" && (
+                  <div className="flex items-start gap-3 pt-2">
+                    <Checkbox
+                      id="whatsapp"
+                      checked={datos.whatsapp}
+                      onCheckedChange={(marcado) => setDatos({ ...datos, whatsapp: Boolean(marcado) })}
+                      className="mt-0.5 border-borde-fuerte"
+                    />
+                    <Label htmlFor="whatsapp" className="cursor-pointer text-sm font-normal leading-snug text-texto-2">
+                      Acepto recibir por WhatsApp los recordatorios de mis turnos. Puedo dejar de recibirlos cuando
+                      quiera, desmarcando esta casilla o escribiendo BAJA.
+                    </Label>
+                  </div>
+                )}
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="email" className="text-texto-2">Email</Label>

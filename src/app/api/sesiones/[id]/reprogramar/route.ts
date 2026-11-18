@@ -9,19 +9,14 @@ import { conAuditoria } from "@/lib/auditoria/con-auditoria"
 import { authConfig } from "@/lib/auth/auth-config"
 import { alcanceSesiones } from "@/lib/auth/alcance-sesiones"
 import { initializeDatabase } from "@/lib/database"
-import { EstadoEntity, PacienteTieneSesionEntity, SesionEntity } from "@/entities"
+import { PacienteTieneSesionEntity, SesionEntity } from "@/entities"
 import { buscarHorariosLibres, HORAS_ANTICIPACION, MENSAJE_SIN_ANTICIPACION } from "@/lib/sesiones/horarios-libres"
-import { buscarSesionSuperpuesta } from "@/lib/validaciones/superposicion-sesiones"
+import { ErrorHorarioOcupado, MENSAJE_HORARIO_NO_DISPONIBLE, moverTurno, turnoTerminado } from "@/lib/sesiones/acciones-paciente"
 import { notificarCambioDeTurno } from "@/lib/notificaciones/notificar"
 
 const reprogramarSchema = z.object({
   fechaHoraInicio: z.string().datetime({ message: "Elegí un horario" }),
 })
-
-const MENSAJE_HORARIO_NO_DISPONIBLE = "Ese horario ya no está disponible. Elegí otro."
-
-// Se lanza dentro de la transacción si alguien ocupó el horario mientras el paciente elegía
-class ErrorHorarioOcupado extends Error {}
 
 // Carga el turno y verifica que quien pide sea uno de sus pacientes y que todavía se pueda mover
 async function turnoDelPaciente(id: string) {
@@ -42,7 +37,7 @@ async function turnoDelPaciente(id: string) {
   if (!sesion || !pacientesIds.includes(alcance.id)) {
     return { error: NextResponse.json({ error: "Sesión no encontrada" }, { status: 404 }) }
   }
-  if (sesion.estado?.nombre === "Finalizada" || sesion.estado?.nombre === "Cancelada") {
+  if (turnoTerminado(sesion)) {
     return { error: NextResponse.json({ error: `No se puede reprogramar un turno ${sesion.estado.nombre.toLowerCase()}.` }, { status: 409 }) }
   }
   if (sesion.fechaHoraInicio.getTime() - Date.now() < HORAS_ANTICIPACION * 60 * 60 * 1000) {
@@ -87,22 +82,8 @@ async function manejarPOST(request: NextRequest, { params }: { params: Promise<{
       return NextResponse.json({ error: MENSAJE_HORARIO_NO_DISPONIBLE }, { status: 409 })
     }
 
-    const reprogramada = await dataSource.getRepository(EstadoEntity).findOne({ where: { nombre: "Reprogramada" } })
     const inicioAnterior = sesion.fechaHoraInicio
-    const inicio = new Date(horario.inicio)
-    const fin = new Date(horario.fin)
-
-    await dataSource.transaction(async (manager) => {
-      // RF 3.1 - Se vuelve a mirar dentro de la transacción por si otro lo tomó recién
-      const superpuesta = await buscarSesionSuperpuesta(manager, sesion.psicologo.id, inicio, fin, sesion.id)
-      if (superpuesta) throw new ErrorHorarioOcupado()
-      await manager.update(SesionEntity, { id: sesion.id }, {
-        fechaHoraInicio: inicio,
-        fechaHoraFin: fin,
-        ...(reprogramada && { estado: { id: reprogramada.id } as EstadoEntity }),
-      })
-    })
-
+    const reprogramada = await moverTurno(dataSource, sesion, horario)
     await notificarCambioDeTurno({
       sesionId: sesion.id,
       tipo: "REPROGRAMACION",

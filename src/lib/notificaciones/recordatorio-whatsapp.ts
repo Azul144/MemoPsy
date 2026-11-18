@@ -1,10 +1,11 @@
 // src/lib/notificaciones/recordatorio-whatsapp.ts
-// RF 3.3 - Recordatorio por WhatsApp a los pacientes que tienen celular cargado, para los turnos
+// RF 3.3 - Recordatorio por WhatsApp a los pacientes que tienen celular cargado y aceptaron recibirlo, para los turnos
 // de las próximas 24 horas. Funciona igual que el del email (recordatorio-email.ts) y es independiente:
 // si WhatsApp falla, el paciente igual recibe el email y el aviso dentro del sistema.
 // En el mensaje va solo con quién, cuándo y la modalidad (con el enlace si es virtual). Nunca contenido clínico.
 import { initializeDatabase } from "@/lib/database";
 import { enviarWhatsapp, WhatsappError, whatsappConfigurado, type RecordatorioWhatsapp } from "@/lib/whatsapp";
+import { guardarConversacion } from "@/lib/whatsapp/conversacion";
 
 const HORAS_RECORDATORIO = 24;
 
@@ -12,6 +13,7 @@ interface TurnoPendiente {
   sesionId: number;
   usuarioId: number;
   telefono: string;
+  pacienteNombre: string;
   inicio: Date;
   modalidad: string | null;
   enlace: string | null;
@@ -22,6 +24,7 @@ interface TurnoPendiente {
 function recordatorio(turno: TurnoPendiente): RecordatorioWhatsapp {
   return {
     para: turno.telefono,
+    paciente: (turno.pacienteNombre ?? "").trim().split(/\s+/)[0] ?? "",
     psicologo: `${turno.psicologoNombre} ${turno.psicologoApellido}`.trim(),
     inicio: new Date(turno.inicio),
     modalidad: (turno.modalidad ?? "presencial").toLowerCase(),
@@ -44,7 +47,7 @@ export async function enviarRecordatoriosPorWhatsapp(): Promise<void> {
     const hasta = new Date(ahora.getTime() + HORAS_RECORDATORIO * 60 * 60 * 1000);
 
     const pendientes: TurnoPendiente[] = await dataSource.query(
-      `SELECT s.id_sesion AS sesionId, u.id_usuario AS usuarioId, pe.telefono, s.fecha_hora_inicio AS inicio,
+      `SELECT s.id_sesion AS sesionId, u.id_usuario AS usuarioId, pe.telefono, pe.nombre AS pacienteNombre, s.fecha_hora_inicio AS inicio,
               m.nombre AS modalidad, s.enlace_videollamada AS enlace,
               pp.nombre AS psicologoNombre, pp.apellido AS psicologoApellido
          FROM sesion s
@@ -59,6 +62,7 @@ export async function enviarRecordatoriosPorWhatsapp(): Promise<void> {
         WHERE s.fecha_hora_inicio BETWEEN ? AND ?
           AND e.nombre NOT IN ('Cancelada', 'Finalizada')
           AND pe.telefono IS NOT NULL AND pe.telefono <> ''
+          AND pe.whatsapp_acepta IS NOT NULL
           AND NOT EXISTS (SELECT 1 FROM recordatorio_enviado r
                            WHERE r.id_sesion = s.id_sesion AND r.id_usuario = u.id_usuario AND r.canal = 'WHATSAPP')`,
       [ahora, hasta],
@@ -74,6 +78,8 @@ export async function enviarRecordatoriosPorWhatsapp(): Promise<void> {
 
       try {
         await enviarWhatsapp(recordatorio(turno));
+        // Si el paciente responde con los botones del recordatorio, el chatbot sabe de qué turno habla
+        await guardarConversacion(turno.telefono, { sesionId: turno.sesionId, paso: "RECORDATORIO", opciones: null });
       } catch (error) {
         // Si el número no puede recibir (error 4xx) no se reintenta; si fue un corte, sí
         if (!(error instanceof WhatsappError && error.definitivo)) {

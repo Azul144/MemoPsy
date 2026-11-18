@@ -4,6 +4,7 @@
 
 export interface RecordatorioWhatsapp {
   para: string; // celular en formato 5493704123456
+  paciente: string; // solo el nombre de pila, para el saludo
   psicologo: string;
   inicio: Date;
   modalidad: string; // "presencial", "remota"

@@ -12,7 +12,10 @@ import { NotificacionEntity, PacienteTieneSesionEntity, SesionEntity } from "@/e
 
 // SEGUIMIENTO: el psicólogo compartió un informe de seguimiento (RF 2.4)
 // RESPUESTA_ACTIVIDAD: el paciente respondió una actividad del informe
-export type TipoNotificacion = "REPROGRAMACION" | "CANCELACION" | "RECORDATORIO" | "SEGUIMIENTO" | "RESPUESTA_ACTIVIDAD";
+// CONFIRMACION: el paciente confirmó su turno por WhatsApp
+// CRISIS: el paciente escribió por WhatsApp un mensaje que puede indicar una crisis
+export type TipoNotificacion =
+  | "REPROGRAMACION" | "CANCELACION" | "RECORDATORIO" | "SEGUIMIENTO" | "RESPUESTA_ACTIVIDAD" | "CONFIRMACION" | "CRISIS";
 
 const ZONA_HORARIA = "America/Argentina/Buenos_Aires";
 const HORAS_RECORDATORIO = 24;

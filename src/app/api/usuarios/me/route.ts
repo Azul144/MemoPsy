@@ -9,7 +9,7 @@ import { registrarIntentoFallido } from "@/lib/auth/login";
 import { conAuditoria } from "@/lib/auditoria/con-auditoria";
 import { initializeDatabase } from "@/lib/database";
 import { UsuarioEntity } from "@/entities";
-import { AYUDA_CELULAR, normalizarCelular } from "@/lib/telefono";
+import { AYUDA_CELULAR, fechaAceptaWhatsapp, normalizarCelular } from "@/lib/telefono";
 import { esEmailValido, normalizarEmail } from "@/lib/validaciones/password";
 
 const datosSchema = z.object({
@@ -17,6 +17,7 @@ const datosSchema = z.object({
   apellido: z.string().trim().min(1, "El apellido es requerido").max(100),
   email: z.string().trim().max(100),
   telefono: z.string().nullish(),
+  whatsapp: z.boolean().optional(),
   passwordActual: z.string().optional(),
 });
 
@@ -38,6 +39,9 @@ export async function GET() {
     apellido: usuario.persona.apellido,
     dni: usuario.persona.dni,
     telefono: usuario.persona.telefono ?? "",
+    // Solo los pacientes reciben recordatorios de turnos por WhatsApp
+    esPaciente: Boolean(session.user.pacienteId),
+    whatsapp: Boolean(usuario.persona.whatsappAcepta),
     email: usuario.email,
     // Fecha de la última foto de perfil (null = sin foto); la foto se pide a /api/usuarios/me/foto
     fotoActualizada: usuario.persona.fotoActualizada ? new Date(usuario.persona.fotoActualizada).toISOString() : null,
@@ -52,7 +56,7 @@ async function manejarPUT(request: NextRequest) {
   if (!validacion.success) {
     return NextResponse.json({ error: validacion.error.issues[0]?.message ?? "Datos inválidos" }, { status: 400 });
   }
-  const { nombre, apellido, telefono, passwordActual } = validacion.data;
+  const { nombre, apellido, telefono, whatsapp, passwordActual } = validacion.data;
 
   const email = normalizarEmail(validacion.data.email);
   if (!esEmailValido(email)) return NextResponse.json({ error: "El email no es válido" }, { status: 400 });
@@ -83,6 +87,7 @@ async function manejarPUT(request: NextRequest) {
     usuario.persona.nombre = nombre;
     usuario.persona.apellido = apellido;
     usuario.persona.telefono = celular;
+    usuario.persona.whatsappAcepta = fechaAceptaWhatsapp(whatsapp ?? Boolean(usuario.persona.whatsappAcepta), celular, usuario.persona.whatsappAcepta);
     await repo.manager.save(usuario.persona);
 
     return NextResponse.json({ ok: true, id: usuario.id });

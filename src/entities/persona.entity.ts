@@ -23,6 +23,10 @@ export class PersonaEntity extends BaseEntity {
   @Column({ name: "telefono", type: "varchar", length: 20, nullable: true })
   telefono?: string | null;
 
+  // Cuándo aceptó recibir mensajes por WhatsApp (null = no aceptó o se dio de baja)
+  @Column({ name: "whatsapp_acepta", type: "datetime", nullable: true })
+  whatsappAcepta?: Date | null;
+
   // Foto de perfil, cifrada (AES-256-GCM). select: false para que no viaje en la sesión ni en los listados:
   // se lee solo desde /api/usuarios/me/foto.
   @Column({ name: "foto", type: "mediumblob", nullable: true, select: false })
