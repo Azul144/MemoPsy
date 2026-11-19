@@ -481,7 +481,77 @@ function ListaInformes() {
       )}
 
       {!isLoading && !error && informes.length > 0 && (
-        <Card style={{ backgroundColor: "var(--card)", borderColor: "var(--borde)" }}>
+        <>
+        {/* En el celular, una tarjeta por nota: la tabla no entra a lo ancho y cortaba la fecha */}
+        <ul className="space-y-3 md:hidden">
+          {informes.map((informe) => {
+            const fecha = new Date(informe.fechaCreacion).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })
+            const etiquetas = (informe.etiquetas ?? '').split(',').map((e) => e.trim()).filter(Boolean)
+            return (
+              <li key={informe.id} className="rounded-2xl border p-4" style={{ backgroundColor: "var(--card)", borderColor: "var(--borde)" }}>
+                <div className="flex items-start justify-between gap-3">
+                  <button
+                    type="button"
+                    onClick={() => router.push(`/informes/detalle/${informe.id}`)}
+                    className="text-left font-medium text-foreground hover:text-dorado"
+                  >
+                    {informe.titulo}
+                  </button>
+                  <Badge variant={informe.esPrivado ? "destructive" : "default"} className="shrink-0 text-xs">
+                    {informe.esPrivado ? <Lock className="w-3 h-3 mr-1" /> : <Unlock className="w-3 h-3 mr-1" />}
+                    {informe.esPrivado ? "Privado" : "Público"}
+                  </Badge>
+                </div>
+                <p className="mt-1 text-sm text-suave">{fecha}</p>
+                {etiquetas.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-1">
+                    {etiquetas.map((etq, i) => (
+                      <Badge key={i} className="bg-primary/20 text-dorado text-xs font-normal">{etq}</Badge>
+                    ))}
+                  </div>
+                )}
+                {userRole === 'psicologo' && informe.pacientes && informe.pacientes.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-1">
+                    {informe.pacientes.map((paciente, index) => (
+                      <Badge key={index} variant="secondary" className="text-xs bg-primary text-primary-foreground">
+                        {paciente.nombre}
+                        {paciente.dni && ` (${paciente.dni})`}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+                {userRole === 'paciente' && informe.psicologo && (
+                  <Badge variant="outline" className="mt-2 text-xs border-dorado text-dorado">
+                    <Brain className="w-3 h-3 mr-1" />
+                    {informe.psicologo.nombre}
+                  </Badge>
+                )}
+                <div className="mt-3 flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => router.push(`/informes/detalle/${informe.id}`)}
+                    className="border-dorado text-dorado hover:bg-primary hover:text-primary-foreground"
+                  >
+                    <Eye className="w-4 h-4 mr-1.5" /> Ver
+                  </Button>
+                  {canEditInforme && userRole === 'psicologo' && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => router.push(`/informes/editar/${informe.id}`)}
+                      className="border-green-500 text-exito hover:bg-primary/90 hover:text-foreground"
+                    >
+                      <Edit className="w-4 h-4 mr-1.5" /> Editar
+                    </Button>
+                  )}
+                </div>
+              </li>
+            )
+          })}
+        </ul>
+
+        <Card className="hidden md:block" style={{ backgroundColor: "var(--card)", borderColor: "var(--borde)" }}>
           <CardContent className="p-0">
             <Table className="text-base">
               <TableHeader className="bg-superficie">
@@ -604,6 +674,7 @@ function ListaInformes() {
             </Table>
           </CardContent>
         </Card>
+        </>
       )}
     </>
   );

@@ -968,7 +968,7 @@ const handleUpdateSesion = async () => {
               {puedeRegistrarSesiones && (
                 <TabsTrigger
                   value="registrar"
-                  className="shrink-0 px-4 sm:px-6"
+                  className="shrink-0 px-3 sm:px-6"
                 >
                   Registrar Sesiones
                 </TabsTrigger>
@@ -976,7 +976,7 @@ const handleUpdateSesion = async () => {
               {session?.user?.psicologoId && (
               <TabsTrigger
                 value="psicologo"
-                className="shrink-0 px-4 sm:px-6"
+                className="shrink-0 px-3 sm:px-6"
               >
                 Mis Sesiones (Psicólogo)
               </TabsTrigger>
@@ -984,7 +984,7 @@ const handleUpdateSesion = async () => {
               {session?.user?.pacienteId && (
               <TabsTrigger
                 value="paciente"
-                className="shrink-0 px-4 sm:px-6"
+                className="shrink-0 px-3 sm:px-6"
               >
                 Mis Sesiones (Paciente)
               </TabsTrigger>
