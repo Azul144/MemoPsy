@@ -1,4 +1,4 @@
-# Casos de prueba: recordatorios, avisos y enlace de videollamada
+# Casos de prueba: recordatorios, avisos, enlace de videollamada y asistente de WhatsApp
 
 Tarjeta #11 del tablero. Requerimientos RF 3.2 (avisos de cambios de turno), RF 3.3 (recordatorios) y RF 3.4 (enlace de videollamada), apartado 8.8.1 del TIF.
 Datos ficticios de la demo, sobre la instalación local. Turnos de prueba creados el domingo 25/10 para el lunes 26/10, entre la psicóloga Carla Benítez (`psicologa@memopsy.test`) y el paciente Azul Coronel, que es la única cuenta con un email real (el de la autora), para poder ver el email que llega.
@@ -44,6 +44,28 @@ Estado: ✅ pasa · ❌ falla · ⏳ pendiente
 | ID | Caso | Pasos | Resultado esperado | Resultado obtenido | Estado |
 |---|---|---|---|---|---|
 | CP-16 | Pedidos simultáneos a la campana | Se borran los recordatorios de Carla y se piden sus avisos cuatro veces a la vez | Un solo recordatorio por turno | Antes de la corrección, Carla tenía dos recordatorios iguales del mismo turno (la campana y la página pedían a la vez). Corregido: los pedidos simultáneos del mismo usuario esperan al primero; quedó uno por turno | ✅ |
+
+## Asistente de WhatsApp y consentimiento (RF 3.2, RF 3.3 y RF 4.3)
+
+Ejecutados el 18/11/2026 sobre la instalación local, con `WHATSAPP_CHATBOT=activo`. Como el número de MemoPsy todavía espera la verificación del negocio en Meta, los mensajes se simularon: un script arma cada pedido igual que Twilio, lo firma con el Auth Token (`X-Twilio-Signature`) y lo manda a `/api/whatsapp/webhook`. La paciente de prueba fue Camila Ruiz (celular ficticio 5493700000001), con un turno remoto de prueba con Carla Benítez (sesión 77). Los resultados se comprobaron en `sesion`, `notificacion`, `auditoria` y `whatsapp_conversacion`, y después se borraron los datos de prueba.
+
+| ID | Caso | Pasos | Resultado esperado | Resultado obtenido | Estado |
+|---|---|---|---|---|---|
+| CP-17 | Botón «Confirmo» del recordatorio | Se responde con el botón CONFIRMAR | El turno queda «Confirmada», se avisa al psicólogo y la respuesta incluye el enlace de videollamada | Turno confirmado, aviso CONFIRMACION a Carla, auditoría CONFIRMAR_WHATSAPP y enlace en la respuesta | ✅ |
+| CP-18 | Pedir reprogramar | Se escribe «3» | Se ofrecen hasta 6 horarios libres dentro de las franjas del psicólogo | Se ofrecieron 6 horarios (jue 19/11 y vie 20/11) | ✅ |
+| CP-19 | Elegir un horario | Se responde «2» | El turno se mueve a ese horario, queda «Reprogramada» y se avisa al psicólogo | Turno movido al jue 19/11 17:00, aviso REPROGRAMACION y auditoría REPROGRAMAR_WHATSAPP | ✅ |
+| CP-20 | Mensaje con riesgo | «ya no aguanto más, me quiero matar» | Respuesta fija con 911, 107, 0800 999 0091, 0800 345 1435 y el enlace a /crisis; aviso urgente al psicólogo; auditoría sin el texto | Respuesta fija, aviso CRISIS «Urgente: posible riesgo» a Carla y auditoría CRISIS_WHATSAPP sin contenido | ✅ |
+| CP-21 | Segundo mensaje de crisis | «estoy con un ataque de pánico», antes de 15 minutos | Se responde con la ayuda, sin repetir el aviso al psicólogo | Respuesta de malestar, sin aviso nuevo (un solo aviso en total) | ✅ |
+| CP-22 | Pedir cancelar | Se escribe «2» | Se pide confirmar con SI o NO | Pidió confirmación | ✅ |
+| CP-23 | Arrepentirse | Se responde «no» | El turno sigue en pie | El turno siguió igual | ✅ |
+| CP-24 | Botón «No puedo ir» y confirmar | Botón CANCELAR y después «Sí» | El turno queda cancelado y se avisa a las partes | Turno cancelado, aviso CANCELACION a Carla y auditoría CANCELAR_WHATSAPP | ✅ |
+| CP-25 | Darse de baja | Se escribe «BAJA» | Se borra el consentimiento y no se mandan más recordatorios por WhatsApp | `whatsapp_acepta` en NULL y auditoría BAJA_WHATSAPP | ✅ |
+| CP-26 | Volver a aceptar | Se escribe «alta» | Se registra la fecha del consentimiento | `whatsapp_acepta` con la fecha y auditoría ALTA_WHATSAPP | ✅ |
+| CP-27 | Mensaje libre | Se escribe «hola» | Se muestra el próximo turno y el menú 1 a 4 | Mostró el turno del mié 25/11 y el menú, sin cambiar nada | ✅ |
+| CP-28 | Celular desconocido | «hola» desde un número que no es de ningún paciente | Se informa que el número no se reconoce y se ofrece la ayuda en crisis | Respuesta de número no reconocido con el enlace a /crisis | ✅ |
+| CP-29 | Crisis desde un celular desconocido | «no quiero vivir» desde ese número | Se responde con la ayuda en crisis, sin decir que se avisó a un psicólogo | Respuesta fija, sin aviso ni auditoría | ✅ |
+| CP-30 | Firma falsa | Pedido con una `X-Twilio-Signature` inválida | Se rechaza sin procesar el mensaje | HTTP 403 | ✅ |
+| CP-31 | Casilla de consentimiento en «Mi cuenta» | La paciente marca la casilla, guarda dos veces y después la desmarca | Se guarda la fecha, se conserva al volver a guardar y se borra al desmarcar | Fecha guardada, igual en el segundo guardado y NULL al desmarcar | ✅ |
 
 ## Observaciones
 
