@@ -39,7 +39,12 @@ export default function PantallaAcceso({ children }: { children: React.ReactNode
 
       {/* Formulario */}
       <section className="relative flex flex-col overflow-hidden px-6 py-6 sm:px-12 sm:py-8">
-        <FondoAnimado intensidad="suave" />
+        {/* En el celular las manchas de luz se apagan cerca del borde de arriba y del de abajo:
+            así la pantalla termina en el mismo verde con que Safari pinta la barra de la hora y la de la dirección */}
+        <FondoAnimado
+          intensidad="suave"
+          className="max-lg:[mask-image:linear-gradient(to_bottom,transparent,black_9rem,black_calc(100%-9rem),transparent)]"
+        />
         {/* En el celular, "Volver" y el botón de crisis entran en una sola línea */}
         <div className="relative flex items-center justify-between gap-3">
           <Link
