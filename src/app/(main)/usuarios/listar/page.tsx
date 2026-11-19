@@ -38,6 +38,7 @@ interface UsuarioCompleto {
     id: string
     especialidad: string
     numeroLicencia: string
+    obrasSociales?: { id: string; nombre: string }[]
   } | null
   paciente: {
     id: string
@@ -64,6 +65,12 @@ const COLOR_PERFIL: Record<string, string> = {
   Recepcionista: "border-naranja text-naranja",
   Auditor: "border-borde-fuerte text-suave",
   Paciente: "border-exito text-exito",
+}
+
+// Obras sociales con las que trabaja un psicólogo, en una línea
+function nombresObrasSociales(obras?: { nombre: string }[]): string {
+  if (!obras || obras.length === 0) return "Sin cargar"
+  return obras.map((o) => (o.nombre.trim().toLowerCase() === "particular" ? "Particular" : o.nombre)).join(", ")
 }
 
 export default function ListarUsuariosPage() {
@@ -158,6 +165,7 @@ export default function ListarUsuariosPage() {
         user.persona?.dni.includes(searchTermLower) ||
         (user.psicologo?.especialidad && user.psicologo.especialidad.toLowerCase().includes(searchTermLower)) ||
         (user.psicologo?.numeroLicencia && user.psicologo.numeroLicencia.toLowerCase().includes(searchTermLower)) ||
+        (user.psicologo?.obrasSociales ?? []).some((o) => o.nombre.toLowerCase().includes(searchTermLower)) ||
         (user.paciente?.obraSocial?.nombre && user.paciente.obraSocial.nombre.toLowerCase().includes(searchTermLower)),
     )
   }, [usuarios, searchTerm])
@@ -369,6 +377,8 @@ export default function ListarUsuariosPage() {
                         <dd className="text-texto-2">{user.psicologo.especialidad || "—"}</dd>
                         <dt className="text-tenue">Licencia</dt>
                         <dd className="text-texto-2">{user.psicologo.numeroLicencia || "—"}</dd>
+                        <dt className="text-tenue">Obras sociales</dt>
+                        <dd className="text-texto-2">{nombresObrasSociales(user.psicologo.obrasSociales)}</dd>
                       </>
                     )}
                     {user.paciente && (
@@ -412,6 +422,7 @@ export default function ListarUsuariosPage() {
                           <>
                             <p className="text-texto-2">{user.psicologo.especialidad || "—"}</p>
                             <p className="text-sm text-tenue">Licencia {user.psicologo.numeroLicencia || "—"}</p>
+                            <p className="text-sm text-tenue">Trabaja con: {nombresObrasSociales(user.psicologo.obrasSociales)}</p>
                           </>
                         )}
                         {user.paciente && (

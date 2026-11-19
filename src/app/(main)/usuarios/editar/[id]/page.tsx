@@ -15,6 +15,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Brain, Activity, AlertCircle } from "lucide-react"
 import { ObraSocial } from "@/models/obra-social.model"
 import { ESPECIALIDADES_PSICOLOGIA } from "@/lib/especialidades"
+import SelectorObrasSociales from "@/components/usuarios/SelectorObrasSociales"
 import { avisoExito } from "@/lib/avisos";
 
 // Interfaces
@@ -43,6 +44,7 @@ interface UsuarioDetails {
     id: string
     especialidad: string
     numeroLicencia: string
+    obrasSociales?: { id: string; nombre: string }[]
   }
   paciente?: {
     id: string
@@ -77,6 +79,7 @@ interface FieldErrors {
   numeroLicencia?: string
   especialidad?: string
   selectedObraSocialId?: string
+  obrasSocialesPsicologo?: string
   general?: string
 }
 
@@ -100,6 +103,8 @@ export default function EditarUsuarioPage() {
   })
 
   const [isPsicologo, setIsPsicologo] = useState(false)
+  // Obras sociales con las que trabaja el psicólogo (ids)
+  const [obrasSocialesPsicologo, setObrasSocialesPsicologo] = useState<string[]>([])
   const [isPaciente, setIsPaciente] = useState(false)
 
   // State for Obras Sociales
@@ -175,6 +180,7 @@ export default function EditarUsuarioPage() {
 
         // Determine user type
         setIsPsicologo(!!userData.psicologo)
+        setObrasSocialesPsicologo((userData.psicologo?.obrasSociales ?? []).map((o) => String(o.id)))
         setIsPaciente(!!userData.paciente)
 
         setFormData({
@@ -389,6 +395,7 @@ export default function EditarUsuarioPage() {
       userDataPayload.psicologo = {
         especialidad: formData.especialidad,
         numeroLicencia: formData.numeroLicencia,
+        obrasSociales: obrasSocialesPsicologo,
       }
     }
 
@@ -691,6 +698,14 @@ export default function EditarUsuarioPage() {
                         <p className="text-peligro text-sm mt-1">{fieldErrors.especialidad}</p>
                       )}
                     </div>
+                    <SelectorObrasSociales
+                      seleccionadas={obrasSocialesPsicologo}
+                      onChange={(ids) => {
+                        setObrasSocialesPsicologo(ids)
+                        setFieldErrors((prev) => ({ ...prev, obrasSocialesPsicologo: undefined }))
+                      }}
+                      error={fieldErrors.obrasSocialesPsicologo}
+                    />
                   </div>
                 )}
 

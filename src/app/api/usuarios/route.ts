@@ -3,6 +3,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { conAuditoria } from "@/lib/auditoria/con-auditoria"
 import { getRepository } from "@/lib/database"
 import { PersonaEntity, UsuarioEntity, PsicologoEntity, PacienteEntity, ObraSocialEntity, PerfilEntity, UsuarioTienePerfilEntity } from "@/entities"
+import { guardarObrasSocialesDePsicologo, limpiarIdsObrasSociales, obrasSocialesDePsicologos } from "@/lib/obras-sociales-psicologo"
 import * as bcrypt from "bcrypt";
 import { AYUDA_CELULAR, fechaAceptaWhatsapp, normalizarCelular } from "@/lib/telefono"
 
@@ -41,6 +42,9 @@ export async function GET() {
         obraSocial: true,
       },
     })
+
+    // Obras sociales con las que trabaja cada psicólogo
+    const obrasPorPsicologo = await obrasSocialesDePsicologos(psicologos.map((p) => p.id))
 
     // Perfiles (roles) de cada usuario
     const asignaciones = await (await getRepository(UsuarioTienePerfilEntity)).find({ relations: { perfil: true } })
@@ -93,6 +97,7 @@ export async function GET() {
               id: psicologo.id,
               especialidad: psicologo.especialidad,
               numeroLicencia: psicologo.numeroLicencia,
+              obrasSociales: obrasPorPsicologo.get(String(psicologo.id)) ?? [],
             }
           : null,
         paciente: paciente
@@ -248,6 +253,20 @@ async function manejarPOST(request: NextRequest) {
       })
 
       await psicologoRepo.save(nuevoPsicologo)
+
+      // Obras sociales con las que trabaja (puede no marcar ninguna y completarlas después)
+      const obrasOk = await guardarObrasSocialesDePsicologo(
+        queryRunner.manager,
+        nuevoPsicologo.id,
+        limpiarIdsObrasSociales(psicologo.obrasSociales),
+      )
+      if (!obrasOk) {
+        await queryRunner.rollbackTransaction();
+        return NextResponse.json(
+          { message: "Alguna obra social elegida no existe o está dada de baja.", errors: { obrasSocialesPsicologo: "Alguna obra social elegida no existe o está dada de baja." } },
+          { status: 400 },
+        )
+      }
     }
 
     // Procesar rol de paciente

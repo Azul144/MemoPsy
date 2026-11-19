@@ -2,6 +2,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { conAuditoria } from "@/lib/auditoria/con-auditoria"
 import { getRepository, getDataSource } from "@/lib/database"
+import { guardarObrasSocialesDePsicologo, limpiarIdsObrasSociales, obrasSocialesDePsicologos } from "@/lib/obras-sociales-psicologo"
 import { AYUDA_CELULAR, fechaAceptaWhatsapp, normalizarCelular } from "@/lib/telefono"
 import {
   PersonaEntity,
@@ -53,6 +54,7 @@ export async function GET(request: NextRequest, { params: paramsPromise }: { par
           id: psicologo.id,
           especialidad: psicologo.especialidad,
           numeroLicencia: psicologo.numeroLicencia,
+          obrasSociales: (await obrasSocialesDePsicologos([psicologo.id])).get(String(psicologo.id)) ?? [],
         }
       }
     }
@@ -218,8 +220,10 @@ async function manejarPUT(request: NextRequest, { params: paramsPromise }: { par
 
     // Procesar rol de psicólogo
     if (roles.isPsicologo && psicologo) {
+      let idPsicologo: string
       // Si ya existe un psicólogo para esta persona, actualizarlo
       if (psicologoExistente) {
+        idPsicologo = psicologoExistente.id
         await psicologoRepo.update(psicologoExistente.id, {
           especialidad: psicologo.especialidad,
           numeroLicencia: psicologo.numeroLicencia,
@@ -248,6 +252,23 @@ async function manejarPUT(request: NextRequest, { params: paramsPromise }: { par
         })
 
         await psicologoRepo.save(nuevoPsicologo)
+        idPsicologo = nuevoPsicologo.id
+      }
+
+      // Obras sociales con las que trabaja: solo se tocan si el formulario las manda
+      if (psicologo.obrasSociales !== undefined) {
+        const obrasOk = await guardarObrasSocialesDePsicologo(
+          queryRunner.manager,
+          idPsicologo,
+          limpiarIdsObrasSociales(psicologo.obrasSociales),
+        )
+        if (!obrasOk) {
+          await queryRunner.rollbackTransaction()
+          return NextResponse.json(
+            { message: "Alguna obra social elegida no existe o está dada de baja.", errors: { obrasSocialesPsicologo: "Alguna obra social elegida no existe o está dada de baja." } },
+            { status: 400 },
+          )
+        }
       }
     }
 

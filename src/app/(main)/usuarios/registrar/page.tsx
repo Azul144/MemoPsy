@@ -20,6 +20,7 @@ import { Persona } from "@/models/persona.model"
 import { Psicologo } from "@/models/psicologo.model"
 import { ObraSocial } from "@/models/obra-social.model"
 import { ESPECIALIDADES_PSICOLOGIA } from "@/lib/especialidades"
+import SelectorObrasSociales from "@/components/usuarios/SelectorObrasSociales"
 
 import { avisoExito } from "@/lib/avisos";
 import InputPassword from "@/components/acceso/InputPassword"
@@ -54,6 +55,7 @@ interface FieldErrors {
   telefono?: string
   numeroLicencia?: string
   especialidad?: string
+  obrasSocialesPsicologo?: string
   selectedObraSocialId?: string
   roleSelection?: string
   general?: string
@@ -78,6 +80,8 @@ export default function RegistrarUsuarioPage() {
   })
 
   const [isPsicologo, setIsPsicologo] = useState(false)
+  // Obras sociales con las que trabaja el psicólogo (ids)
+  const [obrasSocialesPsicologo, setObrasSocialesPsicologo] = useState<string[]>([])
   const [isPaciente, setIsPaciente] = useState(false)
   const [esOtroPerfil, setEsOtroPerfil] = useState(false)
   const [perfilId, setPerfilId] = useState("")
@@ -197,6 +201,7 @@ export default function RegistrarUsuarioPage() {
     }
     setIsPsicologo(checked)
     if (!checked) {
+      setObrasSocialesPsicologo([])
       setFormData((prev) => ({ ...prev, numeroLicencia: "", especialidad: "" }))
       setFieldErrors((prev) => ({ ...prev, numeroLicencia: undefined, especialidad: undefined }))
     }
@@ -349,7 +354,7 @@ export default function RegistrarUsuarioPage() {
           especialidad: formData.especialidad.trim(),
           numeroLicencia: formData.numeroLicencia.trim(),
         })
-        registrationData.psicologo = psicologo.toEntity()
+        registrationData.psicologo = { ...psicologo.toEntity(), obrasSociales: obrasSocialesPsicologo }
       }
 
       // Agregar datos específicos de paciente si aplica
@@ -403,6 +408,7 @@ export default function RegistrarUsuarioPage() {
       especialidad: "",
     })
     setIsPsicologo(false)
+    setObrasSocialesPsicologo([])
     setIsPaciente(false)
     setEsOtroPerfil(false)
     setPerfilId("")
@@ -666,6 +672,14 @@ export default function RegistrarUsuarioPage() {
                         <p className="text-peligro text-sm">{fieldErrors.especialidad}</p>
                       )}
                     </div>
+                    <SelectorObrasSociales
+                      seleccionadas={obrasSocialesPsicologo}
+                      onChange={(ids) => {
+                        setObrasSocialesPsicologo(ids)
+                        setFieldErrors((prev) => ({ ...prev, obrasSocialesPsicologo: undefined }))
+                      }}
+                      error={fieldErrors.obrasSocialesPsicologo}
+                    />
                   </div>
                 )}
 
