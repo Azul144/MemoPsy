@@ -13,6 +13,11 @@ export const metadata: Metadata = {
   title: "MemoPsy | Notas & Psicología",
   description:
     "MemoPsy: sistema web para consultorios de psicología clínica. Notas cifradas, informes, agenda con recordatorios y acceso por roles.",
+  // Verificación del dominio en Meta Business (portfolio «MemoPsy Turnos»), necesaria para habilitar
+  // WhatsApp Business. Es un código público: Meta lo busca en el <head> de la página de inicio.
+  other: {
+    "facebook-domain-verification": "84q9w3gg14gti7refidhozyyupju1n",
+  },
 };
 
 export default function RootLayout({
