@@ -11,9 +11,12 @@ import { esDiaHabilEnConsultorio, MENSAJE_DIA_NO_HABIL } from "@/lib/validacione
 import { buscarSesionSuperpuesta, mensajeSuperposicion, MENSAJE_FIN_ANTES_DE_INICIO } from "@/lib/validaciones/superposicion-sesiones";
 import { notificarCambioDeTurno, notificarRecepcion } from "@/lib/notificaciones/notificar";
 import { enlaceParaSesion } from "@/lib/videollamada";
+import { validarHorarioDeAtencion } from "@/lib/sesiones/horarios-libres";
 
 // Se lanza dentro de la transacción para cortarla cuando el horario está ocupado
 class ErrorSuperposicion extends Error {}
+// Se lanza dentro de la transacción cuando el turno cae fuera de los días y turnos de atención
+class ErrorFueraDeAtencion extends Error {}
 
 // Zod schema for validation
 const updateSesionSchema = z.object({
@@ -205,6 +208,19 @@ async function manejarPUT(request: NextRequest, { params: paramsPromise }: { par
             throw new Error("Sesión no modificable_TRANSACTIONAL");
         }
 
+        // RF 3.1 - Si cambia el día, la hora o el psicólogo, el turno tiene que caer en sus días y turnos
+        // de atención. Si no cambian, se puede editar igual (por ejemplo, un turno cargado antes de la regla).
+        const cambiaHorario =
+            sesionEntity.fechaHoraInicio.getTime() !== new Date(fechaHoraInicio).getTime() ||
+            sesionEntity.fechaHoraFin.getTime() !== new Date(fechaHoraFin).getTime() ||
+            String(sesionEntity.psicologo?.id ?? "") !== String(psicologoId);
+        if (cambiaHorario) {
+            const fueraDeAtencion = await validarHorarioDeAtencion(
+                transactionalEntityManager, psicologoId, new Date(fechaHoraInicio), new Date(fechaHoraFin),
+            );
+            if (fueraDeAtencion) throw new ErrorFueraDeAtencion(fueraDeAtencion);
+        }
+
         // RF 3.1 - El psicólogo no puede tener otro turno en ese horario (sin contar esta misma sesión)
         const superpuesta = await buscarSesionSuperpuesta(
             transactionalEntityManager, psicologoId, new Date(fechaHoraInicio), new Date(fechaHoraFin), id,
@@ -336,6 +352,12 @@ async function manejarPUT(request: NextRequest, { params: paramsPromise }: { par
     }
     if (error.message === "Sesión no modificable_TRANSACTIONAL") {
         return NextResponse.json({ error: "La sesión está Finalizada o Cancelada y no puede ser modificada." }, { status: 403 });
+    }
+    if (error instanceof ErrorFueraDeAtencion) {
+        return NextResponse.json(
+            { error: error.message, details: [{ path: ["horaInicio"], message: error.message }] },
+            { status: 400 },
+        );
     }
     if (error instanceof ErrorSuperposicion) {
         return NextResponse.json(

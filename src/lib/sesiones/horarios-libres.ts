@@ -1,9 +1,10 @@
 // src/lib/sesiones/horarios-libres.ts
 // RF 4.3 - Horarios a los que un paciente puede mover su turno.
-// Salen de las franjas que habilitó el psicólogo (tabla horario_disponible), cortadas en
+// Salen de los turnos de atención del psicólogo (tabla horario_disponible), cortados en
 // turnos de la misma duración que el original, y se descartan los que ya están ocupados.
 import type { DataSource, EntityManager } from "typeorm"
 import { HorarioDisponibleEntity, SesionEntity } from "@/entities"
+import { validarFechasEnAtencion } from "@/lib/sesiones/turnos-atencion"
 
 // El paciente puede reprogramar (y elegir horarios) con al menos 24 h de anticipación
 export const HORAS_ANTICIPACION = 24
@@ -40,6 +41,17 @@ function diaEnConsultorio(fecha: Date): { dia: string; diaSemana: number } {
 // Arma la fecha real de un día y una hora del consultorio ("HH:mm" o "HH:mm:ss")
 function horaDelConsultorio(dia: string, hora: string): Date {
   return new Date(`${dia}T${hora.slice(0, 5)}:00${DESFASE_ARGENTINA}`)
+}
+
+// RF 3.1 - Si el turno no entra en los días y turnos de atención del psicólogo, devuelve el motivo
+export async function validarHorarioDeAtencion(
+  db: DataSource | EntityManager,
+  psicologoId: string | number,
+  inicio: Date,
+  fin: Date,
+): Promise<string | null> {
+  const franjas = await db.getRepository(HorarioDisponibleEntity).find({ where: { psicologoId: Number(psicologoId) } })
+  return validarFechasEnAtencion(franjas, inicio, fin)
 }
 
 export async function buscarHorariosLibres(

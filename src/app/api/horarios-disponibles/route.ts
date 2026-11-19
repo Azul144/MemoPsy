@@ -1,7 +1,9 @@
 // src/app/api/horarios-disponibles/route.ts
-// RF 4.3 - Franjas semanales en las que el psicólogo acepta que sus pacientes reprogramen turnos.
-//  GET: las franjas del psicólogo (el propio, o ?psicologoId= para recepción)
-//  PUT: reemplaza todas las franjas por las que se envían
+// RF 3.1 / RF 4.3 - Días y turnos en que atiende cada psicólogo: mañana (8 a 11) o tarde (18 a 21),
+// de lunes a viernes. Los turnos nuevos, los cambios de horario y las reprogramaciones del
+// paciente solo se pueden dar dentro de ellos.
+//  GET: los turnos del psicólogo (el propio, o ?psicologoId= para recepción)
+//  PUT: reemplaza todos los turnos por los que se envían
 import { type NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth/next"
 import { z } from "zod"
@@ -10,6 +12,7 @@ import { authConfig } from "@/lib/auth/auth-config"
 import { alcanceSesiones } from "@/lib/auth/alcance-sesiones"
 import { initializeDatabase } from "@/lib/database"
 import { HorarioDisponibleEntity } from "@/entities"
+import { turnoDeFranja } from "@/lib/sesiones/turnos-atencion"
 
 const HORA = /^([01]\d|2[0-3]):[0-5]\d$/
 
@@ -85,11 +88,11 @@ async function manejarPUT(request: NextRequest) {
       return NextResponse.json({ error: "Sin permiso para modificar estos horarios" }, { status: 403 })
     }
 
-    // Cada franja debe terminar después de empezar y no pisarse con otra del mismo día
+    // Cada franja tiene que ser uno de los dos turnos (mañana de 8 a 11 o tarde de 18 a 21) y no repetirse
     const errores: { path: (string | number)[]; message: string }[] = []
     franjas.forEach((f, i) => {
-      if (f.horaFin <= f.horaInicio) {
-        errores.push({ path: [i, "horaFin"], message: "La hora de fin debe ser posterior a la de inicio." })
+      if (!turnoDeFranja(f)) {
+        errores.push({ path: [i, "horaInicio"], message: "Solo se atiende de 8 a 11 o de 18 a 21." })
         return
       }
       const pisada = franjas.some(
@@ -120,4 +123,4 @@ async function manejarPUT(request: NextRequest) {
 }
 
 // RF 1.4 - Registro de auditoría de esta ruta
-export const PUT = conAuditoria(manejarPUT, { modulo: "Sesiones", accion: "EDITAR", detalle: "Horarios habilitados para reprogramar turnos" })
+export const PUT = conAuditoria(manejarPUT, { modulo: "Sesiones", accion: "EDITAR", detalle: "Días y horarios de atención del psicólogo" })

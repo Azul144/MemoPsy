@@ -6,6 +6,7 @@ import { esDiaHabilEnConsultorio, MENSAJE_DIA_NO_HABIL } from "@/lib/validacione
 import { alcanceSesiones, puedeVerSesion } from "@/lib/auth/alcance-sesiones"
 import { buscarSesionSuperpuesta, mensajeSuperposicion, MENSAJE_FIN_ANTES_DE_INICIO } from "@/lib/validaciones/superposicion-sesiones"
 import { datosPago, puedeVerPagos } from "@/lib/sesiones/pagos"
+import { validarHorarioDeAtencion } from "@/lib/sesiones/horarios-libres"
 import { enlaceParaSesion } from "@/lib/videollamada"
 import { getServerSession } from "next-auth/next"
 import { authConfig } from "@/lib/auth/auth-config"
@@ -198,6 +199,12 @@ async function manejarPOST(request: NextRequest) {
     const dataSource = await initializeDatabase()
     const sesionRepository = dataSource.getRepository(SesionEntity)
     const pacienteTieneSesionRepository = dataSource.getRepository(PacienteTieneSesionEntity)
+
+    // RF 3.1 - Solo en los días y turnos en que atiende el psicólogo (mañana de 8 a 11, tarde de 18 a 21)
+    const fueraDeAtencion = await validarHorarioDeAtencion(dataSource, psicologoId, inicio, fin)
+    if (fueraDeAtencion) {
+      return NextResponse.json({ error: fueraDeAtencion, details: { horaInicio: fueraDeAtencion } }, { status: 400 })
+    }
 
     // RF 3.1 - El psicólogo no puede tener otro turno en ese horario
     const superpuesta = await buscarSesionSuperpuesta(dataSource, psicologoId, inicio, fin)

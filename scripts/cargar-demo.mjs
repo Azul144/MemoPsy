@@ -93,15 +93,15 @@ if (existe.n > 0) {
 const PSICOLOGOS = [
   { clave: "clinica", nombre: "Carla", apellido: "Benítez", dni: "29444111", nacimiento: "1984-05-20", email: "carla.benitez@demo.memopsy.test",
     especialidad: "Psicología Clínica", licencia: "MP 1234", existente: "psicologa@memopsy.test",
-    franjas: [["09:00", "12:00"], ["16:00", "19:00"]] },
+    franjas: [["08:00", "11:00"], ["18:00", "21:00"]] },
   { clave: "infanto", nombre: "Lucía", apellido: "Ferreyra", dni: "31222333", nacimiento: "1988-02-11", email: "lucia.ferreyra@demo.memopsy.test",
-    especialidad: "Psicología Infanto-Juvenil", licencia: "MP 2045", franjas: [["14:00", "19:00"]] },
+    especialidad: "Psicología Infanto-Juvenil", licencia: "MP 2045", franjas: [["18:00", "21:00"]] },
   { clave: "neuro", nombre: "Diego", apellido: "Martínez", dni: "27555666", nacimiento: "1979-09-30", email: "diego.martinez@demo.memopsy.test",
-    especialidad: "Neuropsicología", licencia: "MP 1987", franjas: [["08:00", "13:00"]] },
+    especialidad: "Neuropsicología", licencia: "MP 1987", franjas: [["08:00", "11:00"]] },
   { clave: "pareja", nombre: "Natalia", apellido: "Correa", dni: "32777888", nacimiento: "1987-12-03", email: "natalia.correa@demo.memopsy.test",
-    especialidad: "Terapia de Pareja", licencia: "MP 2210", franjas: [["17:00", "21:00"]] },
+    especialidad: "Terapia de Pareja", licencia: "MP 2210", franjas: [["18:00", "21:00"]] },
   { clave: "tcc", nombre: "Pablo", apellido: "Sánchez", dni: "30888999", nacimiento: "1983-07-14", email: "pablo.sanchez@demo.memopsy.test",
-    especialidad: "Terapia Cognitivo-Conductual", licencia: "MP 1876", franjas: [["10:00", "13:00"], ["15:00", "18:00"]] },
+    especialidad: "Terapia Cognitivo-Conductual", licencia: "MP 1876", franjas: [["08:00", "11:00"], ["18:00", "21:00"]] },
 ]
 
 // cuenta: false = sin usuario (por ejemplo, un niño: los turnos los maneja la recepción con la familia)
@@ -123,39 +123,39 @@ const PACIENTES = [
 // pago: [medio, monto] para los turnos ya cobrados
 const TURNOS = [
   // Psicología clínica
-  [["camila"], -21, 10, "Finalizada", "Presencial", ["Obra social", 18000]],
-  [["camila"], -14, 10, "Finalizada", "Presencial", ["Obra social", 18000]],
-  [["camila"], -7, 10, "Finalizada", "Presencial", ["Obra social", 18000]],
-  [["valentina"], -12, 11, "Finalizada", "Remota", ["QR del psicólogo", 22000]],
-  [["valentina"], -5, 11, "Finalizada", "Remota", ["QR del psicólogo", 22000]],
+  [["camila"], -21, 10, "Finalizada", "Presencial", ["Obra social", 30000]],
+  [["camila"], -14, 10, "Finalizada", "Presencial", ["Obra social", 30000]],
+  [["camila"], -7, 10, "Finalizada", "Presencial", ["Obra social", 30000]],
+  [["valentina"], -12, 11, "Finalizada", "Remota", ["QR del psicólogo", 35000]],
+  [["valentina"], -5, 11, "Finalizada", "Remota", ["QR del psicólogo", 35000]],
   [["valentina"], -1, 17, "Cancelada", "Remota"],
   [["camila"], 3, 10, "Confirmada", "Presencial"],
   [["valentina"], 4, 11, "Pendiente", "Remota"],
   // Infanto-juvenil
-  [["julieta"], -15, 15, "Finalizada", "Presencial", ["Obra social", 20000]],
-  [["julieta"], -8, 15, "Finalizada", "Presencial", ["Obra social", 20000]],
-  [["mateo"], -9, 16, "Finalizada", "Presencial", ["Obra social", 20000]],
+  [["julieta"], -15, 15, "Finalizada", "Presencial", ["Obra social", 32000]],
+  [["julieta"], -8, 15, "Finalizada", "Presencial", ["Obra social", 32000]],
+  [["mateo"], -9, 16, "Finalizada", "Presencial", ["Obra social", 32000]],
   [["mateo"], -2, 16, "Finalizada", "Presencial"],
   [["julieta"], 2, 15, "Confirmada", "Presencial"],
   [["mateo"], 5, 16, "Pendiente", "Presencial"],
   // Neuropsicología
-  [["rosa"], -20, 9, "Finalizada", "Presencial", ["Obra social", 25000]],
-  [["rosa"], -13, 9, "Finalizada", "Presencial", ["Obra social", 25000]],
-  [["hector"], -10, 11, "Finalizada", "Presencial", ["Efectivo", 25000]],
+  [["rosa"], -20, 9, "Finalizada", "Presencial", ["Obra social", 38000]],
+  [["rosa"], -13, 9, "Finalizada", "Presencial", ["Obra social", 38000]],
+  [["hector"], -10, 11, "Finalizada", "Presencial", ["Efectivo", 38000]],
   [["hector"], -3, 11, "Cancelada", "Presencial"],
   [["rosa"], 6, 9, "Confirmada", "Presencial"],
   [["hector"], 7, 11, "Reprogramada", "Presencial"],
   // Pareja y familia: los dos pacientes en el mismo turno
-  [["ezequiel", "florencia"], -16, 19, "Finalizada", "Presencial", ["Efectivo", 30000]],
-  [["ezequiel", "florencia"], -9, 19, "Finalizada", "Remota", ["QR del psicólogo", 30000]],
+  [["ezequiel", "florencia"], -16, 19, "Finalizada", "Presencial", ["Efectivo", 40000]],
+  [["ezequiel", "florencia"], -9, 19, "Finalizada", "Remota", ["QR del psicólogo", 40000]],
   [["ezequiel", "florencia"], -2, 19, "Finalizada", "Presencial"],
   [["ezequiel", "florencia"], 5, 19, "Pendiente", "Remota"],
   // Cognitivo-conductual
-  [["tomas"], -17, 15, "Finalizada", "Presencial", ["Obra social", 21000]],
-  [["tomas"], -10, 15, "Finalizada", "Presencial", ["Obra social", 21000]],
-  [["agustina"], -11, 10, "Finalizada", "Remota", ["QR del psicólogo", 21000]],
-  [["agustina"], -4, 10, "Finalizada", "Remota", ["QR del psicólogo", 21000]],
-  [["nicolas"], -6, 16, "Finalizada", "Presencial", ["Efectivo", 21000]],
+  [["tomas"], -17, 15, "Finalizada", "Presencial", ["Obra social", 33000]],
+  [["tomas"], -10, 15, "Finalizada", "Presencial", ["Obra social", 33000]],
+  [["agustina"], -11, 10, "Finalizada", "Remota", ["QR del psicólogo", 33000]],
+  [["agustina"], -4, 10, "Finalizada", "Remota", ["QR del psicólogo", 33000]],
+  [["nicolas"], -6, 16, "Finalizada", "Presencial", ["Efectivo", 33000]],
   [["tomas"], 3, 15, "Confirmada", "Presencial"],
   [["agustina"], 4, 10, "Pendiente", "Remota"],
   [["nicolas"], 8, 16, "Pendiente", "Presencial"],
@@ -257,7 +257,7 @@ try {
       const psicologoId = await id("INSERT INTO psicologo (id_persona, especialidad, numero_licencia) VALUES (?, ?, ?)", [personaId, p.especialidad, p.licencia])
       psicologos[p.clave] = { usuarioId, psicologoId, nombre: `${p.nombre} ${p.apellido}` }
     }
-    // Franjas en las que acepta reprogramaciones (lunes a viernes)
+    // Turnos en que atiende (lunes a viernes): mañana de 8 a 11 y/o tarde de 18 a 21
     for (let dia = 1; dia <= 5; dia++) {
       for (const [desde, hasta] of p.franjas) {
         await c.query("INSERT INTO horario_disponible (id_psicologo, dia_semana, hora_inicio, hora_fin) VALUES (?, ?, ?, ?)", [psicologos[p.clave].psicologoId, dia, desde, hasta])
@@ -304,7 +304,7 @@ try {
   }
   // Pacientes que ya estaban cargados: uno pasado y uno para mañana (sirve para probar el recordatorio por email)
   for (const [i, clave] of Object.keys(pacientes).filter((k) => k.startsWith("previo")).entries()) {
-    await turno([clave], diaHabil(-8, 12 + i), "Finalizada", "Presencial", ["Efectivo", 18000])
+    await turno([clave], diaHabil(-8, 12 + i), "Finalizada", "Presencial", ["Efectivo", 30000])
     await turno([clave], diaHabil(1, 12 + i), "Confirmada", "Presencial")
   }
 

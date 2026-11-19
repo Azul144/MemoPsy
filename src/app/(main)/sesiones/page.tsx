@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -29,6 +29,7 @@ import EncabezadoPagina from "@/components/sistema/EncabezadoPagina";
 import { avisoExito, avisoError, confirmar } from "@/lib/avisos";
 import DialogoPago, { type PagoSesion, type MedioDePago } from "@/components/sesiones/DialogoPago";
 import DialogoHorarios from "@/components/sesiones/DialogoHorarios";
+import HorariosDeAtencion from "@/components/sesiones/HorariosDeAtencion";
 import DialogoReprogramar from "@/components/sesiones/DialogoReprogramar";
 
 interface Sesion {
@@ -112,9 +113,9 @@ export default function SesionesPage() {
   // Form state
   const [formData, setFormData] = useState({
     fechaInicio: format(proximoDiaHabil(new Date()), "yyyy-MM-dd"),
-    horaInicio: "09:00",
+    horaInicio: "08:00",
     fechaFin: format(proximoDiaHabil(new Date()), "yyyy-MM-dd"),
-    horaFin: "10:00",
+    horaFin: "09:00",
     psicologoId: "",
     modalidadId: "",
     estadoId: "",
@@ -151,6 +152,8 @@ export default function SesionesPage() {
   const [sesionPago, setSesionPago] = useState<Sesion | null>(null)
   // RF 4.3 - Horarios que habilita el psicólogo y turno que el paciente quiere mover
   const [horariosAbierto, setHorariosAbierto] = useState(false)
+  // RF 3.1 - Días de la semana en que atiende el psicólogo que inició sesión (1 = lunes ... 5 = viernes)
+  const [diasQueAtiendo, setDiasQueAtiendo] = useState<number[] | null>(null)
   const [sesionReprogramar, setSesionReprogramar] = useState<Sesion | null>(null)
 
   // Refs para debounce
@@ -704,6 +707,30 @@ const handleUpdateSesion = async () => {
     }
   }
 
+  // RF 3.1 - El psicólogo ve en el calendario solo los días en que atiende
+  const cargarDiasQueAtiendo = useCallback(() => {
+    if (!session?.user?.psicologoId) return
+    fetch("/api/horarios-disponibles")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => data && setDiasQueAtiendo([...new Set<number>((data.franjas ?? []).map((f: { diaSemana: number }) => f.diaSemana))]))
+      .catch(() => {})
+  }, [session?.user?.psicologoId])
+  useEffect(() => {
+    cargarDiasQueAtiendo()
+  }, [cargarDiasQueAtiendo])
+
+  // RF 3.1 - Turnos que ya ocupan al psicólogo ese día (para tachar esas horas en el formulario)
+  const ocupadosDelDia = (psicologoId: string, fecha: string, excluirId?: string) =>
+    sesiones
+      .filter(
+        (s) =>
+          s.psicologo?.id === psicologoId &&
+          s.id !== excluirId &&
+          s.estado?.nombre !== "Cancelada" &&
+          format(parseISO(s.fechaHoraInicio), "yyyy-MM-dd") === fecha,
+      )
+      .map((s) => ({ inicio: format(parseISO(s.fechaHoraInicio), "HH:mm"), fin: format(parseISO(s.fechaHoraFin), "HH:mm") }))
+
   const getSesionesForDate = (date: Date, filterType: "all" | "psicologo" | "paciente") => {
     return sesiones.filter((sesion) => {
       const sesionDate = parseISO(sesion.fechaHoraInicio)
@@ -746,8 +773,18 @@ const handleUpdateSesion = async () => {
               // Punto dorado; en el día de hoy (fondo dorado) va oscuro para que se vea
               "relative after:pointer-events-none after:absolute after:bottom-0.5 after:left-1/2 after:h-1.5 after:w-1.5 after:-translate-x-1/2 after:rounded-full after:bg-primary data-[today=true]:after:bg-background",
           }}
-          // En "Registrar Sesiones" no se pueden elegir sábados ni domingos
-          disabled={filterType === "all" ? { dayOfWeek: DIAS_NO_HABILES } : undefined}
+          // En "Registrar Sesiones" no se pueden elegir sábados ni domingos; el psicólogo, además,
+          // solo puede elegir los días en que atiende
+          disabled={
+            filterType === "all"
+              ? {
+                  dayOfWeek: [
+                    ...DIAS_NO_HABILES,
+                    ...(diasQueAtiendo && !puedeVerTodaLaAgenda ? [1, 2, 3, 4, 5].filter((d) => !diasQueAtiendo.includes(d)) : []),
+                  ],
+                }
+              : undefined
+          }
           onSelect={(date) => {
             if (date) {
               setSelectedDate(date)
@@ -939,6 +976,8 @@ const handleUpdateSesion = async () => {
 
   const puedeRegistrarSesiones = permisos.includes("Registrar Sesión")
   const puedeVerSesiones = permisos.includes("Ver Sesiones")
+  // Recepción gestiona la agenda de todos los psicólogos (mismo criterio que alcanceSesiones)
+  const puedeVerTodaLaAgenda = permisos.includes("Asignar Profesional") || permisos.includes("Eliminar Sesión")
 
   const defaultTabValue = puedeRegistrarSesiones
   ? "registrar"
@@ -1165,6 +1204,18 @@ const handleUpdateSesion = async () => {
                                 )}
                               </div>
 
+                              {/* RF 3.1 - Cuándo atiende el psicólogo y horas libres del día */}
+                              <HorariosDeAtencion
+                                psicologoId={formData.psicologoId}
+                                fecha={formData.fechaInicio}
+                                horaInicio={formData.horaInicio}
+                                horaFin={formData.horaFin}
+                                ocupados={ocupadosDelDia(formData.psicologoId, formData.fechaInicio)}
+                                onElegir={(horaInicio, horaFin) =>
+                                  setFormData((prev) => ({ ...prev, horaInicio, horaFin, fechaFin: prev.fechaInicio }))
+                                }
+                              />
+
                               {/* Modalidad */}
                               <div className="space-y-2">
                                 <Label htmlFor="modalidad" className="text-foreground">
@@ -1370,7 +1421,7 @@ const handleUpdateSesion = async () => {
                     className="mt-2 w-full gap-2 border-dorado/60 text-dorado hover:bg-primary/10 sm:w-fit"
                   >
                     <CalendarClock className="h-4 w-4" />
-                    Horarios para reprogramar
+                    Días y horarios de atención
                   </Button>
                 </CardHeader>
                 <CardContent>{renderCalendarWithSessions("psicologo")}</CardContent>
@@ -1511,6 +1562,18 @@ const handleUpdateSesion = async () => {
                     {editFormErrors.psicologoId && <p className="text-sm text-peligro">{editFormErrors.psicologoId}</p>}
                 </div>
 
+                {/* RF 3.1 - Cuándo atiende el psicólogo y horas libres del día */}
+                <HorariosDeAtencion
+                  psicologoId={editFormData.psicologoId}
+                  fecha={editFormData.fechaInicio}
+                  horaInicio={editFormData.horaInicio}
+                  horaFin={editFormData.horaFin}
+                  ocupados={ocupadosDelDia(editFormData.psicologoId, editFormData.fechaInicio, editFormData.id)}
+                  onElegir={(horaInicio, horaFin) =>
+                    setEditFormData((prev) => ({ ...prev, horaInicio, horaFin, fechaFin: prev.fechaInicio }))
+                  }
+                />
+
                 {/* Modalidad (Edit) */}
                 <div className="space-y-2">
                     <Label htmlFor="edit_modalidad_trigger" className="text-foreground">Modalidad</Label>
@@ -1640,7 +1703,13 @@ const handleUpdateSesion = async () => {
     />
 
     {/* RF 4.3 - Reprogramación por el paciente dentro de los horarios del psicólogo */}
-    <DialogoHorarios abierto={horariosAbierto} onClose={() => setHorariosAbierto(false)} />
+    <DialogoHorarios
+      abierto={horariosAbierto}
+      onClose={() => {
+        setHorariosAbierto(false)
+        cargarDiasQueAtiendo()
+      }}
+    />
     <DialogoReprogramar
       sesion={sesionReprogramar}
       onClose={() => setSesionReprogramar(null)}

@@ -1,112 +1,65 @@
 "use client"
-// RF 4.3 - El psicólogo indica en qué días y horarios sus pacientes pueden reprogramar turnos.
-// Cada fila es un horario (por ejemplo 09:00 a 13:00) con los días en que vale.
-// En la base se guarda una franja por día; acá se agrupan los días que tienen el mismo horario.
+// RF 3.1 / RF 4.3 - El psicólogo marca en qué días atiende y en qué turno: mañana (8 a 11) o tarde (18 a 21).
+// Los turnos nuevos, los cambios de horario y las reprogramaciones del paciente solo se dan dentro de ellos.
+// En la base se guarda una fila por día y turno.
 
 import { useEffect, useState } from "react"
-import { Loader2, Plus, Trash2 } from "lucide-react"
+import { Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { avisoError, avisoExito } from "@/lib/avisos"
-
-interface Franja {
-  diaSemana: number
-  horaInicio: string
-  horaFin: string
-}
-
-interface Bloque {
-  dias: number[]
-  horaInicio: string
-  horaFin: string
-}
+import { olvidarHorariosDeAtencion } from "@/components/sesiones/HorariosDeAtencion"
+import { DIAS_ATENCION, TURNOS, turnoDeFranja, type FranjaAtencion } from "@/lib/sesiones/turnos-atencion"
 
 interface Props {
   abierto: boolean
   onClose: () => void
 }
 
-// 1 = lunes ... 5 = viernes (el consultorio atiende de lunes a viernes)
-const DIAS = [
-  { numero: 1, corto: "Lun", nombre: "Lunes" },
-  { numero: 2, corto: "Mar", nombre: "Martes" },
-  { numero: 3, corto: "Mié", nombre: "Miércoles" },
-  { numero: 4, corto: "Jue", nombre: "Jueves" },
-  { numero: 5, corto: "Vie", nombre: "Viernes" },
-]
-
-const nuevoBloque = (): Bloque => ({ dias: [1, 2, 3, 4, 5], horaInicio: "09:00", horaFin: "13:00" })
-
-// Franjas de la base → filas: junta los días que tienen exactamente el mismo horario
-function agrupar(franjas: Franja[]): Bloque[] {
-  const bloques: Bloque[] = []
-  franjas.forEach((f) => {
-    const igual = bloques.find((b) => b.horaInicio === f.horaInicio && b.horaFin === f.horaFin)
-    if (igual) igual.dias = [...igual.dias, f.diaSemana].sort()
-    else bloques.push({ dias: [f.diaSemana], horaInicio: f.horaInicio, horaFin: f.horaFin })
-  })
-  return bloques
-}
+// "1-manana", "3-tarde"...
+const clave = (dia: number, turno: string) => `${dia}-${turno}`
 
 export default function DialogoHorarios({ abierto, onClose }: Props) {
-  const [bloques, setBloques] = useState<Bloque[]>([])
-  const [errores, setErrores] = useState<Record<number, string>>({})
+  const [marcados, setMarcados] = useState<Set<string>>(new Set())
+  const [descartadas, setDescartadas] = useState(0)
   const [cargando, setCargando] = useState(false)
   const [guardando, setGuardando] = useState(false)
 
-  // Al abrir: trae los horarios que ya tiene cargados
+  // Al abrir: trae los turnos que ya tiene cargados
   useEffect(() => {
     if (!abierto) return
-    setErrores({})
     setCargando(true)
     fetch("/api/horarios-disponibles")
       .then(async (res) => {
         const data = await res.json()
         if (!res.ok) throw new Error(data.error)
-        setBloques(agrupar(data.franjas ?? []))
+        const franjas: FranjaAtencion[] = data.franjas ?? []
+        const validas = franjas.filter((f) => turnoDeFranja(f))
+        setMarcados(new Set(validas.map((f) => clave(f.diaSemana, turnoDeFranja(f)!.clave))))
+        // Horarios cargados antes de la regla de los dos turnos: se avisan y se descartan al guardar
+        setDescartadas(franjas.length - validas.length)
       })
       .catch(() => avisoError("No se pudieron cargar tus horarios."))
       .finally(() => setCargando(false))
   }, [abierto])
 
-  const cambiar = (i: number, cambios: Partial<Bloque>) => {
-    setBloques((lista) => lista.map((b, j) => (j === i ? { ...b, ...cambios } : b)))
-    setErrores((e) => ({ ...e, [i]: "" }))
-  }
-
-  const alternarDia = (i: number, dia: number) => {
-    const dias = bloques[i].dias
-    cambiar(i, { dias: dias.includes(dia) ? dias.filter((d) => d !== dia) : [...dias, dia].sort() })
-  }
-
-  const quitar = (i: number) => {
-    setBloques((lista) => lista.filter((_, j) => j !== i))
-    setErrores({})
-  }
+  const alternar = (k: string) =>
+    setMarcados((actual) => {
+      const nuevo = new Set(actual)
+      if (nuevo.has(k)) nuevo.delete(k)
+      else nuevo.add(k)
+      return nuevo
+    })
 
   const guardar = async () => {
-    // Antes de enviar: cada fila necesita al menos un día y un horario que termine después de empezar
-    const errs: Record<number, string> = {}
-    bloques.forEach((b, i) => {
-      if (b.dias.length === 0) errs[i] = "Elegí al menos un día."
-      else if (!b.horaInicio || !b.horaFin) errs[i] = "Completá el horario."
-      else if (b.horaFin <= b.horaInicio) errs[i] = "La hora de fin debe ser posterior a la de inicio."
-    })
-    setErrores(errs)
-    if (Object.keys(errs).length > 0) return
-
-    // Una franja por día; se recuerda de qué fila salió cada una para marcar el error en la fila correcta
-    const franjas: Franja[] = []
-    const filaDeFranja: number[] = []
-    bloques.forEach((b, i) =>
-      b.dias.forEach((dia) => {
-        franjas.push({ diaSemana: dia, horaInicio: b.horaInicio, horaFin: b.horaFin })
-        filaDeFranja.push(i)
-      }),
+    const franjas = DIAS_ATENCION.flatMap((d) =>
+      TURNOS.filter((t) => marcados.has(clave(d.numero, t.clave))).map((t) => ({
+        diaSemana: d.numero,
+        horaInicio: t.horaInicio,
+        horaFin: t.horaFin,
+      })),
     )
-
     try {
       setGuardando(true)
       const res = await fetch("/api/horarios-disponibles", {
@@ -116,20 +69,11 @@ export default function DialogoHorarios({ abierto, onClose }: Props) {
       })
       const data = await res.json()
       if (!res.ok) {
-        const errsServidor: Record<number, string> = {}
-        if (Array.isArray(data.details)) {
-          data.details.forEach((d: any) => {
-            const fila = filaDeFranja[d.path?.[0]]
-            if (fila === undefined) return
-            const dia = DIAS.find((x) => x.numero === franjas[d.path[0]].diaSemana)?.nombre
-            errsServidor[fila] = dia ? `${dia}: ${d.message}` : d.message
-          })
-        }
-        setErrores(errsServidor)
         avisoError(data.error || "No se pudieron guardar los horarios.")
         return
       }
-      avisoExito("Horarios guardados.")
+      olvidarHorariosDeAtencion()
+      avisoExito("Horarios de atención guardados.")
       onClose()
     } catch (error) {
       console.error("Error guardando horarios:", error)
@@ -142,14 +86,14 @@ export default function DialogoHorarios({ abierto, onClose }: Props) {
   return (
     <Dialog open={abierto} onOpenChange={(a) => !a && onClose()}>
       <DialogContent
-        className="p-4 sm:max-w-[520px] sm:p-6"
+        className="p-4 sm:max-w-[480px] sm:p-6"
         style={{ backgroundColor: "var(--card)", border: "1px solid var(--dorado)" }}
       >
         <DialogHeader>
-          <DialogTitle className="text-foreground">Horarios para reprogramar</DialogTitle>
+          <DialogTitle className="text-foreground">Días y horarios de atención</DialogTitle>
           <DialogDescription className="text-suave">
-            Elegí los días y el horario. Tus pacientes van a poder mover sus turnos solo a estos horarios, si están
-            libres.
+            Marcá en qué días atendés y en qué turno. Los turnos nuevos y los cambios de horario solo se pueden dar en
+            estos horarios, si están libres.
           </DialogDescription>
         </DialogHeader>
 
@@ -158,74 +102,52 @@ export default function DialogoHorarios({ abierto, onClose }: Props) {
             <Loader2 className="h-6 w-6 animate-spin text-dorado" />
           </div>
         ) : (
-          <div className="max-h-[55vh] space-y-3 overflow-y-auto pr-1">
-            {bloques.length === 0 && (
-              <p className="rounded-lg border border-dashed border-borde-fuerte p-4 text-center text-sm text-suave">
-                No habilitaste horarios. Mientras tanto, tus pacientes no pueden reprogramar por su cuenta.
+          <div className="space-y-3">
+            <div className="grid grid-cols-[auto_1fr_1fr] items-center gap-2" role="group" aria-label="Días y turnos">
+              <span />
+              {TURNOS.map((t) => (
+                <span key={t.clave} className="text-center text-xs text-suave">
+                  <span className="block font-semibold text-foreground">{t.nombre}</span>
+                  {t.texto}
+                </span>
+              ))}
+              {DIAS_ATENCION.map((d) => (
+                <div key={d.numero} className="contents">
+                  <span className="pr-2 text-sm capitalize text-foreground">{d.nombre}</span>
+                  {TURNOS.map((t) => {
+                    const k = clave(d.numero, t.clave)
+                    const activo = marcados.has(k)
+                    return (
+                      <button
+                        key={k}
+                        type="button"
+                        onClick={() => alternar(k)}
+                        aria-pressed={activo}
+                        aria-label={`${d.nombre}, ${t.nombre.toLowerCase()} ${t.texto}`}
+                        className={cn(
+                          "h-10 rounded-full border text-sm transition-colors",
+                          activo
+                            ? "border-dorado bg-primary font-semibold text-primary-foreground"
+                            : "border-borde-fuerte text-suave hover:border-dorado/70",
+                        )}
+                      >
+                        {activo ? "Atiendo" : "—"}
+                      </button>
+                    )
+                  })}
+                </div>
+              ))}
+            </div>
+            {marcados.size === 0 && (
+              <p className="rounded-lg border border-dashed border-borde-fuerte p-3 text-center text-sm text-suave">
+                Sin horarios marcados no se te pueden dar turnos nuevos ni mover los que tenés.
               </p>
             )}
-            {bloques.map((b, i) => (
-              <div
-                key={i}
-                className={cn("space-y-3 rounded-xl border p-3", errores[i] ? "border-red-500/70" : "border-borde-fuerte")}
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex flex-wrap gap-1.5" role="group" aria-label="Días">
-                    {DIAS.map((dia) => {
-                      const activo = b.dias.includes(dia.numero)
-                      return (
-                        <button
-                          key={dia.numero}
-                          type="button"
-                          onClick={() => alternarDia(i, dia.numero)}
-                          aria-pressed={activo}
-                          aria-label={dia.nombre}
-                          className={cn(
-                            "h-9 min-w-12 rounded-full border px-3 text-sm transition-colors",
-                            activo
-                              ? "border-dorado bg-primary font-semibold text-primary-foreground"
-                              : "border-borde-fuerte text-suave hover:border-dorado/70",
-                          )}
-                        >
-                          {dia.corto}
-                        </button>
-                      )
-                    })}
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => quitar(i)}
-                    aria-label="Quitar horario"
-                    className="shrink-0 text-peligro hover:bg-red-500/15 hover:text-peligro"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="time"
-                    aria-label="Desde"
-                    value={b.horaInicio}
-                    onChange={(e) => cambiar(i, { horaInicio: e.target.value })}
-                    className="flex-1 bg-background text-foreground border-borde-fuerte"
-                  />
-                  <span className="text-sm text-suave">a</span>
-                  <Input
-                    type="time"
-                    aria-label="Hasta"
-                    value={b.horaFin}
-                    onChange={(e) => cambiar(i, { horaFin: e.target.value })}
-                    className="flex-1 bg-background text-foreground border-borde-fuerte"
-                  />
-                </div>
-                {errores[i] && <p className="text-xs text-peligro">{errores[i]}</p>}
-              </div>
-            ))}
-            <Button variant="outline" onClick={() => setBloques([...bloques, nuevoBloque()])} className="w-full border-dashed">
-              <Plus className="mr-2 h-4 w-4" />
-              Agregar horario
-            </Button>
+            {descartadas > 0 && (
+              <p className="text-xs text-naranja">
+                Tenías horarios fuera de los turnos de 8 a 11 y de 18 a 21: al guardar, quedan solo los que marques acá.
+              </p>
+            )}
           </div>
         )}
 
