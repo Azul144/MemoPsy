@@ -227,6 +227,13 @@ textarea,
 html {
   scroll-behavior: smooth;
 }
+/* La portada, el login y la ayuda en crisis siempre van en oscuro, aunque el usuario haya
+   elegido el modo claro. Safari en el celular pinta la barra de arriba (la hora) y la de abajo
+   (la dirección) con el fondo de html/body: si quedara el fondo claro, se verían franjas blancas */
+html:has(.tema-oscuro),
+html:has(.tema-oscuro) body {
+  background-color: #152A2A;
+}
 section,
 footer {
   scroll-margin-top: 5rem;
