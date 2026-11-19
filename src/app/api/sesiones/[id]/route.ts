@@ -9,7 +9,7 @@ import { SesionEntity, PacienteTieneSesionEntity, PsicologoEntity, ModalidadEnti
 import { ZodError, z } from "zod";
 import { esDiaHabilEnConsultorio, MENSAJE_DIA_NO_HABIL } from "@/lib/validaciones/dias-habiles";
 import { buscarSesionSuperpuesta, mensajeSuperposicion, MENSAJE_FIN_ANTES_DE_INICIO } from "@/lib/validaciones/superposicion-sesiones";
-import { notificarCambioDeTurno } from "@/lib/notificaciones/notificar";
+import { notificarCambioDeTurno, notificarRecepcion } from "@/lib/notificaciones/notificar";
 import { enlaceParaSesion } from "@/lib/videollamada";
 
 // Se lanza dentro de la transacción para cortarla cuando el horario está ocupado
@@ -316,6 +316,12 @@ async function manejarPUT(request: NextRequest, { params: paramsPromise }: { par
                 usuarioQueCambia: session.user.id,
             });
         }
+    }
+
+    // RF 3.5 - Sesión realizada: recepción se entera, con el estado del pago.
+    // Una sesión Finalizada ya no se puede editar, así que si quedó Finalizada es porque pasó recién.
+    if (finalSesionConRelaciones.estado?.nombre === "Finalizada") {
+        await notificarRecepcion({ sesionId: id, tipo: "SESION_REALIZADA", usuarioQueCambia: session.user.id });
     }
 
     return NextResponse.json(sesionTransformada, { status: 200 });

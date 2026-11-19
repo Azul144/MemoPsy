@@ -9,7 +9,7 @@ import { authConfig } from "@/lib/auth/auth-config"
 import { alcanceSesiones } from "@/lib/auth/alcance-sesiones"
 import { initializeDatabase } from "@/lib/database"
 import { SesionEntity, EstadoEntity } from "@/entities"
-import { notificarCambioDeTurno } from "@/lib/notificaciones/notificar"
+import { notificarCambioDeTurno, notificarRecepcion } from "@/lib/notificaciones/notificar"
 
 const estadoSchema = z.object({
   estadoId: z.coerce.number().int().positive(),
@@ -69,6 +69,11 @@ async function manejarPATCH(request: NextRequest, { params }: { params: Promise<
         inicioAnterior: sesion.fechaHoraInicio,
         usuarioQueCambia: session.user.id,
       })
+    }
+
+    // RF 3.5 - Sesión realizada: recepción se entera, con el estado del pago
+    if (estado.nombre === "Finalizada") {
+      await notificarRecepcion({ sesionId: id, tipo: "SESION_REALIZADA", usuarioQueCambia: session.user.id })
     }
 
     return NextResponse.json({ ok: true, estado: { id: estado.id, nombre: estado.nombre } })

@@ -14,8 +14,11 @@ import { NotificacionEntity, PacienteTieneSesionEntity, SesionEntity } from "@/e
 // RESPUESTA_ACTIVIDAD: el paciente respondió una actividad del informe
 // CONFIRMACION: el paciente confirmó su turno por WhatsApp
 // CRISIS: el paciente escribió por WhatsApp un mensaje que puede indicar una crisis
+// SESION_REALIZADA: un turno pasó a Finalizada; se avisa a recepción con el estado del pago (RF 3.5)
+// PAGO_REGISTRADO: se cargó el pago de una sesión ya realizada; se avisa a recepción (RF 3.5)
 export type TipoNotificacion =
-  | "REPROGRAMACION" | "CANCELACION" | "RECORDATORIO" | "SEGUIMIENTO" | "RESPUESTA_ACTIVIDAD" | "CONFIRMACION" | "CRISIS";
+  | "REPROGRAMACION" | "CANCELACION" | "RECORDATORIO" | "SEGUIMIENTO" | "RESPUESTA_ACTIVIDAD" | "CONFIRMACION" | "CRISIS"
+  | "SESION_REALIZADA" | "PAGO_REGISTRADO";
 
 const ZONA_HORARIA = "America/Argentina/Buenos_Aires";
 const HORAS_RECORDATORIO = 24;
@@ -127,6 +130,76 @@ export async function notificarCambioDeTurno(cambio: CambioDeTurno): Promise<voi
     await manager.insert(NotificacionEntity, avisos);
   } catch {
     console.error("No se pudo generar la notificación del turno"); // sin datos personales
+  }
+}
+
+// "pagado con transferencia ($15.000)" o "pendiente". Sin facturación ni obra social:
+// recepción solo se entera de si la sesión se cobró y cómo.
+function textoPago(sesion: SesionEntity): string {
+  if (sesion.estadoPago !== "Pagado") return "pendiente";
+  // "Efectivo" → "efectivo", pero las siglas quedan como están ("QR del psicólogo")
+  const desc = sesion.medioDePago?.descripcion ?? "";
+  const enMinuscula = /^.[A-ZÁÉÍÓÚÑ]/.test(desc) ? desc : desc.charAt(0).toLowerCase() + desc.slice(1);
+  const medio = desc ? ` con ${enMinuscula}` : "";
+  const monto =
+    sesion.monto !== null && sesion.monto !== undefined
+      ? ` (${new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 }).format(Number(sesion.monto))})`
+      : "";
+  return `pagado${medio}${monto}`;
+}
+
+interface AvisoARecepcion {
+  sesionId: string | number;
+  tipo: "SESION_REALIZADA" | "PAGO_REGISTRADO";
+  // Quien hizo el cambio: si es de recepción, no se le avisa a sí misma
+  usuarioQueCambia?: string | number | null;
+}
+
+// RF 3.5 - Avisa a recepción que una sesión se realizó (con el estado del pago) o que se cargó su pago.
+// Recepción son las cuentas activas con el permiso "Registrar Pago" que no son de un psicólogo
+// (el psicólogo también lo tiene, pero solo para sus propias sesiones).
+export async function notificarRecepcion(aviso: AvisoARecepcion): Promise<void> {
+  try {
+    const dataSource = await initializeDatabase();
+    const manager = dataSource.manager;
+    const sesionId = String(aviso.sesionId);
+    const sesion = await manager.findOne(SesionEntity, {
+      where: { id: sesionId },
+      relations: ["psicologo", "psicologo.persona", "medioDePago"],
+    });
+    if (!sesion) return;
+
+    const filas: { usuarioId: number }[] = await manager.query(
+      `SELECT DISTINCT u.id_usuario AS usuarioId
+         FROM usuario u
+         JOIN usuario_tiene_perfil up ON up.id_usuario = u.id_usuario
+         JOIN perfil_tiene_permiso pp ON pp.id_perfil = up.id_perfil
+         JOIN permiso pm ON pm.id_permiso = pp.id_permiso
+        WHERE pm.nombre = 'Registrar Pago' AND u.activo = 1
+          AND NOT EXISTS (SELECT 1 FROM psicologo ps WHERE ps.id_persona = u.id_persona)`,
+    );
+    const quienCambia = aviso.usuarioQueCambia != null ? Number(aviso.usuarioQueCambia) : null;
+    const destinatarios = filas.map((f) => Number(f.usuarioId)).filter((id) => id !== quienCambia);
+    if (destinatarios.length === 0) return;
+
+    const pts = await manager.find(PacienteTieneSesionEntity, {
+      where: { sesionId: sesion.id },
+      relations: ["paciente", "paciente.persona"],
+    });
+    const pacientes = pts.map((p) => nombre(p.paciente?.persona)).filter(Boolean).join(", ");
+    const psicologo = nombre(sesion.psicologo?.persona);
+    const turno = `${pacientes || "Turno"}${psicologo ? ` con ${psicologo}` : ""}, ${fechaTurno(sesion.fechaHoraInicio)}`;
+
+    const realizada = aviso.tipo === "SESION_REALIZADA";
+    const titulo = realizada ? "Sesión realizada" : "Pago registrado";
+    const mensaje = realizada ? `${turno}. Pago: ${textoPago(sesion)}.` : `${turno}: ${textoPago(sesion)}.`;
+
+    await manager.insert(
+      NotificacionEntity,
+      destinatarios.map((usuarioId) => ({ usuarioId, sesionId: Number(sesionId), tipo: aviso.tipo, titulo, mensaje })),
+    );
+  } catch {
+    console.error("No se pudo avisar a recepción"); // sin datos personales
   }
 }
 

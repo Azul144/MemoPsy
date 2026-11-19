@@ -11,6 +11,7 @@ import { alcanceSesiones } from "@/lib/auth/alcance-sesiones"
 import { initializeDatabase } from "@/lib/database"
 import { SesionEntity, MedioDePagoEntity } from "@/entities"
 import { ESTADOS_PAGO, datosPago, puedeVerPagos } from "@/lib/sesiones/pagos"
+import { notificarRecepcion } from "@/lib/notificaciones/notificar"
 
 const pagoSchema = z
   .object({
@@ -42,7 +43,7 @@ async function manejarPATCH(request: NextRequest, { params }: { params: Promise<
 
     const dataSource = await initializeDatabase()
     const sesionRepository = dataSource.getRepository(SesionEntity)
-    const sesion = await sesionRepository.findOne({ where: { id }, relations: ["psicologo", "medioDePago"] })
+    const sesion = await sesionRepository.findOne({ where: { id }, relations: ["psicologo", "medioDePago", "estado"] })
     if (!sesion) {
       return NextResponse.json({ error: "Sesión no encontrada" }, { status: 404 })
     }
@@ -54,6 +55,7 @@ async function manejarPATCH(request: NextRequest, { params }: { params: Promise<
       return NextResponse.json({ error: "No tenés permiso para registrar el pago de esta sesión." }, { status: 403 })
     }
 
+    const yaEstabaPagada = sesion.estadoPago === "Pagado"
     if (estadoPago === "Pagado") {
       const medio = await dataSource.getRepository(MedioDePagoEntity).findOne({ where: { id: String(medioDePagoId) } })
       if (!medio) {
@@ -75,6 +77,12 @@ async function manejarPATCH(request: NextRequest, { params }: { params: Promise<
     }
 
     await sesionRepository.save(sesion)
+
+    // RF 3.5 - Si la sesión ya se realizó y recién ahora se cobró, recepción se entera
+    if (sesion.estado?.nombre === "Finalizada" && estadoPago === "Pagado" && !yaEstabaPagada) {
+      await notificarRecepcion({ sesionId: id, tipo: "PAGO_REGISTRADO", usuarioQueCambia: session.user.id })
+    }
+
     return NextResponse.json({ message: "Pago registrado", pago: datosPago(sesion) })
   } catch (error: any) {
     console.error("Error registrando pago de sesión:", error)
