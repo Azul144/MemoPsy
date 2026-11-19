@@ -177,6 +177,8 @@ export default function MiCuentaPage() {
 
             <form onSubmit={cambiarContrasena} className="h-fit space-y-4 rounded-2xl border border-borde bg-card p-5">
               <h2 className="text-lg font-semibold text-dorado">Cambiar contraseña</h2>
+              {/* Oculto: le dice al administrador de contraseñas del celular a qué cuenta corresponde la contraseña nueva */}
+              <input type="email" name="username" autoComplete="username" value={emailGuardado} readOnly hidden />
               <div className="space-y-1.5">
                 <Label htmlFor="actual" className="text-texto-2">Contraseña actual</Label>
                 <InputPassword id="actual" value={actual} required autoComplete="current-password" onChange={(e) => setActual(e.target.value)} />

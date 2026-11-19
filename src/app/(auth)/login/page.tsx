@@ -83,8 +83,12 @@ export default function LoginPage() {
                 <Label htmlFor="email" style={ETIQUETA}>Email</Label>
                 <Input
                   id="email"
+                  name="email"
                   type="email"
-                  autoComplete="email"
+                  // "username" (y no "email"): así el llavero del iPhone y el administrador de contraseñas
+                  // de Google reconocen la cuenta, ofrecen guardarla y la completan con Face ID o la huella
+                  autoComplete="username"
+                  inputMode="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -102,6 +106,7 @@ export default function LoginPage() {
                 </div>
                 <InputPassword
                   id="password"
+                  name="password"
                   autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
