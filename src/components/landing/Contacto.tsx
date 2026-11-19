@@ -39,7 +39,7 @@ export default function Contacto() {
   }
 
   return (
-    <section id="contacto" className="px-6 py-24">
+    <section id="contacto" className="px-6 py-16 sm:py-24">
       <div className="mx-auto grid max-w-6xl items-start gap-12 md:grid-cols-[1fr_1.15fr]">
         {/* Título y qué pasa después de enviar el formulario */}
         <div>

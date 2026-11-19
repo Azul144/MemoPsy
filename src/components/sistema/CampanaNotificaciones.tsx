@@ -112,14 +112,17 @@ export default function CampanaNotificaciones() {
       </button>
 
       {abierto && (
-        <div className="absolute right-0 top-12 z-50 w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-foreground/10 bg-card text-crema shadow-2xl shadow-black/40">
+        // En el celular el panel ocupa el ancho de la pantalla (con margen) debajo de la barra,
+        // porque la campanita no está en el borde y anclado a ella se salía por la izquierda.
+        // Desde tablet vuelve a abrirse alineado con la campanita.
+        <div className="fixed inset-x-3 top-[4.5rem] z-50 overflow-hidden sm:absolute sm:inset-x-auto sm:right-0 sm:top-12 sm:w-[22rem] rounded-2xl border border-foreground/10 bg-card text-crema shadow-2xl shadow-black/40">
           <div className="border-b border-foreground/10 px-4 py-3">
             <p className="font-semibold">Notificaciones</p>
           </div>
           {notificaciones.length === 0 ? (
             <p className="px-4 py-8 text-center text-sm text-crema/65">No tenés avisos por ahora.</p>
           ) : (
-            <ul className="max-h-96 overflow-y-auto">
+            <ul className="max-h-[min(24rem,65dvh)] overflow-y-auto">
               {notificaciones.map((n) => {
                 const { icono: Icono, color } = ICONOS[n.tipo] ?? { icono: Bell, color: "text-crema/70" };
                 return (

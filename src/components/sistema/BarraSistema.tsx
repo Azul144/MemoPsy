@@ -48,9 +48,11 @@ export default function BarraSistema() {
 
   return (
     <nav className="sticky top-0 z-40 border-b border-foreground/10 bg-background/80 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-6">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 sm:gap-4 sm:px-6">
         <Link href="/welcome" className="flex items-center gap-3">
-          <LogoMemoPsy tamano="sm" />
+          {/* En el celular, logo más chico para que entren la campanita, el tema y el menú */}
+          <span className="sm:hidden"><LogoMemoPsy tamano="xs" /></span>
+          <span className="hidden sm:block"><LogoMemoPsy tamano="sm" /></span>
         </Link>
 
         {/* Accesos rápidos a los módulos (en pantallas grandes) */}
@@ -71,7 +73,7 @@ export default function BarraSistema() {
           })}
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <span className="hidden text-sm text-crema/70 lg:block">{nombreCompleto}</span>
           <BotonTema />
           <CampanaNotificaciones />

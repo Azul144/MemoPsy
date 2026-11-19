@@ -65,13 +65,24 @@ const conexion = await mysql.createConnection({
   database: process.env.DB_DATABASE || "psicologia_db",
   ...(process.env.DB_SSL === "true" ? { ssl: { rejectUnauthorized: true, ...(process.env.DB_CA ? { ca: process.env.DB_CA } : {}) } } : {}),
 })
+// En la demo publicada (Render) estas tres cuentas locales tienen otro email
+const EQUIVALENTES = {
+  "psicologa@memopsy.test": "carla.benitez@demo.memopsy.test",
+  "recepcion@memopsy.test": "recepcion@demo.memopsy.test",
+  "auditor@memopsy.test": "auditor@demo.memopsy.test",
+}
 let cargadas = 0
 for (const [email, foto] of Object.entries(recortes)) {
-  const [r] = await conexion.query(
-    "UPDATE persona p JOIN usuario u ON u.id_persona = p.id_persona SET p.foto = ?, p.foto_actualizada = NOW() WHERE u.email = ?",
-    [cifrarBytes(foto), email],
-  )
-  if (r.affectedRows) cargadas++
+  const datos = cifrarBytes(foto)
+  let cargada = false
+  for (const destino of [email, EQUIVALENTES[email]].filter(Boolean)) {
+    const [r] = await conexion.query(
+      "UPDATE persona p JOIN usuario u ON u.id_persona = p.id_persona SET p.foto = ?, p.foto_actualizada = NOW() WHERE u.email = ?",
+      [datos, destino],
+    )
+    if (r.affectedRows) { cargada = true; break }
+  }
+  if (cargada) cargadas++
   else console.log("No existe la cuenta", email)
 }
 await conexion.end()

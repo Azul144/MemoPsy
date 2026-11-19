@@ -4,6 +4,7 @@
 // (PDF), generados con scripts/generar-logo.mjs.
 
 const TAMANOS = {
+  xs: { icono: 38, texto: "text-xl" },
   sm: { icono: 48, texto: "text-2xl" },
   md: { icono: 56, texto: "text-3xl" },
   lg: { icono: 64, texto: "text-4xl" },

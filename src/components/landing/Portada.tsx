@@ -33,11 +33,11 @@ const tarjetas = [
 
 export default function Portada() {
   return (
-    <section id="inicio" className="relative overflow-hidden px-6 pt-16 pb-24 lg:pt-24">
+    <section id="inicio" className="relative overflow-hidden px-6 pt-10 pb-14 sm:pt-16 sm:pb-24 lg:pt-24">
       {/* Luces que se mueven despacio en el fondo */}
       <FondoAnimado />
 
-      <div className="relative mx-auto grid max-w-7xl items-center gap-16 lg:grid-cols-[1.05fr_1fr]">
+      <div className="relative mx-auto grid max-w-7xl items-center gap-12 sm:gap-16 lg:grid-cols-[1.05fr_1fr]">
         {/* Texto */}
         <div>
           <h1 className="titulo entrar text-5xl text-crema sm:text-6xl lg:text-7xl">
@@ -52,23 +52,23 @@ export default function Portada() {
             sistema web seguro, pensado para consultorios de psicología de la Provincia de Formosa.
           </p>
 
-          <div className="entrar mt-10 flex flex-wrap gap-4" style={{ animationDelay: "0.3s" }}>
+          <div className="entrar mt-8 flex flex-col gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:gap-4" style={{ animationDelay: "0.3s" }}>
             <a
               href="#contacto"
-              className="rounded-full bg-primary px-7 py-3.5 font-semibold text-primary-foreground transition-transform hover:-translate-y-0.5"
+              className="rounded-full bg-primary px-7 py-3.5 text-center font-semibold text-primary-foreground transition-transform hover:-translate-y-0.5"
             >
               Pedir una demostración
             </a>
             <Link
               href="/login"
-              className="rounded-full border border-crema/30 px-7 py-3.5 font-semibold text-crema transition-colors hover:border-primary hover:text-dorado"
+              className="rounded-full border border-crema/30 px-7 py-3.5 text-center font-semibold text-crema transition-colors hover:border-primary hover:text-dorado"
             >
               Iniciar sesión
             </Link>
           </div>
 
           <ul
-            className="entrar mt-12 flex flex-wrap gap-x-8 gap-y-3 text-sm text-crema/70"
+            className="entrar mt-8 flex flex-wrap gap-x-8 gap-y-3 text-sm sm:mt-12 text-crema/70"
             style={{ animationDelay: "0.45s" }}
           >
             <li className="flex items-center gap-2">

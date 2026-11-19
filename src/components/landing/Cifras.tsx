@@ -8,7 +8,7 @@ const cifras = [
 
 export default function Cifras() {
   return (
-    <section className="px-6 pb-20">
+    <section className="px-6 pb-14 sm:pb-20">
       <div className="mx-auto grid max-w-6xl grid-cols-2 gap-y-10 rounded-[2rem] border border-foreground/10 bg-card/60 px-6 py-10 md:grid-cols-4 md:divide-x md:divide-foreground/10">
         {cifras.map((c) => (
           <div key={c.texto} className="px-4 text-center">

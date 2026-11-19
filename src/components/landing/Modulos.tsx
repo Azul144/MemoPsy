@@ -41,7 +41,7 @@ const modulos = [
 
 export default function Modulos() {
   return (
-    <section id="modulos" className="relative overflow-hidden bg-superficie px-6 py-24">
+    <section id="modulos" className="relative overflow-hidden bg-superficie px-6 py-16 sm:py-24">
       <FondoAnimado intensidad="suave" />
       {/* Encabezado centrado, acompaña la grilla simétrica de 2x2 */}
       <div className="relative mx-auto max-w-3xl text-center">

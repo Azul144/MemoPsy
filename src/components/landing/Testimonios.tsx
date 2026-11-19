@@ -50,7 +50,7 @@ function iniciales(nombre: string) {
 
 export default function Testimonios() {
   return (
-    <section id="testimonios" className="seccion-crema bg-background px-6 py-24">
+    <section id="testimonios" className="seccion-crema bg-background px-6 py-16 sm:py-24">
       <div className="mx-auto max-w-6xl">
         <h2 className="titulo max-w-xl text-4xl text-balance text-crema sm:text-5xl">Lo que dicen quienes ya lo usan</h2>
         <p className="mt-4 max-w-xl text-lg text-crema/70">

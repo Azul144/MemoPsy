@@ -42,7 +42,7 @@ export default function PiePagina() {
 
   return (
     <footer id="sobre-nosotros" className="relative overflow-hidden border-t border-foreground/10 bg-card px-6">
-      <div className="relative mx-auto grid max-w-6xl gap-12 pt-20 pb-10 lg:grid-cols-[1.2fr_1.2fr_1fr] lg:gap-16">
+      <div className="relative mx-auto grid max-w-6xl gap-12 pt-14 pb-10 sm:pt-20 lg:grid-cols-[1.2fr_1.2fr_1fr] lg:gap-16">
 
         {/* Marca */}
         <div>
