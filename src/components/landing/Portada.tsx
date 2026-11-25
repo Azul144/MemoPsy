@@ -25,7 +25,7 @@ const tarjetas = [
   {
     icono: Mail,
     titulo: "Recordatorio enviado",
-    detalle: "Por email y WhatsApp, 24 h antes",
+    detalle: "Por email, 24 h antes",
     posicion: "bottom-8 left-2 lg:-left-6",
     retraso: "1.3s",
   },
