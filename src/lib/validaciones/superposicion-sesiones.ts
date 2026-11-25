@@ -6,7 +6,7 @@
 import type { DataSource, EntityManager } from "typeorm"
 import { SesionEntity } from "@/entities"
 
-export const MENSAJE_FIN_ANTES_DE_INICIO = "La hora de fin debe ser posterior a la hora de inicio."
+export const MENSAJE_FIN_ANTES_DE_INICIO = "El turno debe terminar después de empezar: revisá la fecha y la hora de fin."
 
 export async function buscarSesionSuperpuesta(
   db: DataSource | EntityManager,

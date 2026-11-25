@@ -32,6 +32,21 @@ import DialogoHorarios from "@/components/sesiones/DialogoHorarios";
 import HorariosDeAtencion from "@/components/sesiones/HorariosDeAtencion";
 import DialogoReprogramar from "@/components/sesiones/DialogoReprogramar";
 
+// Los turnos terminan el mismo día: al cambiar la fecha de inicio, la de fin la acompaña
+// si estaba en el mismo día que el inicio anterior o quedaría antes del nuevo inicio.
+function fechaFinQueSigue(fechaInicioAnterior: string, fechaFinActual: string, fechaInicioNueva: string): string {
+  if (!fechaFinActual || fechaFinActual === fechaInicioAnterior || fechaFinActual < fechaInicioNueva) return fechaInicioNueva
+  return fechaFinActual
+}
+
+// Dice qué campo está mal cuando el fin no queda después del inicio: la fecha o la hora
+function erroresOrdenFin(fechaInicio: string, horaInicio: string, fechaFin: string, horaFin: string): Record<string, string> {
+  if (!fechaInicio || !horaInicio || !fechaFin || !horaFin) return {}
+  if (fechaFin < fechaInicio) return { fechaFin: "La fecha de fin no puede ser anterior a la fecha de inicio." }
+  if (fechaFin === fechaInicio && horaFin <= horaInicio) return { horaFin: "La hora de fin debe ser posterior a la hora de inicio." }
+  return {}
+}
+
 interface Sesion {
   id: string
   fechaHoraInicio: string
@@ -273,13 +288,8 @@ const validateEditForm = () => {
     if (editFormData.fechaInicio && !esFechaHabil(editFormData.fechaInicio)) errors.fechaInicio = MENSAJE_DIA_NO_HABIL;
     if (editFormData.fechaFin && !esFechaHabil(editFormData.fechaFin)) errors.fechaFin = MENSAJE_DIA_NO_HABIL;
     
-    const startDateTimeStr = `${editFormData.fechaInicio}T${editFormData.horaInicio}`;
-    const endDateTimeStr = `${editFormData.fechaFin}T${editFormData.horaFin}`;
-    if (editFormData.fechaInicio && editFormData.horaInicio && editFormData.fechaFin && editFormData.horaFin) {
-        if (!errors.fechaFin && new Date(startDateTimeStr) >= new Date(endDateTimeStr)) {
-            errors.fechaFin = "La fecha/hora de fin debe ser posterior"; 
-            errors.horaFin = "a la fecha/hora de inicio"; 
-        }
+    if (!errors.fechaFin && !errors.horaFin) {
+        Object.assign(errors, erroresOrdenFin(editFormData.fechaInicio, editFormData.horaInicio, editFormData.fechaFin, editFormData.horaFin));
     }
 
     setEditFormErrors(errors);
@@ -639,6 +649,9 @@ const handleUpdateSesion = async () => {
     if (formData.pacientesIds.length === 0) errors.pacientesIds = "Debe seleccionar al menos un paciente"
     if (formData.fechaInicio && !esFechaHabil(formData.fechaInicio)) errors.fechaInicio = MENSAJE_DIA_NO_HABIL
     if (formData.fechaFin && !esFechaHabil(formData.fechaFin)) errors.fechaFin = MENSAJE_DIA_NO_HABIL
+    if (!errors.fechaFin && !errors.horaFin) {
+      Object.assign(errors, erroresOrdenFin(formData.fechaInicio, formData.horaInicio, formData.fechaFin, formData.horaFin))
+    }
 
     setFormErrors(errors)
     return Object.keys(errors).length === 0
@@ -1083,7 +1096,14 @@ const handleUpdateSesion = async () => {
                                     id="fechaInicio"
                                     type="date"
                                     value={formData.fechaInicio}
-                                    onChange={(e) => setFormData({ ...formData, fechaInicio: e.target.value })}
+                                    onChange={(e) => {
+                                      const fechaInicio = e.target.value
+                                      setFormData((prev) => ({
+                                        ...prev,
+                                        fechaInicio,
+                                        fechaFin: fechaFinQueSigue(prev.fechaInicio, prev.fechaFin, fechaInicio),
+                                      }))
+                                    }}
                                     className={cn(
                                       "bg-background text-foreground border-borde-fuerte",
                                       formErrors.fechaInicio && "border-red-500",
@@ -1503,7 +1523,7 @@ const handleUpdateSesion = async () => {
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div className="space-y-2">
                         <Label htmlFor="edit_fechaInicio" className="text-foreground">Fecha Inicio</Label>
-                        <Input id="edit_fechaInicio" type="date" value={editFormData.fechaInicio} onChange={(e) => setEditFormData({ ...editFormData, fechaInicio: e.target.value })} className={cn("bg-background text-foreground border-borde-fuerte w-full", editFormErrors.fechaInicio && "border-red-500")} />
+                        <Input id="edit_fechaInicio" type="date" value={editFormData.fechaInicio} onChange={(e) => { const fechaInicio = e.target.value; setEditFormData((prev) => ({ ...prev, fechaInicio, fechaFin: fechaFinQueSigue(prev.fechaInicio, prev.fechaFin, fechaInicio) })) }} className={cn("bg-background text-foreground border-borde-fuerte w-full", editFormErrors.fechaInicio && "border-red-500")} />
                         {editFormErrors.fechaInicio && <p className="text-sm text-peligro">{editFormErrors.fechaInicio}</p>}
                     </div>
                     <div className="space-y-2">
