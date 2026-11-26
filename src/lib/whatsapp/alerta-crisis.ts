@@ -14,7 +14,7 @@ interface Psicologo {
 }
 
 // Psicólogos que atienden al paciente: los de sus turnos y los que tienen su historia clínica
-async function psicologosDelPaciente(pacienteId: number): Promise<Psicologo[]> {
+export async function psicologosDelPaciente(pacienteId: number): Promise<Psicologo[]> {
   const dataSource = await initializeDatabase();
   const filas: { usuarioId: number; email: string; nombre: string }[] = await dataSource.query(
     `SELECT DISTINCT u.id_usuario AS usuarioId, u.email, pe.nombre

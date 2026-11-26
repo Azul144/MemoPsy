@@ -1,6 +1,7 @@
 // src/app/crisis/page.tsx
 // Página pública de ayuda en crisis: se abre sin iniciar sesión, a cualquier hora,
-// desde el botón del login y de la portada. No guarda ni envía ningún dato.
+// desde el botón del login y de la portada, y también desde el inicio del paciente con la sesión
+// iniciada. No guarda nada; solo envía un aviso al psicólogo si el paciente lo pide (RF 4.3).
 import type { Metadata } from "next"
 import AyudaCrisis from "@/components/crisis/AyudaCrisis"
 

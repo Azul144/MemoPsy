@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { HomeIcon, LogOut, Menu, UserRound, X } from "lucide-react";
+import { HomeIcon, LifeBuoy, LogOut, Menu, UserRound, X } from "lucide-react";
 import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
 import { MODULOS_DISPONIBLES } from "@/config/modulos";
 import CampanaNotificaciones from "./CampanaNotificaciones";
@@ -113,6 +113,13 @@ export default function BarraSistema() {
                       {m.nombre}
                     </Link>
                   ))}
+                  {/* RF 4.3 - El paciente llega a la ayuda en crisis desde cualquier pantalla */}
+                  {usuario?.pacienteId && (
+                    <Link href="/crisis" className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-peligro transition-colors hover:bg-red-500/10">
+                      <LifeBuoy className="h-5 w-5" />
+                      Ayuda en crisis
+                    </Link>
+                  )}
                 </div>
                 <div className="border-t border-foreground/10 p-2">
                   <button

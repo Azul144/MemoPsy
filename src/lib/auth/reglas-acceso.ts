@@ -126,6 +126,8 @@ export const REGLAS_API: Regla[] = [
   { ruta: "/api/horarios-disponibles", metodos: ["GET", "PUT"], permisos: AGENDA },
   // RF 3.2 / 3.3 - Avisos propios: cada uno ve solo los suyos.
   { ruta: "/api/notificaciones", metodos: ["GET", "PATCH"], permisos: "cualquiera" },
+  // RF 4.3 - Aviso de la ayuda en crisis al psicólogo (la ruta valida además que sea un paciente)
+  { ruta: "/api/crisis/aviso", metodos: ["POST"], permisos: "cualquiera" },
   { ruta: "/api/medios-de-pago", metodos: ["GET"], permisos: ["Registrar Pago"] },
   { ruta: "/api/estados", metodos: ["GET"], permisos: AGENDA },
   { ruta: "/api/estados/[id]", metodos: ["GET"], permisos: AGENDA },

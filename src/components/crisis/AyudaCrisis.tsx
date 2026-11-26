@@ -2,13 +2,18 @@
 // Ayuda en crisis: barra fija con los teléfonos, mosaico de "¿Qué te está pasando?" y, para cada
 // situación, pasos breves y un ejercicio guiado (respiración o 5-4-3-2-1). En el celular la guía
 // se abre en su propia vista; en la computadora, al costado del mosaico.
-// Todo ocurre en el navegador: no se guarda ni se envía nada.
+// Todo ocurre en el navegador: no se guarda ni se envía nada. La única excepción es opcional:
+// si un paciente inició sesión, puede tocar "Avisarle a mi psicólogo" (RF 4.3).
 
 import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
+import { useSession } from "next-auth/react"
 import {
   ArrowLeft,
+  BellRing,
+  Check,
   ChevronDown,
+  Loader2,
   CloudFog,
   CloudRain,
   Flame,
@@ -379,7 +384,7 @@ function partesDeLaGuia(guia: GuiaCrisis): Parte[] {
   return partes
 }
 
-function Guia({ guia }: { guia: GuiaCrisis }) {
+function Guia({ guia, puedeAvisar }: { guia: GuiaCrisis; puedeAvisar: boolean }) {
   const { soportada, sinVoz, decir, callar, turno } = useVoz()
   const [lectura, setLectura] = useState<"quieta" | "leyendo" | "pausada">("quieta")
   const [leyendo, setLeyendo] = useState<Parte["clave"] | null>(null)
@@ -500,7 +505,63 @@ function Guia({ guia }: { guia: GuiaCrisis }) {
       <p className={cn("rounded-2xl border border-dorado/40 bg-primary/10 p-4 leading-relaxed text-crema/90 transition-shadow", resaltada("cierre"))}>
         {guia.cierre}
       </p>
+
+      {puedeAvisar && guia.id !== "acompanar" && <AvisoPsicologo guia={guia} />}
     </article>
+  )
+}
+
+// RF 4.3 - Solo para el paciente que inició sesión, y solo si él lo decide
+function AvisoPsicologo({ guia }: { guia: GuiaCrisis }) {
+  const [estado, setEstado] = useState<"listo" | "enviando" | "enviado" | "error">("listo")
+  const [error, setError] = useState("")
+
+  const avisar = async () => {
+    setEstado("enviando")
+    try {
+      const res = await fetch("/api/crisis/aviso", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ situacion: guia.id }),
+      })
+      const datos = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        setError(datos.error || "No se pudo enviar el aviso. Probá de nuevo en un rato.")
+        setEstado("error")
+        return
+      }
+      setEstado("enviado")
+    } catch {
+      setError("No se pudo enviar el aviso. Revisá tu conexión.")
+      setEstado("error")
+    }
+  }
+
+  return (
+    <div className="rounded-2xl border border-borde bg-card p-4">
+      <p className="font-semibold text-crema">¿Querés que tu psicólogo/a sepa lo que te pasó?</p>
+      <p className="mt-1 text-sm leading-relaxed text-crema/70">
+        Le llega un aviso con el día, la hora y lo que elegiste. Lo va a ver cuando entre a MemoPsy: no es atención inmediata.
+        Si estás en peligro, llamá a los teléfonos de arriba.
+      </p>
+      {estado === "enviado" ? (
+        <p className="mt-3 flex items-center gap-2 text-sm font-semibold text-exito" role="status">
+          <Check className="h-4 w-4" aria-hidden="true" />
+          Listo, tu psicólogo/a va a ver el aviso.
+        </p>
+      ) : (
+        <button
+          type="button"
+          onClick={avisar}
+          disabled={estado === "enviando"}
+          className="mt-3 inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
+        >
+          {estado === "enviando" ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <BellRing className="h-4 w-4" aria-hidden="true" />}
+          Avisarle a mi psicólogo/a
+        </button>
+      )}
+      {estado === "error" && <p className="mt-2 text-sm text-peligro" role="alert">{error}</p>}
+    </div>
   )
 }
 
@@ -541,6 +602,10 @@ function Opcion({ guia, activa, ancho, onElegir }: { guia: GuiaCrisis; activa: b
 
 export default function AyudaCrisis() {
   const [elegida, setElegida] = useState<GuiaCrisis | null>(null)
+  // Con la sesión iniciada se vuelve al inicio del sistema; si es paciente, puede avisarle a su psicólogo
+  const { data: session } = useSession()
+  const conSesion = !!session?.user
+  const esPaciente = !!session?.user?.pacienteId
 
   const elegir = (g: GuiaCrisis) => {
     setElegida(g)
@@ -577,9 +642,9 @@ export default function AyudaCrisis() {
               </li>
             ))}
           </ul>
-          <Link href="/login" className="mt-6 inline-flex items-center gap-2 text-sm text-crema/60 transition-colors hover:text-dorado">
+          <Link href={conSesion ? "/welcome" : "/login"} className="mt-6 inline-flex items-center gap-2 text-sm text-crema/60 transition-colors hover:text-dorado">
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-            Volver a iniciar sesión
+            {conSesion ? "Volver al inicio" : "Volver a iniciar sesión"}
           </Link>
         </section>
 
@@ -596,7 +661,7 @@ export default function AyudaCrisis() {
                   <ArrowLeft className="h-4 w-4" aria-hidden="true" />
                   Volver a las opciones
                 </button>
-                <Guia key={elegida.id} guia={elegida} />
+                <Guia key={elegida.id} guia={elegida} puedeAvisar={esPaciente} />
               </>
             ) : (
               <div className="flex min-h-[22rem] flex-col items-center justify-center rounded-3xl border border-dashed border-borde p-8 text-center">
@@ -614,8 +679,10 @@ export default function AyudaCrisis() {
       <footer className="mx-auto w-full max-w-6xl px-4 pb-8 sm:px-6">
         <p className="border-t border-borde pt-6 text-sm leading-relaxed text-crema/60">
           Esta página da orientación general para atravesar el momento: no reemplaza la atención de un/a profesional, una guardia
-          ni un servicio de emergencias. Si estás en tratamiento, contale a tu psicólogo/a lo que pasó. MemoPsy no guarda nada de
-          lo que hagas en esta página.
+          ni un servicio de emergencias. Si estás en tratamiento, contale a tu psicólogo/a lo que pasó.{" "}
+          {esPaciente
+            ? "MemoPsy no guarda lo que hagas en esta página: solo envía el aviso a tu psicólogo/a si tocás «Avisarle a mi psicólogo/a»."
+            : "MemoPsy no guarda nada de lo que hagas en esta página."}
         </p>
       </footer>
     </main>

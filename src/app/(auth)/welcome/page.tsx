@@ -10,7 +10,7 @@ import FondoAnimado from "@/components/comunes/FondoAnimado";
 import CampanaNotificaciones from "@/components/sistema/CampanaNotificaciones";
 import BotonTema from "@/components/sistema/BotonTema";
 import { Button } from "@/components/ui/button";
-import { Menu, X, LogOut, HomeIcon, UserRound, KeyRound, Loader2, ArrowRight, ShieldCheck, ShieldAlert } from "lucide-react"
+import { Menu, X, LogOut, HomeIcon, UserRound, KeyRound, Loader2, ArrowRight, ShieldCheck, ShieldAlert, LifeBuoy } from "lucide-react"
 import ModalActivarMfa from "@/components/mfa/ModalActivarMfa";
 import ModalDesactivarMfa from "@/components/mfa/ModalDesactivarMfa";
 import toast from "react-hot-toast";
@@ -258,6 +258,24 @@ export default function WelcomePage() {
             )}
           </div>
         </section>
+
+        {/* RF 4.3 - Ayuda en crisis también desde la cuenta del paciente: desde acá puede avisarle a su psicólogo */}
+        {session.user.pacienteId && (
+          <section className="entrar mt-6 flex flex-col gap-4 rounded-3xl border border-red-400/40 bg-red-500/10 p-5 sm:flex-row sm:items-center sm:justify-between" style={{ animationDelay: '0.3s' }}>
+            <div className="flex items-start gap-3">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-red-500 text-white">
+                <LifeBuoy className="h-6 w-6" aria-hidden="true" />
+              </span>
+              <div>
+                <p className="font-semibold">¿Estás pasando por un momento difícil?</p>
+                <p className="text-sm text-crema/70">Teléfonos de ayuda, pasos para atravesarlo y la opción de avisarle a tu psicólogo/a.</p>
+              </div>
+            </div>
+            <Button onClick={() => router.push('/crisis')} className="shrink-0 rounded-full bg-red-500 text-white hover:bg-red-600">
+              Ayuda en crisis
+            </Button>
+          </section>
+        )}
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_20rem]">
           {/* Módulos */}
