@@ -1034,12 +1034,18 @@ const handleUpdateSesion = async () => {
   // Recepción gestiona la agenda de todos los psicólogos (mismo criterio que alcanceSesiones)
   const puedeVerTodaLaAgenda = permisos.includes("Asignar Profesional") || permisos.includes("Eliminar Sesión")
 
+  // RF 4.2 - Quien solo consulta la agenda (el Auditor) no registra turnos ni tiene los propios:
+  // ve todos los turnos del consultorio en solo lectura, sin acciones ni datos de pago
+  const soloConsulta = !puedeRegistrarSesiones && !session?.user?.psicologoId && !session?.user?.pacienteId
+
   const defaultTabValue = puedeRegistrarSesiones
   ? "registrar"
   : session?.user?.psicologoId
   ? "psicologo"
   : session?.user?.pacienteId
   ? "paciente"
+  : soloConsulta
+  ? "consulta"
   : undefined;
 
   return (
@@ -1083,7 +1089,32 @@ const handleUpdateSesion = async () => {
                 Mis Sesiones (Paciente)
               </TabsTrigger>
               )}
+              {soloConsulta && (
+              <TabsTrigger
+                value="consulta"
+                className="shrink-0 px-3 sm:px-6"
+              >
+                Agenda del consultorio
+              </TabsTrigger>
+              )}
             </TabsList>
+
+            {soloConsulta && (
+              <TabsContent value="consulta" className="space-y-4">
+                <Card style={{ backgroundColor: "var(--card)" }}>
+                  <CardHeader>
+                    <CardTitle className="text-foreground flex items-center space-x-2">
+                      <CalendarIcon className="w-5 h-5" style={{ color: "var(--dorado)" }} />
+                      <span>Agenda del consultorio</span>
+                    </CardTitle>
+                    <CardDescription className="text-suave">
+                      Consulta en solo lectura de los turnos de todos los psicólogos. Los cambios de cada perfil se ven en Auditoría.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>{renderCalendarWithSessions("all")}</CardContent>
+                </Card>
+              </TabsContent>
+            )}
 
             {puedeRegistrarSesiones && (
               <TabsContent value="registrar" className="space-y-4">
