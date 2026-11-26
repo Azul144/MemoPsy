@@ -81,3 +81,14 @@ Con **BAJA**, o desmarcando la casilla, deja de recibirlos.
 ## 7. Prueba local sin WhatsApp
 
 Se puede simular un mensaje de Twilio firmado con el `TWILIO_AUTH_TOKEN` y enviarlo por POST a `http://localhost:3000/api/whatsapp/webhook`. La respuesta llega en TwiML.
+
+## Alternativa: Infobip
+
+Infobip es otro intermediario de la API de WhatsApp de Meta, igual que Twilio. Para mandar desde el número propio de MemoPsy, Meta también exige el negocio verificado. La prueba gratis (14 días, 100 mensajes) usa el remitente de prueba de Infobip y solo entrega a los números verificados en la cuenta.
+
+1. En portal.infobip.com → Guía, copiar la **Clave API** y la **URL base de API** a `INFOBIP_API_KEY` e `INFOBIP_BASE_URL`.
+2. Probar el envío sin turno: `node --env-file=.env.local scripts/probar-infobip.mjs 549XXXXXXXXXX`.
+3. Para que los recordatorios salgan por Infobip: `WHATSAPP_PROVEEDOR=infobip` y `RECORDATORIOS_WHATSAPP=activo`.
+4. Con número propio aprobado: `INFOBIP_WHATSAPP_FROM` y, en `INFOBIP_PLANTILLA`, una plantilla con 4 datos ({{1}} paciente, {{2}} psicólogo, {{3}} día y hora, {{4}} modalidad).
+
+El chatbot (webhook `/api/whatsapp/webhook`) sigue funcionando solo con Twilio: con Infobip se envían los recordatorios, pero las respuestas del paciente todavía no se procesan.
