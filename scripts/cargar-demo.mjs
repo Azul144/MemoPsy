@@ -234,12 +234,13 @@ const SEGUIMIENTOS = {
 try {
   await c.beginTransaction()
 
-  // --- Personal (solo si no hay)
+  // --- Personal (solo si no hay). Mismos nombres que en la base local y en Docker,
+  // para que la demo publicada y las capturas del TIF muestren a las mismas personas
   if (!(await existeCuentaConPerfil("Recepcionista"))) {
-    await crearCuenta(await crearPersona("Marta", "Giménez", "28444555", "1980-09-03"), "recepcion@demo.memopsy.test", "Recepcionista")
+    await crearCuenta(await crearPersona("Sofía", "Romero", "28444555", "1980-09-03"), "recepcion@demo.memopsy.test", "Recepcionista")
   }
   if (!(await existeCuentaConPerfil("Auditor"))) {
-    await crearCuenta(await crearPersona("Jorge", "Acosta", "25666777", "1976-01-20"), "auditor@demo.memopsy.test", "Auditor")
+    await crearCuenta(await crearPersona("Martín", "Giménez", "25666777", "1976-01-20"), "auditor@demo.memopsy.test", "Auditor")
   }
   const recepcion = await uno("SELECT u.id_usuario AS id FROM usuario u JOIN usuario_tiene_perfil up ON up.id_usuario = u.id_usuario JOIN perfil p ON p.id_perfil = up.id_perfil WHERE p.nombre = 'Recepcionista' AND u.activo = 1 ORDER BY u.id_usuario LIMIT 1")
 
