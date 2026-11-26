@@ -67,7 +67,7 @@ export default function Funciones() {
           {/* Recordatorios */}
           <article className="group relative overflow-hidden rounded-[2rem] border border-foreground/10 bg-card p-8 md:col-span-3">
             <Encabezado icono={Bell} titulo="Recordatorios">
-              Tus pacientes reciben el recordatorio por email y un aviso en el sistema, 24 horas antes de cada sesión.
+              Tus pacientes reciben el recordatorio por email y por WhatsApp, y un aviso en el sistema, 24 horas antes de cada sesión.
             </Encabezado>
 
             {/* Mini email de recordatorio */}
