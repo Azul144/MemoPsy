@@ -9,8 +9,9 @@ import { readFileSync, writeFileSync } from "node:fs"
 import { exec } from "node:child_process"
 
 const ARCHIVO_ENV = ".env.local"
-const PUERTO = 53682
-const REDIRECCION = `http://localhost:${PUERTO}`
+// Puerto libre que elige el sistema: Windows reserva rangos para Hyper-V, WSL y Docker (el 53682 cayó
+// en uno y daba EACCES). Los clientes OAuth de escritorio aceptan cualquier puerto de localhost.
+let REDIRECCION = ""
 const PERMISO = "https://www.googleapis.com/auth/calendar.events"
 
 const env = readFileSync(ARCHIVO_ENV, "utf8")
@@ -22,7 +23,7 @@ if (!clientId || !clientSecret) {
   process.exit(1)
 }
 
-const urlAutorizacion =
+const urlAutorizacion = () =>
   "https://accounts.google.com/o/oauth2/v2/auth?" +
   new URLSearchParams({
     client_id: clientId,
@@ -74,8 +75,10 @@ const servidor = createServer(async (pedido, respuesta) => {
   servidor.close()
 })
 
-servidor.listen(PUERTO, () => {
+servidor.listen(0, "127.0.0.1", () => {
+  REDIRECCION = `http://127.0.0.1:${servidor.address().port}`
+  const enlace = urlAutorizacion()
   console.log("Se abre el navegador para autorizar a MemoPsy en tu cuenta de Google...")
-  console.log(`Si no se abre, copiá este enlace en el navegador:\n${urlAutorizacion}\n`)
-  exec(`start "" "${urlAutorizacion}"`)
+  console.log(`Si no se abre, copiá este enlace en el navegador:\n${enlace}\n`)
+  exec(`start "" "${enlace}"`)
 })
