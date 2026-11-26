@@ -14,6 +14,7 @@ export interface TurnoPendiente {
   sesionId: number;
   usuarioId: number;
   email: string;
+  pacienteNombre: string | null;
   inicio: Date;
   modalidad: string | null;
   enlace: string | null;
@@ -24,25 +25,33 @@ export interface TurnoPendiente {
 const escapar = (texto: string) =>
   texto.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 
+// Mismo formato que el WhatsApp de Infobip (src/lib/whatsapp/infobip.ts): saludo y un dato por renglón
 export function armarEmail(turno: TurnoPendiente) {
-  const psicologo = escapar(`${turno.psicologoNombre} ${turno.psicologoApellido}`.trim());
-  const cuando = escapar(fechaTurno(new Date(turno.inicio)));
-  const modalidad = turno.modalidad ? ` (${escapar(turno.modalidad.toLowerCase())})` : "";
-  const enlace =
-    turno.enlace && /^https?:\/\//i.test(turno.enlace)
-      ? `<p>Para conectarte a la videollamada usá este enlace:<br><a href="${escapar(turno.enlace)}">${escapar(turno.enlace)}</a></p>`
-      : "";
+  const [dia, hora] = fechaTurno(new Date(turno.inicio)).split(" a las ");
+  const nombre = (turno.pacienteNombre ?? "").trim().split(/\s+/)[0] ?? "";
+  const enlace = turno.enlace && /^https?:\/\//i.test(turno.enlace) ? escapar(turno.enlace) : "";
   const sitio = (process.env.NEXTAUTH_URL ?? "").replace(/\/$/, "");
+  const datos: [string, string, string][] = [
+    ["📅", "Día", escapar(dia)],
+    ["🕐", "Hora", escapar(hora ?? "")],
+    ["👤", "Profesional", escapar(`${turno.psicologoNombre} ${turno.psicologoApellido}`.trim())],
+    ["📍", "Modalidad", escapar((turno.modalidad ?? "presencial").toLowerCase())],
+    ...(enlace ? [["🔗", "Videollamada", `<a href="${enlace}">${enlace}</a>`] as [string, string, string]] : []),
+  ];
+  const renglones = datos
+    .map(([icono, etiqueta, valor]) => `<p style="margin: 4px 0;">${icono} <strong>${etiqueta}:</strong> ${valor}</p>`)
+    .join("\n        ");
   return {
     // Con la fecha en el asunto, si el turno se reprograma el email nuevo no queda escondido
     // en la misma conversación que el anterior
     asunto: `Recordatorio: tu turno del ${fechaTurno(new Date(turno.inicio))} en MemoPsy`,
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 480px;">
-        <h2 style="color: #1D3434;">Recordatorio de turno</h2>
-        <p>Te recordamos que tenés turno con ${psicologo} el <strong>${cuando}</strong>${modalidad}.</p>
-        ${enlace}
-        <p>Si no podés asistir, podés reprogramar el turno desde tu cuenta de MemoPsy hasta 24 horas antes${sitio ? ` (<a href="${escapar(sitio)}">${escapar(sitio)}</a>)` : ""}, o avisarle al centro.</p>
+      <div style="font-family: Arial, sans-serif; max-width: 480px; color: #1D3434;">
+        <h2>Recordatorio de turno</h2>
+        <p>${nombre ? `Hola ${escapar(nombre)} 👋` : "Hola 👋"}</p>
+        ${renglones}
+        <p style="margin-top: 16px;">Si no podés asistir, reprogramá el turno desde tu cuenta de MemoPsy hasta 24 horas antes${sitio ? ` (<a href="${escapar(sitio)}">${escapar(sitio)}</a>)` : ""} o avisale al centro.</p>
+        <p>— MemoPsy</p>
         <p style="color: #888; font-size: 12px;">Este es un mensaje automático de MemoPsy. No lo respondas.</p>
       </div>
     `,
@@ -61,7 +70,7 @@ export async function enviarRecordatoriosPorEmail(): Promise<void> {
     const hasta = new Date(ahora.getTime() + HORAS_RECORDATORIO * 60 * 60 * 1000);
 
     const pendientes: TurnoPendiente[] = await dataSource.query(
-      `SELECT s.id_sesion AS sesionId, u.id_usuario AS usuarioId, u.email, s.fecha_hora_inicio AS inicio,
+      `SELECT s.id_sesion AS sesionId, u.id_usuario AS usuarioId, u.email, pe.nombre AS pacienteNombre, s.fecha_hora_inicio AS inicio,
               m.nombre AS modalidad, s.enlace_videollamada AS enlace,
               pp.nombre AS psicologoNombre, pp.apellido AS psicologoApellido
          FROM sesion s
@@ -71,6 +80,7 @@ export async function enviarRecordatoriosPorEmail(): Promise<void> {
          JOIN persona pp ON pp.id_persona = ps.id_persona
          JOIN paciente_tiene_sesion pts ON pts.id_sesion = s.id_sesion
          JOIN paciente pa ON pa.id_paciente = pts.id_paciente
+         JOIN persona pe ON pe.id_persona = pa.id_persona
          JOIN usuario u ON u.id_persona = pa.id_persona AND u.activo = 1
         WHERE s.fecha_hora_inicio BETWEEN ? AND ?
           AND e.nombre NOT IN ('Cancelada', 'Finalizada')
