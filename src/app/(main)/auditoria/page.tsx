@@ -60,6 +60,7 @@ const NOMBRE_ACCION: Record<string, string> = {
   ESTRUCTURAR_IA: "Nota ordenada con IA",
   REPROGRAMAR: "Reprogramación de turno",
   RESPONDER_ACTIVIDAD: "Respuesta a actividad",
+  ENVIAR_RECORDATORIO: "Recordatorio enviado a mano",
 }
 
 const MOTIVO_LOGIN: Record<string, string> = {

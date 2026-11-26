@@ -10,7 +10,7 @@ import { fechaTurno } from "./notificar";
 
 const HORAS_RECORDATORIO = 24;
 
-interface TurnoPendiente {
+export interface TurnoPendiente {
   sesionId: number;
   usuarioId: number;
   email: string;
@@ -24,7 +24,7 @@ interface TurnoPendiente {
 const escapar = (texto: string) =>
   texto.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 
-function armarEmail(turno: TurnoPendiente) {
+export function armarEmail(turno: TurnoPendiente) {
   const psicologo = escapar(`${turno.psicologoNombre} ${turno.psicologoApellido}`.trim());
   const cuando = escapar(fechaTurno(new Date(turno.inicio)));
   const modalidad = turno.modalidad ? ` (${escapar(turno.modalidad.toLowerCase())})` : "";

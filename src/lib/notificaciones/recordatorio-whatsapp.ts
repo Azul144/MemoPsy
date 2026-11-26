@@ -9,7 +9,7 @@ import { guardarConversacion } from "@/lib/whatsapp/conversacion";
 
 const HORAS_RECORDATORIO = 24;
 
-interface TurnoPendiente {
+export interface TurnoPendiente {
   sesionId: number;
   usuarioId: number;
   telefono: string;
@@ -21,7 +21,7 @@ interface TurnoPendiente {
   psicologoApellido: string;
 }
 
-function recordatorio(turno: TurnoPendiente): RecordatorioWhatsapp {
+export function recordatorio(turno: TurnoPendiente): RecordatorioWhatsapp {
   return {
     para: turno.telefono,
     paciente: (turno.pacienteNombre ?? "").trim().split(/\s+/)[0] ?? "",

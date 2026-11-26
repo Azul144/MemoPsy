@@ -118,6 +118,8 @@ export const REGLAS_API: Regla[] = [
   { ruta: "/api/sesiones/[id]/pago", metodos: ["PATCH"], permisos: ["Registrar Pago"] },
   // Cambiar el estado del turno (confirmar / cancelar / reprogramar).
   { ruta: "/api/sesiones/[id]/estado", metodos: ["PATCH"], permisos: ["Editar Sesión"] },
+  // RF 3.3 - Mandar en el momento el recordatorio del turno (email y WhatsApp).
+  { ruta: "/api/sesiones/[id]/recordatorio", metodos: ["POST"], permisos: ["Editar Sesión"] },
   // RF 4.3 - El paciente mueve su turno a un horario habilitado (la ruta valida además que sea su turno).
   { ruta: "/api/sesiones/[id]/reprogramar", metodos: ["GET", "POST"], permisos: ["Ver Sesiones"] },
   // RF 4.3 - Horarios que el psicólogo habilita (la ruta valida que sean los suyos, o que sea recepción).

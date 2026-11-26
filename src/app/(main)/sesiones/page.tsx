@@ -21,7 +21,7 @@ import { Calendar } from "@/components/ui/calendar"
 import { DIAS_NO_HABILES, MENSAJE_DIA_NO_HABIL, esDiaHabil, esFechaHabil, proximoDiaHabil } from "@/lib/validaciones/dias-habiles"
 import { Badge } from "@/components/ui/badge"
 import { TypographyP } from '@/components/ui/typography';
-import { Loader2, X, CalendarIcon, CalendarClock, Plus, Users, User, Brain, Clock, MapPin, Activity, Check, Pencil, Wallet, Video } from "lucide-react"
+import { Loader2, X, CalendarIcon, CalendarClock, Plus, Users, User, Brain, Clock, MapPin, Activity, Check, Pencil, Wallet, Video, Send } from "lucide-react"
 import { format, parseISO, isSameDay } from "date-fns"
 import { es } from "date-fns/locale"
 import { cn } from "@/lib/utils"
@@ -216,6 +216,37 @@ export default function SesionesPage() {
     } catch (error) {
       console.error("Error cambiando el estado:", error);
       avisoError("No se pudo cambiar el estado. Verificá tu conexión.");
+    }
+  };
+
+  // RF 3.3 - Mandar en el momento el recordatorio del turno por email y WhatsApp
+  const [enviandoRecordatorio, setEnviandoRecordatorio] = useState<string | null>(null);
+  const enviarRecordatorio = async (sesion: Sesion) => {
+    const ok = await confirmar("Se le va a mandar al paciente el recordatorio del turno por email y WhatsApp. ¿Seguimos?", "Sí, enviar");
+    if (!ok) return;
+    setEnviandoRecordatorio(String(sesion.id));
+    try {
+      const res = await fetch(`/api/sesiones/${sesion.id}/recordatorio`, { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) {
+        avisoError(data.error || "No se pudo enviar el recordatorio.");
+        return;
+      }
+      const canales = [
+        data.email?.includes("enviado") && "email",
+        data.whatsapp?.includes("enviado") && "WhatsApp",
+      ].filter(Boolean);
+      const fallos = [...(data.email ?? []), ...(data.whatsapp ?? [])].includes("error");
+      if (canales.length === 0) {
+        avisoError(fallos ? "No se pudo enviar el recordatorio. Probá de nuevo en un rato." : "El paciente no tiene email real ni WhatsApp aceptado para recibir el recordatorio.");
+      } else {
+        avisoExito(`Recordatorio enviado por ${canales.join(" y ")}.${fallos ? " Algún canal falló." : ""}`);
+      }
+    } catch (error) {
+      console.error("Error enviando el recordatorio:", error);
+      avisoError("No se pudo enviar el recordatorio. Verificá tu conexión.");
+    } finally {
+      setEnviandoRecordatorio(null);
     }
   };
 
@@ -946,6 +977,17 @@ const handleUpdateSesion = async () => {
                                 >
                                     <CalendarClock className="h-3.5 w-3.5" />
                                     Reprogramar
+                                </Button>
+                            )}
+                            {puedeEditar && parseISO(sesion.fechaHoraInicio).getTime() > Date.now() && (
+                                <Button
+                                    variant="outline"
+                                    disabled={enviandoRecordatorio === String(sesion.id)}
+                                    onClick={() => enviarRecordatorio(sesion)}
+                                    className={cn(claseBoton, "border-sky-400/60 text-sky-500 hover:bg-sky-400/15 hover:text-sky-500")}
+                                >
+                                    {enviandoRecordatorio === String(sesion.id) ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
+                                    Recordatorio
                                 </Button>
                             )}
                             {puedeEditar && (
