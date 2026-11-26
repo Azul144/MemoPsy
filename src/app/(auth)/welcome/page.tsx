@@ -260,25 +260,25 @@ export default function WelcomePage() {
           </div>
 
           {/* RF 4.3 - Ayuda en crisis también desde la cuenta del paciente: desde acá puede avisarle a su psicólogo.
-              Va dentro del saludo, en coral (no en rojo de "error") para que se vea sin alarmar */}
+              Va dentro del saludo, con los colores invertidos del tema (no en rojo de "error") para que resalte sin alarmar */}
           {session.user.pacienteId && (
             <aside
               aria-label="Ayuda en crisis"
-              className="entrar w-full rounded-3xl border border-coral/35 bg-background/50 p-5 backdrop-blur-sm lg:w-80"
+              className="entrar w-full rounded-3xl bg-crisis-fondo p-5 text-crisis-texto shadow-xl shadow-black/20 lg:w-80"
               style={{ animationDelay: '0.3s' }}
             >
               <div className="flex items-start gap-3">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-coral/15 text-coral">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-crisis-icono-fondo text-crisis-icono">
                   <LifeBuoy className="h-5 w-5" aria-hidden="true" />
                 </span>
                 <div>
                   <p className="font-semibold">¿Momento difícil?</p>
-                  <p className="mt-0.5 text-sm text-crema/70">Teléfonos de ayuda, pasos para atravesarlo y aviso a tu psicólogo/a.</p>
+                  <p className="mt-0.5 text-sm text-crisis-texto-2">Teléfonos de ayuda, pasos para atravesarlo y aviso a tu psicólogo/a.</p>
                 </div>
               </div>
               <Button
                 onClick={() => router.push('/crisis')}
-                className="mt-4 w-full rounded-full bg-coral font-semibold text-coral-contraste hover:bg-coral/90"
+                className="mt-4 w-full rounded-full bg-crisis-boton font-semibold text-crisis-boton-texto hover:bg-crisis-boton/90"
               >
                 Pedir ayuda ahora
               </Button>

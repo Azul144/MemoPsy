@@ -51,8 +51,14 @@
   --texto-suave: #D1D5DB; /* Descripciones */
   --texto-tenue: #9CA3AF; /* Ayudas y datos secundarios */
   --peligro: #F87171;
-  --coral: #EE8A6F; /* Ayuda en crisis: visible pero sin el rojo de "error" */
-  --coral-contraste: #1D3434; /* Texto sobre el coral */
+  /* Tarjeta de ayuda en crisis: invertida respecto del tema (crema sobre oscuro), resalta sin el rojo de "error" */
+  --crisis-fondo: #F6EFE2;
+  --crisis-texto: #173030;
+  --crisis-texto-2: #3F5755;
+  --crisis-icono: #A4503A;
+  --crisis-icono-fondo: rgba(194, 103, 79, 0.14);
+  --crisis-boton: #1D4A48;
+  --crisis-boton-texto: #FFFFFF;
   --aviso: #FCD34D;
   --exito: #6EE7B7;
   --info: #7DD3FC;
@@ -103,8 +109,13 @@
   --texto-suave: #3F5755;
   --texto-tenue: #4E6664;
   --peligro: #B42318;
-  --coral: #B4472C;
-  --coral-contraste: #FFFFFF;
+  --crisis-fondo: #1D4A48; /* En claro, la tarjeta va en petróleo */
+  --crisis-texto: #F6EFE2;
+  --crisis-texto-2: rgba(246, 239, 226, 0.82);
+  --crisis-icono: #F1C77A;
+  --crisis-icono-fondo: rgba(241, 199, 122, 0.18);
+  --crisis-boton: #F1C77A;
+  --crisis-boton-texto: #1D3434;
   --aviso: #8A4B00;
   --exito: #1A6B43;
   --info: #1D5F8A;
@@ -151,8 +162,13 @@
   --color-suave: var(--texto-suave);
   --color-tenue: var(--texto-tenue);
   --color-peligro: var(--peligro);
-  --color-coral: var(--coral);
-  --color-coral-contraste: var(--coral-contraste);
+  --color-crisis-fondo: var(--crisis-fondo);
+  --color-crisis-texto: var(--crisis-texto);
+  --color-crisis-texto-2: var(--crisis-texto-2);
+  --color-crisis-icono: var(--crisis-icono);
+  --color-crisis-icono-fondo: var(--crisis-icono-fondo);
+  --color-crisis-boton: var(--crisis-boton);
+  --color-crisis-boton-texto: var(--crisis-boton-texto);
   --color-aviso: var(--aviso);
   --color-exito: var(--exito);
   --color-info: var(--info);
