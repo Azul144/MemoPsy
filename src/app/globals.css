@@ -51,6 +51,8 @@
   --texto-suave: #D1D5DB; /* Descripciones */
   --texto-tenue: #9CA3AF; /* Ayudas y datos secundarios */
   --peligro: #F87171;
+  --coral: #EE8A6F; /* Ayuda en crisis: visible pero sin el rojo de "error" */
+  --coral-contraste: #1D3434; /* Texto sobre el coral */
   --aviso: #FCD34D;
   --exito: #6EE7B7;
   --info: #7DD3FC;
@@ -101,6 +103,8 @@
   --texto-suave: #3F5755;
   --texto-tenue: #4E6664;
   --peligro: #B42318;
+  --coral: #B4472C;
+  --coral-contraste: #FFFFFF;
   --aviso: #8A4B00;
   --exito: #1A6B43;
   --info: #1D5F8A;
@@ -147,6 +151,8 @@
   --color-suave: var(--texto-suave);
   --color-tenue: var(--texto-tenue);
   --color-peligro: var(--peligro);
+  --color-coral: var(--coral);
+  --color-coral-contraste: var(--coral-contraste);
   --color-aviso: var(--aviso);
   --color-exito: var(--exito);
   --color-info: var(--info);

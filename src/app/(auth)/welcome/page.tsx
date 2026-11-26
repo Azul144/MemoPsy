@@ -239,7 +239,8 @@ export default function WelcomePage() {
         {/* Saludo */}
         <section className="relative overflow-hidden rounded-[2rem] border border-foreground/10 bg-card px-8 py-10 sm:px-12">
           <FondoAnimado />
-          <div className="relative">
+          <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
+          <div>
             <p className="entrar text-sm text-crema/60">{hoy}</p>
             <h1 className="titulo entrar mt-2 text-4xl sm:text-5xl" style={{ animationDelay: '0.1s' }}>
               Hola{nombre ? `, ${nombre}` : ''}
@@ -257,25 +258,34 @@ export default function WelcomePage() {
               </div>
             )}
           </div>
-        </section>
 
-        {/* RF 4.3 - Ayuda en crisis también desde la cuenta del paciente: desde acá puede avisarle a su psicólogo */}
-        {session.user.pacienteId && (
-          <section className="entrar mt-6 flex flex-col gap-4 rounded-3xl border border-red-400/40 bg-red-500/10 p-5 sm:flex-row sm:items-center sm:justify-between" style={{ animationDelay: '0.3s' }}>
-            <div className="flex items-start gap-3">
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-red-500 text-white">
-                <LifeBuoy className="h-6 w-6" aria-hidden="true" />
-              </span>
-              <div>
-                <p className="font-semibold">¿Estás pasando por un momento difícil?</p>
-                <p className="text-sm text-crema/70">Teléfonos de ayuda, pasos para atravesarlo y la opción de avisarle a tu psicólogo/a.</p>
+          {/* RF 4.3 - Ayuda en crisis también desde la cuenta del paciente: desde acá puede avisarle a su psicólogo.
+              Va dentro del saludo, en coral (no en rojo de "error") para que se vea sin alarmar */}
+          {session.user.pacienteId && (
+            <aside
+              aria-label="Ayuda en crisis"
+              className="entrar w-full rounded-3xl border border-coral/35 bg-background/50 p-5 backdrop-blur-sm lg:w-80"
+              style={{ animationDelay: '0.3s' }}
+            >
+              <div className="flex items-start gap-3">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-coral/15 text-coral">
+                  <LifeBuoy className="h-5 w-5" aria-hidden="true" />
+                </span>
+                <div>
+                  <p className="font-semibold">¿Momento difícil?</p>
+                  <p className="mt-0.5 text-sm text-crema/70">Teléfonos de ayuda, pasos para atravesarlo y aviso a tu psicólogo/a.</p>
+                </div>
               </div>
-            </div>
-            <Button onClick={() => router.push('/crisis')} className="shrink-0 rounded-full bg-red-500 text-white hover:bg-red-600">
-              Ayuda en crisis
-            </Button>
-          </section>
-        )}
+              <Button
+                onClick={() => router.push('/crisis')}
+                className="mt-4 w-full rounded-full bg-coral font-semibold text-coral-contraste hover:bg-coral/90"
+              >
+                Pedir ayuda ahora
+              </Button>
+            </aside>
+          )}
+          </div>
+        </section>
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_20rem]">
           {/* Módulos */}
