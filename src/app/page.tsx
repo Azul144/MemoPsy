@@ -6,6 +6,7 @@ import Modulos from "@/components/landing/Modulos";
 import Contacto from "@/components/landing/Contacto";
 import Testimonios from "@/components/landing/Testimonios";
 import PorQue from "@/components/landing/PorQue";
+import ParaQuien from "@/components/landing/ParaQuien";
 import PiePagina from "@/components/landing/PiePagina";
 
 export default function Home() {
@@ -16,6 +17,7 @@ export default function Home() {
       <main className="min-h-screen bg-background text-foreground">
         <Portada />
         <Cifras />
+        <ParaQuien />
         <Funciones />
         <Modulos />
         <Testimonios />

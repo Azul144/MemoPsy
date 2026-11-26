@@ -1,5 +1,5 @@
 // src/app/api/crisis/aviso/route.ts
-// RF 4.3 - El paciente que inició sesión y usó la ayuda en crisis puede pedir que se le avise
+// RF 4.3 - Cuando el paciente que inició sesión elige qué le pasa en la ayuda en crisis, se le avisa
 // a su psicólogo. Solo lo puede hacer un paciente, y solo sobre su propia cuenta.
 import { type NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth/next"
@@ -44,5 +44,5 @@ async function manejarPOST(request: NextRequest) {
 export const POST = conAuditoria(manejarPOST, {
   modulo: "Sesiones",
   accion: "AVISO_CRISIS",
-  detalle: (r) => (r?.repetido ? null : "El paciente pidió avisar a su psicólogo desde la ayuda en crisis"),
+  detalle: (r) => (r?.repetido ? null : "Aviso al psicólogo desde la ayuda en crisis"),
 })

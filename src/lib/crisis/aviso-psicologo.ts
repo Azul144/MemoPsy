@@ -1,15 +1,15 @@
 // src/lib/crisis/aviso-psicologo.ts
-// RF 4.3 - Aviso opcional al psicólogo cuando un paciente que inició sesión usa la ayuda en crisis
-// y elige "Avisarle a mi psicólogo". Le llega a la campanita (y por email si tiene casilla real)
+// RF 4.3 - Aviso al psicólogo cuando un paciente que inició sesión usa la ayuda en crisis
+// y elige qué le está pasando. Le llega a la campanita (y por email si tiene casilla real)
 // con el día, la hora y la situación que eligió. No se guarda nada más de lo que hizo en la guía.
-import { MoreThan } from "typeorm";
+import { Like, MoreThan } from "typeorm";
 import { initializeDatabase } from "@/lib/database";
 import { NotificacionEntity } from "@/entities";
 import { enviarEmail } from "@/lib/email/brevo";
 import { psicologosDelPaciente } from "@/lib/whatsapp/alerta-crisis";
 import type { GuiaCrisis } from "./contenido";
 
-// Si el paciente toca el botón otra vez en este lapso, no se repite el aviso
+// Si el paciente elige otra situación en este lapso, no se repite el aviso
 const MINUTOS_SIN_REPETIR = 10;
 
 export type ResultadoAviso = { avisados: number; repetido: boolean };
@@ -35,18 +35,24 @@ export async function avisarCrisisAlPsicologo(pacienteId: number, paciente: stri
     `${paciente} usó la ayuda en crisis de MemoPsy el ${dia} a las ${hora} y eligió «${guia.titulo}». ` +
     (riesgo
       ? "La guía le indicó llamar a las líneas de emergencia y de salud mental. Comunicate con la persona lo antes posible."
-      : "Pidió que lo sepas para retomarlo con vos.");
+      : "Retomalo con la persona en el próximo contacto.");
 
   const dataSource = await initializeDatabase();
   const repo = dataSource.getRepository(NotificacionEntity);
 
-  // Evita avisos repetidos por tocar el botón más de una vez
+  // El aviso sale solo al elegir la situación: si el paciente recorre varias opciones seguidas,
+  // el psicólogo recibe uno solo. La excepción es pasar a la situación de riesgo, que siempre avisa.
   const desde = new Date(ahora.getTime() - MINUTOS_SIN_REPETIR * 60 * 1000);
   const previo = await repo.findOne({
-    where: { usuarioId: psicologos[0].usuarioId, tipo: "CRISIS", fecha: MoreThan(desde) },
+    where: {
+      usuarioId: psicologos[0].usuarioId,
+      tipo: "CRISIS",
+      fecha: MoreThan(desde),
+      mensaje: Like(`${paciente} usó la ayuda en crisis%`),
+    },
     order: { fecha: "DESC" },
   });
-  if (previo?.mensaje.startsWith(`${paciente} usó la ayuda en crisis`) && previo.mensaje.includes(`«${guia.titulo}»`)) {
+  if (previo && (!riesgo || previo.titulo.startsWith("⚠️"))) {
     return { avisados: psicologos.length, repetido: true };
   }
 

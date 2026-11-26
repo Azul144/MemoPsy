@@ -8,6 +8,7 @@ import { Menu, X } from "lucide-react";
 import LogoMemoPsy from "@/components/comunes/LogoMemoPsy"
 
 const links = [
+  { href: "#beneficios", texto: "Beneficios" },
   { href: "#funciones", texto: "Funciones" },
   { href: "#modulos", texto: "Módulos" },
   { href: "#testimonios", texto: "Testimonios" },
