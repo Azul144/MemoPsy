@@ -26,13 +26,31 @@ function urlBase(): string {
   return /^https?:\/\//i.test(base) ? base : `https://${base}`;
 }
 
+// Texto libre, un dato por renglón. Las plantillas no admiten saltos de línea dentro de un dato, por eso
+// este formato solo sale con INFOBIP_PLANTILLA=ninguna. En WhatsApp *texto* es negrita y "" deja un
+// renglón en blanco.
 // Con Infobip el chatbot (1 confirmar / 2 cancelar) no recibe las respuestas, así que no se piden.
-function texto(r: RecordatorioWhatsapp): string {
-  const enlace = r.enlace ? `\nEnlace de la videollamada: ${r.enlace}` : "";
-  return (
-    `Hola ${r.paciente} 👋 Te recordamos tu turno con ${r.psicologo} el ${fechaTurno(r.inicio)} (${r.modalidad}).${enlace}\n` +
-    "Si no podés asistir, reprogramá el turno desde tu cuenta de MemoPsy hasta 24 horas antes o avisale al centro.\n— MemoPsy"
-  );
+export function textoRecordatorio(r: RecordatorioWhatsapp): string {
+  const [dia, hora] = fechaTurno(r.inicio).split(" a las ");
+  const sitio = (process.env.NEXTAUTH_URL ?? "").replace(/\/$/, "");
+  const lineas = [
+    "*Recordatorio de turno*",
+    "",
+    r.paciente ? `Hola ${r.paciente} 👋` : "Hola 👋",
+    "",
+    `📅 *Día:* ${dia}`,
+    `🕐 *Hora:* ${hora}`,
+    `👤 *Profesional:* ${r.psicologo}`,
+    `📍 *Modalidad:* ${r.modalidad}`,
+    ...(r.enlace ? [`🔗 *Videollamada:* ${r.enlace}`] : []),
+    "",
+    "Si no podés asistir, reprogramá el turno desde tu cuenta de MemoPsy hasta 24 horas antes" +
+      (sitio ? ` (${sitio})` : "") +
+      " o avisale al centro.",
+    "",
+    "— MemoPsy",
+  ];
+  return lineas.join("\n");
 }
 
 function datosPlantilla(plantilla: string, r: RecordatorioWhatsapp): string[] {
@@ -52,7 +70,7 @@ function datosDelPedido(r: RecordatorioWhatsapp): { ruta: string; cuerpo: unknow
   const plantilla = configurada || (propio ? "" : PLANTILLA_PRUEBA);
 
   if (!plantilla || plantilla === "ninguna") {
-    return { ruta: "/whatsapp/1/message/text", cuerpo: { from, to, content: { text: texto(r) } } };
+    return { ruta: "/whatsapp/1/message/text", cuerpo: { from, to, content: { text: textoRecordatorio(r) } } };
   }
   return {
     ruta: "/whatsapp/1/message/template",
