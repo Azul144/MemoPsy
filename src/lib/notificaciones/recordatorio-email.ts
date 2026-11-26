@@ -32,6 +32,7 @@ export function armarEmail(turno: TurnoPendiente) {
     turno.enlace && /^https?:\/\//i.test(turno.enlace)
       ? `<p>Para conectarte a la videollamada usá este enlace:<br><a href="${escapar(turno.enlace)}">${escapar(turno.enlace)}</a></p>`
       : "";
+  const sitio = (process.env.NEXTAUTH_URL ?? "").replace(/\/$/, "");
   return {
     // Con la fecha en el asunto, si el turno se reprograma el email nuevo no queda escondido
     // en la misma conversación que el anterior
@@ -41,7 +42,7 @@ export function armarEmail(turno: TurnoPendiente) {
         <h2 style="color: #1D3434;">Recordatorio de turno</h2>
         <p>Te recordamos que tenés turno con ${psicologo} el <strong>${cuando}</strong>${modalidad}.</p>
         ${enlace}
-        <p>Si no podés asistir, avisale a tu psicólogo con anticipación.</p>
+        <p>Si no podés asistir, podés reprogramar el turno desde tu cuenta de MemoPsy hasta 24 horas antes${sitio ? ` (<a href="${escapar(sitio)}">${escapar(sitio)}</a>)` : ""}, o avisarle al centro.</p>
         <p style="color: #888; font-size: 12px;">Este es un mensaje automático de MemoPsy. No lo respondas.</p>
       </div>
     `,

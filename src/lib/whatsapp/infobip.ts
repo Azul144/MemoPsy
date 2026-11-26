@@ -26,11 +26,12 @@ function urlBase(): string {
   return /^https?:\/\//i.test(base) ? base : `https://${base}`;
 }
 
+// Con Infobip el chatbot (1 confirmar / 2 cancelar) no recibe las respuestas, así que no se piden.
 function texto(r: RecordatorioWhatsapp): string {
   const enlace = r.enlace ? `\nEnlace de la videollamada: ${r.enlace}` : "";
   return (
     `Hola ${r.paciente} 👋 Te recordamos tu turno con ${r.psicologo} el ${fechaTurno(r.inicio)} (${r.modalidad}).${enlace}\n` +
-    "Respondé *1* si confirmás o *2* si no podés ir.\n— MemoPsy"
+    "Si no podés asistir, reprogramá el turno desde tu cuenta de MemoPsy hasta 24 horas antes o avisale al centro.\n— MemoPsy"
   );
 }
 
