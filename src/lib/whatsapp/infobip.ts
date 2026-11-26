@@ -1,17 +1,21 @@
 // src/lib/whatsapp/infobip.ts
 // Envía el recordatorio por WhatsApp a través de Infobip. Solo se usa en el servidor.
 //  - INFOBIP_API_KEY y INFOBIP_BASE_URL salen del portal de Infobip (Guía → Clave API y URL base de API).
-//  - INFOBIP_WHATSAPP_FROM: número remitente. Si no está, se usa el remitente de prueba de Infobip,
-//    que en la prueba gratis solo entrega a los números verificados en la cuenta.
-//  - Con INFOBIP_PLANTILLA: usa esa plantilla aprobada. Sus datos, en orden, son
-//      {{1}} nombre del paciente, {{2}} psicólogo, {{3}} día y hora, {{4}} modalidad
-//    (como la plantilla "recordatorio_turno" de Twilio). Funciona aunque el paciente nunca haya escrito.
-//  - Sin INFOBIP_PLANTILLA: manda el texto en español. WhatsApp solo lo entrega dentro de las 24 horas
-//    después de que el paciente le escribió al número (sirve para probar).
+//  - INFOBIP_WHATSAPP_FROM: número remitente propio. Si no está, se usa el remitente de prueba de Infobip,
+//    que en la prueba gratis solo entrega a los números verificados en la cuenta. Esos números quedan
+//    registrados sin el 9 de los celulares argentinos, así que con el remitente de prueba se manda sin el 9.
+//  - INFOBIP_PLANTILLA: plantilla aprobada. Funciona aunque el paciente nunca le haya escrito al número.
+//      · "appointment_reminder" (la trae el remitente de prueba, en inglés): {{1}} paciente, {{2}} día,
+//        {{3}} hora y psicólogo. Es la que se usa por defecto con el remitente de prueba.
+//      · Cualquier otra (propia, en castellano): {{1}} paciente, {{2}} psicólogo, {{3}} día y hora,
+//        {{4}} modalidad, como la plantilla "recordatorio_turno" de Twilio.
+//  - INFOBIP_PLANTILLA=ninguna: manda el texto en castellano. WhatsApp solo lo entrega dentro de las
+//    24 horas después de que el paciente le escribió al número.
 import { fechaTurno } from "@/lib/notificaciones/notificar";
 import { WhatsappError, type RecordatorioWhatsapp } from "./tipos";
 
 const REMITENTE_PRUEBA = "447860088970";
+const PLANTILLA_PRUEBA = "appointment_reminder";
 
 export function infobipConfigurado(): boolean {
   return Boolean(process.env.INFOBIP_API_KEY && process.env.INFOBIP_BASE_URL);
@@ -30,12 +34,24 @@ function texto(r: RecordatorioWhatsapp): string {
   );
 }
 
-function datosDelPedido(r: RecordatorioWhatsapp): { ruta: string; cuerpo: unknown } {
-  const from = (process.env.INFOBIP_WHATSAPP_FROM || REMITENTE_PRUEBA).replace(/\D/g, "");
-  const plantilla = process.env.INFOBIP_PLANTILLA;
+function datosPlantilla(plantilla: string, r: RecordatorioWhatsapp): string[] {
+  const paciente = r.paciente || "👋";
+  if (plantilla === PLANTILLA_PRUEBA) {
+    const [dia, hora] = fechaTurno(r.inicio).split(" a las ");
+    return [paciente, dia, `${hora} con ${r.psicologo} (MemoPsy, ${r.modalidad})`];
+  }
+  return [paciente, r.psicologo, fechaTurno(r.inicio), r.modalidad];
+}
 
-  if (!plantilla) {
-    return { ruta: "/whatsapp/1/message/text", cuerpo: { from, to: r.para, content: { text: texto(r) } } };
+function datosDelPedido(r: RecordatorioWhatsapp): { ruta: string; cuerpo: unknown } {
+  const propio = process.env.INFOBIP_WHATSAPP_FROM?.replace(/\D/g, "");
+  const from = propio || REMITENTE_PRUEBA;
+  const to = propio ? r.para : r.para.replace(/^549/, "54");
+  const configurada = process.env.INFOBIP_PLANTILLA?.trim();
+  const plantilla = configurada || (propio ? "" : PLANTILLA_PRUEBA);
+
+  if (!plantilla || plantilla === "ninguna") {
+    return { ruta: "/whatsapp/1/message/text", cuerpo: { from, to, content: { text: texto(r) } } };
   }
   return {
     ruta: "/whatsapp/1/message/template",
@@ -43,13 +59,11 @@ function datosDelPedido(r: RecordatorioWhatsapp): { ruta: string; cuerpo: unknow
       messages: [
         {
           from,
-          to: r.para,
+          to,
           content: {
             templateName: plantilla,
-            templateData: {
-              body: { placeholders: [r.paciente || "👋", r.psicologo, fechaTurno(r.inicio), r.modalidad] },
-            },
-            language: process.env.INFOBIP_IDIOMA || "es_AR",
+            templateData: { body: { placeholders: datosPlantilla(plantilla, r) } },
+            language: process.env.INFOBIP_IDIOMA || (plantilla === PLANTILLA_PRUEBA ? "en" : "es_AR"),
           },
         },
       ],
