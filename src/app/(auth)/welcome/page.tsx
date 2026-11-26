@@ -371,7 +371,8 @@ export default function WelcomePage() {
               <Button
                 onClick={handleToggleMfa}
                 disabled={loadingMfaStatus || isTogglingMfa || mfaEnabled === null}
-                className={`mt-4 w-full rounded-full ${mfaEnabled ? 'border border-primary/60 bg-transparent text-dorado hover:bg-primary/10' : ''}`}
+                // De contorno, activada o no: el único botón relleno del inicio es el de ayuda en crisis
+                className="mt-4 w-full rounded-full border border-primary/60 bg-transparent text-dorado hover:bg-primary/10"
               >
                 {isTogglingMfa ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <KeyRound className="mr-2 h-4 w-4" />}
                 {mfaEnabled ? 'Desactivar' : 'Activar ahora'}
