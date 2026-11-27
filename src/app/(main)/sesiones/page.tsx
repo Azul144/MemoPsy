@@ -1183,6 +1183,9 @@ const handleUpdateSesion = async () => {
   const soloConsulta = !puedeRegistrarSesiones && !session?.user?.psicologoId && !session?.user?.pacienteId
 
   // El psicólogo entra directo a su agenda de turnos; recepción, a registrar turnos
+  // Pestañas que ve esta persona: si es una sola, no se muestra la barra de pestañas
+  const cantidadPestanas = [puedeRegistrarSesiones, !!session?.user?.psicologoId, !!session?.user?.pacienteId, soloConsulta].filter(Boolean).length
+
   // Del lado del paciente se habla de "sesiones" (el psicólogo da turnos)
   const soloPaciente = !!session?.user?.pacienteId && !session?.user?.psicologoId && !puedeRegistrarSesiones
 
@@ -1216,8 +1219,8 @@ const handleUpdateSesion = async () => {
               // This ensures consistency across different views
             }}
           >
-            {/* Quien es solo paciente tiene una sola pestaña: no hace falta mostrarla */}
-            <TabsList className={cn("mb-2 flex w-full max-w-full justify-start overflow-x-auto sm:w-fit", soloPaciente && "hidden")}>
+            {/* Con una sola pestaña (recepción, paciente, auditor) no hace falta mostrarla */}
+            <TabsList className={cn("mb-2 flex w-full max-w-full justify-start overflow-x-auto sm:w-fit", cantidadPestanas <= 1 && "hidden")}>
               {puedeRegistrarSesiones && (
                 <TabsTrigger
                   value="registrar"
