@@ -33,7 +33,7 @@ const tarjetas = [
 
 export default function Portada() {
   return (
-    <section id="inicio" className="relative overflow-hidden px-6 pt-10 pb-14 sm:pt-16 sm:pb-24 lg:pt-24">
+    <section id="inicio" className="relative overflow-hidden px-6 pt-6 pb-14 sm:pt-8 sm:pb-20 lg:pt-10">
       {/* Luces que se mueven despacio en el fondo */}
       <FondoAnimado />
 

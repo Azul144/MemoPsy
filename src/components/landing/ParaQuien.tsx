@@ -1,114 +1,66 @@
 // src/components/landing/ParaQuien.tsx
-// Sitio público: qué gana el psicólogo y qué gana el paciente al usar MemoPsy.
-// Cada punto es un beneficio respaldado por una función que el sistema ya tiene.
-import { Stethoscope, HeartHandshake, Check } from "lucide-react";
+// Sitio público: los tres beneficios más fuertes para el psicólogo y para el paciente.
+// Cada uno está respaldado por una función que el sistema ya tiene.
+import { Stethoscope, HeartHandshake, Mic, BellRing, ShieldCheck, CalendarDays, Repeat } from "lucide-react";
 
-const publicos = [
+const roles = [
   {
-    id: "psicologo",
+    rol: "Para el psicólogo",
+    frase: "Más tiempo para la clínica, menos para la administración.",
     icono: Stethoscope,
-    etiqueta: "Para el psicólogo",
-    titulo: "Más tiempo para la clínica, menos para la administración",
     beneficios: [
-      {
-        titulo: "Notas en minutos",
-        texto: "Dictás lo que pasó en la sesión y la IA te propone la nota ordenada. Vos la revisás antes de guardarla.",
-      },
-      {
-        titulo: "Todo el historial antes de cada sesión",
-        texto: "Historia clínica, notas y seguimientos del paciente en un solo lugar, con búsqueda por fecha o etiqueta.",
-      },
-      {
-        titulo: "Menos ausencias",
-        texto: "El paciente recibe el recordatorio por email y WhatsApp 24 horas antes, y podés reenviarlo con un clic.",
-      },
-      {
-        titulo: "Una agenda que se ordena sola",
-        texto: "Turnos dentro de tus horarios de atención y sin superposiciones. La recepción los gestiona sin ver lo clínico.",
-      },
-      {
-        titulo: "El tratamiento sigue entre sesiones",
-        texto: "Le dejás pautas y actividades al paciente y ves cuáles pudo hacer antes del próximo encuentro.",
-      },
-      {
-        titulo: "Tranquilidad legal",
-        texto: "Notas cifradas, verificación en dos pasos, registro de cada acceso e historia clínica en PDF foliado.",
-      },
+      { icono: Mic, titulo: "Notas en minutos", texto: "Dictás la sesión y la IA ordena la nota. Vos la revisás." },
+      { icono: BellRing, titulo: "Menos ausencias", texto: "El paciente recibe el recordatorio por email y WhatsApp." },
+      { icono: ShieldCheck, titulo: "Tranquilidad legal", texto: "Notas cifradas y registro de cada acceso." },
     ],
   },
   {
-    id: "paciente",
+    rol: "Para el paciente",
+    frase: "Acompañado también entre una sesión y otra.",
     icono: HeartHandshake,
-    etiqueta: "Para el paciente",
-    titulo: "Acompañado también entre una sesión y otra",
     beneficios: [
-      {
-        titulo: "Sus turnos siempre a mano",
-        texto: "Ve sus próximas sesiones y, si son remotas, entra a la videollamada desde el mismo turno.",
-      },
-      {
-        titulo: "No se olvida de la sesión",
-        texto: "Recibe el recordatorio por email y por WhatsApp, con el día, la hora y, si es remota, el enlace.",
-      },
-      {
-        titulo: "Reprograma sin llamar",
-        texto: "Con 24 horas de anticipación, elige otro horario libre de su psicólogo y el cambio se avisa solo.",
-      },
-      {
-        titulo: "Lo trabajado, por escrito",
-        texto: "Lee el resumen de la sesión, las pautas y las actividades, y puede descargarlos en PDF.",
-      },
-      {
-        titulo: "Ayuda cuando más la necesita",
-        texto: "Una guía para momentos de crisis, con líneas de ayuda. Al usarla, su psicólogo recibe un aviso.",
-      },
-      {
-        titulo: "Su privacidad, protegida",
-        texto: "Solo su psicólogo lee las notas clínicas. La recepción ve turnos y pagos, nunca lo que se habla en sesión.",
-      },
+      { icono: CalendarDays, titulo: "Sus turnos a mano", texto: "Y la videollamada a un toque, si la sesión es remota." },
+      { icono: Repeat, titulo: "Reprograma solo", texto: "Elige otro horario libre sin llamar al consultorio." },
+      { icono: HeartHandshake, titulo: "Ayuda en crisis", texto: "Una guía para el momento, y su psicólogo se entera." },
     ],
   },
 ];
 
 export default function ParaQuien() {
   return (
-    <section id="beneficios" className="px-6 pb-16 sm:pb-24">
+    <section id="beneficios" className="px-6 py-16 sm:py-24">
       <div className="mx-auto max-w-6xl">
-        <div className="mx-auto max-w-3xl text-center">
-          <h2 className="titulo text-4xl text-balance text-crema sm:text-5xl">Lo que MemoPsy hace por cada uno</h2>
-          <p className="mx-auto mt-4 max-w-xl text-lg text-balance text-crema/75">
-            El psicólogo trabaja más ordenado y el paciente se siente acompañado durante todo el tratamiento.
-          </p>
-        </div>
+        <h2 data-revelar className="titulo max-w-2xl text-4xl text-balance text-crema sm:text-5xl">Lo que gana cada uno</h2>
 
-        <div className="mt-14 grid gap-6 lg:grid-cols-2">
-          {publicos.map((p) => (
-            <article
-              key={p.id}
-              className="rounded-[2rem] border border-foreground/10 bg-gradient-to-br from-card to-superficie p-8 sm:p-10"
-            >
-              <div className="flex items-center gap-3">
-                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/15">
-                  <p.icono className="h-6 w-6 text-dorado" />
+        <div className="mt-14 space-y-12">
+          {roles.map((r) => (
+            <div key={r.rol} className="grid items-center gap-8 lg:grid-cols-[17rem_1fr]">
+              <div data-revelar="izquierda">
+                <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
+                  <r.icono className="h-7 w-7" aria-hidden="true" />
                 </span>
-                <span className="text-sm font-semibold tracking-wider text-dorado uppercase">{p.etiqueta}</span>
+                <h3 className="titulo mt-4 text-3xl text-crema">{r.rol}</h3>
+                <p className="mt-2 leading-relaxed text-crema/70">{r.frase}</p>
               </div>
-              <h3 className="titulo mt-6 text-2xl text-crema sm:text-3xl">{p.titulo}</h3>
 
-              <ul className="mt-8 space-y-5">
-                {p.beneficios.map((b) => (
-                  <li key={b.titulo} className="flex gap-3">
-                    <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/15">
-                      <Check className="h-3.5 w-3.5 text-dorado" />
+              <div className="grid gap-4 sm:grid-cols-3">
+                {r.beneficios.map((b, i) => (
+                  <article
+                    key={b.titulo}
+                    data-revelar
+                    style={{ "--retraso": `${150 + i * 120}ms` } as React.CSSProperties}
+                    className="relative overflow-hidden rounded-3xl border border-foreground/10 bg-gradient-to-br from-card to-superficie p-6 transition-transform duration-300 hover:-translate-y-1"
+                  >
+                    <span className="titulo pointer-events-none absolute -top-3 right-3 text-8xl text-foreground/5" aria-hidden="true">
+                      {i + 1}
                     </span>
-                    <div>
-                      <p className="font-semibold text-crema">{b.titulo}</p>
-                      <p className="mt-1 leading-relaxed text-crema/70">{b.texto}</p>
-                    </div>
-                  </li>
+                    <b.icono className="h-7 w-7 text-dorado" aria-hidden="true" />
+                    <p className="mt-6 text-xl font-semibold text-crema">{b.titulo}</p>
+                    <p className="mt-1 leading-relaxed text-crema/65">{b.texto}</p>
+                  </article>
                 ))}
-              </ul>
-            </article>
+              </div>
+            </div>
           ))}
         </div>
       </div>

@@ -7,13 +7,13 @@ export default function Funciones() {
   return (
     <section id="funciones" className="seccion-crema bg-background px-6 py-16 sm:py-24">
       <div className="mx-auto max-w-6xl">
-        <h2 className="titulo max-w-2xl text-4xl text-crema sm:text-5xl">
+        <h2 data-revelar className="titulo max-w-2xl text-4xl text-crema sm:text-5xl">
           Todo lo que tu consultorio necesita, en una sola plataforma
         </h2>
 
         <div className="mt-14 grid gap-5 md:grid-cols-6">
           {/* Notas cifradas: tarjeta grande */}
-          <article className="group relative overflow-hidden rounded-[2rem] border border-foreground/10 bg-gradient-to-br from-superficie to-card p-8 md:col-span-4">
+          <article data-revelar style={{ "--retraso": "0ms" } as React.CSSProperties} className="group relative overflow-hidden rounded-[2rem] border border-foreground/10 bg-gradient-to-br from-superficie to-card p-8 md:col-span-4">
             <Encabezado icono={Lock} titulo="Notas cifradas">
               Cada nota clínica se guarda cifrada y solo la ve el psicólogo que la escribió. Cumple con la Ley 25.326.
             </Encabezado>
@@ -39,7 +39,7 @@ export default function Funciones() {
           </article>
 
           {/* Agenda */}
-          <article className="group relative overflow-hidden rounded-[2rem] border border-foreground/10 bg-card p-8 md:col-span-2">
+          <article data-revelar style={{ "--retraso": "120ms" } as React.CSSProperties} className="group relative overflow-hidden rounded-[2rem] border border-foreground/10 bg-card p-8 md:col-span-2">
             <Encabezado icono={CalendarDays} titulo="Agenda terapéutica">
               Turnos sin superposiciones de horario.
             </Encabezado>
@@ -65,7 +65,7 @@ export default function Funciones() {
           </article>
 
           {/* Recordatorios */}
-          <article className="group relative overflow-hidden rounded-[2rem] border border-foreground/10 bg-card p-8 md:col-span-3">
+          <article data-revelar style={{ "--retraso": "240ms" } as React.CSSProperties} className="group relative overflow-hidden rounded-[2rem] border border-foreground/10 bg-card p-8 md:col-span-3">
             <Encabezado icono={Bell} titulo="Recordatorios">
               Tus pacientes reciben el recordatorio por email y por WhatsApp, y un aviso en el sistema, 24 horas antes de cada sesión.
             </Encabezado>
@@ -81,7 +81,7 @@ export default function Funciones() {
           </article>
 
           {/* Informes */}
-          <article className="group relative overflow-hidden rounded-[2rem] border border-foreground/10 bg-gradient-to-br from-card to-superficie p-8 md:col-span-3">
+          <article data-revelar style={{ "--retraso": "360ms" } as React.CSSProperties} className="group relative overflow-hidden rounded-[2rem] border border-foreground/10 bg-gradient-to-br from-card to-superficie p-8 md:col-span-3">
             <Encabezado icono={FileText} titulo="Informes">
               El historial del paciente en un clic, antes de cada sesión.
             </Encabezado>

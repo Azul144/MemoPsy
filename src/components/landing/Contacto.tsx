@@ -42,7 +42,7 @@ export default function Contacto() {
     <section id="contacto" className="px-6 py-16 sm:py-24">
       <div className="mx-auto grid max-w-6xl items-start gap-12 md:grid-cols-[1fr_1.15fr]">
         {/* Título y qué pasa después de enviar el formulario */}
-        <div>
+        <div data-revelar="izquierda">
           <h2 className="titulo text-4xl text-crema sm:text-5xl">Pedí una demostración</h2>
           <p className="mt-4 text-lg text-crema/75">
             Contanos cuándo te viene bien y coordinamos una reunión para mostrarte MemoPsy en acción.
@@ -69,6 +69,8 @@ export default function Contacto() {
 
         {/* Formulario */}
         <form
+          data-revelar="derecha"
+          style={{ "--retraso": "150ms" } as React.CSSProperties}
           onSubmit={enviar}
           className="flex flex-col gap-4 rounded-[2rem] border border-foreground/10 bg-card p-7 sm:p-8"
         >

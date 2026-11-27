@@ -8,11 +8,10 @@ import { Menu, X } from "lucide-react";
 import LogoMemoPsy from "@/components/comunes/LogoMemoPsy"
 
 const links = [
-  { href: "#beneficios", texto: "Beneficios" },
+  { href: "#lo-que-cambia", texto: "Beneficios" },
   { href: "#funciones", texto: "Funciones" },
-  { href: "#modulos", texto: "Módulos" },
-  { href: "#testimonios", texto: "Testimonios" },
-  { href: "#por-que", texto: "¿Por qué MemoPsy?" },
+  { href: "#como-funciona", texto: "Cómo funciona" },
+  { href: "#seguridad", texto: "Seguridad" },
   { href: "#contacto", texto: "Contacto" },
 ];
 

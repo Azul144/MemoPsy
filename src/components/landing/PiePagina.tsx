@@ -16,9 +16,8 @@ const grupos = [
     titulo: "Producto",
     enlaces: [
       { href: "#funciones", texto: "Funciones" },
-      { href: "#modulos", texto: "Módulos" },
-      { href: "#testimonios", texto: "Testimonios" },
-      { href: "#por-que", texto: "¿Por qué MemoPsy?" },
+      { href: "#como-funciona", texto: "Cómo funciona" },
+      { href: "#seguridad", texto: "Seguridad" },
     ],
   },
   {
