@@ -16,6 +16,8 @@ interface SubModuloConfig {
   icon: any; // Lucide icon component
   ruta: string;
   permisoRequerido: string;
+  // Texto para quien solo consulta (el Auditor): sin "editalos o eliminalos"
+  descripcionSoloLectura?: string;
 }
 
 const SUB_MODULOS_PERFILES: SubModuloConfig[] = [
@@ -31,6 +33,7 @@ const SUB_MODULOS_PERFILES: SubModuloConfig[] = [
     id: 'listar_perfiles',
     nombre: 'Perfiles',
     descripcion: 'Consultá los perfiles y sus permisos, editalos o eliminalos.',
+    descripcionSoloLectura: 'Consultá los perfiles y qué permisos tiene cada uno (solo lectura).',
     icon: List,
     ruta: '/perfiles/listar',
     permisoRequerido: 'Ver Perfiles',
@@ -64,9 +67,16 @@ export default function PerfilesPage() {
     if (session?.user?.permisos) {
       const userPermissions = session.user.permisos.map((p: any) => p.nombre);
 
-      const filteredSubModules = SUB_MODULOS_PERFILES.filter(subModule =>
-        userPermissions.includes(subModule.permisoRequerido)
-      );
+      const soloLectura =
+        !userPermissions.includes('Editar Perfil') && !userPermissions.includes('Eliminar Perfil');
+
+      const filteredSubModules = SUB_MODULOS_PERFILES
+        .filter(subModule => userPermissions.includes(subModule.permisoRequerido))
+        .map(subModule =>
+          soloLectura && subModule.descripcionSoloLectura
+            ? { ...subModule, descripcion: subModule.descripcionSoloLectura }
+            : subModule
+        );
       setSubModulosPerfilesPermitidos(filteredSubModules);
     }
   }, [session]);
