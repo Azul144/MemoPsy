@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { armarRecorrido, diaLargo } from "@/lib/carpetas/sesiones";
 
 interface Turno { id: string; inicio: string; fin: string | null; estado: string; modalidad: string; franja: "manana" | "tarde" | null }
 interface Nota { id: string; titulo: string; fecha: string; etiquetas: string | null; tieneSeguimiento: boolean }
@@ -162,20 +163,19 @@ export default function CarpetaPacientePage({ params }: { params: Promise<{ id: 
     [carpeta, desde, hasta],
   );
 
-  // Historia clínica: todo lo de la carpeta en una sola línea de tiempo, hasta lo último
-  const lineaDeTiempo = useMemo(() => {
-    if (!carpeta) return [];
-    const eventos = [
-      ...carpeta.turnos
-        .filter((t) => new Date(t.inicio).getTime() < ahora && t.estado !== "Cancelada")
-        .map((t) => ({ fecha: t.inicio, tipo: "turno" as const, titulo: `Turno ${t.franja === "manana" ? "de la mañana" : "de la tarde-noche"} · ${t.modalidad}`, href: null })),
-      ...carpeta.notas.map((n) => ({ fecha: n.fecha, tipo: "nota" as const, titulo: n.titulo, href: `/informes/detalle/${n.id}` })),
-      ...carpeta.seguimientos.map((s) => ({ fecha: s.fecha, tipo: "seguimiento" as const, titulo: "Informe de seguimiento compartido", href: `/informes/detalle/${s.informeId}` })),
-    ];
-    return eventos.sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
-  }, [carpeta, ahora]);
+  // Historia clínica: sesión por sesión (turno, nota y seguimiento del mismo día), del primer día al último
+  const recorrido = useMemo(
+    () => (carpeta ? armarRecorrido(carpeta.turnos, carpeta.notas, carpeta.seguimientos, ahora) : []),
+    [carpeta, ahora],
+  );
 
-  const ultimo = (tipo: "turno" | "nota" | "seguimiento") => lineaDeTiempo.find((e) => e.tipo === tipo)?.fecha ?? null;
+  const ultimo = (tipo: "turno" | "nota" | "seguimiento") => {
+    for (const s of [...recorrido].reverse()) {
+      const lista = tipo === "turno" ? s.turnos.map((t) => t.inicio) : (tipo === "nota" ? s.notas : s.seguimientos).map((x) => x.fecha);
+      if (lista.length) return lista[lista.length - 1];
+    }
+    return null;
+  };
 
   if (error) {
     return (
@@ -341,28 +341,58 @@ export default function CarpetaPacientePage({ params }: { params: Promise<{ id: 
             </section>
 
             <section className="rounded-2xl border border-borde bg-card p-5">
-              <h3 className="mb-4 font-semibold text-foreground">Todo el recorrido, del más reciente al primero</h3>
-              {lineaDeTiempo.length === 0 ? (
+              <h3 className="font-semibold text-foreground">Todo el recorrido, del primer día al último</h3>
+              <p className="mb-5 text-sm text-tenue">Cada sesión junta el turno, la nota clínica y el informe de seguimiento de ese día.</p>
+              {recorrido.length === 0 ? (
                 <p className="text-sm text-tenue">Todavía no hay turnos, notas ni seguimientos.</p>
               ) : (
-                <ol className="relative ml-2 border-l border-foreground/15">
-                  {lineaDeTiempo.map((e, i) => {
-                    const Icono = e.tipo === "turno" ? CalendarDays : e.tipo === "nota" ? NotebookPen : ClipboardCheck;
-                    return (
-                      <li key={i} className="mb-4 ml-6">
-                        <span className="absolute -left-3 flex h-6 w-6 items-center justify-center rounded-full bg-primary/20">
-                          <Icono className="h-3.5 w-3.5 text-dorado" />
-                        </span>
-                        <p className="text-xs text-tenue">{fecha(e.fecha)} · {hora(e.fecha)}</p>
-                        {e.href ? (
-                          <Link href={e.href} className="text-foreground hover:text-dorado hover:underline">{e.titulo}</Link>
-                        ) : (
-                          <p className="text-foreground">{e.titulo}</p>
+                <ol className="space-y-3">
+                  {recorrido.map((s) => (
+                    <li key={s.dia} className="rounded-xl border border-foreground/10 bg-background p-4">
+                      <p className="flex flex-wrap items-baseline gap-x-2 font-semibold text-dorado">
+                        Sesión {s.numero}
+                        <span className="text-sm font-normal text-suave first-letter:uppercase">{diaLargo(s.dia)}</span>
+                      </p>
+                      <ul className="mt-3 space-y-2 text-sm">
+                        {s.turnos.map((t) => (
+                          <li key={t.id} className="flex items-start gap-2">
+                            <CalendarDays className="mt-0.5 h-4 w-4 shrink-0 text-dorado" />
+                            <span className="text-texto-2">
+                              Turno de {hora(t.inicio)}{t.fin ? ` a ${hora(t.fin)}` : ""} · {t.franja === "manana" ? "mañana" : "tarde-noche"} · {t.modalidad} · {t.estado}
+                            </span>
+                          </li>
+                        ))}
+                        {s.notas.map((n) => (
+                          <li key={n.id} className="flex items-start gap-2">
+                            <NotebookPen className="mt-0.5 h-4 w-4 shrink-0 text-dorado" />
+                            <span>
+                              <span className="text-tenue">Nota clínica: </span>
+                              <Link href={`/informes/detalle/${n.id}`} className="text-foreground hover:text-dorado hover:underline">{n.titulo}</Link>
+                            </span>
+                          </li>
+                        ))}
+                        {s.seguimientos.map((seg) => (
+                          <li key={seg.informeId} className="flex items-start gap-2">
+                            <ClipboardCheck className="mt-0.5 h-4 w-4 shrink-0 text-dorado" />
+                            <span className="text-texto-2">
+                              <span className="text-tenue">Seguimiento: </span>
+                              {seg.resumen.length > 140 ? `${seg.resumen.slice(0, 140).trimEnd()}…` : seg.resumen}
+                            </span>
+                          </li>
+                        ))}
+                        {s.notas.length === 0 && s.turnos.length > 0 && (
+                          <li className="pl-6 text-xs text-tenue">Sin nota clínica de esta sesión.</li>
                         )}
-                      </li>
-                    );
-                  })}
+                      </ul>
+                    </li>
+                  ))}
                 </ol>
+              )}
+              {programados.length > 0 && (
+                <p className="mt-4 flex items-center gap-2 text-sm text-suave">
+                  <CalendarDays className="h-4 w-4 text-dorado" />
+                  Lo que sigue: {programados.length} {programados.length === 1 ? "turno programado" : "turnos programados"}, el próximo el {fecha(programados[0].inicio)} a las {hora(programados[0].inicio)}.
+                </p>
               )}
             </section>
           </TabsContent>

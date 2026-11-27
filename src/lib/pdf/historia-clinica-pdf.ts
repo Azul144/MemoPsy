@@ -1,7 +1,7 @@
 // src/lib/pdf/historia-clinica-pdf.ts
 // Arma en memoria el PDF de la historia clínica completa (Ley 26.529, art. 12: cronológica,
-// foliada y completa): identificación, admisión, evolución (las notas clínicas en orden de fecha)
-// y cierre. No se guarda en el servidor: la ruta lo genera cuando el psicólogo lo pide.
+// foliada y completa): identificación, admisión, evolución sesión por sesión (turno, nota clínica
+// e informe de seguimiento de cada día, del primero al último) y cierre. No se guarda en el servidor: la ruta lo genera cuando el psicólogo lo pide.
 import { readFile } from "fs/promises";
 import path from "path";
 import { PDFDocument, StandardFonts, type PDFFont, type PDFPage } from "pdf-lib";
@@ -21,11 +21,21 @@ import {
 } from "./informe-pdf";
 import { APARTADOS_ADMISION, CAMPOS_IDENTIFICACION, NOMBRE_MOTIVO_CIERRE, edadEn } from "@/lib/historia-clinica/apartados";
 import type { HistoriaCompleta } from "@/lib/historia-clinica/datos";
+import type { CarpetaPaciente } from "@/lib/carpetas/datos";
+import { armarRecorrido, diaLargo, horaDelConsultorio } from "@/lib/carpetas/sesiones";
+
+const RESPUESTA_ACTIVIDAD: Record<string, string> = { HECHA: "la hizo", NO_PUDE: "no pudo hacerla" };
 
 // Las fechas sin hora (AAAA-MM-DD) se muestran tal cual, sin pasar por zonas horarias
 const fechaDia = (fecha: string | null | undefined) => (fecha ? fecha.slice(0, 10).split("-").reverse().join("/") : "-");
 
-export async function generarPdfHistoriaClinica(datos: HistoriaCompleta, generadoPor: string): Promise<Uint8Array> {
+// carpeta: turnos y seguimientos del paciente, para armar la evolución sesión por sesión.
+// Sin ella, la evolución lista solo las notas clínicas.
+export async function generarPdfHistoriaClinica(
+  datos: HistoriaCompleta,
+  generadoPor: string,
+  carpeta?: Pick<CarpetaPaciente, "turnos" | "seguimientos"> | null,
+): Promise<Uint8Array> {
   const historia = datos.historia;
   if (!historia) throw new Error("El paciente no tiene historia clínica");
 
@@ -143,17 +153,40 @@ export async function generarPdfHistoriaClinica(datos: HistoriaCompleta, generad
       : "No registrado.",
   );
 
-  // ---- 3. Evolución ----
+  // ---- 3. Evolución: sesión por sesión, del primer día al último ----
   seccion("3. Evolución");
-  if (datos.evoluciones.length === 0) {
+  const recorrido = armarRecorrido(carpeta?.turnos ?? [], datos.evoluciones, carpeta?.seguimientos ?? []);
+  if (recorrido.length === 0) {
     parrafo("Todavía no hay sesiones registradas.", MARGEN, 10, normal, GRIS);
   }
-  for (const nota of datos.evoluciones) {
-    asegurarEspacio(48);
-    escribir(formatoFecha(nota.fecha), MARGEN, y, 10, negrita, GRIS);
-    y -= 15;
-    parrafo(nota.titulo, MARGEN, 10.5, negrita, VERDE);
-    parrafo(nota.contenido);
+  const SANGRIA = MARGEN + 12;
+  for (const sesion of recorrido) {
+    asegurarEspacio(60);
+    escribir(`Sesión ${sesion.numero} · ${diaLargo(sesion.dia)}`, MARGEN, y, 11, negrita, VERDE);
+    y -= 16;
+    for (const t of sesion.turnos) {
+      parrafo(
+        `Turno: ${horaDelConsultorio(t.inicio)}${t.fin ? ` a ${horaDelConsultorio(t.fin)}` : ""} · ${t.modalidad} · ${t.estado}`,
+        SANGRIA, 9.5, normal, GRIS,
+      );
+    }
+    for (const nota of sesion.notas) {
+      y -= 3;
+      parrafo(`Nota clínica: ${nota.titulo}`, SANGRIA, 10, negrita);
+      parrafo(nota.contenido, SANGRIA);
+    }
+    if (sesion.notas.length === 0) parrafo("Sin nota clínica de esta sesión.", SANGRIA, 9.5, normal, GRIS);
+    for (const seg of sesion.seguimientos) {
+      y -= 3;
+      parrafo("Informe de seguimiento compartido con el paciente", SANGRIA, 10, negrita);
+      parrafo(seg.resumen, SANGRIA);
+      if (seg.avances) parrafo(`Avances: ${seg.avances}`, SANGRIA);
+      if (seg.pautas) parrafo(`Pautas: ${seg.pautas}`, SANGRIA);
+      for (const a of seg.actividades) {
+        const respuesta = a.respuesta ? RESPUESTA_ACTIVIDAD[a.respuesta] ?? a.respuesta : "sin responder";
+        parrafo(`- ${a.descripcion} (${respuesta}${a.comentario ? `: "${a.comentario}"` : ""})`, SANGRIA + 8, 9.5);
+      }
+    }
     y -= 6;
     asegurarEspacio(10);
     pagina.drawLine({ start: { x: MARGEN, y: y + 4 }, end: { x: A4.ancho - MARGEN, y: y + 4 }, thickness: 0.4, color: LINEA });

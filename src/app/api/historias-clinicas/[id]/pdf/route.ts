@@ -8,6 +8,7 @@ import { initializeDatabase } from "@/lib/database";
 import { conAuditoria } from "@/lib/auditoria/con-auditoria";
 import { cargarHistoria } from "@/lib/historia-clinica/datos";
 import { generarPdfHistoriaClinica } from "@/lib/pdf/historia-clinica-pdf";
+import { cargarCarpeta } from "@/lib/carpetas/datos";
 
 async function manejarGET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -27,7 +28,9 @@ async function manejarGET(_request: NextRequest, { params }: { params: Promise<{
       return NextResponse.json({ error: "Este paciente todavía no tiene historia clínica." }, { status: 404 });
     }
 
-    const bytes = await generarPdfHistoriaClinica(datos, session.user.persona?.nombreCompleto || session.user.email || "MemoPsy");
+    // Turnos y seguimientos, para que la evolución vaya sesión por sesión
+    const carpeta = await cargarCarpeta(ds, id, String(session.user.psicologoId));
+    const bytes = await generarPdfHistoriaClinica(datos, session.user.persona?.nombreCompleto || session.user.email || "MemoPsy", carpeta);
     const archivo = `historia-clinica-${datos.paciente.apellido}-${datos.paciente.nombre}`
       .normalize("NFD")
       .replace(/[̀-ͯ]/g, "")
