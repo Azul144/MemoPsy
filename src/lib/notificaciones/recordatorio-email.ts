@@ -6,6 +6,7 @@
 // En el email va solo fecha, hora, con quién y el enlace si es virtual. Nunca contenido clínico.
 import { initializeDatabase } from "@/lib/database";
 import { enviarEmail } from "@/lib/email/brevo";
+import { marcoEmail, parrafo, recuadroDatos, sitioMemoPsy } from "@/lib/email/plantilla";
 import { fechaTurno } from "./notificar";
 
 const HORAS_RECORDATORIO = 24;
@@ -22,39 +23,39 @@ export interface TurnoPendiente {
   psicologoApellido: string;
 }
 
-const escapar = (texto: string) =>
-  texto.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
-
-// Mismo formato que el WhatsApp de Infobip (src/lib/whatsapp/infobip.ts): saludo y un dato por renglón
+// Mismos datos que el WhatsApp (src/lib/whatsapp/infobip.ts), con la plantilla clara de los emails
 export function armarEmail(turno: TurnoPendiente) {
   const [dia, hora] = fechaTurno(new Date(turno.inicio)).split(" a las ");
   const nombre = (turno.pacienteNombre ?? "").trim().split(/\s+/)[0] ?? "";
-  const enlace = turno.enlace && /^https?:\/\//i.test(turno.enlace) ? escapar(turno.enlace) : "";
-  const sitio = (process.env.NEXTAUTH_URL ?? "").replace(/\/$/, "");
-  const datos: [string, string, string][] = [
-    ["📅", "Día", escapar(dia)],
-    ["🕐", "Hora", escapar(hora ?? "")],
-    ["👤", "Profesional", escapar(`${turno.psicologoNombre} ${turno.psicologoApellido}`.trim())],
-    ["📍", "Modalidad", escapar((turno.modalidad ?? "presencial").toLowerCase())],
-    ...(enlace ? [["🔗", "Videollamada", `<a href="${enlace}">${enlace}</a>`] as [string, string, string]] : []),
-  ];
-  const renglones = datos
-    .map(([icono, etiqueta, valor]) => `<p style="margin: 4px 0;">${icono} <strong>${etiqueta}:</strong> ${valor}</p>`)
-    .join("\n        ");
+  const enlace = turno.enlace && /^https?:\/\//i.test(turno.enlace) ? turno.enlace : "";
+  const sitio = sitioMemoPsy();
+  const modalidad = (turno.modalidad ?? "presencial").toLowerCase();
   return {
     // Con la fecha en el asunto, si el turno se reprograma el email nuevo no queda escondido
     // en la misma conversación que el anterior
     asunto: `Recordatorio: tu turno del ${fechaTurno(new Date(turno.inicio))} en MemoPsy`,
-    html: `
-      <div style="font-family: Arial, sans-serif; max-width: 480px; color: #1D3434;">
-        <h2>Recordatorio de turno</h2>
-        <p>${nombre ? `Hola ${escapar(nombre)} 👋` : "Hola 👋"}</p>
-        ${renglones}
-        <p style="margin-top: 16px;">Si no podés asistir, reprogramá el turno desde tu cuenta de MemoPsy hasta 24 horas antes${sitio ? ` (<a href="${escapar(sitio)}">${escapar(sitio)}</a>)` : ""} o avisale al centro.</p>
-        <p>— MemoPsy</p>
-        <p style="color: #888; font-size: 12px;">Este es un mensaje automático de MemoPsy. No lo respondas.</p>
-      </div>
-    `,
+    html: marcoEmail({
+      resumen: `Tu turno es el ${dia} a las ${hora} con ${turno.psicologoNombre} ${turno.psicologoApellido}.`,
+      titulo: nombre ? `${nombre}, te esperamos en tu sesión` : "Te esperamos en tu sesión",
+      cuerpo:
+        parrafo("Te recordamos los datos de tu próximo turno:") +
+        recuadroDatos([
+          ["Día", dia],
+          ["Hora", hora ?? ""],
+          ["Profesional", `${turno.psicologoNombre} ${turno.psicologoApellido}`.trim()],
+          ["Modalidad", modalidad.charAt(0).toUpperCase() + modalidad.slice(1)],
+        ]),
+      // Sesión remota: el botón lleva directo a la videollamada; presencial: a su cuenta
+      boton: enlace
+        ? { texto: "Entrar a la videollamada", enlace }
+        : sitio
+          ? { texto: "Ver mi turno", enlace: `${sitio}/sesiones` }
+          : undefined,
+      notas: [
+        "Si no podés asistir, reprogramá el turno desde tu cuenta de MemoPsy hasta 24 horas antes, o avisale al consultorio.",
+        ...(enlace ? [`Enlace de la videollamada: <a href="${enlace.replace(/"/g, "")}" style="color: #1D4A48;">${enlace.replace(/[<>"]/g, "")}</a>`] : []),
+      ],
+    }),
   };
 }
 

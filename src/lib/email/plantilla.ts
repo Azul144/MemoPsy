@@ -45,6 +45,20 @@ export function lista(items: string[]): string {
   return `<table role="presentation" cellpadding="0" cellspacing="0" style="margin: 0 0 20px;">${filas}</table>`;
 }
 
+// Recuadro con datos en renglones (etiqueta a la izquierda, valor a la derecha), p. ej. los del turno
+export function recuadroDatos(filas: [string, string][]): string {
+  const renglones = filas
+    .map(
+      ([etiqueta, valor], i) => `
+        <tr>
+          <td style="padding: 10px 16px; font-size: 14px; color: ${SUAVE}; white-space: nowrap;${i > 0 ? " border-top: 1px solid #E1E7E6;" : ""}">${escapar(etiqueta)}</td>
+          <td style="padding: 10px 16px; font-size: 15px; font-weight: bold; color: ${TEXTO};${i > 0 ? " border-top: 1px solid #E1E7E6;" : ""}">${escapar(valor)}</td>
+        </tr>`,
+    )
+    .join("");
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 20px; background: #F6F8F7; border: 1px solid #E1E7E6; border-radius: 12px;">${renglones}</table>`;
+}
+
 export function marcoEmail({ resumen, titulo, cuerpo, boton, notas = [] }: Email): string {
   const sitio = sitioMemoPsy();
   return `<!doctype html>
