@@ -73,6 +73,7 @@ export const REGLAS_API: Regla[] = [
   { ruta: "/api/usuarios/[id]/estado", metodos: ["PATCH"], permisos: ["Editar Usuario"] },
   { ruta: "/api/usuarios/[id]/toggle-status", metodos: ["PATCH"], permisos: ["Editar Usuario"] },
   { ruta: "/api/usuarios/[id]/change-password", metodos: ["POST"], permisos: ["Editar Usuario"] },
+  { ruta: "/api/usuarios/[id]/bienvenida", metodos: ["POST"], permisos: ["Editar Usuario"] },
   { ruta: "/api/usuarios/[id]/perfiles", metodos: ["GET"], permisos: [...VER_USUARIOS, "Editar Usuario", "Asignar Perfil"] },
   { ruta: "/api/usuarios/[id]/perfiles", metodos: ["PUT"], permisos: ["Editar Usuario", "Asignar Perfil"] },
   { ruta: "/api/personas", metodos: ["GET"], permisos: [...VER_USUARIOS, ...GESTIONA_USUARIOS] },

@@ -12,11 +12,11 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Brain, Activity, AlertCircle } from "lucide-react"
+import { Brain, Activity, AlertCircle, Loader2, Mail } from "lucide-react"
 import { ObraSocial } from "@/models/obra-social.model"
 import { ESPECIALIDADES_PSICOLOGIA } from "@/lib/especialidades"
 import SelectorObrasSociales from "@/components/usuarios/SelectorObrasSociales"
-import { avisoExito } from "@/lib/avisos";
+import { avisoError, avisoExito } from "@/lib/avisos";
 
 // Interfaces
 interface Perfil {
@@ -88,6 +88,22 @@ export default function EditarUsuarioPage() {
   const router = useRouter()
   const params = useParams()
   const userId = params?.id as string
+  const [enviandoAcceso, setEnviandoAcceso] = useState(false)
+
+  // Reenvía al paciente el email con el enlace para crear su contraseña (su contraseña no cambia hasta que lo use)
+  const enviarAcceso = async () => {
+    setEnviandoAcceso(true)
+    try {
+      const res = await fetch(`/api/usuarios/${userId}/bienvenida`, { method: "POST" })
+      const datos = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(datos.message || datos.error || "No se pudo enviar el email.")
+      avisoExito(`Le enviamos a ${datos.email} el enlace para crear su contraseña.`)
+    } catch (e) {
+      avisoError(e instanceof Error ? e.message : "No se pudo enviar el email.")
+    } finally {
+      setEnviandoAcceso(false)
+    }
+  }
 
   const [formData, setFormData] = useState<UserFormData>({
     email: "",
@@ -478,7 +494,21 @@ export default function EditarUsuarioPage() {
 
       {/* Main Content */}
       <main className="mx-auto w-full max-w-6xl px-6 py-10">
-        <EncabezadoPagina titulo={<>{pageTitle}</>} descripcion="Actualice los datos del usuario y asigne perfiles según sea necesario." volverA="/usuarios" textoVolver="Volver a Usuarios" />
+        <EncabezadoPagina titulo={<>{pageTitle}</>} descripcion="Actualice los datos del usuario y asigne perfiles según sea necesario." volverA="/usuarios" textoVolver="Volver a Usuarios">
+          {isPaciente && !isLoadingData && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={enviarAcceso}
+              disabled={enviandoAcceso}
+              title="Le llega un email con el enlace para crear su contraseña y entrar a MemoPsy"
+              className="rounded-full border-dorado text-dorado hover:bg-primary hover:text-primary-foreground"
+            >
+              {enviandoAcceso ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Mail className="mr-2 h-4 w-4" />}
+              Enviar acceso por email
+            </Button>
+          )}
+        </EncabezadoPagina>
         <Card className="max-w-2xl mx-auto" style={{ backgroundColor: "var(--card)", borderColor: "var(--borde)" }}>
           <CardContent>
             {isLoadingData && userActionPermissions.canEdit ? (
