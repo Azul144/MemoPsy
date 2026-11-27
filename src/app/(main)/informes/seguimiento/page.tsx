@@ -59,10 +59,10 @@ export default function MisSeguimientosPage() {
     <div className="min-h-screen">
       <main className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6 sm:py-10">
         <EncabezadoPagina
-          titulo="Mis informes de seguimiento"
+          titulo="Mis seguimientos"
           descripcion="Lo que trabajaste en cada sesión, tus actividades para la semana y las pautas de tu psicólogo/a."
-          volverA="/informes"
-          textoVolver="Volver a Informes"
+          volverA="/welcome"
+          textoVolver="Volver al inicio"
         />
 
         {cargando ? (

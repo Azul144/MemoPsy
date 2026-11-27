@@ -57,13 +57,18 @@ export const MODULOS_DISPONIBLES: ModuloConfig[] = [
 ];
 
 // Del lado del paciente se habla de "sesiones" (el psicólogo da turnos, el paciente tiene sesiones).
-// Para quien es solo paciente, el módulo de la agenda se llama "Mis sesiones".
+// Para quien es solo paciente, la agenda se llama "Mis sesiones" e Informes pasa a ser
+// "Mis seguimientos" (lo único que ve ahí) y lleva directo a la lista.
 export function modulosParaUsuario(
   modulos: ModuloConfig[],
   usuario?: { pacienteId?: string | number | null; psicologoId?: string | number | null } | null,
 ): ModuloConfig[] {
   if (!usuario?.pacienteId || usuario.psicologoId) return modulos;
-  return modulos.map((m) =>
-    m.id === "sesiones" ? { ...m, nombre: "Mis sesiones", descripcion: "Tus sesiones en el calendario, presenciales y por videollamada" } : m,
-  );
+  return modulos.map((m) => {
+    if (m.id === "sesiones") return { ...m, nombre: "Mis sesiones", descripcion: "Tus sesiones en el calendario, presenciales y por videollamada" };
+    if (m.id === "informes") {
+      return { ...m, nombre: "Mis seguimientos", descripcion: "Lo que trabajaste en cada sesión, tus actividades y las pautas de tu psicólogo/a", ruta: "/informes/seguimiento" };
+    }
+    return m;
+  });
 }

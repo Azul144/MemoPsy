@@ -83,6 +83,11 @@ export default function GestionInformesPage() {
     if (status === 'unauthenticated') {
       router.push('/login');
     } else if (status === 'authenticated' && session?.user) {
+      // Quien es solo paciente no tiene nada que gestionar acá: va directo a sus seguimientos
+      if (session.user.pacienteId && !session.user.psicologoId) {
+        router.replace('/informes/seguimiento');
+        return;
+      }
       const userPermissions = session.user.permisos.map((p: any) => p.nombre);
       
 
