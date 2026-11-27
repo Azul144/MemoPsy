@@ -1,20 +1,44 @@
 "use client"
 // src/app/(main)/crisis/page.tsx
-// RF 4.3 - Aviso de crisis: el paciente, con la sesión iniciada, elige qué le está pasando y toca
-// «Avisar a mi psicólogo/a». El aviso le llega al profesional por la campanita, por WhatsApp y por email.
+// RF 4.3 - Aviso de crisis: el paciente, con la sesión iniciada, toca lo que le está pasando y en ese
+// mismo momento se le avisa a su psicólogo/a (sin pasos intermedios). El aviso le llega al profesional por la campanita, por WhatsApp y por email.
 // El sistema no da indicaciones ni técnicas: quien decide cómo intervenir es el psicólogo/a.
 // Solo ante la opción de riesgo se muestran los teléfonos de emergencia, porque el profesional
 // puede tardar en ver el aviso.
 
 import { useState } from "react"
 import { useSession } from "next-auth/react"
-import { AlertCircle, BellRing, Check, Loader2, Phone } from "lucide-react"
+import {
+  AlertCircle,
+  Check,
+  CloudFog,
+  CloudRain,
+  Flame,
+  Loader2,
+  MessageCircleQuestion,
+  Phone,
+  ShieldAlert,
+  Wind,
+  Zap,
+  type LucideIcon,
+} from "lucide-react"
 import EncabezadoPagina from "@/components/sistema/EncabezadoPagina"
 import { Button } from "@/components/ui/button"
 import { LINEAS_EMERGENCIA, SITUACIONES_CRISIS, type SituacionCrisis } from "@/lib/crisis/contenido"
 import { cn } from "@/lib/utils"
 
 type Estado = "eligiendo" | "enviando" | "enviado" | "error"
+
+// Ícono de cada situación, para que la lista se lea de un vistazo
+const ICONOS: Record<string, LucideIcon> = {
+  ansiedad: Wind,
+  estres: Zap,
+  angustia: CloudRain,
+  enojo: Flame,
+  desconexion: CloudFog,
+  otra: MessageCircleQuestion,
+  dano: ShieldAlert,
+}
 
 export default function AvisoCrisisPage() {
   const { data: session, status } = useSession()
@@ -23,15 +47,16 @@ export default function AvisoCrisisPage() {
   const [error, setError] = useState("")
   const [canales, setCanales] = useState<string[]>([])
 
-  const avisar = async () => {
-    if (!elegida) return
+  // Tocar la opción ya envía el aviso
+  const avisar = async (situacion: SituacionCrisis) => {
+    setElegida(situacion)
     setEstado("enviando")
     setError("")
     try {
       const res = await fetch("/api/crisis/aviso", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ situacion: elegida.id }),
+        body: JSON.stringify({ situacion: situacion.id }),
       })
       const datos = await res.json().catch(() => ({}))
       if (!res.ok) {
@@ -65,7 +90,7 @@ export default function AvisoCrisisPage() {
     <main className="mx-auto w-full max-w-3xl px-6 py-10">
       <EncabezadoPagina
         titulo="Avisar a mi psicólogo/a"
-        descripcion="Elegí lo que más se parece a lo que te pasa. Tu psicólogo/a recibe un aviso con el día, la hora y lo que elegiste."
+        descripcion="Tocá lo que más se parece a lo que te pasa y tu psicólogo/a recibe el aviso al instante, con el día y la hora."
         volverA="/welcome"
         textoVolver="Volver al inicio"
       />
@@ -97,15 +122,17 @@ export default function AvisoCrisisPage() {
           <ul className="grid gap-3 sm:grid-cols-2">
             {SITUACIONES_CRISIS.map((s) => {
               const activa = elegida?.id === s.id
+              const Icono = ICONOS[s.id] ?? MessageCircleQuestion
+              const enviandoEsta = estado === "enviando" && activa
               return (
                 <li key={s.id} className={cn(s.riesgo && "sm:col-span-2")}>
                   <button
                     type="button"
-                    onClick={() => setElegida(s)}
+                    onClick={() => avisar(s)}
                     aria-pressed={activa}
                     disabled={estado === "enviando"}
                     className={cn(
-                      "h-full w-full rounded-2xl border p-4 text-left transition-colors",
+                      "flex h-full w-full items-center gap-4 rounded-2xl border p-4 text-left transition-colors disabled:cursor-wait",
                       s.riesgo
                         ? activa
                           ? "border-red-300 bg-red-500/30"
@@ -115,15 +142,29 @@ export default function AvisoCrisisPage() {
                           : "border-borde bg-card hover:border-dorado/60",
                     )}
                   >
-                    <span className="block font-semibold leading-snug text-crema">{s.titulo}</span>
-                    <span className="mt-1 block text-sm leading-snug text-suave">{s.subtitulo}</span>
+                    <span
+                      className={cn(
+                        "flex h-12 w-12 shrink-0 items-center justify-center rounded-xl",
+                        s.riesgo ? "bg-red-500 text-white" : "bg-primary/15 text-dorado",
+                      )}
+                    >
+                      {enviandoEsta ? (
+                        <Loader2 className="h-6 w-6 animate-spin" aria-hidden="true" />
+                      ) : (
+                        <Icono className="h-6 w-6" aria-hidden="true" />
+                      )}
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block font-semibold leading-snug text-crema">{s.titulo}</span>
+                      <span className="mt-1 block text-sm leading-snug text-suave">
+                        {enviandoEsta ? "Avisando a tu psicólogo/a..." : s.subtitulo}
+                      </span>
+                    </span>
                   </button>
                 </li>
               )
             })}
           </ul>
-
-          {riesgo && <Emergencia />}
 
           {estado === "error" && (
             <p className="flex items-start gap-2 text-sm text-peligro" role="alert">
@@ -132,21 +173,8 @@ export default function AvisoCrisisPage() {
             </p>
           )}
 
-          <Button
-            onClick={avisar}
-            disabled={!elegida || estado === "enviando"}
-            className="w-full rounded-full bg-primary font-semibold text-primary-foreground hover:bg-primary/90 sm:w-auto"
-          >
-            {estado === "enviando" ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
-            ) : (
-              <BellRing className="mr-2 h-4 w-4" aria-hidden="true" />
-            )}
-            {estado === "enviando" ? "Avisando..." : "Avisar a mi psicólogo/a"}
-          </Button>
-
           <p className="text-xs leading-relaxed text-tenue">
-            Solo se envía lo que elegiste, con el día y la hora. MemoPsy no guarda nada más de esta pantalla.
+            Solo se envía lo que tocaste, con el día y la hora. Si estás en peligro ahora, llamá al 911.
           </p>
         </section>
       )}
