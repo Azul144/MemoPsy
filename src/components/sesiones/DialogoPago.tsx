@@ -116,7 +116,7 @@ export default function DialogoPago({ sesion, mediosDePago, onClose, onGuardado 
     <Dialog open={!!sesion} onOpenChange={(abierto) => !abierto && onClose()}>
       <DialogContent
         className="p-4 sm:max-w-[440px] sm:p-6"
-        style={{ backgroundColor: "var(--card)", border: "1px solid var(--dorado)" }}
+        style={{ backgroundColor: "var(--card)", border: "1px solid var(--borde)" }}
       >
         <DialogHeader>
           <DialogTitle className="text-foreground">Pago de la sesión</DialogTitle>

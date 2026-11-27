@@ -95,7 +95,7 @@ export default function DialogoReprogramar({ sesion, onClose, onReprogramada }: 
     <Dialog open={!!sesion} onOpenChange={(a) => !a && onClose()}>
       <DialogContent
         className="p-4 sm:max-w-[520px] sm:p-6"
-        style={{ backgroundColor: "var(--card)", border: "1px solid var(--dorado)" }}
+        style={{ backgroundColor: "var(--card)", border: "1px solid var(--borde)" }}
       >
         <DialogHeader>
           <DialogTitle className="text-foreground">Reprogramar turno</DialogTitle>

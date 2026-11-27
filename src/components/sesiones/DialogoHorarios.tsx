@@ -87,7 +87,7 @@ export default function DialogoHorarios({ abierto, onClose }: Props) {
     <Dialog open={abierto} onOpenChange={(a) => !a && onClose()}>
       <DialogContent
         className="p-4 sm:max-w-[480px] sm:p-6"
-        style={{ backgroundColor: "var(--card)", border: "1px solid var(--dorado)" }}
+        style={{ backgroundColor: "var(--card)", border: "1px solid var(--borde)" }}
       >
         <DialogHeader>
           <DialogTitle className="text-foreground">Días y horarios de atención</DialogTitle>

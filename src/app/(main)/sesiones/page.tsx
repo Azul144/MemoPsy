@@ -1254,7 +1254,7 @@ const handleUpdateSesion = async () => {
                           </DialogTrigger>
                           <DialogContent
                             className="max-h-[90dvh] overflow-y-auto p-4 sm:max-w-[500px] sm:p-6"
-                            style={{ backgroundColor: "var(--card)", border: "1px solid var(--dorado)" }}
+                            style={{ backgroundColor: "var(--card)", border: "1px solid var(--borde)" }}
                           >
                             <DialogHeader>
                               <DialogTitle className="text-foreground">Registrar nuevo turno</DialogTitle>
@@ -1687,7 +1687,7 @@ const handleUpdateSesion = async () => {
         }
         setIsEditDialogOpen(isOpen);
     }}>
-        <DialogContent className="max-h-[90dvh] p-4 sm:max-w-[500px] sm:p-6" style={{ backgroundColor: "var(--card)", border: "1px solid var(--dorado)" }}>
+        <DialogContent className="max-h-[90dvh] p-4 sm:max-w-[500px] sm:p-6" style={{ backgroundColor: "var(--card)", border: "1px solid var(--borde)" }}>
             <DialogHeader>
                 <DialogTitle className="text-foreground">Editar turno</DialogTitle>
                 <DialogDescription className="text-suave">
