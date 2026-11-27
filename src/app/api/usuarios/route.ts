@@ -3,6 +3,7 @@ import { initializeDatabase } from "@/lib/database"
 import { describirUsuario } from "@/lib/auditoria/detalle"
 import { type NextRequest, NextResponse } from "next/server"
 import { conAuditoria } from "@/lib/auditoria/con-auditoria"
+import { enviarBienvenidaPaciente } from "@/lib/email/bienvenida-paciente"
 import { getRepository } from "@/lib/database"
 import { PersonaEntity, UsuarioEntity, PsicologoEntity, PacienteEntity, ObraSocialEntity, PerfilEntity, UsuarioTienePerfilEntity } from "@/entities"
 import { guardarObrasSocialesDePsicologo, limpiarIdsObrasSociales, obrasSocialesDePsicologos } from "@/lib/obras-sociales-psicologo"
@@ -314,10 +315,17 @@ async function manejarPOST(request: NextRequest) {
     // Confirmar transacción si todo está bien
     await queryRunner.commitTransaction();
 
+    // Paciente nuevo: le llega por email el enlace para crear su contraseña (fuera de la transacción:
+    // si el correo falla, la cuenta queda creada igual y el administrador lo ve en el aviso)
+    const bienvenida = roles.isPaciente
+      ? await enviarBienvenidaPaciente(Number(usuarioGuardado.id), usuarioGuardado.email, personaGuardada.nombre)
+      : null
+
     return NextResponse.json(
       {
         message: "Usuario registrado exitosamente",
         data: resultados,
+        bienvenida,
       },
       { status: 201 },
     )

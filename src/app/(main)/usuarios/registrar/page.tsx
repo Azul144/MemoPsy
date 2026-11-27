@@ -22,7 +22,7 @@ import { ObraSocial } from "@/models/obra-social.model"
 import { ESPECIALIDADES_PSICOLOGIA } from "@/lib/especialidades"
 import SelectorObrasSociales from "@/components/usuarios/SelectorObrasSociales"
 
-import { avisoExito } from "@/lib/avisos";
+import { avisoError, avisoExito } from "@/lib/avisos";
 import InputPassword from "@/components/acceso/InputPassword"
 import RequisitosPassword from "@/components/acceso/RequisitosPassword"
 import { validarPassword } from "@/lib/validaciones/password"
@@ -382,6 +382,12 @@ export default function RegistrarUsuarioPage() {
 
       // Mostrar mensaje de éxito con los datos guardados
       avisoExito(`Usuario registrado correctamente como ${isPsicologo ? "Psicólogo" : isPaciente ? "Paciente" : otrosPerfiles.find((p) => p.id === perfilId)?.nombre ?? "usuario"}.`)
+      // Paciente: se le mandó (o no) el email para crear su contraseña
+      if (result.bienvenida === "enviada") {
+        avisoExito("Le enviamos al paciente un email para que cree su contraseña y entre a MemoPsy.")
+      } else if (result.bienvenida === "error") {
+        avisoError("No se pudo enviar el email de bienvenida. El paciente puede entrar con «¿La olvidaste?» desde el login.")
+      }
 
       resetForm()
       router.push("/usuarios")

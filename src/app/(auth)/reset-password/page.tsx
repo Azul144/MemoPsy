@@ -22,7 +22,10 @@ export default function ResetPasswordPage() {
 }
 
 function FormularioNuevaPassword() {
-  const token = useSearchParams().get("token") ?? "";
+  const parametros = useSearchParams();
+  const token = parametros.get("token") ?? "";
+  // Enlace del email de bienvenida al paciente nuevo: la misma pantalla, con otro texto
+  const bienvenida = parametros.get("bienvenida") === "1";
 
   const [password, setPassword] = useState("");
   const [confirmacion, setConfirmacion] = useState("");
@@ -67,12 +70,19 @@ function FormularioNuevaPassword() {
         ) : listo ? (
           <div className="mt-6">
             <CheckCircle2 className="h-10 w-10 text-dorado" aria-hidden="true" />
-            <p role="status" className="mt-3 text-foreground/90">Tu contraseña se actualizó.</p>
+            <p role="status" className="mt-3 text-foreground/90">{bienvenida ? "Listo, ya creaste tu contraseña." : "Tu contraseña se actualizó."}</p>
             <Link href="/login" className="mt-6 inline-block text-dorado underline">Iniciar sesión</Link>
           </div>
         ) : (
           <>
-            <h1 className="mt-4 mb-6 titulo text-3xl text-crema">Elegí tu contraseña nueva</h1>
+            {bienvenida ? (
+              <>
+                <h1 className="mt-4 titulo text-3xl text-crema">Bienvenido/a a MemoPsy</h1>
+                <p className="mt-2 mb-6 text-foreground/80">Creá tu contraseña para entrar a tu cuenta.</p>
+              </>
+            ) : (
+              <h1 className="mt-4 mb-6 titulo text-3xl text-crema">Elegí tu contraseña nueva</h1>
+            )}
             <form onSubmit={guardar} className="space-y-4">
               <div>
                 <Label htmlFor="password">Contraseña nueva</Label>
