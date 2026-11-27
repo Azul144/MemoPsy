@@ -454,10 +454,10 @@ export default function RegistrarInformePage() {
                 )}
                 <Button
                   type="button"
-                  variant="ghost"
+                  variant="link"
                   size="sm"
                   onClick={() => setPacienteNuevoAbierto(true)}
-                  className="h-auto gap-1.5 px-0 text-dorado hover:bg-transparent hover:underline"
+                  className="h-auto gap-1.5 px-0 text-dorado hover:text-dorado"
                 >
                   <UserPlus className="h-4 w-4" />
                   ¿Paciente nuevo, que no está en el sistema? Registralo acá
