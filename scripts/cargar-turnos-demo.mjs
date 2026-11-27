@@ -6,6 +6,8 @@
 //    los recordatorios automáticos nunca le escriben a una persona de verdad.
 //  - Los turnos pasados quedan Finalizados (algunos cancelados); los futuros, Confirmados o Pendientes.
 //  - No pisa turnos que ya estén cargados en el mismo horario.
+//  - Respeta la regla del consultorio: cada paciente, una sola sesión por día y como máximo 2 por
+//    semana. Si en un horario no hay ningún paciente libre, ese horario queda vacío.
 //  - Es seguro correrlo más de una vez: si ya están los pacientes de esta carga, no hace nada.
 //   node --env-file=.env.local scripts/cargar-turnos-demo.mjs
 //   node --env-file=.env.render scripts/cargar-turnos-demo.mjs carla.benitez@demo.memopsy.test   (Render)
@@ -68,6 +70,28 @@ for (const p of NUEVOS) {
 }
 const pacientes = [...actuales, ...nuevos]
 
+// Regla del consultorio: una sesión por día y hasta 2 por semana (lunes a domingo) por paciente
+const ZONA = "America/Argentina/Buenos_Aires"
+const diaTxt = (d) => new Intl.DateTimeFormat("en-CA", { timeZone: ZONA }).format(d)
+const lunesDe = (t) => {
+  const [a, m, d] = t.split("-").map(Number)
+  const f = new Date(Date.UTC(a, m - 1, d))
+  return new Date(f.getTime() - ((f.getUTCDay() + 6) % 7) * 86400000).toISOString().slice(0, 10)
+}
+const agenda = new Map(pacientes.map((p) => [p, { dias: new Set(), semanas: new Map() }]))
+const anotar = (p, d) => {
+  const a = agenda.get(p)
+  a.dias.add(diaTxt(d))
+  a.semanas.set(lunesDe(diaTxt(d)), (a.semanas.get(lunesDe(diaTxt(d))) ?? 0) + 1)
+}
+const libre = (p, d) => !agenda.get(p).dias.has(diaTxt(d)) && (agenda.get(p).semanas.get(lunesDe(diaTxt(d))) ?? 0) < 2
+// Lo que ya tenían cargado (sin cancelados)
+for (const f of (await c.query(
+  `SELECT pts.id_paciente AS p, s.fecha_hora_inicio AS inicio FROM paciente_tiene_sesion pts
+     JOIN sesion s ON s.id_sesion = pts.id_sesion JOIN estado e ON e.id_estado = s.id_estado
+    WHERE e.nombre <> 'Cancelada' AND pts.id_paciente IN (?)`, [pacientes.length ? pacientes : [0]],
+))[0]) if (agenda.has(f.p)) anotar(f.p, new Date(f.inicio))
+
 // Generador al azar con semilla fija: cada corrida arma la misma agenda
 let semilla = 20261126
 const azar = () => ((semilla = (semilla * 1103515245 + 12345) % 2 ** 31) / 2 ** 31)
@@ -93,6 +117,8 @@ for (let dias = -14; dias <= 21; dias++) {
     const inicio = new Date(dia)
     inicio.setHours(hora, 0, 0, 0)
     if (await ocupado(inicio)) continue
+    const disponibles = pacientes.filter((p) => libre(p, inicio))
+    if (disponibles.length === 0) continue
     const fin = new Date(inicio.getTime() + 50 * 60000)
     const pasado = inicio.getTime() < Date.now()
     const nombreEstado = pasado ? (azar() < 0.1 ? "Cancelada" : "Finalizada") : azar() < 0.7 ? "Confirmada" : "Pendiente"
@@ -106,7 +132,8 @@ for (let dias = -14; dias <= 21; dias++) {
         pagado ? "Pagado" : "Pendiente", pagado ? efectivo : null, pagado ? 30000 : null, pagado ? formato(fin) : null,
       ],
     )
-    const paciente = pacientes[Math.floor(azar() * pacientes.length)]
+    const paciente = disponibles[Math.floor(azar() * disponibles.length)]
+    anotar(paciente, inicio)
     await c.query("INSERT INTO paciente_tiene_sesion (id_sesion, id_paciente) VALUES (?, ?)", [sesionId, paciente])
     cargados++
   }

@@ -9,6 +9,7 @@ import { SesionEntity, PacienteTieneSesionEntity, PsicologoEntity, ModalidadEnti
 import { ZodError, z } from "zod";
 import { esDiaHabilEnConsultorio, MENSAJE_DIA_NO_HABIL } from "@/lib/validaciones/dias-habiles";
 import { buscarSesionSuperpuesta, mensajeSuperposicion, MENSAJE_FIN_ANTES_DE_INICIO } from "@/lib/validaciones/superposicion-sesiones";
+import { validarSesionesDelPaciente } from "@/lib/validaciones/sesiones-del-paciente";
 import { notificarCambioDeTurno, notificarRecepcion } from "@/lib/notificaciones/notificar";
 import { enlaceParaSesion } from "@/lib/videollamada";
 import { validarHorarioDeAtencion } from "@/lib/sesiones/horarios-libres";
@@ -228,6 +229,15 @@ async function manejarPUT(request: NextRequest, { params: paramsPromise }: { par
         if (superpuesta) {
             throw new ErrorSuperposicion(mensajeSuperposicion(superpuesta));
         }
+
+        // Un paciente: una sola sesión por día y como máximo 2 por semana (sin contar esta misma)
+        const pacientesDelTurno = pacientesIds ?? (
+            await transactionalEntityManager.find(PacienteTieneSesionEntity, { where: { sesionId: id } })
+        ).map((p) => p.pacienteId);
+        const reglaPaciente = await validarSesionesDelPaciente(
+            transactionalEntityManager, pacientesDelTurno, new Date(fechaHoraInicio), id,
+        );
+        if (reglaPaciente) throw new ErrorSuperposicion(reglaPaciente);
 
         inicioAnterior = sesionEntity.fechaHoraInicio;
 

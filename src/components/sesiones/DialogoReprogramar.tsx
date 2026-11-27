@@ -75,15 +75,15 @@ export default function DialogoReprogramar({ sesion, onClose, onReprogramada }: 
       })
       const data = await res.json()
       if (!res.ok) {
-        avisoError(data.error || "No se pudo reprogramar el turno.")
+        avisoError(data.error || "No se pudo reprogramar la sesión.")
         return
       }
-      avisoExito(`Turno reprogramado para el ${format(parseISO(elegido), "EEEE d/MM 'a las' HH:mm", { locale: es })}.`)
+      avisoExito(`Sesión reprogramada para el ${format(parseISO(elegido), "EEEE d/MM 'a las' HH:mm", { locale: es })}.`)
       onReprogramada()
       onClose()
     } catch (error) {
       console.error("Error reprogramando turno:", error)
-      avisoError("No se pudo reprogramar el turno. Verificá tu conexión.")
+      avisoError("No se pudo reprogramar la sesión. Verificá tu conexión.")
     } finally {
       setGuardando(false)
     }
@@ -98,9 +98,9 @@ export default function DialogoReprogramar({ sesion, onClose, onReprogramada }: 
         style={{ backgroundColor: "var(--card)", border: "1px solid var(--borde)" }}
       >
         <DialogHeader>
-          <DialogTitle className="text-foreground">Reprogramar turno</DialogTitle>
+          <DialogTitle className="text-foreground">Reprogramar sesión</DialogTitle>
           <DialogDescription className="text-suave">
-            {sesion && `Turno actual: ${format(parseISO(sesion.fechaHoraInicio), "EEEE d/MM 'a las' HH:mm", { locale: es })}`}
+            {sesion && `Sesión actual: ${format(parseISO(sesion.fechaHoraInicio), "EEEE d/MM 'a las' HH:mm", { locale: es })}`}
             {psicologo && ` · ${psicologo.nombre} ${psicologo.apellido}`}
           </DialogDescription>
         </DialogHeader>
@@ -113,7 +113,7 @@ export default function DialogoReprogramar({ sesion, onClose, onReprogramada }: 
           <p className="rounded-lg border border-red-500/40 p-4 text-center text-sm text-peligro">{error}</p>
         ) : porDia.length === 0 ? (
           <p className="rounded-lg border border-dashed border-borde-fuerte p-4 text-center text-sm text-suave">
-            Tu psicólogo no tiene horarios libres habilitados en las próximas semanas. Comunicate con el consultorio
+            No hay horarios libres en las próximas semanas (recordá que podés tener una sola sesión por día y hasta 2 por semana). Comunicate con el consultorio
             para reprogramar.
           </p>
         ) : (

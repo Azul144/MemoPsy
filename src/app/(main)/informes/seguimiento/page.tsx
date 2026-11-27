@@ -37,7 +37,11 @@ export default function MisSeguimientosPage() {
         const data = await res.json()
         if (!res.ok) throw new Error(data.error)
         setSeguimientos(data.seguimientos ?? [])
-        setAbierto(data.seguimientos?.[0]?.id ?? null)
+        // Desde "Mi tratamiento" se puede pedir uno en particular (?abrir=id): se abre y se muestra
+        const pedido = new URLSearchParams(window.location.search).get("abrir")
+        const existe = pedido && (data.seguimientos ?? []).some((s: { id: string }) => s.id === pedido)
+        setAbierto(existe ? pedido : data.seguimientos?.[0]?.id ?? null)
+        if (existe) setTimeout(() => document.getElementById(`seguimiento-${pedido}`)?.scrollIntoView({ behavior: "smooth", block: "start" }), 100)
       })
       .catch((e) => setError(e.message || "No se pudieron cargar tus informes."))
       .finally(() => setCargando(false))
@@ -78,13 +82,14 @@ export default function MisSeguimientosPage() {
         ) : (
           <div className="space-y-4">
             {seguimientos.map((s) => (
-              <TarjetaSeguimiento
-                key={s.id}
-                seguimiento={s}
-                abierto={abierto === s.id}
-                onAlternar={() => setAbierto(abierto === s.id ? null : s.id)}
-                onRespondida={(a) => actualizarActividad(s.id, a)}
-              />
+              <div key={s.id} id={`seguimiento-${s.id}`} className="scroll-mt-6">
+                <TarjetaSeguimiento
+                  seguimiento={s}
+                  abierto={abierto === s.id}
+                  onAlternar={() => setAbierto(abierto === s.id ? null : s.id)}
+                  onRespondida={(a) => actualizarActividad(s.id, a)}
+                />
+              </div>
             ))}
           </div>
         )}

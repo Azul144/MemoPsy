@@ -5,6 +5,7 @@
 import type { DataSource, EntityManager } from "typeorm"
 import { HorarioDisponibleEntity, SesionEntity } from "@/entities"
 import { validarFechasEnAtencion } from "@/lib/sesiones/turnos-atencion"
+import { motivoSesionNoPermitida, sesionesDePacientes } from "@/lib/validaciones/sesiones-del-paciente"
 
 // El paciente puede reprogramar (y elegir horarios) con al menos 24 h de anticipación
 export const HORAS_ANTICIPACION = 24
@@ -90,6 +91,14 @@ export async function buscarHorariosLibres(
   }
   const ocupados = await consulta.getMany()
 
+  // Un paciente: una sola sesión por día y como máximo 2 por semana. Se miran sus otras sesiones
+  // desde una semana antes hasta una semana después del rango que se ofrece.
+  const otrasDelPaciente = await sesionesDePacientes(
+    db, pacientesIds, new Date(ahora - 8 * UN_DIA), new Date(hasta.getTime() + 8 * UN_DIA), sesion.id,
+  )
+  const permitidoParaPacientes = (inicio: Date) =>
+    pacientesIds.every((id) => !motivoSesionNoPermitida(otrasDelPaciente.filter((o) => o.pacienteId === String(id)), inicio))
+
   const libres: HorarioLibre[] = []
   for (let t = ahora; t <= hasta.getTime(); t += UN_DIA) {
     const { dia, diaSemana } = diaEnConsultorio(new Date(t))
@@ -99,7 +108,7 @@ export async function buscarHorariosLibres(
         const fin = inicio + duracion
         if (inicio < desde.getTime() || inicio === sesion.fechaHoraInicio.getTime()) continue
         const pisaOtro = ocupados.some((o) => o.fechaHoraInicio.getTime() < fin && o.fechaHoraFin.getTime() > inicio)
-        if (!pisaOtro) libres.push({ inicio: new Date(inicio).toISOString(), fin: new Date(fin).toISOString() })
+        if (!pisaOtro && permitidoParaPacientes(new Date(inicio))) libres.push({ inicio: new Date(inicio).toISOString(), fin: new Date(fin).toISOString() })
       }
     }
   }

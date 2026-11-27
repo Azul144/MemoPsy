@@ -10,7 +10,7 @@ import FondoAnimado from "@/components/comunes/FondoAnimado";
 import CampanaNotificaciones from "@/components/sistema/CampanaNotificaciones";
 import BotonTema from "@/components/sistema/BotonTema";
 import { Button } from "@/components/ui/button";
-import { Menu, X, LogOut, HomeIcon, UserRound, KeyRound, Loader2, ArrowRight, ShieldCheck, ShieldAlert, LifeBuoy } from "lucide-react"
+import { Menu, X, LogOut, HomeIcon, UserRound, KeyRound, Loader2, ArrowRight, ShieldCheck, ShieldAlert, LifeBuoy, HeartHandshake } from "lucide-react"
 import ModalActivarMfa from "@/components/mfa/ModalActivarMfa";
 import ModalDesactivarMfa from "@/components/mfa/ModalDesactivarMfa";
 import toast from "react-hot-toast";
@@ -59,7 +59,23 @@ export default function WelcomePage() {
         );
       });
       
-      setModulosPermitidos(modulosConPermiso);
+      // El paciente tiene primero "Mi tratamiento": sus turnos, sesiones y seguimientos en una lista
+      const miTratamiento: ModuloConfig = {
+        id: "mi_tratamiento",
+        nombre: "Mi tratamiento",
+        descripcion: "Tus próximas sesiones, las que ya tuviste y tus seguimientos, en una lista",
+        icon: HeartHandshake,
+        ruta: "/mi-tratamiento",
+        permisosRequeridos: [],
+      };
+      // Del lado del paciente se habla de "sesiones": el psicólogo da turnos, el paciente tiene sesiones
+      const soloPaciente = session.user.pacienteId && !session.user.psicologoId;
+      const modulos = soloPaciente
+        ? modulosConPermiso.map((m) =>
+            m.id === "sesiones" ? { ...m, nombre: "Mis sesiones", descripcion: "Tus sesiones en el calendario, presenciales y por videollamada" } : m,
+          )
+        : modulosConPermiso;
+      setModulosPermitidos(session.user.pacienteId ? [miTratamiento, ...modulos] : modulos);
     }
   }, [session]);
 

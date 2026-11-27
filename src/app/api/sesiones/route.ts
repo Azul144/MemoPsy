@@ -5,6 +5,7 @@ import { conAuditoria } from "@/lib/auditoria/con-auditoria"
 import { esDiaHabilEnConsultorio, MENSAJE_DIA_NO_HABIL } from "@/lib/validaciones/dias-habiles"
 import { alcanceSesiones, puedeVerSesion } from "@/lib/auth/alcance-sesiones"
 import { buscarSesionSuperpuesta, mensajeSuperposicion, MENSAJE_FIN_ANTES_DE_INICIO } from "@/lib/validaciones/superposicion-sesiones"
+import { validarSesionesDelPaciente } from "@/lib/validaciones/sesiones-del-paciente"
 import { datosPago, puedeVerPagos } from "@/lib/sesiones/pagos"
 import { validarHorarioDeAtencion } from "@/lib/sesiones/horarios-libres"
 import { enlaceParaSesion } from "@/lib/videollamada"
@@ -211,6 +212,12 @@ async function manejarPOST(request: NextRequest) {
     if (superpuesta) {
       const mensaje = mensajeSuperposicion(superpuesta)
       return NextResponse.json({ error: mensaje, details: { horaInicio: mensaje } }, { status: 409 })
+    }
+
+    // Un paciente: una sola sesión por día y como máximo 2 por semana
+    const reglaPaciente = await validarSesionesDelPaciente(dataSource, pacientesIds ?? [], inicio)
+    if (reglaPaciente) {
+      return NextResponse.json({ error: reglaPaciente, details: { pacientesIds: reglaPaciente } }, { status: 409 })
     }
 
     // RF 3.4 - Si es remota y no escribieron enlace, se genera uno

@@ -919,7 +919,7 @@ const handleUpdateSesion = async () => {
 
         <div className="w-full min-w-0 space-y-2">
           <h4 className="font-semibold text-foreground first-letter:uppercase">
-            Turnos del {format(selectedDate, "EEEE d 'de' MMMM", { locale: es })}
+            {filterType === "paciente" ? "Sesiones" : "Turnos"} del {format(selectedDate, "EEEE d 'de' MMMM", { locale: es })}
             {delDia.length > 0 && <span className="ml-2 text-sm font-normal text-suave">({delDia.length} en total)</span>}
           </h4>
           <div className="space-y-4">
@@ -934,10 +934,10 @@ const handleUpdateSesion = async () => {
                     {franja.titulo} <span className="font-normal text-suave">{franja.texto}</span>
                   </span>
                   <Badge variant="outline" className="border-dorado/50 text-dorado">
-                    {lista.length} {lista.length === 1 ? "turno" : "turnos"}
+                    {lista.length} {filterType === "paciente" ? (lista.length === 1 ? "sesión" : "sesiones") : lista.length === 1 ? "turno" : "turnos"}
                   </Badge>
                 </div>
-                {lista.length === 0 && <p className="px-1 text-xs text-tenue">Sin turnos en esta franja.</p>}
+                {lista.length === 0 && <p className="px-1 text-xs text-tenue">{filterType === "paciente" ? "Sin sesiones en esta franja." : "Sin turnos en esta franja."}</p>}
             {lista.map((sesion) => (
               <Card key={sesion.id} className="p-3" style={{ backgroundColor: "var(--background)" }}>
                 <div className="flex items-start justify-between"> {/* items-start for alignment */}
@@ -1111,7 +1111,9 @@ const handleUpdateSesion = async () => {
             })}
             {delDia.length === 0 && (
               <p className="text-tenue text-sm text-center py-4">
-                No hay turnos programados para esta fecha. Los días con turnos están marcados con un punto en el calendario.
+                {filterType === "paciente"
+                  ? "No tenés sesiones este día. Los días con sesión están marcados con un punto en el calendario."
+                  : "No hay turnos programados para esta fecha. Los días con turnos están marcados con un punto en el calendario."}
               </p>
             )}
           </div>
@@ -1192,7 +1194,7 @@ const handleUpdateSesion = async () => {
                 value="paciente"
                 className="shrink-0 px-3 sm:px-6"
               >
-                Mis turnos (Paciente)
+                Mis sesiones
               </TabsTrigger>
               )}
               {soloConsulta && (
@@ -1661,9 +1663,9 @@ const handleUpdateSesion = async () => {
                 <CardHeader>
                   <CardTitle className="text-foreground flex items-center space-x-2">
                     <User className="w-5 h-5" style={{ color: "var(--dorado)" }} />
-                    <span>Mis turnos como paciente</span>
+                    <span>Mis sesiones</span>
                   </CardTitle>
-                  <CardDescription className="text-suave">Tus turnos con tu psicólogo/a</CardDescription>
+                  <CardDescription className="text-suave">Tus sesiones con tu psicólogo/a. Como máximo 2 por semana, en días distintos.</CardDescription>
                 </CardHeader>
                 <CardContent>{renderCalendarWithSessions("paciente")}</CardContent>
               </Card>
