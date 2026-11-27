@@ -1,11 +1,11 @@
 // src/components/landing/ParaQuien.tsx
-// Sitio público: los tres beneficios más fuertes para el psicólogo y para el paciente.
-// Cada uno está respaldado por una función que el sistema ya tiene.
-import { Stethoscope, HeartHandshake, Mic, BellRing, ShieldCheck, CalendarDays, Repeat } from "lucide-react";
+// Sitio público: los beneficios para el psicólogo, que es quien contrata MemoPsy. Lo que reciben sus
+// pacientes se presenta como un valor agregado de su consultorio. Cada uno lo respalda una función real.
+import { Stethoscope, HeartHandshake, LifeBuoy, Mic, BellRing, ShieldCheck, CalendarDays, Repeat } from "lucide-react";
 
 const roles = [
   {
-    rol: "Para el psicólogo",
+    rol: "Para vos",
     frase: "Más tiempo para la clínica, menos para la administración.",
     icono: Stethoscope,
     beneficios: [
@@ -15,13 +15,13 @@ const roles = [
     ],
   },
   {
-    rol: "Para el paciente",
-    frase: "Acompañado también entre una sesión y otra.",
+    rol: "Para tus pacientes",
+    frase: "Un valor agregado de tu consultorio, sin trabajo extra para vos.",
     icono: HeartHandshake,
     beneficios: [
       { icono: CalendarDays, titulo: "Sus turnos a mano", texto: "Y la videollamada a un toque, si la sesión es remota." },
-      { icono: Repeat, titulo: "Reprograma solo", texto: "Elige otro horario libre sin llamar al consultorio." },
-      { icono: HeartHandshake, titulo: "Ayuda en crisis", texto: "Una guía para el momento, y su psicólogo se entera." },
+      { icono: Repeat, titulo: "Reprograman solos", texto: "Eligen otro horario libre sin llamarte." },
+      { icono: LifeBuoy, titulo: "Te avisan si están mal", texto: "Desde su cuenta te avisan qué les pasa y te llega al WhatsApp." },
     ],
   },
 ];
@@ -30,7 +30,7 @@ export default function ParaQuien() {
   return (
     <section id="beneficios" className="px-6 py-16 sm:py-24">
       <div className="mx-auto max-w-6xl">
-        <h2 data-revelar className="titulo max-w-2xl text-4xl text-balance text-crema sm:text-5xl">Lo que gana cada uno</h2>
+        <h2 data-revelar className="titulo max-w-2xl text-4xl text-balance text-crema sm:text-5xl">Lo que gana tu consultorio</h2>
 
         <div className="mt-14 space-y-12">
           {roles.map((r) => (
