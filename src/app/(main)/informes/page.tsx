@@ -8,7 +8,7 @@ import EncabezadoPagina from "@/components/sistema/EncabezadoPagina";
 import TarjetaAccion from "@/components/sistema/TarjetaAccion";
 import { useRouter } from 'next/navigation';
 import { TypographyP } from '@/components/ui/typography';
-import { FileText, PlusSquare, ListChecks, Loader2, ClipboardCheck, BookOpen } from "lucide-react"
+import { FileText, PlusSquare, ListChecks, Loader2, ClipboardCheck, BookOpen, FolderOpen } from "lucide-react"
 
 // Interfaces (identical to perfiles/page.tsx)
 
@@ -25,6 +25,15 @@ interface SubModuloConfig {
 
 // SUB_MODULOS_INFORMES (specific to this page)
 const SUB_MODULOS_INFORMES: SubModuloConfig[] = [
+  {
+    // Una carpeta por paciente: turnos, seguimientos, notas de cada sesión e historia clínica
+    id: 'carpetas',
+    nombre: 'Carpetas de pacientes',
+    descripcion: 'Todo de cada paciente en un lugar: turnos, seguimientos, notas e historia clínica.',
+    icon: FolderOpen,
+    ruta: '/informes/carpetas',
+    permisoRequerido: 'Registrar Informe',
+  },
   {
     id: 'registrar_informe',
     nombre: 'Registrar nota clínica',
@@ -82,7 +91,7 @@ export default function GestionInformesPage() {
         if (subModule.id === 'registrar_informe') {
           return userPermissions.includes(subModule.permisoRequerido) && !!session.user.psicologoId;
         }
-        if (subModule.id === 'historias_clinicas') {
+        if (subModule.id === 'historias_clinicas' || subModule.id === 'carpetas') {
           return userPermissions.includes(subModule.permisoRequerido) && !!session.user.psicologoId;
         }
         if (subModule.id === 'mis_seguimientos') {

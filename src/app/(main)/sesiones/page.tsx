@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -21,7 +22,7 @@ import { Calendar } from "@/components/ui/calendar"
 import { DIAS_NO_HABILES, MENSAJE_DIA_NO_HABIL, esDiaHabil, esFechaHabil, proximoDiaHabil } from "@/lib/validaciones/dias-habiles"
 import { Badge } from "@/components/ui/badge"
 import { TypographyP } from '@/components/ui/typography';
-import { Loader2, X, CalendarIcon, CalendarClock, Plus, Users, User, Brain, Clock, MapPin, Activity, Check, Pencil, Wallet, Video, Send } from "lucide-react"
+import { Loader2, X, CalendarIcon, CalendarClock, Plus, Users, User, Brain, Clock, MapPin, Activity, Check, Pencil, Wallet, Video, Send, Sun, Moon, FolderOpen } from "lucide-react"
 import { format, parseISO, isSameDay } from "date-fns"
 import { es } from "date-fns/locale"
 import { cn } from "@/lib/utils"
@@ -30,6 +31,7 @@ import { avisoExito, avisoError, confirmar } from "@/lib/avisos";
 import DialogoPago, { type PagoSesion, type MedioDePago } from "@/components/sesiones/DialogoPago";
 import DialogoHorarios from "@/components/sesiones/DialogoHorarios";
 import HorariosDeAtencion from "@/components/sesiones/HorariosDeAtencion";
+import { TURNOS } from "@/lib/sesiones/turnos-atencion";
 import DialogoReprogramar from "@/components/sesiones/DialogoReprogramar";
 
 // Los turnos terminan el mismo día: al cambiar la fecha de inicio, la de fin la acompaña
@@ -368,12 +370,12 @@ const handleUpdateSesion = async () => {
             setIsEditDialogOpen(false);
             await loadInitialData(fechaHoraInicio);
             setEditingSesion(null); 
-            avisoExito("Sesión actualizada correctamente.");
+            avisoExito("Turno actualizado correctamente.");
         } else {
             const errorData = await response.json();
             const newErrors: Record<string, string> = {};
             // Horario ocupado (RF 3.1): se muestra el motivo concreto
-            let alertMessage = response.status === 409 && errorData.error ? errorData.error : "Error al actualizar la sesión.";
+            let alertMessage = response.status === 409 && errorData.error ? errorData.error : "Error al actualizar el turno.";
 
             if (errorData.details && Array.isArray(errorData.details)) {
                 const generalErrorMessages: string[] = [];
@@ -400,7 +402,7 @@ const handleUpdateSesion = async () => {
     } catch (error) {
         console.error("Error updating session:", error);
         setEditFormErrors({ general: "Error de conexión o del cliente." });
-        avisoError("No se pudo actualizar la sesión. Revisá la conexión y probá de nuevo.");
+        avisoError("No se pudo actualizar el turno. Revisá la conexión y probá de nuevo.");
     } finally {
         setIsEditSubmitting(false);
     }
@@ -740,12 +742,12 @@ const handleUpdateSesion = async () => {
           // Horario ocupado (RF 3.1): además del error en el campo, se avisa arriba
           if (response.status === 409) avisoError(errorData.error)
         } else {
-          avisoError("Error al crear la sesión: " + errorData.error)
+          avisoError("Error al crear el turno: " + errorData.error)
         }
       }
     } catch (error) {
       console.error("Error creating session:", error)
-      avisoError("Error al crear la sesión. Por favor, intente nuevamente.")
+      avisoError("Error al crear el turno. Por favor, intente nuevamente.")
     } finally {
       setIsSubmitting(false)
     }
@@ -796,6 +798,32 @@ const handleUpdateSesion = async () => {
     })
   }
 
+  // Franjas de atención del consultorio: mañana (8 a 11) y tarde-noche (18 a 21)
+  const FRANJAS_DEL_DIA = [
+    { clave: TURNOS[0].clave, titulo: "Mañana", texto: TURNOS[0].texto },
+    { clave: TURNOS[1].clave, titulo: "Tarde-noche", texto: TURNOS[1].texto },
+  ]
+  // Un turno es de la mañana si empieza antes de las 14; si no, de la tarde-noche
+  const franjaDeTurno = (s: Sesion) => (parseISO(s.fechaHoraInicio).getHours() < 14 ? TURNOS[0].clave : TURNOS[1].clave)
+
+  const turnosProgramadosPorPaciente = () => {
+    const ahora = Date.now()
+    const porPaciente = new Map<string, { id: string; nombre: string; cantidad: number; proximo: Date | null }>()
+    for (const s of sesiones) {
+      if (s.psicologo?.id !== session?.user?.psicologoId) continue
+      if (s.estado?.nombre === "Cancelada" || s.estado?.nombre === "Finalizada") continue
+      const inicio = parseISO(s.fechaHoraInicio)
+      if (inicio.getTime() < ahora) continue
+      for (const p of s.pacientes ?? []) {
+        const actual = porPaciente.get(String(p.id)) ?? { id: String(p.id), nombre: `${p.persona.nombre} ${p.persona.apellido}`, cantidad: 0, proximo: null }
+        actual.cantidad++
+        if (!actual.proximo || inicio < actual.proximo) actual.proximo = inicio
+        porPaciente.set(String(p.id), actual)
+      }
+    }
+    return [...porPaciente.values()].sort((a, b) => b.cantidad - a.cantidad || a.nombre.localeCompare(b.nombre))
+  }
+
   const renderCalendarWithSessions = (filterType: "all" | "psicologo" | "paciente") => {
     // Días que tienen al menos un turno visible para esta vista: se marcan con un punto en el calendario
     const diasConTurno = sesiones
@@ -806,8 +834,52 @@ const handleUpdateSesion = async () => {
       })
       .map((sesion) => parseISO(sesion.fechaHoraInicio))
 
+    // Turnos del día elegido, en orden de hora, para separarlos por franja (mañana / tarde-noche)
+    const delDia = getSesionesForDate(selectedDate, filterType).sort(
+      (a, b) => parseISO(a.fechaHoraInicio).getTime() - parseISO(b.fechaHoraInicio).getTime(),
+    )
+
+    // Psicólogo: cuántos turnos tiene programados con cada paciente (de hoy en adelante, sin cancelados ni finalizados)
+    const programadosPorPaciente = filterType === "psicologo" ? turnosProgramadosPorPaciente() : []
+
     return (
+      <div className="space-y-6">
+      {filterType === "psicologo" && (
+        <section className="rounded-md border p-4" style={{ backgroundColor: "var(--background)" }}>
+          <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+            <p className="font-semibold text-foreground">Turnos programados por paciente</p>
+            <Link href="/informes/carpetas" className="text-sm text-dorado hover:underline">Ver todas las carpetas</Link>
+          </div>
+          {programadosPorPaciente.length === 0 ? (
+            <p className="text-sm text-tenue">No tenés turnos próximos.</p>
+          ) : (
+            <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+              {programadosPorPaciente.map((p) => (
+                <li key={p.id}>
+                  <Link
+                    href={`/informes/carpetas/${p.id}`}
+                    className="flex h-full items-center gap-3 rounded-lg border border-foreground/10 px-3 py-2.5 transition-colors hover:border-primary/50 hover:bg-primary/10"
+                    title="Abrir la carpeta del paciente"
+                  >
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/15">
+                      <FolderOpen className="h-4 w-4 text-dorado" />
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block truncate text-sm font-medium text-foreground">{p.nombre}</span>
+                      <span className="block text-xs text-suave">
+                        <strong className="text-dorado">{p.cantidad}</strong> {p.cantidad === 1 ? "turno" : "turnos"}
+                        {p.proximo && ` · próx. ${format(p.proximo, "dd/MM HH:mm")}`}
+                      </span>
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      )}
       <div className="flex w-full flex-col gap-4 lg:flex-row lg:gap-6">
+        <div className="flex flex-col gap-4 self-center lg:self-start">
         <Calendar
           mode="single"
           selected={selectedDate}
@@ -840,13 +912,30 @@ const handleUpdateSesion = async () => {
           style={{ backgroundColor: "var(--background)", borderRadius: "8px", padding: "10px" }}
           locale={es}
         />
+        </div>
 
         <div className="w-full min-w-0 space-y-2">
-          <h4 className="font-semibold text-foreground">
-            Sesiones para {format(selectedDate, "dd/MM/yyyy", { locale: es })}
+          <h4 className="font-semibold text-foreground first-letter:uppercase">
+            Turnos del {format(selectedDate, "EEEE d 'de' MMMM", { locale: es })}
+            {delDia.length > 0 && <span className="ml-2 text-sm font-normal text-suave">({delDia.length} en total)</span>}
           </h4>
-          <div className="space-y-3">
-            {getSesionesForDate(selectedDate, filterType).map((sesion) => (
+          <div className="space-y-4">
+            {delDia.length > 0 && FRANJAS_DEL_DIA.map((franja) => {
+              const lista = delDia.filter((s) => franjaDeTurno(s) === franja.clave)
+              const Icono = franja.clave === "manana" ? Sun : Moon
+              return (
+              <section key={franja.clave} className="space-y-2">
+                <div className="flex items-center justify-between rounded-lg border border-foreground/10 bg-primary/10 px-3 py-2">
+                  <span className="flex items-center gap-2 text-sm font-semibold text-dorado">
+                    <Icono className="h-4 w-4" />
+                    {franja.titulo} <span className="font-normal text-suave">{franja.texto}</span>
+                  </span>
+                  <Badge variant="outline" className="border-dorado/50 text-dorado">
+                    {lista.length} {lista.length === 1 ? "turno" : "turnos"}
+                  </Badge>
+                </div>
+                {lista.length === 0 && <p className="px-1 text-xs text-tenue">Sin turnos en esta franja.</p>}
+            {lista.map((sesion) => (
               <Card key={sesion.id} className="p-3" style={{ backgroundColor: "var(--background)" }}>
                 <div className="flex items-start justify-between"> {/* items-start for alignment */}
                     <div className="space-y-1 flex-grow"> {/* This div wraps the session details */}
@@ -857,7 +946,7 @@ const handleUpdateSesion = async () => {
                                 {format(parseISO(sesion.fechaHoraFin), "HH:mm")}
                             </span>
                         </div>
-                        {sesion.psicologo && (
+                        {sesion.psicologo && filterType !== "psicologo" && (
                             <div className="flex items-center space-x-2">
                                 <Brain className="w-4 h-4 text-info" />
                                 <span className="text-sm text-suave">
@@ -896,7 +985,16 @@ const handleUpdateSesion = async () => {
                             <div className="flex items-center space-x-2">
                                 <Users className="w-4 h-4 text-purple-400" />
                                 <span className="text-sm text-suave">
-                                    {sesion.pacientes.map((p) => `${p.persona.nombre} ${p.persona.apellido}`).join(", ")}
+                                    {filterType === "psicologo"
+                                        ? sesion.pacientes.map((p, i) => (
+                                            <span key={p.id}>
+                                                {i > 0 && ", "}
+                                                <Link href={`/informes/carpetas/${p.id}`} className="text-foreground underline-offset-2 hover:text-dorado hover:underline" title="Abrir la carpeta del paciente">
+                                                    {p.persona.nombre} {p.persona.apellido}
+                                                </Link>
+                                            </span>
+                                        ))
+                                        : sesion.pacientes.map((p) => `${p.persona.nombre} ${p.persona.apellido}`).join(", ")}
                                 </span>
                             </div>
                         )}
@@ -1005,13 +1103,17 @@ const handleUpdateSesion = async () => {
                 })()}
               </Card>
             ))}
-            {getSesionesForDate(selectedDate, filterType).length === 0 && (
+              </section>
+              )
+            })}
+            {delDia.length === 0 && (
               <p className="text-tenue text-sm text-center py-4">
-                No hay sesiones programadas para esta fecha. Los días con turnos están marcados con un punto en el calendario.
+                No hay turnos programados para esta fecha. Los días con turnos están marcados con un punto en el calendario.
               </p>
             )}
           </div>
         </div>
+      </div>
       </div>
     )
   }
@@ -1038,10 +1140,11 @@ const handleUpdateSesion = async () => {
   // ve todos los turnos del consultorio en solo lectura, sin acciones ni datos de pago
   const soloConsulta = !puedeRegistrarSesiones && !session?.user?.psicologoId && !session?.user?.pacienteId
 
-  const defaultTabValue = puedeRegistrarSesiones
-  ? "registrar"
-  : session?.user?.psicologoId
+  // El psicólogo entra directo a su agenda de turnos; recepción, a registrar turnos
+  const defaultTabValue = session?.user?.psicologoId
   ? "psicologo"
+  : puedeRegistrarSesiones
+  ? "registrar"
   : session?.user?.pacienteId
   ? "paciente"
   : soloConsulta
@@ -1053,7 +1156,7 @@ const handleUpdateSesion = async () => {
 
       {/* Main Content */}
       <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-10">
-        <EncabezadoPagina titulo="Gestión de Sesiones" descripcion="Turnos presenciales y por videollamada: agenda, estados y pagos." volverA="/welcome" textoVolver="Volver al inicio" />
+        <EncabezadoPagina titulo="Turnos" descripcion="Agenda de turnos presenciales y por videollamada: estados y pagos." volverA="/welcome" textoVolver="Volver al inicio" />
 
         {puedeVerSesiones ? (
           <Tabs
@@ -1070,7 +1173,7 @@ const handleUpdateSesion = async () => {
                   value="registrar"
                   className="shrink-0 px-3 sm:px-6"
                 >
-                  Registrar Sesiones
+                  Registrar turnos
                 </TabsTrigger>
               )}
               {session?.user?.psicologoId && (
@@ -1078,7 +1181,7 @@ const handleUpdateSesion = async () => {
                 value="psicologo"
                 className="shrink-0 px-3 sm:px-6"
               >
-                Mis Sesiones (Psicólogo)
+                Mis turnos (Psicólogo)
               </TabsTrigger>
               )}
               {session?.user?.pacienteId && (
@@ -1086,7 +1189,7 @@ const handleUpdateSesion = async () => {
                 value="paciente"
                 className="shrink-0 px-3 sm:px-6"
               >
-                Mis Sesiones (Paciente)
+                Mis turnos (Paciente)
               </TabsTrigger>
               )}
               {soloConsulta && (
@@ -1122,10 +1225,10 @@ const handleUpdateSesion = async () => {
                   <CardHeader>
                     <CardTitle className="text-foreground flex items-center space-x-2">
                       <Plus className="w-5 h-5" style={{ color: "var(--dorado)" }} />
-                      <span>Calendario de Registro de Sesiones</span>
+                      <span>Calendario de registro de turnos</span>
                     </CardTitle>
                     <CardDescription className="text-suave">
-                      Selecciona una fecha para programar una nueva sesión
+                      Seleccioná una fecha para programar un nuevo turno
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -1146,7 +1249,7 @@ const handleUpdateSesion = async () => {
                           <DialogTrigger asChild>
                             <Button className="w-full" style={{ backgroundColor: "var(--primary)", color: "var(--primary-foreground)" }}>
                               <Plus className="w-4 h-4 mr-2" />
-                              Nueva Sesión
+                              Nuevo turno
                             </Button>
                           </DialogTrigger>
                           <DialogContent
@@ -1154,9 +1257,9 @@ const handleUpdateSesion = async () => {
                             style={{ backgroundColor: "var(--card)", border: "1px solid var(--dorado)" }}
                           >
                             <DialogHeader>
-                              <DialogTitle className="text-foreground">Registrar Nueva Sesión</DialogTitle>
+                              <DialogTitle className="text-foreground">Registrar nuevo turno</DialogTitle>
                               <DialogDescription className="text-suave">
-                                Complete los datos para programar una nueva sesión.
+                                Completá los datos para programar un nuevo turno.
                               </DialogDescription>
                             </DialogHeader>
                             <div className="grid gap-4 py-4">
@@ -1485,7 +1588,7 @@ const handleUpdateSesion = async () => {
                                 style={{ backgroundColor: "var(--primary)", color: "var(--primary-foreground)" }}
                                 disabled={isSubmitting}
                               >
-                                {isSubmitting ? "Creando..." : "Crear Sesión"}
+                                {isSubmitting ? "Creando..." : "Crear turno"}
                               </Button>
                             </div>
                           </DialogContent>
@@ -1503,10 +1606,10 @@ const handleUpdateSesion = async () => {
                 <CardHeader>
                   <CardTitle className="text-foreground flex items-center space-x-2">
                     <Brain className="w-5 h-5" style={{ color: "var(--dorado)" }} />
-                    <span>Mis Sesiones como Psicólogo</span>
+                    <span>Mis turnos como psicólogo</span>
                   </CardTitle>
                   <CardDescription className="text-suave">
-                    Sesiones donde figuras como psicólogo asignado
+                    Los turnos que diste, día por día. Los días con turnos tienen un punto en el calendario.
                   </CardDescription>
                   <Button
                     variant="outline"
@@ -1527,9 +1630,9 @@ const handleUpdateSesion = async () => {
                 <CardHeader>
                   <CardTitle className="text-foreground flex items-center space-x-2">
                     <User className="w-5 h-5" style={{ color: "var(--dorado)" }} />
-                    <span>Mis Sesiones como Paciente</span>
+                    <span>Mis turnos como paciente</span>
                   </CardTitle>
-                  <CardDescription className="text-suave">Sesiones donde figuras como paciente</CardDescription>
+                  <CardDescription className="text-suave">Tus turnos con tu psicólogo/a</CardDescription>
                 </CardHeader>
                 <CardContent>{renderCalendarWithSessions("paciente")}</CardContent>
               </Card>
@@ -1540,9 +1643,9 @@ const handleUpdateSesion = async () => {
           <div className="text-center mt-12">
             <div className="p-8 rounded-2xl max-w-md mx-auto" style={{ backgroundColor: "var(--card)" }}>
               <CalendarIcon className="w-16 h-16 mx-auto mb-6" style={{ color: "var(--dorado)" }} />
-              <h3 className="text-2xl font-semibold text-foreground mb-4">Sin Acceso a Sesiones</h3>
+              <h3 className="text-2xl font-semibold text-foreground mb-4">Sin acceso a los turnos</h3>
               <p className="text-suave">
-                No tenés los permisos necesarios para ver las sesiones. Si creés que es un error,
+                No tenés los permisos necesarios para ver los turnos. Si creés que es un error,
                 consultá con el administrador del sistema.
               </p>
             </div>
@@ -1586,9 +1689,9 @@ const handleUpdateSesion = async () => {
     }}>
         <DialogContent className="max-h-[90dvh] p-4 sm:max-w-[500px] sm:p-6" style={{ backgroundColor: "var(--card)", border: "1px solid var(--dorado)" }}>
             <DialogHeader>
-                <DialogTitle className="text-foreground">Editar Sesión</DialogTitle>
+                <DialogTitle className="text-foreground">Editar turno</DialogTitle>
                 <DialogDescription className="text-suave">
-                    Modifique los datos de la sesión.
+                    Modificá los datos del turno.
                 </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4 max-h-[65vh] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
@@ -1777,7 +1880,7 @@ const handleUpdateSesion = async () => {
                     className="w-full sm:w-auto" 
                     style={{ backgroundColor: "var(--primary)", color: "var(--primary-foreground)" }} 
                     disabled={isEditSubmitting || editingSesion?.estado?.nombre === "Finalizada" || editingSesion?.estado?.nombre === "Cancelada"}
-                    title={editingSesion?.estado?.nombre === "Finalizada" || editingSesion?.estado?.nombre === "Cancelada" ? "No se puede guardar una sesión finalizada o cancelada" : ""}
+                    title={editingSesion?.estado?.nombre === "Finalizada" || editingSesion?.estado?.nombre === "Cancelada" ? "No se puede guardar un turno finalizado o cancelado" : ""}
                 >
                     {isEditSubmitting ? "Guardando..." : "Guardar Cambios"}
                 </Button>

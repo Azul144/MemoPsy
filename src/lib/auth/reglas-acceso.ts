@@ -47,6 +47,9 @@ export const REGLAS_PAGINAS: Regla[] = [
   // Historia clínica: solo el psicólogo (el paciente no tiene estos permisos)
   { ruta: "/informes/historias/[id]", permisos: HISTORIA_CLINICA },
   { ruta: "/informes/historias", permisos: HISTORIA_CLINICA },
+  // Carpeta de cada paciente: turnos, notas, seguimientos e historia clínica del psicólogo tratante
+  { ruta: "/informes/carpetas/[id]", permisos: HISTORIA_CLINICA },
+  { ruta: "/informes/carpetas", permisos: HISTORIA_CLINICA },
   { ruta: "/informes", permisos: ["Ver Informes", "Registrar Informe"] },
   { ruta: "/auditoria", permisos: ["Ver Auditoría"] },
 ];
@@ -160,6 +163,8 @@ export const REGLAS_API: Regla[] = [
 
   // Historia clínica del paciente (las rutas validan además que sea un psicólogo; cada uno ve solo la suya)
   { ruta: "/api/historias-clinicas", metodos: ["GET"], permisos: HISTORIA_CLINICA },
+  { ruta: "/api/carpetas", metodos: ["GET"], permisos: HISTORIA_CLINICA },
+  { ruta: "/api/carpetas/[id]", metodos: ["GET"], permisos: HISTORIA_CLINICA },
   { ruta: "/api/historias-clinicas/[id]", metodos: ["GET", "PUT"], permisos: HISTORIA_CLINICA },
   { ruta: "/api/historias-clinicas/[id]/pdf", metodos: ["GET"], permisos: HISTORIA_CLINICA },
 

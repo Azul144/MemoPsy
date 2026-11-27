@@ -24,7 +24,7 @@ export const MODULOS_DISPONIBLES: ModuloConfig[] = [
   },
   {
     id: "sesiones",
-    nombre: "Sesiones",
+    nombre: "Turnos",
     descripcion: "Agenda de turnos, presenciales y por videollamada",
     icon: Calendar,
     ruta: "/sesiones",
