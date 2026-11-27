@@ -7,6 +7,7 @@ import { initializeDatabase } from "@/lib/database";
 import { UsuarioEntity } from "@/entities";
 import { generarToken } from "@/lib/auth/recuperacion";
 import { enviarEmail } from "./brevo";
+import { lista, marcoEmail, parrafo, sitioMemoPsy } from "./plantilla";
 
 // El paciente puede tardar en ver el correo: el enlace de bienvenida dura más que el de recuperación
 export const HORAS_VALIDEZ_BIENVENIDA = 72;
@@ -25,30 +26,38 @@ export async function enviarBienvenidaPaciente(usuarioId: number, email: string,
       resetExpira: new Date(Date.now() + HORAS_VALIDEZ_BIENVENIDA * 60 * 60 * 1000),
     });
 
-    const sitio = (process.env.NEXTAUTH_URL ?? "").replace(/\/$/, "");
-    const enlace = `${sitio}/reset-password?token=${token}&bienvenida=1`;
+    const sitio = sitioMemoPsy();
     await enviarEmail({
       para: email,
       asunto: "Tu psicólogo/a te dio acceso a MemoPsy",
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 560px; margin: 0 auto; background: #152B2B; color: #ffffff; padding: 32px; border-radius: 12px;">
-          <h2 style="color: #F1C77A; margin-top: 0;">¡Hola, ${nombre}!</h2>
-          <p>Tu consultorio te creó una cuenta en MemoPsy. Desde ahí vas a ver tus turnos, entrar a las videollamadas,
-          reprogramar una sesión y recibir lo que tu psicólogo/a te deje entre una sesión y otra.</p>
-          <p>Para empezar, creá tu contraseña:</p>
-          <p style="text-align: center; margin: 32px 0;">
-            <a href="${enlace}" style="background: #F1C77A; color: #152B2B; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: bold;">
-              Crear mi contraseña
-            </a>
-          </p>
-          <p style="font-size: 13px; color: #cfd8d8;">El enlace es personal, vence en ${HORAS_VALIDEZ_BIENVENIDA / 24} días y sirve una sola vez.
-          Si vence, entrá a MemoPsy y tocá «¿La olvidaste?» con este mismo email.</p>
-          <p style="font-size: 13px; color: #cfd8d8;">Para entrar después: ${sitio}/login</p>
-        </div>`,
+      html: htmlBienvenida(nombre, `${sitio}/reset-password?token=${token}&bienvenida=1`, `${sitio}/login`),
     });
     return "enviada";
   } catch {
     console.error("No se pudo enviar el email de bienvenida al paciente");
     return "error";
   }
+}
+
+// Contenido del email (exportado para poder verlo en el navegador sin mandarlo)
+export function htmlBienvenida(nombre: string, enlace: string, login: string): string {
+  const nombreSeguro = nombre.replace(/[&<>"]/g, "");
+  return marcoEmail({
+    resumen: "Creá tu contraseña para ver tus turnos y lo que te deja tu psicólogo/a.",
+    titulo: `¡Hola, ${nombreSeguro}! Ya tenés tu cuenta`,
+    cuerpo:
+      parrafo("Tu consultorio te dio acceso a MemoPsy. Desde tu cuenta vas a poder:") +
+      lista([
+        "Ver tus próximos turnos y confirmarlos",
+        "Entrar a la videollamada con un toque, si la sesión es remota",
+        "Reprogramar una sesión sin tener que llamar",
+        "Recibir las pautas y actividades que te deje tu psicólogo/a",
+      ]) +
+      parrafo("Para empezar, creá tu contraseña:"),
+    boton: { texto: "Crear mi contraseña", enlace },
+    notas: [
+      `El enlace es personal, vence en ${HORAS_VALIDEZ_BIENVENIDA / 24} días y sirve una sola vez. Si vence, entrá a MemoPsy y tocá «¿La olvidaste?» con este mismo email.`,
+      `Para entrar después: <a href="${login}" style="color: #1D4A48;">${login.replace(/^https?:\/\//, "")}</a>`,
+    ],
+  });
 }
