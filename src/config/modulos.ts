@@ -55,3 +55,15 @@ export const MODULOS_DISPONIBLES: ModuloConfig[] = [
     permisosRequeridos: ["Ver Auditoría"],
   },
 ];
+
+// Del lado del paciente se habla de "sesiones" (el psicólogo da turnos, el paciente tiene sesiones).
+// Para quien es solo paciente, el módulo de la agenda se llama "Mis sesiones".
+export function modulosParaUsuario(
+  modulos: ModuloConfig[],
+  usuario?: { pacienteId?: string | number | null; psicologoId?: string | number | null } | null,
+): ModuloConfig[] {
+  if (!usuario?.pacienteId || usuario.psicologoId) return modulos;
+  return modulos.map((m) =>
+    m.id === "sesiones" ? { ...m, nombre: "Mis sesiones", descripcion: "Tus sesiones en el calendario, presenciales y por videollamada" } : m,
+  );
+}

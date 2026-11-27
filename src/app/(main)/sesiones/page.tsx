@@ -1146,6 +1146,9 @@ const handleUpdateSesion = async () => {
   const soloConsulta = !puedeRegistrarSesiones && !session?.user?.psicologoId && !session?.user?.pacienteId
 
   // El psicólogo entra directo a su agenda de turnos; recepción, a registrar turnos
+  // Del lado del paciente se habla de "sesiones" (el psicólogo da turnos)
+  const soloPaciente = !!session?.user?.pacienteId && !session?.user?.psicologoId && !puedeRegistrarSesiones
+
   const defaultTabValue = session?.user?.psicologoId
   ? "psicologo"
   : puedeRegistrarSesiones
@@ -1161,7 +1164,11 @@ const handleUpdateSesion = async () => {
 
       {/* Main Content */}
       <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-10">
-        <EncabezadoPagina titulo="Turnos" descripcion="Agenda de turnos presenciales y por videollamada: estados y pagos." volverA="/welcome" textoVolver="Volver al inicio" />
+        {soloPaciente ? (
+          <EncabezadoPagina titulo="Mis sesiones" descripcion="Tus sesiones con tu psicólogo/a, presenciales y por videollamada." volverA="/welcome" textoVolver="Volver al inicio" />
+        ) : (
+          <EncabezadoPagina titulo="Turnos" descripcion="Agenda de turnos presenciales y por videollamada: estados y pagos." volverA="/welcome" textoVolver="Volver al inicio" />
+        )}
 
         {puedeVerSesiones ? (
           <Tabs
@@ -1172,7 +1179,8 @@ const handleUpdateSesion = async () => {
               // This ensures consistency across different views
             }}
           >
-            <TabsList className="mb-2 flex w-full max-w-full justify-start overflow-x-auto sm:w-fit">
+            {/* Quien es solo paciente tiene una sola pestaña: no hace falta mostrarla */}
+            <TabsList className={cn("mb-2 flex w-full max-w-full justify-start overflow-x-auto sm:w-fit", soloPaciente && "hidden")}>
               {puedeRegistrarSesiones && (
                 <TabsTrigger
                   value="registrar"
@@ -1663,7 +1671,7 @@ const handleUpdateSesion = async () => {
                 <CardHeader>
                   <CardTitle className="text-foreground flex items-center space-x-2">
                     <User className="w-5 h-5" style={{ color: "var(--dorado)" }} />
-                    <span>Mis sesiones</span>
+                    <span>{soloPaciente ? "Tu calendario" : "Mis sesiones como paciente"}</span>
                   </CardTitle>
                   <CardDescription className="text-suave">Tus sesiones con tu psicólogo/a. Como máximo 2 por semana, en días distintos.</CardDescription>
                 </CardHeader>

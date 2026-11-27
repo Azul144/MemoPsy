@@ -9,7 +9,7 @@ import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { HomeIcon, LifeBuoy, LogOut, Menu, UserRound, X } from "lucide-react";
 import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
-import { MODULOS_DISPONIBLES } from "@/config/modulos";
+import { MODULOS_DISPONIBLES, modulosParaUsuario } from "@/config/modulos";
 import CampanaNotificaciones from "./CampanaNotificaciones";
 import BotonTema from "./BotonTema";
 import LogoMemoPsy from "@/components/comunes/LogoMemoPsy"
@@ -44,7 +44,7 @@ export default function BarraSistema() {
   };
   const permisos: string[] = (usuario?.permisos ?? []).map((p: { nombre: string }) => p.nombre);
   // Cada módulo aparece si la persona tiene al menos uno de sus permisos (lista central en src/config/modulos.ts)
-  const modulos = MODULOS_DISPONIBLES.filter((m) => m.permisosRequeridos.some((p) => permisos.includes(p)));
+  const modulos = modulosParaUsuario(MODULOS_DISPONIBLES.filter((m) => m.permisosRequeridos.some((p) => permisos.includes(p))), usuario);
 
   return (
     <nav className="sticky top-0 z-40 border-b border-foreground/10 bg-background/80 backdrop-blur-md">

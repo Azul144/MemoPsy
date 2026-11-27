@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { MODULOS_DISPONIBLES, type ModuloConfig } from "@/config/modulos";
+import { MODULOS_DISPONIBLES, modulosParaUsuario, type ModuloConfig } from "@/config/modulos";
 import { useSession } from 'next-auth/react';
 import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
 import { useRouter } from 'next/navigation';
@@ -69,12 +69,7 @@ export default function WelcomePage() {
         permisosRequeridos: [],
       };
       // Del lado del paciente se habla de "sesiones": el psicólogo da turnos, el paciente tiene sesiones
-      const soloPaciente = session.user.pacienteId && !session.user.psicologoId;
-      const modulos = soloPaciente
-        ? modulosConPermiso.map((m) =>
-            m.id === "sesiones" ? { ...m, nombre: "Mis sesiones", descripcion: "Tus sesiones en el calendario, presenciales y por videollamada" } : m,
-          )
-        : modulosConPermiso;
+      const modulos = modulosParaUsuario(modulosConPermiso, session.user);
       setModulosPermitidos(session.user.pacienteId ? [miTratamiento, ...modulos] : modulos);
     }
   }, [session]);
