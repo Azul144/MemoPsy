@@ -261,11 +261,11 @@ export default function WelcomePage() {
             )}
           </div>
 
-          {/* RF 4.3 - Ayuda en crisis también desde la cuenta del paciente: desde acá puede avisarle a su psicólogo.
+          {/* RF 4.3 - Aviso de crisis: el paciente le avisa a su psicólogo/a qué le está pasando.
               Va dentro del saludo, con los colores invertidos del tema (no en rojo de "error") para que resalte sin alarmar */}
           {session.user.pacienteId && (
             <aside
-              aria-label="Ayuda en crisis"
+              aria-label="Avisar a mi psicólogo/a"
               className="entrar w-full rounded-3xl bg-crisis-fondo p-5 text-crisis-texto shadow-xl shadow-black/20 lg:w-80"
               style={{ animationDelay: '0.3s' }}
             >
@@ -275,14 +275,14 @@ export default function WelcomePage() {
                 </span>
                 <div>
                   <p className="font-semibold">¿Momento difícil?</p>
-                  <p className="mt-0.5 text-sm text-crisis-texto-2">Teléfonos de ayuda, pasos para atravesarlo y aviso a tu psicólogo/a.</p>
+                  <p className="mt-0.5 text-sm text-crisis-texto-2">Contale a tu psicólogo/a qué te está pasando: le llega un aviso al momento.</p>
                 </div>
               </div>
               <Button
                 onClick={() => router.push('/crisis')}
                 className="mt-4 w-full rounded-full bg-crisis-boton font-semibold text-crisis-boton-texto hover:bg-crisis-boton/90"
               >
-                Pedir ayuda ahora
+                Avisar a mi psicólogo/a
               </Button>
             </aside>
           )}
@@ -373,7 +373,7 @@ export default function WelcomePage() {
               <Button
                 onClick={handleToggleMfa}
                 disabled={loadingMfaStatus || isTogglingMfa || mfaEnabled === null}
-                // De contorno, activada o no: el único botón relleno del inicio es el de ayuda en crisis
+                // De contorno, activada o no: el único botón relleno del inicio es el del aviso de crisis
                 className="mt-4 w-full rounded-full border border-primary/60 bg-transparent text-dorado hover:bg-primary/10"
               >
                 {isTogglingMfa ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <KeyRound className="mr-2 h-4 w-4" />}

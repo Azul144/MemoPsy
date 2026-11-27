@@ -4,7 +4,7 @@
 // En el celular se ve solo el formulario.
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, HeartHandshake, ShieldCheck } from "lucide-react";
+import { ArrowLeft, ShieldCheck } from "lucide-react";
 import FondoAnimado from "@/components/comunes/FondoAnimado";
 import LogoMemoPsy from "@/components/comunes/LogoMemoPsy"
 
@@ -45,7 +45,7 @@ export default function PantallaAcceso({ children }: { children: React.ReactNode
           intensidad="suave"
           className="max-lg:[mask-image:linear-gradient(to_bottom,transparent,black_9rem,black_calc(100%-9rem),transparent)]"
         />
-        {/* En el celular, "Volver" y el botón de crisis entran en una sola línea */}
+        {/* Vuelta a la portada */}
         <div className="relative flex items-center justify-between gap-3">
           <Link
             href="/"
@@ -54,14 +54,6 @@ export default function PantallaAcceso({ children }: { children: React.ReactNode
             <ArrowLeft className="h-4 w-4" />
             <span className="sm:hidden">Inicio</span>
             <span className="hidden sm:inline">Volver al inicio</span>
-          </Link>
-          {/* Ayuda en crisis: pública, sin iniciar sesión, a cualquier hora */}
-          <Link
-            href="/crisis"
-            className="inline-flex items-center gap-2 rounded-full border border-red-400/50 bg-red-500/15 px-3.5 py-2 text-sm font-semibold text-crema transition-colors hover:bg-red-500/25 sm:px-4"
-          >
-            <HeartHandshake className="h-4 w-4 shrink-0 text-peligro" aria-hidden="true" />
-            ¿Estás en crisis? Ayuda ahora
           </Link>
         </div>
 

@@ -4,10 +4,10 @@
 //  1  Confirmar el próximo turno
 //  2  Cancelarlo (pide confirmación)
 //  3  Reprogramarlo dentro de las franjas del psicólogo (con 24 h de anticipación)
-//  4  Ayuda en crisis
+//  4  Avisar al psicólogo de una crisis
 //  BAJA / ALTA  dejar de recibir o volver a recibir mensajes
-// Antes que nada se revisa si el mensaje puede indicar una crisis: en ese caso se responde con
-// la ayuda de crisis y se avisa al psicólogo, sin importar en qué paso esté la charla.
+// Antes que nada se revisa si el mensaje puede indicar una crisis: en ese caso se avisa al psicólogo
+// y se responde con el 911 y la línea nacional, sin importar en qué paso esté la charla.
 import { initializeDatabase } from "@/lib/database";
 import { PacienteTieneSesionEntity, SesionEntity } from "@/entities";
 import { registrarAuditoria } from "@/lib/auditoria/registrar";
@@ -46,7 +46,7 @@ const MENU =
   "*1* Confirmar el turno\n" +
   "*2* Cancelar el turno\n" +
   "*3* Reprogramar el turno\n" +
-  "*4* Necesito ayuda ahora (crisis)\n\n" +
+  "*4* Estoy en crisis: avisar a mi psicólogo/a\n\n" +
   "Escribí *BAJA* si no querés recibir más mensajes.";
 
 // ----- Interpretación del mensaje -----
@@ -175,7 +175,7 @@ export async function responderMensaje(m: MensajeEntrante): Promise<string> {
     return (
       "Hola. Este es el número automático de recordatorios de MemoPsy y no reconoce tu celular. " +
       "Si sos paciente, pedile al consultorio que cargue este número en tu cuenta.\n\n" +
-      `Si estás pasando un momento difícil, escribí *AYUDA* o abrí ${urlBase()}/crisis` +
+      "Si estás en peligro, llamá al *911* o a la línea nacional de salud mental *0800 999 0091* (gratis, 24 h)." +
       FIRMA
     );
   }

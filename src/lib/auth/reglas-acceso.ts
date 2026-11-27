@@ -52,6 +52,8 @@ export const REGLAS_PAGINAS: Regla[] = [
   { ruta: "/informes/carpetas", permisos: HISTORIA_CLINICA },
   { ruta: "/informes", permisos: ["Ver Informes", "Registrar Informe"] },
   { ruta: "/auditoria", permisos: ["Ver Auditoría"] },
+  // RF 4.3 - Aviso de crisis al psicólogo (la página y la API controlan además que sea un paciente)
+  { ruta: "/crisis", permisos: "cualquiera" },
 ];
 
 // ----- API -----
@@ -131,7 +133,7 @@ export const REGLAS_API: Regla[] = [
   { ruta: "/api/horarios-disponibles", metodos: ["GET", "PUT"], permisos: AGENDA },
   // RF 3.2 / 3.3 - Avisos propios: cada uno ve solo los suyos.
   { ruta: "/api/notificaciones", metodos: ["GET", "PATCH"], permisos: "cualquiera" },
-  // RF 4.3 - Aviso de la ayuda en crisis al psicólogo (la ruta valida además que sea un paciente)
+  // RF 4.3 - Aviso de crisis al psicólogo (la ruta valida además que sea un paciente)
   { ruta: "/api/crisis/aviso", metodos: ["POST"], permisos: "cualquiera" },
   { ruta: "/api/medios-de-pago", metodos: ["GET"], permisos: ["Registrar Pago"] },
   { ruta: "/api/estados", metodos: ["GET"], permisos: AGENDA },

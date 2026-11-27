@@ -40,3 +40,14 @@ export async function enviarPorMeta(r: RecordatorioWhatsapp): Promise<void> {
 
   if (!respuesta.ok) throw new WhatsappError(respuesta.status);
 }
+
+// Mensaje de texto libre (por ejemplo, el aviso de crisis al psicólogo). Misma regla de las 24 horas que en Twilio.
+export async function enviarTextoPorMeta(para: string, cuerpo: string): Promise<void> {
+  const version = process.env.WHATSAPP_API_VERSION || "v25.0";
+  const respuesta = await fetch(`https://graph.facebook.com/${version}/${process.env.WHATSAPP_PHONE_NUMBER_ID}/messages`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${process.env.WHATSAPP_TOKEN}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ messaging_product: "whatsapp", to: para, type: "text", text: { body: cuerpo } }),
+  });
+  if (!respuesta.ok) throw new WhatsappError(respuesta.status);
+}

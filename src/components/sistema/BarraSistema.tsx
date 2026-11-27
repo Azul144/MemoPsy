@@ -113,11 +113,11 @@ export default function BarraSistema() {
                       {m.nombre}
                     </Link>
                   ))}
-                  {/* RF 4.3 - El paciente llega a la ayuda en crisis desde cualquier pantalla */}
+                  {/* RF 4.3 - El paciente le avisa a su psicólogo/a de una crisis desde cualquier pantalla */}
                   {usuario?.pacienteId && (
                     <Link href="/crisis" className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-peligro transition-colors hover:bg-red-500/10">
                       <LifeBuoy className="h-5 w-5" />
-                      Ayuda en crisis
+                      Avisar a mi psicólogo/a
                     </Link>
                   )}
                 </div>

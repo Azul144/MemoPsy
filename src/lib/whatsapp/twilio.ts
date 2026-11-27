@@ -56,3 +56,20 @@ export async function enviarPorTwilio(r: RecordatorioWhatsapp): Promise<void> {
 
   if (!respuesta.ok) throw new WhatsappError(respuesta.status);
 }
+
+// Mensaje de texto libre (por ejemplo, el aviso de crisis al psicólogo). WhatsApp solo lo entrega dentro de
+// las 24 horas después de que el destinatario le escribió al número; para entregarlo siempre hace falta
+// una plantilla aprobada, como la del recordatorio.
+export async function enviarTextoPorTwilio(para: string, cuerpo: string): Promise<void> {
+  const cuenta = process.env.TWILIO_ACCOUNT_SID!;
+  const desde = process.env.TWILIO_WHATSAPP_FROM || SANDBOX;
+  const respuesta = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${cuenta}/Messages.json`, {
+    method: "POST",
+    headers: {
+      Authorization: `Basic ${Buffer.from(`${cuenta}:${process.env.TWILIO_AUTH_TOKEN}`).toString("base64")}`,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: new URLSearchParams({ From: `whatsapp:${desde}`, To: `whatsapp:+${para}`, Body: cuerpo }),
+  });
+  if (!respuesta.ok) throw new WhatsappError(respuesta.status);
+}

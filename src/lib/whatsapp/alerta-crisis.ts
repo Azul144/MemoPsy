@@ -1,23 +1,25 @@
 // src/lib/whatsapp/alerta-crisis.ts
 // Aviso urgente a los psicólogos de un paciente que escribió por WhatsApp un mensaje de crisis.
-// Va dentro de MemoPsy (campanita) y por email. Nunca incluye el texto del mensaje: solo quién,
+// Va dentro de MemoPsy (campanita), por WhatsApp al celular del psicólogo y por email. Nunca incluye el texto del mensaje: solo quién,
 // cuándo y qué tipo de alerta, para que el profesional decida cómo comunicarse.
 import { initializeDatabase } from "@/lib/database";
 import { NotificacionEntity } from "@/entities";
 import { enviarEmail } from "@/lib/email/brevo";
 import type { NivelCrisis } from "./crisis";
+import { enviarTextoWhatsapp } from "./index";
 
 interface Psicologo {
   usuarioId: number;
   email: string;
   nombre: string;
+  telefono: string | null;
 }
 
 // Psicólogos que atienden al paciente: los de sus turnos y los que tienen su historia clínica
 export async function psicologosDelPaciente(pacienteId: number): Promise<Psicologo[]> {
   const dataSource = await initializeDatabase();
-  const filas: { usuarioId: number; email: string; nombre: string }[] = await dataSource.query(
-    `SELECT DISTINCT u.id_usuario AS usuarioId, u.email, pe.nombre
+  const filas: { usuarioId: number; email: string; nombre: string; telefono: string | null }[] = await dataSource.query(
+    `SELECT DISTINCT u.id_usuario AS usuarioId, u.email, pe.nombre, pe.telefono
        FROM psicologo ps
        JOIN persona pe ON pe.id_persona = ps.id_persona
        JOIN usuario u ON u.id_persona = ps.id_persona AND u.activo = 1
@@ -30,7 +32,7 @@ export async function psicologosDelPaciente(pacienteId: number): Promise<Psicolo
             )`,
     [pacienteId, pacienteId],
   );
-  return filas.map((f) => ({ usuarioId: Number(f.usuarioId), email: f.email, nombre: f.nombre }));
+  return filas.map((f) => ({ usuarioId: Number(f.usuarioId), email: f.email, nombre: f.nombre, telefono: f.telefono || null }));
 }
 
 export async function avisarCrisis(pacienteId: number, paciente: string, nivel: NivelCrisis): Promise<number> {
@@ -41,9 +43,9 @@ export async function avisarCrisis(pacienteId: number, paciente: string, nivel: 
   const mensaje =
     nivel === "riesgo"
       ? `${paciente} escribió por WhatsApp un mensaje que puede indicar riesgo para su vida o su integridad. ` +
-        "El bot le envió las líneas de emergencia y de salud mental. Comunicate con la persona lo antes posible."
+        "El bot le envió el 911 y la línea nacional de salud mental. Comunicate con la persona lo antes posible."
       : `${paciente} pidió ayuda por WhatsApp porque está atravesando un momento difícil. ` +
-        "El bot le envió las líneas de ayuda y la guía de crisis.";
+        "Retomalo con la persona cuando puedas.";
 
   const dataSource = await initializeDatabase();
   await dataSource.manager.insert(
@@ -51,8 +53,15 @@ export async function avisarCrisis(pacienteId: number, paciente: string, nivel: 
     psicologos.map((p) => ({ usuarioId: p.usuarioId, sesionId: null, tipo: "CRISIS", titulo, mensaje })),
   );
 
-  // El email es un segundo canal: si Brevo no está configurado o falla, queda el aviso interno
+  // WhatsApp y email son canales extra: si no están configurados o fallan, queda el aviso interno
   for (const p of psicologos) {
+    if (p.telefono) {
+      try {
+        await enviarTextoWhatsapp(p.telefono, `${nivel === "riesgo" ? "⚠️ *URGENTE* — " : ""}Hola ${p.nombre}. ${mensaje}\n— MemoPsy`);
+      } catch {
+        console.error("No se pudo enviar por WhatsApp el aviso de crisis");
+      }
+    }
     // Las cuentas de demostración (@...test) no tienen casilla real
     if (/\.test$/i.test(p.email)) continue;
     try {
