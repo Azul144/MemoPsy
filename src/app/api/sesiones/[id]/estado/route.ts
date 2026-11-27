@@ -1,6 +1,7 @@
 // src/app/api/sesiones/[id]/estado/route.ts
 // Cambia SOLO el estado de un turno (confirmar / cancelar / reprogramar), sin tener que
 // reenviar toda la sesión. Lo usan las acciones rápidas de la agenda.
+import { conDetalleAuditoria, describirTurno, fechaHoraCorta } from "@/lib/auditoria/detalle"
 import { type NextRequest, NextResponse } from "next/server"
 import { conAuditoria } from "@/lib/auditoria/con-auditoria"
 import { getServerSession } from "next-auth/next"
@@ -76,7 +77,13 @@ async function manejarPATCH(request: NextRequest, { params }: { params: Promise<
       await notificarRecepcion({ sesionId: id, tipo: "SESION_REALIZADA", usuarioQueCambia: session.user.id })
     }
 
-    return NextResponse.json({ ok: true, estado: { id: estado.id, nombre: estado.nombre } })
+    // Auditoría: qué turno y qué pasó con él (confirmó, canceló, sesión realizada)
+    const ACCION_POR_ESTADO: Record<string, string> = { Confirmada: "CONFIRMAR", Cancelada: "CANCELAR", Finalizada: "FINALIZAR" }
+    return conDetalleAuditoria(
+      NextResponse.json({ ok: true, estado: { id: estado.id, nombre: estado.nombre } }),
+      `${estado.nombre}: ${await describirTurno(dataSource, id)}`,
+      ACCION_POR_ESTADO[estado.nombre],
+    )
   } catch (error) {
     console.error("Error al cambiar el estado de la sesión:", error)
     return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 })

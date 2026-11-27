@@ -86,6 +86,8 @@ interface CambioDeTurno {
   inicioAnterior: Date;
   // Quien hizo el cambio: no se le avisa a sí mismo
   usuarioQueCambia?: string | number | null;
+  // Si lo movió la recepción: a pedido de quién (se aclara en el aviso)
+  pedidoPor?: "psicologo" | "paciente" | null;
 }
 
 export async function notificarCambioDeTurno(cambio: CambioDeTurno): Promise<void> {
@@ -124,7 +126,13 @@ export async function notificarCambioDeTurno(cambio: CambioDeTurno): Promise<voi
             sesionId: Number(sesionId),
             tipo: cambio.tipo,
             titulo: "Turno reprogramado",
-            mensaje: `El turno${conQuien[d.rol]} del ${antes} pasó al ${fechaTurno(sesion.fechaHoraInicio)}.`,
+            mensaje: `El turno${conQuien[d.rol]} del ${antes} pasó al ${fechaTurno(sesion.fechaHoraInicio)}${
+              cambio.pedidoPor === "psicologo" && d.rol === "paciente"
+                ? ", a pedido de tu psicólogo/a"
+                : cambio.pedidoPor === "paciente" && d.rol === "psicologo"
+                  ? ", a pedido del paciente"
+                  : ""
+            }.`,
           },
     );
     await manager.insert(NotificacionEntity, avisos);

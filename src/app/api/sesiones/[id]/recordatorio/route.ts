@@ -1,6 +1,7 @@
 // src/app/api/sesiones/[id]/recordatorio/route.ts
 // RF 3.3 - El psicólogo (de sus turnos) o recepción (de todos) manda en el momento el recordatorio
 // del turno por email y por WhatsApp, con el botón "Recordatorio" de la agenda.
+import { conDetalleAuditoria, describirTurno, fechaHoraCorta } from "@/lib/auditoria/detalle"
 import { type NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth/next"
 import { conAuditoria } from "@/lib/auditoria/con-auditoria"
@@ -46,7 +47,10 @@ async function manejarPOST(_request: NextRequest, { params }: { params: Promise<
     if (resultado.pacientes === 0) {
       return NextResponse.json({ error: "El turno no tiene pacientes con cuenta activa." }, { status: 409 })
     }
-    return NextResponse.json({ ok: true, ...resultado })
+    return conDetalleAuditoria(
+      NextResponse.json({ ok: true, ...resultado }),
+      `Recordatorio enviado a mano: ${await describirTurno(await initializeDatabase(), id)}`,
+    )
   } catch (error) {
     console.error("Error al enviar el recordatorio:", error)
     return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 })

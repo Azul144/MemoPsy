@@ -1,5 +1,6 @@
 // src/app/api/sesiones/route.ts
 // src/app/api/sesiones/route.ts
+import { conDetalleAuditoria, describirTurno, fechaHoraCorta } from "@/lib/auditoria/detalle"
 import { type NextRequest, NextResponse } from "next/server"
 import { conAuditoria } from "@/lib/auditoria/con-auditoria"
 import { esDiaHabilEnConsultorio, MENSAJE_DIA_NO_HABIL } from "@/lib/validaciones/dias-habiles"
@@ -253,12 +254,9 @@ async function manejarPOST(request: NextRequest) {
       await pacienteTieneSesionRepository.save(pacienteRelaciones)
     }
 
-    return NextResponse.json(
-      {
-        message: "Sesión creada exitosamente",
-        sesion: sesionGuardada,
-      },
-      { status: 201 },
+    return conDetalleAuditoria(
+      NextResponse.json({ message: "Sesión creada exitosamente", sesion: sesionGuardada }, { status: 201 }),
+      `Turno nuevo: ${await describirTurno(dataSource, sesionGuardada.id)}`,
     )
   } catch (error: any) {
     console.error("Error creating session:", error)

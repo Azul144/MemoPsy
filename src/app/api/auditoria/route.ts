@@ -33,7 +33,15 @@ export async function GET(request: NextRequest) {
     const repo = dataSource.getRepository(AuditoriaEntity)
     const qb = repo.createQueryBuilder("a")
 
-    if (usuario) qb.andWhere("LOWER(a.email) LIKE LOWER(:usuario)", { usuario: `%${usuario}%` })
+    // Por email o por nombre y apellido de la persona
+    if (usuario) {
+      qb.andWhere(
+        `(LOWER(a.email) LIKE LOWER(:usuario) OR a.id_usuario IN (
+           SELECT u.id_usuario FROM usuario u JOIN persona pe ON pe.id_persona = u.id_persona
+            WHERE LOWER(CONCAT(pe.nombre, ' ', pe.apellido)) LIKE LOWER(:usuario)))`,
+        { usuario: `%${usuario}%` },
+      )
+    }
     if (modulo) qb.andWhere("a.modulo = :modulo", { modulo })
     if (accion) qb.andWhere("a.accion = :accion", { accion })
     if (desde && FECHA.test(desde)) qb.andWhere("a.fecha >= :desde", { desde: `${desde} 00:00:00` })
@@ -49,8 +57,24 @@ export async function GET(request: NextRequest) {
       repo.createQueryBuilder("a").select("DISTINCT a.accion", "valor").orderBy("valor").getRawMany(),
     ])
 
+    // Quién es cada usuario: nombre y perfil (además del email que quedó guardado)
+    const ids = [...new Set(eventos.map((e) => e.usuarioId).filter((id): id is number => id != null))]
+    const personas: { id: number; nombre: string; perfiles: string | null }[] = ids.length
+      ? await dataSource.query(
+          `SELECT u.id_usuario AS id, CONCAT(pe.nombre, ' ', pe.apellido) AS nombre,
+                  (SELECT GROUP_CONCAT(p.nombre SEPARATOR ', ') FROM usuario_tiene_perfil up JOIN perfil p ON p.id_perfil = up.id_perfil
+                    WHERE up.id_usuario = u.id_usuario) AS perfiles
+             FROM usuario u LEFT JOIN persona pe ON pe.id_persona = u.id_persona WHERE u.id_usuario IN (?)`,
+          [ids],
+        )
+      : []
+    const quien = new Map(personas.map((p) => [Number(p.id), p]))
+
     return NextResponse.json({
-      data: eventos,
+      data: eventos.map((e) => {
+        const p = e.usuarioId != null ? quien.get(Number(e.usuarioId)) : undefined
+        return { ...e, nombre: p?.nombre ?? null, perfiles: p?.perfiles ?? null }
+      }),
       total,
       page,
       totalPages: Math.max(1, Math.ceil(total / limit)),

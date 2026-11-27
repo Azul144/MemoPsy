@@ -1,4 +1,6 @@
 // app/api/usuarios/route.ts
+import { initializeDatabase } from "@/lib/database"
+import { describirUsuario } from "@/lib/auditoria/detalle"
 import { type NextRequest, NextResponse } from "next/server"
 import { conAuditoria } from "@/lib/auditoria/con-auditoria"
 import { getRepository } from "@/lib/database"
@@ -345,4 +347,8 @@ async function manejarPOST(request: NextRequest) {
 }
 
 // RF 1.4 - Registro de auditoría de esta ruta
-export const POST = conAuditoria(manejarPOST, { modulo: "Usuarios", accion: "CREAR", detalle: "Alta de usuario" })
+export const POST = conAuditoria(manejarPOST, {
+  modulo: "Usuarios",
+  accion: "CREAR",
+  detalle: async (d) => `Cuenta nueva: ${await describirUsuario(await initializeDatabase(), d?.data?.usuario?.id ?? null)}`,
+})

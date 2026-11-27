@@ -35,6 +35,7 @@ import { TURNOS } from "@/lib/sesiones/turnos-atencion";
 import DialogoReprogramar from "@/components/sesiones/DialogoReprogramar";
 import DialogoPacienteNuevo from "@/components/pacientes/DialogoPacienteNuevo";
 import SesionesDeLaSemana from "@/components/sesiones/SesionesDeLaSemana";
+import AgendaDelPsicologo, { type PsicologoDeAgenda, type HorarioElegido } from "@/components/sesiones/AgendaDelPsicologo";
 
 // Los turnos terminan el mismo día: al cambiar la fecha de inicio, la de fin la acompaña
 // si estaba en el mismo día que el inicio anterior o quedaría antes del nuevo inicio.
@@ -120,6 +121,9 @@ export default function SesionesPage() {
   // Búsqueda de psicólogos y pacientes
   const [psicologoSearch, setPsicologoSearch] = useState("")
   const [pacienteSearch, setPacienteSearch] = useState("")
+  // Recepción: de qué psicólogo se ve la agenda en "Registrar turnos" ("" = todos)
+  const [agendaPsicologoId, setAgendaPsicologoId] = useState("")
+  const [psicologosAgenda, setPsicologosAgenda] = useState<PsicologoDeAgenda[]>([])
   // Paciente que todavía no está en el sistema: se registra sin salir del turno
   const [pacienteNuevoAbierto, setPacienteNuevoAbierto] = useState(false)
   const [psicologoSearchResults, setPsicologoSearchResults] = useState<Psicologo[]>([])
@@ -798,7 +802,8 @@ const handleUpdateSesion = async () => {
         return sesion.pacientes?.some((p) => p.id === session?.user?.pacienteId)
       }
 
-      return true // 'all' - mostrar todas las sesiones (para administradores)
+      // 'all' - todas las sesiones (recepción), o solo las del psicólogo elegido en "Agenda de"
+      return !agendaPsicologoId || String(sesion.psicologo?.id ?? "") === agendaPsicologoId
     })
   }
 
@@ -828,13 +833,39 @@ const handleUpdateSesion = async () => {
     return [...porPaciente.values()].sort((a, b) => b.cantidad - a.cantidad || a.nombre.localeCompare(b.nombre))
   }
 
+  // Recepción: al tocar un horario libre de la agenda se abre "Nuevo turno" con todo cargado
+  const darTurnoEnHorario = (h: HorarioElegido) => {
+    setFormData((prev) => ({
+      ...prev,
+      fechaInicio: h.fecha,
+      fechaFin: h.fecha,
+      horaInicio: h.horaInicio,
+      horaFin: h.horaFin,
+      psicologoId: h.psicologo.id,
+    }))
+    setPsicologoSearch(`${h.psicologo.persona.nombre} ${h.psicologo.persona.apellido}`)
+    setFormErrors({})
+    setIsCreateDialogOpen(true)
+  }
+
+  // Lista de psicólogos para "Agenda de" (solo recepción)
+  useEffect(() => {
+    if (!permisos.includes("Asignar Profesional") && !permisos.includes("Eliminar Sesión")) return
+    fetch("/api/psicologos")
+      .then((r) => (r.ok ? r.json() : []))
+      .then((lista: PsicologoDeAgenda[]) =>
+        setPsicologosAgenda(lista.map((p) => ({ ...p, id: String(p.id) })).sort((a, b) => a.persona.apellido.localeCompare(b.persona.apellido))),
+      )
+      .catch(() => setPsicologosAgenda([]))
+  }, [permisos])
+
   const renderCalendarWithSessions = (filterType: "all" | "psicologo" | "paciente") => {
     // Días que tienen al menos un turno visible para esta vista: se marcan con un punto en el calendario
     const diasConTurno = sesiones
       .filter((sesion) => {
         if (filterType === "psicologo") return sesion.psicologo?.id === session?.user?.psicologoId
         if (filterType === "paciente") return sesion.pacientes?.some((p) => p.id === session?.user?.pacienteId)
-        return true
+        return !agendaPsicologoId || String(sesion.psicologo?.id ?? "") === agendaPsicologoId
       })
       .map((sesion) => parseISO(sesion.fechaHoraInicio))
 
@@ -1034,9 +1065,14 @@ const handleUpdateSesion = async () => {
                     const puedeEditar = permisos.includes("Editar Sesión") && !cerrada
                     const verPago = !!sesion.pago && sesion.estado?.nombre !== "Cancelada"
                     // RF 4.3 - El paciente puede mover su turno con al menos 24 h de anticipación
+                    // RF 4.3 - El paciente puede mover su turno con al menos 24 h de anticipación;
+                    // la recepción, cualquier turno que todavía no empezó (a pedido del psicólogo o del paciente)
                     const puedeReprogramar =
-                        filterType === "paciente" && !cerrada &&
-                        parseISO(sesion.fechaHoraInicio).getTime() - Date.now() >= 24 * 60 * 60 * 1000
+                        !cerrada &&
+                        ((filterType === "paciente" &&
+                          parseISO(sesion.fechaHoraInicio).getTime() - Date.now() >= 24 * 60 * 60 * 1000) ||
+                         (filterType === "all" && puedeVerTodaLaAgenda && !soloConsulta &&
+                          parseISO(sesion.fechaHoraInicio).getTime() > Date.now()))
                     if (!puedeEditar && !verPago && !puedeReprogramar) return null
                     const claseBoton = "h-8 gap-1.5 rounded-full border bg-transparent px-3 text-sm font-medium"
                     return (
@@ -1247,7 +1283,19 @@ const handleUpdateSesion = async () => {
                   </CardHeader>
                   <CardContent>
                     <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-6">
-                      <div className="min-w-0 flex-1">{renderCalendarWithSessions("all")}</div>
+                      <div className="min-w-0 flex-1">
+                        {puedeVerTodaLaAgenda && (
+                          <AgendaDelPsicologo
+                            psicologos={psicologosAgenda}
+                            psicologoId={agendaPsicologoId}
+                            onCambiarPsicologo={setAgendaPsicologoId}
+                            fecha={selectedDate}
+                            sesiones={sesiones}
+                            onElegir={darTurnoEnHorario}
+                          />
+                        )}
+                        {renderCalendarWithSessions("all")}
+                      </div>
                       <div className="order-first lg:order-last lg:flex-shrink-0">
                         <Dialog
                           open={isCreateDialogOpen}
@@ -1960,6 +2008,7 @@ const handleUpdateSesion = async () => {
       sesion={sesionReprogramar}
       onClose={() => setSesionReprogramar(null)}
       onReprogramada={recargarSesiones}
+      modo={puedeVerTodaLaAgenda ? "recepcion" : "paciente"}
     />
 
     </div>

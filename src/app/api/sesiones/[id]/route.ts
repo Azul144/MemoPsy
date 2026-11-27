@@ -1,4 +1,5 @@
 // src/app/api/sesiones/[id]/route.ts
+import { conDetalleAuditoria, describirTurno, fechaHoraCorta } from "@/lib/auditoria/detalle";
 import { type NextRequest, NextResponse } from "next/server";
 import { conAuditoria } from "@/lib/auditoria/con-auditoria"
 import { getServerSession } from "next-auth/next";
@@ -350,7 +351,13 @@ async function manejarPUT(request: NextRequest, { params: paramsPromise }: { par
         await notificarRecepcion({ sesionId: id, tipo: "SESION_REALIZADA", usuarioQueCambia: session.user.id });
     }
 
-    return NextResponse.json(sesionTransformada, { status: 200 });
+    // Auditoría: qué turno quedó y, si se movió, de cuándo venía
+    const anterior = inicioAnterior as Date | null;
+    const movido = anterior && anterior.getTime() !== new Date(fechaHoraInicio).getTime();
+    return conDetalleAuditoria(
+      NextResponse.json(sesionTransformada, { status: 200 }),
+      `Edición: ${await describirTurno(dataSource, id)}${movido ? ` (antes: ${fechaHoraCorta(anterior)})` : ""}`,
+    );
 
   } catch (error: any) {
     console.error("Error updating session:", error);

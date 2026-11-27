@@ -1,4 +1,6 @@
 // app/api/usuarios/[id]/route.ts
+import { initializeDatabase } from "@/lib/database"
+import { conDetalleAuditoria, describirUsuario } from "@/lib/auditoria/detalle"
 import { type NextRequest, NextResponse } from "next/server"
 import { conAuditoria } from "@/lib/auditoria/con-auditoria"
 import { getRepository, getDataSource } from "@/lib/database"
@@ -382,9 +384,11 @@ async function manejarDELETE(request: NextRequest, { params: paramsPromise }: { 
       return NextResponse.json({ message: "Usuario no encontrado" }, { status: 404 })
     }
 
+    // Para la auditoría, antes de que deje de existir
+    const quien = await describirUsuario(await initializeDatabase(), id)
     await usuarioRepo.remove(usuario)
 
-    return NextResponse.json({ message: "Usuario eliminado exitosamente" })
+    return conDetalleAuditoria(NextResponse.json({ message: "Usuario eliminado exitosamente" }), `Baja de la cuenta: ${quien}`)
   } catch (error) {
     console.error("Error al eliminar usuario:", error)
     return NextResponse.json({ message: "Error al eliminar usuario" }, { status: 500 })
@@ -392,5 +396,9 @@ async function manejarDELETE(request: NextRequest, { params: paramsPromise }: { 
 }
 
 // RF 1.4 - Registro de auditoría de esta ruta
-export const PUT = conAuditoria(manejarPUT, { modulo: "Usuarios", accion: "EDITAR", detalle: "Edición de datos del usuario" })
+export const PUT = conAuditoria(manejarPUT, {
+  modulo: "Usuarios",
+  accion: "EDITAR",
+  detalle: async (_d, { entidadId }) => `Edición de la cuenta: ${await describirUsuario(await initializeDatabase(), entidadId)}`,
+})
 export const DELETE = conAuditoria(manejarDELETE, { modulo: "Usuarios", accion: "ELIMINAR", detalle: "Baja de usuario" })

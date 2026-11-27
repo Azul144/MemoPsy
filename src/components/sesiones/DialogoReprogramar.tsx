@@ -1,5 +1,6 @@
 "use client"
-// RF 4.3 - El paciente elige un nuevo horario para su turno entre los que habilitó su psicólogo
+// RF 4.3 - El paciente elige un nuevo horario para su sesión entre los que habilitó su psicólogo.
+// La recepción usa el mismo cartel (modo "recepcion"): sin el límite de 24 h y diciendo quién pidió el cambio.
 
 import { useEffect, useMemo, useState } from "react"
 import { format, parseISO } from "date-fns"
@@ -14,6 +15,7 @@ interface SesionParaReprogramar {
   id: string
   fechaHoraInicio: string
   psicologo?: { persona: { nombre: string; apellido: string } } | null
+  pacientes?: { persona: { nombre: string; apellido: string } }[]
 }
 
 interface HorarioLibre {
@@ -25,9 +27,14 @@ interface Props {
   sesion: SesionParaReprogramar | null
   onClose: () => void
   onReprogramada: () => void
+  modo?: "paciente" | "recepcion"
 }
 
-export default function DialogoReprogramar({ sesion, onClose, onReprogramada }: Props) {
+type PedidoPor = "psicologo" | "paciente"
+
+export default function DialogoReprogramar({ sesion, onClose, onReprogramada, modo = "paciente" }: Props) {
+  const recepcion = modo === "recepcion"
+  const [pedidoPor, setPedidoPor] = useState<PedidoPor | null>(null)
   const [horarios, setHorarios] = useState<HorarioLibre[]>([])
   const [elegido, setElegido] = useState<string | null>(null)
   const [cargando, setCargando] = useState(false)
@@ -38,6 +45,7 @@ export default function DialogoReprogramar({ sesion, onClose, onReprogramada }: 
   useEffect(() => {
     if (!sesion) return
     setElegido(null)
+    setPedidoPor(null)
     setHorarios([])
     setError(null)
     setCargando(true)
@@ -65,20 +73,23 @@ export default function DialogoReprogramar({ sesion, onClose, onReprogramada }: 
   }, [horarios])
 
   const confirmar = async () => {
-    if (!sesion || !elegido) return
+    if (!sesion || !elegido || (recepcion && !pedidoPor)) return
     try {
       setGuardando(true)
       const res = await fetch(`/api/sesiones/${sesion.id}/reprogramar`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fechaHoraInicio: elegido }),
+        body: JSON.stringify({ fechaHoraInicio: elegido, ...(recepcion && { pedidoPor }) }),
       })
       const data = await res.json()
       if (!res.ok) {
         avisoError(data.error || "No se pudo reprogramar la sesión.")
         return
       }
-      avisoExito(`Sesión reprogramada para el ${format(parseISO(elegido), "EEEE d/MM 'a las' HH:mm", { locale: es })}.`)
+      avisoExito(
+        `${recepcion ? "Turno reprogramado" : "Sesión reprogramada"} para el ${format(parseISO(elegido), "EEEE d/MM 'a las' HH:mm", { locale: es })}.` +
+          (recepcion ? " Se les avisó a la psicóloga/o y al paciente." : ""),
+      )
       onReprogramada()
       onClose()
     } catch (error) {
@@ -90,6 +101,7 @@ export default function DialogoReprogramar({ sesion, onClose, onReprogramada }: 
   }
 
   const psicologo = sesion?.psicologo?.persona
+  const pacientes = (sesion?.pacientes ?? []).map((p) => `${p.persona.nombre} ${p.persona.apellido}`).join(", ")
 
   return (
     <Dialog open={!!sesion} onOpenChange={(a) => !a && onClose()}>
@@ -98,12 +110,37 @@ export default function DialogoReprogramar({ sesion, onClose, onReprogramada }: 
         style={{ backgroundColor: "var(--card)", border: "1px solid var(--borde)" }}
       >
         <DialogHeader>
-          <DialogTitle className="text-foreground">Reprogramar sesión</DialogTitle>
+          <DialogTitle className="text-foreground">{recepcion ? "Reprogramar turno" : "Reprogramar sesión"}</DialogTitle>
           <DialogDescription className="text-suave">
-            {sesion && `Sesión actual: ${format(parseISO(sesion.fechaHoraInicio), "EEEE d/MM 'a las' HH:mm", { locale: es })}`}
+            {sesion && `${recepcion ? "Turno" : "Sesión"} actual: ${format(parseISO(sesion.fechaHoraInicio), "EEEE d/MM 'a las' HH:mm", { locale: es })}`}
             {psicologo && ` · ${psicologo.nombre} ${psicologo.apellido}`}
+            {recepcion && pacientes && ` · ${pacientes}`}
           </DialogDescription>
         </DialogHeader>
+
+        {recepcion && (
+          <div className="space-y-2">
+            <p className="text-sm font-semibold text-foreground">¿Quién pidió el cambio?</p>
+            <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Quién pidió el cambio">
+              {([["psicologo", "La psicóloga/o"], ["paciente", "El paciente"]] as [PedidoPor, string][]).map(([valor, texto]) => (
+                <button
+                  key={valor}
+                  type="button"
+                  role="radio"
+                  aria-checked={pedidoPor === valor}
+                  onClick={() => setPedidoPor(valor)}
+                  className={cn(
+                    "rounded-full border px-4 py-1.5 text-sm transition-colors",
+                    pedidoPor === valor ? "border-dorado bg-primary font-semibold text-primary-foreground" : "border-borde-fuerte text-texto-2 hover:border-dorado/70",
+                  )}
+                >
+                  {texto}
+                </button>
+              ))}
+            </div>
+            <p className="text-xs text-tenue">Se les avisa a los dos del nuevo horario y queda registrado en la auditoría.</p>
+          </div>
+        )}
 
         {cargando ? (
           <div className="flex justify-center py-8">
@@ -113,14 +150,15 @@ export default function DialogoReprogramar({ sesion, onClose, onReprogramada }: 
           <p className="rounded-lg border border-red-500/40 p-4 text-center text-sm text-peligro">{error}</p>
         ) : porDia.length === 0 ? (
           <p className="rounded-lg border border-dashed border-borde-fuerte p-4 text-center text-sm text-suave">
-            No hay horarios libres en las próximas semanas (recordá que podés tener una sola sesión por día y hasta 2 por semana). Comunicate con el consultorio
-            para reprogramar.
+            {recepcion
+              ? "No hay horarios libres para este turno en las próximas semanas (dentro de los días de atención y con la regla de 1 sesión por día y hasta 2 por semana por paciente)."
+              : "No hay horarios libres en las próximas semanas (recordá que podés tener una sola sesión por día y hasta 2 por semana). Comunicate con el consultorio para reprogramar."}
           </p>
         ) : (
           <div className="max-h-[50vh] space-y-4 overflow-y-auto pr-1">
             {porDia.map(([dia, lista]) => (
               <div key={dia}>
-                <p className="mb-2 text-sm font-semibold capitalize text-foreground">
+                <p className="mb-2 text-sm font-semibold text-foreground first-letter:uppercase">
                   {format(parseISO(lista[0].inicio), "EEEE d 'de' MMMM", { locale: es })}
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -150,7 +188,7 @@ export default function DialogoReprogramar({ sesion, onClose, onReprogramada }: 
           <Button variant="outline" onClick={onClose} disabled={guardando}>
             Cancelar
           </Button>
-          <Button onClick={confirmar} disabled={!elegido || guardando} style={{ backgroundColor: "var(--primary)", color: "var(--primary-foreground)" }}>
+          <Button onClick={confirmar} disabled={!elegido || guardando || (recepcion && !pedidoPor)} style={{ backgroundColor: "var(--primary)", color: "var(--primary-foreground)" }}>
             {guardando && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Reprogramar
           </Button>

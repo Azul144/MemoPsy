@@ -20,6 +20,8 @@ interface Evento {
   fecha: string
   usuarioId: number | null
   email: string | null
+  nombre?: string | null
+  perfiles?: string | null
   accion: string
   modulo: string
   entidadId: string | null
@@ -61,6 +63,10 @@ const NOMBRE_ACCION: Record<string, string> = {
   REPROGRAMAR: "Reprogramación de turno",
   RESPONDER_ACTIVIDAD: "Respuesta a actividad",
   ENVIAR_RECORDATORIO: "Recordatorio enviado a mano",
+  CONFIRMAR: "Confirmó un turno",
+  CANCELAR: "Canceló un turno",
+  FINALIZAR: "Sesión realizada",
+  PEDIR_RESTABLECER: "Pidió restablecer la contraseña",
 }
 
 const MOTIVO_LOGIN: Record<string, string> = {
@@ -77,8 +83,8 @@ const textoDetalle = (e: Evento) =>
 
 function colorAccion(accion: string) {
   if (accion === "LOGIN_FALLIDO" || accion === "ACCESO_DENEGADO") return "border-red-500 text-peligro"
-  if (accion === "ELIMINAR") return "border-orange-400 text-naranja"
-  if (accion === "CREAR") return "border-emerald-500 text-exito"
+  if (accion === "ELIMINAR" || accion === "CANCELAR") return "border-orange-400 text-naranja"
+  if (accion === "CREAR" || accion === "CONFIRMAR" || accion === "FINALIZAR") return "border-emerald-500 text-exito"
   if (accion === "LOGIN_OK" || accion === "LOGOUT") return "border-sky-500 text-info"
   if (accion === "VER") return "border-borde-fuerte text-suave"
   return "border-amber-400 text-aviso"
@@ -149,13 +155,13 @@ export default function AuditoriaPage() {
         <div className="mb-6 rounded-2xl border border-foreground/10 bg-background p-4">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
             <div className="space-y-1.5 lg:col-span-2">
-              <Label htmlFor="aud-usuario" className="text-suave">Usuario (email)</Label>
+              <Label htmlFor="aud-usuario" className="text-suave">Usuario (nombre o email)</Label>
               <Input
                 id="aud-usuario"
                 value={borrador.usuario}
                 onChange={(e) => setBorrador({ ...borrador, usuario: e.target.value })}
                 onKeyDown={(e) => e.key === "Enter" && aplicar()}
-                placeholder="Ej: psicologa@..."
+                placeholder="Nombre o email"
                 className={campo}
               />
             </div>
@@ -234,7 +240,11 @@ export default function AuditoriaPage() {
                       {format(new Date(e.fecha), "dd/MM/yyyy HH:mm", { locale: es })}
                     </span>
                   </div>
-                  <p className="mt-2 break-all text-sm font-medium text-texto-2">{e.email ?? "Sin usuario"}</p>
+                  <p className="mt-2 text-sm font-medium text-texto-2">
+                    {e.nombre ?? e.email ?? "Sin usuario"}
+                    {e.perfiles && <span className="font-normal text-tenue"> · {e.perfiles}</span>}
+                  </p>
+                  {e.nombre && e.email && <p className="break-all text-xs text-tenue">{e.email}</p>}
                   {textoDetalle(e) && <p className="mt-1 text-sm text-suave">{textoDetalle(e)}</p>}
                   <p className="mt-2 text-xs text-tenue">
                     {e.modulo}
@@ -264,8 +274,16 @@ export default function AuditoriaPage() {
                         <p>{format(new Date(e.fecha), "dd/MM/yyyy", { locale: es })}</p>
                         <p className="text-sm text-tenue">{format(new Date(e.fecha), "HH:mm:ss", { locale: es })}</p>
                       </TableCell>
-                      <TableCell className="px-4 py-3 whitespace-normal break-all text-texto-2">
-                        {e.email ?? <span className="text-tenue">—</span>}
+                      <TableCell className="px-4 py-3 whitespace-normal text-texto-2">
+                        {e.nombre ? (
+                          <>
+                            <p className="font-medium">{e.nombre}</p>
+                            {e.perfiles && <p className="text-sm text-tenue">{e.perfiles}</p>}
+                            <p className="break-all text-xs text-tenue">{e.email}</p>
+                          </>
+                        ) : (
+                          <span className="break-all">{e.email ?? <span className="text-tenue">—</span>}</span>
+                        )}
                       </TableCell>
                       <TableCell className="px-4 py-3">
                         <Badge variant="outline" className={cn("text-xs", colorAccion(e.accion))}>

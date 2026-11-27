@@ -2,6 +2,7 @@
 // RF 3.5 - Registrar el estado de pago de una sesión.
 // Va aparte del PUT de la sesión porque el pago se suele cargar cuando la sesión
 // ya está Finalizada, y esas sesiones no se pueden editar.
+import { conDetalleAuditoria, describirTurno, fechaHoraCorta } from "@/lib/auditoria/detalle"
 import { type NextRequest, NextResponse } from "next/server"
 import { conAuditoria } from "@/lib/auditoria/con-auditoria"
 import { getServerSession } from "next-auth/next"
@@ -83,7 +84,10 @@ async function manejarPATCH(request: NextRequest, { params }: { params: Promise<
       await notificarRecepcion({ sesionId: id, tipo: "PAGO_REGISTRADO", usuarioQueCambia: session.user.id })
     }
 
-    return NextResponse.json({ message: "Pago registrado", pago: datosPago(sesion) })
+    return conDetalleAuditoria(
+      NextResponse.json({ message: "Pago registrado", pago: datosPago(sesion) }),
+      `Pago ${estadoPago === "Pagado" ? "registrado" : "pendiente"}: ${await describirTurno(dataSource, id)}`,
+    )
   } catch (error: any) {
     console.error("Error registrando pago de sesión:", error)
     return NextResponse.json({ error: "Error interno del servidor", details: error.message }, { status: 500 })

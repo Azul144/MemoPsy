@@ -1,4 +1,6 @@
 // src/app/api/usuarios/[id]/perfiles/route.ts
+import { initializeDatabase } from "@/lib/database"
+import { describirUsuario } from "@/lib/auditoria/detalle"
 import { NextRequest } from 'next/server';
 import { conAuditoria } from "@/lib/auditoria/con-auditoria"
 import { UsuarioController } from '@/lib/controllers/usuario.controller';
@@ -22,4 +24,8 @@ async function manejarPUT(
 }
 
 // RF 1.4 - Registro de auditoría de esta ruta
-export const PUT = conAuditoria(manejarPUT, { modulo: "Usuarios", accion: "ASIGNAR_PERFIL", detalle: "Cambio de perfiles asignados" })
+export const PUT = conAuditoria(manejarPUT, {
+  modulo: "Usuarios",
+  accion: "ASIGNAR_PERFIL",
+  detalle: async (_d, { entidadId }) => `Cambió los perfiles de: ${await describirUsuario(await initializeDatabase(), entidadId)}`,
+})

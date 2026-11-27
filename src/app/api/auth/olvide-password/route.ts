@@ -6,6 +6,7 @@ import { UsuarioEntity } from "@/entities";
 import { enviarEmail } from "@/lib/email/brevo";
 import { generarToken, MINUTOS_VALIDEZ } from "@/lib/auth/recuperacion";
 import { esEmailValido, normalizarEmail } from "@/lib/validaciones/password";
+import { ipDelPedido, registrarAuditoria } from "@/lib/auditoria/registrar";
 
 // SIEMPRE respondemos lo mismo, exista o no el email (así nadie averigua qué emails están registrados)
 const RESPUESTA = {
@@ -13,6 +14,7 @@ const RESPUESTA = {
 };
 
 export async function POST(request: Request) {
+  const ip = ipDelPedido(request.headers);
   let email = "";
   try {
     const body = await request.json();
@@ -53,6 +55,16 @@ export async function POST(request: Request) {
           html: plantillaEmail(enlace),
         });
       }
+      // RF 1.4 - Queda en la auditoría que la cuenta pidió restablecer la contraseña (nunca el enlace)
+      await registrarAuditoria({
+        usuarioId: usuario.id,
+        email: usuario.email,
+        accion: "PEDIR_RESTABLECER",
+        modulo: "Autenticación",
+        entidadId: usuario.id,
+        detalle: pidioHacePoco ? "Pidió restablecer la contraseña (ya tenía un enlace reciente)" : "Pidió restablecer la contraseña: se envió el enlace por email",
+        ip,
+      });
     }
   } catch {
     // No mostramos el error ni datos personales; la respuesta es la misma

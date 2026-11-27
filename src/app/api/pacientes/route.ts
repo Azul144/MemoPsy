@@ -134,4 +134,8 @@ async function manejarPOST(request: NextRequest) {
 }
 
 // Queda en la auditoría (sin los datos personales)
-export const POST = conAuditoria(manejarPOST, { modulo: "Pacientes", accion: "CREAR", detalle: "Alta rápida de paciente nuevo" })
+export const POST = conAuditoria(manejarPOST, {
+  modulo: "Pacientes",
+  accion: "CREAR",
+  detalle: (d) => `Paciente nuevo (sin cuenta): ${d?.persona?.nombreCompleto ?? "sin nombre"}`,
+})

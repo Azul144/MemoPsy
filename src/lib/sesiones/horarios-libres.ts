@@ -55,10 +55,12 @@ export async function validarHorarioDeAtencion(
   return validarFechasEnAtencion(franjas, inicio, fin)
 }
 
+// anticipacionHoras: el paciente reprograma con 24 h de anticipación; la recepción, desde ahora
 export async function buscarHorariosLibres(
   db: DataSource | EntityManager,
   sesion: SesionEntity,
   pacientesIds: string[],
+  anticipacionHoras = HORAS_ANTICIPACION,
 ): Promise<HorarioLibre[]> {
   const psicologoId = sesion.psicologo?.id
   if (!psicologoId) return []
@@ -70,7 +72,7 @@ export async function buscarHorariosLibres(
   if (duracion <= 0) return []
 
   const ahora = Date.now()
-  const desde = new Date(ahora + HORAS_ANTICIPACION * UNA_HORA)
+  const desde = new Date(ahora + anticipacionHoras * UNA_HORA)
   const hasta = new Date(ahora + DIAS_A_FUTURO * UN_DIA)
 
   // Turnos que ya ocupan al psicólogo o a alguno de los pacientes (los cancelados no ocupan)

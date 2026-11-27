@@ -10,12 +10,14 @@ import type { NextRequest } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authConfig } from "@/lib/auth/auth-config";
 import { ipDelPedido, registrarAuditoria } from "./registrar";
+import { leerDetalleAuditoria } from "./detalle";
 
 interface OpcionesAuditoria {
   modulo: string;
   accion: string;
-  // Texto fijo, o calculado a partir de la respuesta (por ejemplo el nuevo estado del turno)
-  detalle?: string | ((datosRespuesta: any) => string | null | undefined);
+  // Texto fijo, o calculado a partir de la respuesta (por ejemplo el nuevo estado del turno).
+  // Puede ser async y recibe el id del registro afectado (para buscar a quién se refiere).
+  detalle?: string | ((datosRespuesta: any, contexto: { entidadId: string | null }) => string | null | undefined | Promise<string | null | undefined>);
 }
 
 // Busca el id del registro afectado: primero en la URL (/api/x/[id]); si es un alta, en la respuesta
@@ -32,6 +34,8 @@ export function conAuditoria<A extends [NextRequest, ...any[]], R extends Respon
 ): (...args: A) => Promise<R> {
   return async (...args: A) => {
     const respuesta = await handler(...args);
+    // Si la ruta describió qué pasó (conDetalleAuditoria), eso manda sobre el texto fijo
+    const propio = leerDetalleAuditoria(respuesta);
     const exito = respuesta.status < 400;
     const denegado = respuesta.status === 403;
     if (!exito && !denegado) return respuesta;
@@ -55,14 +59,16 @@ export function conAuditoria<A extends [NextRequest, ...any[]], R extends Respon
 
       const detalle = denegado
         ? `Intento sin permiso: ${opciones.accion.toLowerCase()} en ${opciones.modulo}`
-        : typeof opciones.detalle === "function"
-          ? opciones.detalle(datos)
+        : propio.detalle
+          ? propio.detalle
+          : typeof opciones.detalle === "function"
+          ? await opciones.detalle(datos, { entidadId })
           : opciones.detalle;
 
       await registrarAuditoria({
         usuarioId: session?.user?.id ?? null,
         email: session?.user?.email ?? null,
-        accion: denegado ? "ACCESO_DENEGADO" : opciones.accion,
+        accion: denegado ? "ACCESO_DENEGADO" : propio.accion ?? opciones.accion,
         modulo: opciones.modulo,
         entidadId,
         detalle: detalle ?? null,

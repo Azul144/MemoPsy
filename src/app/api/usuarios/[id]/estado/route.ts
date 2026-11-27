@@ -1,4 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
+import { initializeDatabase } from "@/lib/database"
+import { cuentaActiva, describirUsuario } from "@/lib/auditoria/detalle"
 import { conAuditoria } from "@/lib/auditoria/con-auditoria"
 import { getRepository } from "@/lib/database"
 import { UsuarioEntity } from "@/entities"
@@ -56,4 +58,12 @@ async function manejarPATCH(request: NextRequest, { params: paramsPromise }: { p
 }
 
 // RF 1.4 - Registro de auditoría de esta ruta
-export const PATCH = conAuditoria(manejarPATCH, { modulo: "Usuarios", accion: "CAMBIAR_ESTADO", detalle: "Activación o desactivación de la cuenta" })
+export const PATCH = conAuditoria(manejarPATCH, {
+  modulo: "Usuarios",
+  accion: "CAMBIAR_ESTADO",
+  detalle: async (_d, { entidadId }) => {
+    const ds = await initializeDatabase()
+    const activa = await cuentaActiva(ds, entidadId)
+    return `${activa === false ? "Desactivó" : "Activó"} la cuenta: ${await describirUsuario(ds, entidadId)}`
+  },
+})

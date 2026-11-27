@@ -1,4 +1,6 @@
 // app/api/usuarios/[id]/change-password/route.ts
+import { initializeDatabase } from "@/lib/database"
+import { describirUsuario } from "@/lib/auditoria/detalle"
 import { NextRequest } from 'next/server';
 import { conAuditoria } from "@/lib/auditoria/con-auditoria"
 import { UsuarioController } from '@/lib/controllers/usuario.controller';
@@ -12,4 +14,8 @@ async function manejarPOST(
 }
 
 // RF 1.4 - Registro de auditoría de esta ruta
-export const POST = conAuditoria(manejarPOST, { modulo: "Usuarios", accion: "CAMBIAR_CONTRASENA", detalle: "Cambio de contraseña de un usuario" })
+export const POST = conAuditoria(manejarPOST, {
+  modulo: "Usuarios",
+  accion: "CAMBIAR_CONTRASENA",
+  detalle: async (_d, { entidadId }) => `Cambió la contraseña de: ${await describirUsuario(await initializeDatabase(), entidadId)}`,
+})
