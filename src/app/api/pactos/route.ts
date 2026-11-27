@@ -12,7 +12,7 @@ import { authConfig } from "@/lib/auth/auth-config"
 import { alcanceSesiones } from "@/lib/auth/alcance-sesiones"
 import { conAuditoria } from "@/lib/auditoria/con-auditoria"
 import { initializeDatabase } from "@/lib/database"
-import { guardarPacto, resumenPacto, validarPacto } from "@/lib/sesiones/pacto"
+import { generarTurnosPactados, guardarPacto, resumenPacto, validarPacto } from "@/lib/sesiones/pacto"
 
 interface FilaPacto {
   id: number
@@ -56,10 +56,16 @@ export async function GET(request: NextRequest) {
   if (alcance.tipo === "psicologo" && !pacienteId) psicologoId = Number(alcance.id)
   if (alcance.tipo === "ninguna") return NextResponse.json({ error: "Sin acceso" }, { status: 403 })
 
+  // Al mirar la agenda se completan los turnos que falten de las próximas semanas. Así no depende
+  // solo de la pasada del servidor (en Render gratis el servidor se duerme y no corre cada hora).
+  const generados = pacienteId || psicologoId
+    ? await generarTurnosPactados(await initializeDatabase(), pacienteId ? { pacienteId } : { psicologoId: psicologoId! })
+    : { creados: 0 }
+
   let pactos = pacienteId ? await leerPactos("hp.id_paciente", pacienteId) : psicologoId ? await leerPactos("hp.id_psicologo", psicologoId) : []
   // El psicólogo ve solo lo pactado con él
   if (alcance.tipo === "psicologo") pactos = pactos.filter((p) => String(p.psicologoId) === alcance.id)
-  return NextResponse.json({ pactos })
+  return NextResponse.json({ pactos, turnosNuevos: generados.creados, ...(generados.error ? { errorTurnos: generados.error } : {}) })
 }
 
 const horarioSchema = z.object({

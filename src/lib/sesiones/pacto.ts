@@ -143,10 +143,14 @@ let generando = false
 export async function generarTurnosPactados(
   db: DataSource,
   filtro: { pacienteId?: number; psicologoId?: number } = {},
-): Promise<{ creados: number }> {
-  if (generando && !filtro.pacienteId) return { creados: 0 }
-  if (!filtro.pacienteId) generando = true
+): Promise<{ creados: number; error?: string }> {
+  // La pasada general (sin filtro) no se superpone consigo misma; las de un paciente o psicólogo sí
+  // pueden correr a la vez: la clave única (horario pactado + fecha) evita los turnos repetidos
+  const general = !filtro.pacienteId && !filtro.psicologoId
+  if (general && generando) return { creados: 0 }
+  if (general) generando = true
   let creados = 0
+  let error: string | undefined
   try {
     const pactos = await db.getRepository(HorarioPactadoEntity).find({
       where: { activo: true, ...(filtro.pacienteId ? { pacienteId: filtro.pacienteId } : {}), ...(filtro.psicologoId ? { psicologoId: filtro.psicologoId } : {}) },
@@ -200,12 +204,13 @@ export async function generarTurnosPactados(
         }
       }
     }
-  } catch {
-    console.error("No se pudieron generar los turnos de los horarios pactados")
+  } catch (e) {
+    error = e instanceof Error ? e.message : String(e)
+    console.error("No se pudieron generar los turnos de los horarios pactados:", error)
   } finally {
-    if (!filtro.pacienteId) generando = false
+    if (general) generando = false
   }
-  return { creados }
+  return { creados, error }
 }
 
 // Pactos activos de un paciente (con qué psicólogo) o de un psicólogo (con qué pacientes)
