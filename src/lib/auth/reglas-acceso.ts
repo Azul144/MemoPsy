@@ -132,6 +132,9 @@ export const REGLAS_API: Regla[] = [
   { ruta: "/api/sesiones/[id]/reprogramar", metodos: ["GET", "POST"], permisos: ["Ver Sesiones"] },
   // RF 4.3 - Horarios que el psicólogo habilita (la ruta valida que sean los suyos, o que sea recepción).
   { ruta: "/api/horarios-disponibles", metodos: ["GET", "PUT"], permisos: AGENDA },
+  // RF 3.1 - Horario pactado: lo ven todos los que ven la agenda; lo cambian psicólogo y recepción (la ruta filtra por alcance)
+  { ruta: "/api/pactos", metodos: ["GET"], permisos: ["Ver Sesiones"] },
+  { ruta: "/api/pactos", metodos: ["PUT"], permisos: ["Editar Sesión"] },
   // RF 3.2 / 3.3 - Avisos propios: cada uno ve solo los suyos.
   { ruta: "/api/notificaciones", metodos: ["GET", "PATCH"], permisos: "cualquiera" },
   // RF 4.3 - Aviso de crisis al psicólogo (la ruta valida además que sea un paciente)

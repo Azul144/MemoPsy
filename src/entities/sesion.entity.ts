@@ -46,4 +46,11 @@ export class SesionEntity extends BaseEntity {
 
   @Column({ name: "fecha_pago", type: "datetime", nullable: true })
   fechaPago: Date | null;
+
+  // RF 3.1 - Si el turno lo creó un horario pactado: cuál y para qué fecha (así no se vuelve a crear)
+  @Column({ name: "id_horario_pactado", type: "int", nullable: true })
+  horarioPactadoId: number | null;
+
+  @Column({ name: "fecha_pactada", type: "date", nullable: true })
+  fechaPactada: string | null;
 }

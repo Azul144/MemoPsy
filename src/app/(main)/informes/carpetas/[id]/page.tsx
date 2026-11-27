@@ -12,6 +12,8 @@ import {
   AlertCircle, BookOpen, CalendarDays, Check, ClipboardCheck, Download, FolderOpen, Loader2, Moon, NotebookPen, Plus, Sun, X,
 } from "lucide-react";
 import EncabezadoPagina from "@/components/sistema/EncabezadoPagina";
+import EditorPacto from "@/components/sesiones/EditorPacto";
+import { useSession } from "next-auth/react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -134,6 +136,10 @@ export default function CarpetaPacientePage({ params }: { params: Promise<{ id: 
   const [error, setError] = useState("");
   const [desde, setDesde] = useState("");
   const [hasta, setHasta] = useState("");
+  const { data: session } = useSession();
+  const psicologoId = session?.user?.psicologoId;
+  // Al guardar el horario pactado se vuelve a leer la carpeta para ver los turnos nuevos
+  const [recarga, setRecarga] = useState(0);
 
   useEffect(() => {
     fetch(`/api/carpetas/${id}`)
@@ -143,7 +149,7 @@ export default function CarpetaPacientePage({ params }: { params: Promise<{ id: 
         setCarpeta(datos);
       })
       .catch((e: Error) => setError(e.message));
-  }, [id]);
+  }, [id, recarga]);
 
   const ahora = Date.now();
   const programados = useMemo(
@@ -226,6 +232,9 @@ export default function CarpetaPacientePage({ params }: { params: Promise<{ id: 
           </TabsList>
 
           <TabsContent value="turnos" className="space-y-6">
+            {psicologoId && (
+              <EditorPacto psicologoId={psicologoId} pacienteId={paciente.id} onGuardado={() => setRecarga((n) => n + 1)} />
+            )}
             <section className="rounded-2xl border border-borde bg-card p-5">
               <h2 className="mb-3 text-lg font-semibold text-dorado">Programados ({programados.length})</h2>
               {programados.length === 0 ? (

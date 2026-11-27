@@ -68,6 +68,7 @@ const NOMBRE_ACCION: Record<string, string> = {
   FINALIZAR: "Sesión realizada",
   PEDIR_RESTABLECER: "Pidió restablecer la contraseña",
   ENVIAR_ACCESO: "Envió el email de acceso",
+  PACTAR_HORARIO: "Horario pactado",
   AVISO_CRISIS: "Aviso de crisis al psicólogo",
 }
 

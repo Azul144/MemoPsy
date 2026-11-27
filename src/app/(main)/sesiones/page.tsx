@@ -1,5 +1,7 @@
 "use client"
 
+import MiSemana from "@/components/sesiones/MiSemana"
+import PactoDelPaciente from "@/components/sesiones/PactoDelPaciente"
 import { useState, useEffect, useRef, useCallback } from "react"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
@@ -22,7 +24,7 @@ import { Calendar } from "@/components/ui/calendar"
 import { DIAS_NO_HABILES, MENSAJE_DIA_NO_HABIL, esDiaHabil, esFechaHabil, proximoDiaHabil } from "@/lib/validaciones/dias-habiles"
 import { Badge } from "@/components/ui/badge"
 import { TypographyP } from '@/components/ui/typography';
-import { Loader2, X, CalendarIcon, CalendarClock, Plus, Users, User, Brain, Clock, MapPin, Activity, Check, Pencil, Wallet, Video, Send, Sun, Moon, FolderOpen, UserPlus } from "lucide-react"
+import { Loader2, X, CalendarIcon, CalendarClock, Plus, Users, User, Brain, Clock, MapPin, Activity, Check, Pencil, Wallet, Video, Send, Sun, Moon, UserPlus } from "lucide-react"
 import { format, parseISO, isSameDay } from "date-fns"
 import { es } from "date-fns/locale"
 import { cn } from "@/lib/utils"
@@ -879,39 +881,12 @@ const handleUpdateSesion = async () => {
 
     return (
       <div className="space-y-6">
-      {filterType === "psicologo" && (
-        <section className="rounded-md border p-4" style={{ backgroundColor: "var(--background)" }}>
-          <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
-            <p className="font-semibold text-foreground">Turnos programados por paciente</p>
-            <Link href="/informes/carpetas" className="text-sm text-dorado hover:underline">Ver todas las carpetas</Link>
-          </div>
-          {programadosPorPaciente.length === 0 ? (
-            <p className="text-sm text-tenue">No tenés turnos próximos.</p>
-          ) : (
-            <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-              {programadosPorPaciente.map((p) => (
-                <li key={p.id}>
-                  <Link
-                    href={`/informes/carpetas/${p.id}`}
-                    className="flex h-full items-center gap-3 rounded-lg border border-foreground/10 px-3 py-2.5 transition-colors hover:border-primary/50 hover:bg-primary/10"
-                    title="Abrir la carpeta del paciente"
-                  >
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/15">
-                      <FolderOpen className="h-4 w-4 text-dorado" />
-                    </span>
-                    <span className="min-w-0">
-                      <span className="block truncate text-sm font-medium text-foreground">{p.nombre}</span>
-                      <span className="block text-xs text-suave">
-                        <strong className="text-dorado">{p.cantidad}</strong> {p.cantidad === 1 ? "turno" : "turnos"}
-                        {p.proximo && ` · próx. ${format(p.proximo, "dd/MM HH:mm")}`}
-                      </span>
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
+      {/* RF 3.1 - La semana fija del psicólogo, con el horario pactado de cada paciente */}
+      {filterType === "psicologo" && session?.user?.psicologoId && (
+        <MiSemana
+          psicologoId={String(session.user.psicologoId)}
+          sinPactoCandidatos={programadosPorPaciente.map((p) => ({ id: String(p.id), nombre: p.nombre }))}
+        />
       )}
       <div className="flex w-full flex-col gap-4 lg:flex-row lg:gap-6">
         <div className="flex flex-col gap-4 self-center lg:self-start">
@@ -1205,7 +1180,10 @@ const handleUpdateSesion = async () => {
       {/* Main Content */}
       <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-10">
         {soloPaciente ? (
-          <EncabezadoPagina titulo="Mis sesiones" descripcion="Las sesiones que tenés esta semana y cómo entrar a cada una: por videollamada o en el consultorio." volverA="/welcome" textoVolver="Volver al inicio" />
+          <>
+            <EncabezadoPagina titulo="Mis sesiones" descripcion="Las sesiones que tenés esta semana y cómo entrar a cada una: por videollamada o en el consultorio." volverA="/welcome" textoVolver="Volver al inicio" />
+            <PactoDelPaciente />
+          </>
         ) : (
           <EncabezadoPagina titulo="Turnos" descripcion="Agenda de turnos presenciales y por videollamada: estados y pagos." volverA="/welcome" textoVolver="Volver al inicio" />
         )}

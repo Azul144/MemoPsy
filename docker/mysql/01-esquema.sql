@@ -88,6 +88,24 @@ CREATE TABLE `horario_disponible` (
   CONSTRAINT `horario_disponible_ibfk_psicologo` FOREIGN KEY (`id_psicologo`) REFERENCES `psicologo` (`id_psicologo`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+CREATE TABLE `horario_pactado` (
+  `id_horario_pactado` int NOT NULL AUTO_INCREMENT,
+  `id_psicologo` int NOT NULL,
+  `id_paciente` int NOT NULL,
+  `dia_semana` tinyint NOT NULL,
+  `hora_inicio` time NOT NULL,
+  `id_modalidad` int NOT NULL,
+  `activo` tinyint(1) NOT NULL DEFAULT '1',
+  `creado` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id_horario_pactado`),
+  KEY `idx_pactado_psicologo` (`id_psicologo`,`dia_semana`,`activo`),
+  KEY `idx_pactado_paciente` (`id_paciente`,`activo`),
+  KEY `fk_pactado_modalidad` (`id_modalidad`),
+  CONSTRAINT `fk_pactado_modalidad` FOREIGN KEY (`id_modalidad`) REFERENCES `modalidad` (`id_modalidad`),
+  CONSTRAINT `fk_pactado_paciente` FOREIGN KEY (`id_paciente`) REFERENCES `paciente` (`id_paciente`) ON DELETE CASCADE,
+  CONSTRAINT `fk_pactado_psicologo` FOREIGN KEY (`id_psicologo`) REFERENCES `psicologo` (`id_psicologo`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 CREATE TABLE `informe` (
   `id_informe` int NOT NULL AUTO_INCREMENT,
   `id_psicologo` int NOT NULL,
@@ -285,11 +303,15 @@ CREATE TABLE `sesion` (
   `id_medio_de_pago` int DEFAULT NULL,
   `monto` decimal(10,2) DEFAULT NULL,
   `fecha_pago` datetime DEFAULT NULL,
+  `id_horario_pactado` int DEFAULT NULL,
+  `fecha_pactada` date DEFAULT NULL,
   PRIMARY KEY (`id_sesion`),
+  UNIQUE KEY `uq_sesion_pactada` (`id_horario_pactado`,`fecha_pactada`),
   KEY `psicologo_id` (`id_psicologo`),
   KEY `modalidad_id` (`id_modalidad`),
   KEY `estado_id` (`id_estado`),
   KEY `medio_de_pago_id` (`id_medio_de_pago`),
+  CONSTRAINT `fk_sesion_pactado` FOREIGN KEY (`id_horario_pactado`) REFERENCES `horario_pactado` (`id_horario_pactado`) ON DELETE SET NULL,
   CONSTRAINT `sesion_ibfk_1` FOREIGN KEY (`id_psicologo`) REFERENCES `psicologo` (`id_psicologo`),
   CONSTRAINT `sesion_ibfk_3` FOREIGN KEY (`id_modalidad`) REFERENCES `modalidad` (`id_modalidad`),
   CONSTRAINT `sesion_ibfk_4` FOREIGN KEY (`id_estado`) REFERENCES `estado` (`id_estado`),
