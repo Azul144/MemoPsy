@@ -34,6 +34,7 @@ import HorariosDeAtencion from "@/components/sesiones/HorariosDeAtencion";
 import { TURNOS } from "@/lib/sesiones/turnos-atencion";
 import DialogoReprogramar from "@/components/sesiones/DialogoReprogramar";
 import DialogoPacienteNuevo from "@/components/pacientes/DialogoPacienteNuevo";
+import SesionesDeLaSemana from "@/components/sesiones/SesionesDeLaSemana";
 
 // Los turnos terminan el mismo día: al cambiar la fecha de inicio, la de fin la acompaña
 // si estaba en el mismo día que el inicio anterior o quedaría antes del nuevo inicio.
@@ -1165,7 +1166,7 @@ const handleUpdateSesion = async () => {
       {/* Main Content */}
       <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-10">
         {soloPaciente ? (
-          <EncabezadoPagina titulo="Mis sesiones" descripcion="Tus sesiones con tu psicólogo/a, presenciales y por videollamada." volverA="/welcome" textoVolver="Volver al inicio" />
+          <EncabezadoPagina titulo="Mis sesiones" descripcion="Las sesiones que tenés esta semana y cómo entrar a cada una: por videollamada o en el consultorio." volverA="/welcome" textoVolver="Volver al inicio" />
         ) : (
           <EncabezadoPagina titulo="Turnos" descripcion="Agenda de turnos presenciales y por videollamada: estados y pagos." volverA="/welcome" textoVolver="Volver al inicio" />
         )}
@@ -1667,6 +1668,13 @@ const handleUpdateSesion = async () => {
             )}
             {session?.user?.pacienteId && (
             <TabsContent value="paciente" className="space-y-4">
+              {soloPaciente ? (
+                // El paciente ve sus sesiones de la semana en lista, con cómo entrar a cada una
+                <SesionesDeLaSemana
+                  sesiones={sesiones.filter((s) => s.pacientes?.some((p) => p.id === session?.user?.pacienteId))}
+                  onReprogramar={(s) => setSesionReprogramar(s as Sesion)}
+                />
+              ) : (
               <Card style={{ backgroundColor: "var(--card)" }}>
                 <CardHeader>
                   <CardTitle className="text-foreground flex items-center space-x-2">
@@ -1677,6 +1685,7 @@ const handleUpdateSesion = async () => {
                 </CardHeader>
                 <CardContent>{renderCalendarWithSessions("paciente")}</CardContent>
               </Card>
+              )}
             </TabsContent>
             )}
           </Tabs>

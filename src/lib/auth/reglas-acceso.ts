@@ -29,8 +29,6 @@ const BUSCA_PACIENTES = ["Registrar Sesión", "Editar Sesión", "Registrar Infor
 // ----- PÁGINAS -----
 export const REGLAS_PAGINAS: Regla[] = [
   { ruta: "/welcome", permisos: "cualquiera" },
-  // Panel del paciente: sus turnos, sesiones y seguimientos (la página muestra solo lo suyo)
-  { ruta: "/mi-tratamiento", permisos: ["Ver Sesiones", "Ver Informes"] },
   { ruta: "/cuenta", permisos: "cualquiera" },
   { ruta: "/usuarios/registrar", permisos: ["Registrar Usuario"] },
   { ruta: "/usuarios/editar/[id]", permisos: ["Editar Usuario"] },

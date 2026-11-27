@@ -60,7 +60,7 @@ export default function MisSeguimientosPage() {
       <main className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6 sm:py-10">
         <EncabezadoPagina
           titulo="Mis seguimientos"
-          descripcion="Lo que trabajaste en cada sesión, tus actividades para la semana y las pautas de tu psicólogo/a."
+          descripcion="Tus seguimientos anteriores: lo que trabajaste en cada sesión y lo que te dejó tu psicólogo/a."
           volverA="/welcome"
           textoVolver="Volver al inicio"
         />
@@ -128,7 +128,16 @@ function TarjetaSeguimiento({
         className="flex w-full items-center justify-between gap-4 p-5 text-left transition-colors hover:bg-foreground/5"
       >
         <div className="min-w-0">
-          <p className="font-semibold capitalize text-foreground">Sesión del {fechaSesion(s.fechaSesion)}</p>
+          <p className="font-semibold text-foreground">Sesión del {fechaSesion(s.fechaSesion)}</p>
+          {/* Lo que le dejó el psicólogo, de un vistazo sin abrir el seguimiento */}
+          <p className="mt-0.5 text-sm text-texto-2">
+            Te dejó:{" "}
+            {[
+              s.actividades.length > 0 && `${s.actividades.length} ${s.actividades.length === 1 ? "actividad" : "actividades"}`,
+              s.pautas && "pautas",
+              s.avances && "tus avances",
+            ].filter(Boolean).join(", ") || "lo trabajado en la sesión"}
+          </p>
           <p className="mt-0.5 text-sm text-tenue">
             {s.psicologo ?? "Tu psicólogo/a"}
             {pendientes > 0 && (
@@ -144,6 +153,10 @@ function TarjetaSeguimiento({
       {abierto && (
         <div className="space-y-6 border-t border-borde p-5">
           <Bloque titulo="Lo que trabajamos en la sesión" texto={s.resumen} />
+
+          {(s.actividades.length > 0 || s.pautas) && (
+            <h3 className="-mb-3 text-sm font-semibold uppercase tracking-wide text-dorado">Lo que te dejó tu psicólogo/a</h3>
+          )}
 
           {s.actividades.length > 0 && (
             <div>
