@@ -4,7 +4,7 @@
 // Botón «Ordenar con IA» (RF 2.3): pide la propuesta de estructura y la muestra al lado del texto original.
 // No reemplaza nada hasta que el psicólogo la acepta.
 import { useEffect, useState } from "react";
-import { AlertCircle, Check, Loader2, ShieldAlert, Sparkles, X } from "lucide-react";
+import { AlertCircle, Check, Loader2, ShieldAlert, Sparkles, Undo2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface PropuestaIAProps {
@@ -22,6 +22,9 @@ export default function PropuestaIA({ texto, onAceptar, disabled }: PropuestaIAP
   const [propuesta, setPropuesta] = useState<string | null>(null);
   const [original, setOriginal] = useState("");
   const [error, setError] = useState("");
+  // Después de aceptar, se guardan las dos versiones para poder ir y volver entre ellas hasta guardar la nota.
+  // Al cambiar, lo que el profesional editó en la versión que deja queda guardado en esa versión.
+  const [versiones, setVersiones] = useState<{ mia: string; ia: string; usando: "mia" | "ia" } | null>(null);
   // null mientras se consulta si el servidor tiene la clave de la IA
   const [configurada, setConfigurada] = useState<boolean | null>(null);
 
@@ -36,6 +39,7 @@ export default function PropuestaIA({ texto, onAceptar, disabled }: PropuestaIAP
     setCargando(true);
     setError("");
     setPropuesta(null);
+    setVersiones(null);
     try {
       const respuesta = await fetch("/api/informes/estructurar", {
         method: "POST",
@@ -58,8 +62,22 @@ export default function PropuestaIA({ texto, onAceptar, disabled }: PropuestaIAP
   };
 
   const aceptar = () => {
-    if (propuesta) onAceptar(propuesta);
+    if (propuesta) {
+      onAceptar(propuesta);
+      setVersiones({ mia: original, ia: propuesta, usando: "ia" });
+    }
     setPropuesta(null);
+  };
+
+  const cambiarVersion = () => {
+    if (!versiones) return;
+    if (versiones.usando === "ia") {
+      setVersiones({ ...versiones, ia: texto, usando: "mia" });
+      onAceptar(versiones.mia);
+    } else {
+      setVersiones({ ...versiones, mia: texto, usando: "ia" });
+      onAceptar(versiones.ia);
+    }
   };
 
   return (
@@ -97,10 +115,32 @@ export default function PropuestaIA({ texto, onAceptar, disabled }: PropuestaIAP
         </p>
       )}
 
+      {versiones && propuesta === null && (
+        <div className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-dorado/40 bg-background px-3 py-2">
+          <p className="text-sm text-suave">
+            {versiones.usando === "ia"
+              ? "Estás usando la versión ordenada por la IA."
+              : "Volviste a tu versión."}{" "}
+            Podés cambiar hasta que guardes la nota.
+          </p>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            disabled={disabled}
+            onClick={cambiarVersion}
+            className="border-dorado text-dorado hover:bg-primary hover:text-primary-foreground"
+          >
+            {versiones.usando === "ia" ? <Undo2 className="mr-2 h-4 w-4" /> : <Sparkles className="mr-2 h-4 w-4" />}
+            {versiones.usando === "ia" ? "Volver a mi versión" : "Usar la de la IA"}
+          </Button>
+        </div>
+      )}
+
       {propuesta !== null && (
         <div className="space-y-3 rounded-md border border-dorado/40 bg-background p-4">
           <p className="text-sm text-suave">
-            Revisá la propuesta antes de usarla. Si la aceptás, reemplaza el contenido y lo podés seguir editando.
+            Revisá la propuesta antes de usarla. Si la aceptás, reemplaza el contenido y lo podés seguir editando; hasta que guardes, podés volver a tu versión.
           </p>
           <div className="grid gap-3 md:grid-cols-2">
             <div className="space-y-1">
