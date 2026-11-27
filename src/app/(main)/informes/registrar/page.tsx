@@ -15,11 +15,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { TypographyH1, TypographyP, TypographySmall } from '@/components/ui/typography';
-import { FilePlus, X, Check, Loader2, AlertCircle, Lock } from "lucide-react"
+import { FilePlus, X, Check, Loader2, AlertCircle, Lock, UserPlus } from "lucide-react"
 import { cn } from "@/lib/utils";
 import { ImagenesPendientes, subirImagen, type ImagenPendiente } from "@/components/informes/ImagenesNota";
 import { avisoError } from "@/lib/avisos";
 import MotivosConsulta from "@/components/informes/MotivosConsulta";
+import DialogoPacienteNuevo from "@/components/pacientes/DialogoPacienteNuevo";
 import { etiquetasConMotivos, tituloDeMotivos } from "@/lib/informes/motivos-consulta";
 
 // Interfaces
@@ -65,6 +66,8 @@ export default function RegistrarInformePage() {
   const [imagenes, setImagenes] = useState<ImagenPendiente[]>([]);
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [isPacientePopoverOpen, setIsPacientePopoverOpen] = useState(false);
+  // Paciente que todavía no está en el sistema: se registra sin salir de la nota
+  const [pacienteNuevoAbierto, setPacienteNuevoAbierto] = useState(false);
   
   const [hasPagePermission, setHasPagePermission] = useState<boolean | null>(null);
   const [loadingPermissions, setLoadingPermissions] = useState(true);
@@ -430,6 +433,15 @@ export default function RegistrarInformePage() {
                             {pacienteSearchQuery.length > 1
                               ? "No se encontraron pacientes."
                               : "No tenés pacientes con sesiones aún. Escribí un nombre, apellido o DNI para buscar."}
+                            {pacienteSearchQuery.length > 1 && (
+                              <button
+                                type="button"
+                                onMouseDown={(e) => { e.preventDefault(); setIsPacientePopoverOpen(false); setPacienteNuevoAbierto(true); }}
+                                className="mx-auto mt-2 flex items-center gap-1.5 font-semibold text-dorado hover:underline"
+                              >
+                                <UserPlus className="h-4 w-4" /> Registrar «{pacienteSearchQuery.trim()}» como paciente nuevo
+                              </button>
+                            )}
                           </div>
                         )}
                       </div>
@@ -440,6 +452,25 @@ export default function RegistrarInformePage() {
                 {formErrors.pacientesIds && (
                   <TypographySmall className="text-peligro">{formErrors.pacientesIds}</TypographySmall>
                 )}
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setPacienteNuevoAbierto(true)}
+                  className="h-auto gap-1.5 px-0 text-dorado hover:bg-transparent hover:underline"
+                >
+                  <UserPlus className="h-4 w-4" />
+                  ¿Paciente nuevo, que no está en el sistema? Registralo acá
+                </Button>
+                <DialogoPacienteNuevo
+                  abierto={pacienteNuevoAbierto}
+                  busqueda={pacienteSearchQuery}
+                  onCerrar={() => setPacienteNuevoAbierto(false)}
+                  onListo={(paciente) => {
+                    setPacienteNuevoAbierto(false);
+                    handleSelectPaciente(paciente);
+                  }}
+                />
               </div>
 
             </CardContent>

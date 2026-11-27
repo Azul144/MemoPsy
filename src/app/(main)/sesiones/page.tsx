@@ -22,7 +22,7 @@ import { Calendar } from "@/components/ui/calendar"
 import { DIAS_NO_HABILES, MENSAJE_DIA_NO_HABIL, esDiaHabil, esFechaHabil, proximoDiaHabil } from "@/lib/validaciones/dias-habiles"
 import { Badge } from "@/components/ui/badge"
 import { TypographyP } from '@/components/ui/typography';
-import { Loader2, X, CalendarIcon, CalendarClock, Plus, Users, User, Brain, Clock, MapPin, Activity, Check, Pencil, Wallet, Video, Send, Sun, Moon, FolderOpen } from "lucide-react"
+import { Loader2, X, CalendarIcon, CalendarClock, Plus, Users, User, Brain, Clock, MapPin, Activity, Check, Pencil, Wallet, Video, Send, Sun, Moon, FolderOpen, UserPlus } from "lucide-react"
 import { format, parseISO, isSameDay } from "date-fns"
 import { es } from "date-fns/locale"
 import { cn } from "@/lib/utils"
@@ -33,6 +33,7 @@ import DialogoHorarios from "@/components/sesiones/DialogoHorarios";
 import HorariosDeAtencion from "@/components/sesiones/HorariosDeAtencion";
 import { TURNOS } from "@/lib/sesiones/turnos-atencion";
 import DialogoReprogramar from "@/components/sesiones/DialogoReprogramar";
+import DialogoPacienteNuevo from "@/components/pacientes/DialogoPacienteNuevo";
 
 // Los turnos terminan el mismo día: al cambiar la fecha de inicio, la de fin la acompaña
 // si estaba en el mismo día que el inicio anterior o quedaría antes del nuevo inicio.
@@ -118,6 +119,8 @@ export default function SesionesPage() {
   // Búsqueda de psicólogos y pacientes
   const [psicologoSearch, setPsicologoSearch] = useState("")
   const [pacienteSearch, setPacienteSearch] = useState("")
+  // Paciente que todavía no está en el sistema: se registra sin salir del turno
+  const [pacienteNuevoAbierto, setPacienteNuevoAbierto] = useState(false)
   const [psicologoSearchResults, setPsicologoSearchResults] = useState<Psicologo[]>([])
   const [pacienteSearchResults, setPacienteSearchResults] = useState<Paciente[]>([])
   const [isPsicologoPopoverOpen, setIsPsicologoPopoverOpen] = useState(false)
@@ -1562,6 +1565,15 @@ const handleUpdateSesion = async () => {
                                               : formData.psicologoId
                                                 ? "Este psicólogo todavía no tiene pacientes. Escribe para buscar."
                                                 : "Elige un psicólogo para ver sus pacientes, o escribe para buscar"}
+                                            {pacienteSearch.trim().length > 1 && (
+                                              <button
+                                                type="button"
+                                                onClick={() => { setIsPacientePopoverOpen(false); setPacienteNuevoAbierto(true) }}
+                                                className="mx-auto mt-2 flex items-center gap-1.5 font-semibold text-dorado hover:underline"
+                                              >
+                                                <UserPlus className="h-4 w-4" /> Registrar «{pacienteSearch.trim()}» como paciente nuevo
+                                              </button>
+                                            )}
                                           </div>
                                         )}
                                       </div>
@@ -1571,6 +1583,25 @@ const handleUpdateSesion = async () => {
                                 {formErrors.pacientesIds && (
                                   <p className="text-sm text-peligro">{formErrors.pacientesIds}</p>
                                 )}
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => setPacienteNuevoAbierto(true)}
+                                  className="h-auto gap-1.5 px-0 text-dorado hover:bg-transparent hover:underline"
+                                >
+                                  <UserPlus className="h-4 w-4" />
+                                  ¿Paciente nuevo? Registralo acá
+                                </Button>
+                                <DialogoPacienteNuevo
+                                  abierto={pacienteNuevoAbierto}
+                                  busqueda={pacienteSearch}
+                                  onCerrar={() => setPacienteNuevoAbierto(false)}
+                                  onListo={(paciente) => {
+                                    setPacienteNuevoAbierto(false)
+                                    handleSelectPaciente(paciente)
+                                  }}
+                                />
                               </div>
                             </div>
                             <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">

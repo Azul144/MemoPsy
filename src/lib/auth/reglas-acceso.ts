@@ -84,6 +84,8 @@ export const REGLAS_API: Regla[] = [
 
   // Pacientes y psicólogos
   { ruta: "/api/pacientes", metodos: ["GET"], permisos: BUSCA_PACIENTES },
+  // Alta rápida de un paciente nuevo (sin cuenta) desde la nota clínica o el turno
+  { ruta: "/api/pacientes", metodos: ["POST"], permisos: ["Registrar Informe", "Registrar Sesión"] },
   { ruta: "/api/pacientes/buscar", metodos: ["GET"], permisos: BUSCA_PACIENTES },
   { ruta: "/api/pacientes/[id]", metodos: ["GET"], permisos: BUSCA_PACIENTES },
   { ruta: "/api/pacientes/[id]", metodos: ["PUT"], permisos: ["Editar Usuario"] },
