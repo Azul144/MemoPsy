@@ -154,23 +154,26 @@ function TarjetaSeguimiento({
         <div className="space-y-6 border-t border-borde p-5">
           <Bloque titulo="Lo que trabajamos en la sesión" texto={s.resumen} />
 
+          {/* Lo que le dejó el psicólogo: actividades y pautas, juntas y con su propio título */}
           {(s.actividades.length > 0 || s.pautas) && (
-            <h3 className="-mb-3 text-sm font-semibold uppercase tracking-wide text-dorado">Lo que te dejó tu psicólogo/a</h3>
-          )}
+            <div className="space-y-5 border-t border-borde pt-5">
+              <h3 className="text-sm font-semibold uppercase tracking-wide text-dorado">Lo que te dejó tu psicólogo/a</h3>
 
-          {s.actividades.length > 0 && (
-            <div>
-              <h3 className="mb-1 font-semibold text-foreground">Actividades hasta la próxima sesión</h3>
-              <p className="mb-3 text-sm text-tenue">Contale a tu psicólogo/a si pudiste hacerlas. Lo va a ver antes de la próxima sesión.</p>
-              <ol className="space-y-3">
-                {s.actividades.map((a, i) => (
-                  <ActividadParaResponder key={a.id} numero={i + 1} actividad={a} onRespondida={onRespondida} />
-                ))}
-              </ol>
+              {s.actividades.length > 0 && (
+                <div>
+                  <h4 className="mb-1 font-semibold text-foreground">Actividades hasta la próxima sesión</h4>
+                  <p className="mb-3 text-sm text-tenue">Contale a tu psicólogo/a si pudiste hacerlas. Lo va a ver antes de la próxima sesión.</p>
+                  <ol className="space-y-3">
+                    {s.actividades.map((a, i) => (
+                      <ActividadParaResponder key={a.id} numero={i + 1} actividad={a} onRespondida={onRespondida} />
+                    ))}
+                  </ol>
+                </div>
+              )}
+
+              {s.pautas && <Bloque titulo="Pautas y recomendaciones" texto={s.pautas} />}
             </div>
           )}
-
-          {s.pautas && <Bloque titulo="Pautas y recomendaciones" texto={s.pautas} />}
           {s.avances && <Bloque titulo="Avances y logros" texto={s.avances} destacado />}
 
           <GaleriaImagenes informeId={s.informeId} titulo="Imágenes que compartió tu psicólogo/a" />
