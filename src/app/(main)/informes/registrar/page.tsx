@@ -19,6 +19,8 @@ import { FilePlus, X, Check, Loader2, AlertCircle, Lock } from "lucide-react"
 import { cn } from "@/lib/utils";
 import { ImagenesPendientes, subirImagen, type ImagenPendiente } from "@/components/informes/ImagenesNota";
 import { avisoError } from "@/lib/avisos";
+import MotivosConsulta from "@/components/informes/MotivosConsulta";
+import { etiquetasConMotivos, tituloDeMotivos } from "@/lib/informes/motivos-consulta";
 
 // Interfaces
 interface Paciente {
@@ -163,6 +165,23 @@ export default function RegistrarInformePage() {
     }
   };
 
+  // Motivo de consulta: arma el título (si el psicólogo no lo cambió a mano) y se suma a las etiquetas
+  const [motivos, setMotivos] = useState<string[]>([]);
+  const cambiarMotivo = (motivo: string) => {
+    const quitar = motivos.includes(motivo);
+    const nuevos = quitar ? motivos.filter((m) => m !== motivo) : [...motivos, motivo];
+    setMotivos(nuevos);
+    setFormData(prev => {
+      const tituloAutomatico = !prev.titulo.trim() || prev.titulo === tituloDeMotivos(motivos);
+      return {
+        ...prev,
+        titulo: tituloAutomatico ? tituloDeMotivos(nuevos) : prev.titulo,
+        etiquetas: etiquetasConMotivos(prev.etiquetas, quitar ? [] : [motivo], quitar ? [motivo] : []),
+      };
+    });
+    if (formErrors.titulo) setFormErrors(prev => ({ ...prev, titulo: undefined }));
+  };
+
   // Lo dictado se suma al final de lo que ya está escrito, nunca lo reemplaza.
   const agregarDictado = (texto: string) => {
     setFormData(prev => ({
@@ -291,10 +310,16 @@ export default function RegistrarInformePage() {
                 </div>
               )}
               <div className="space-y-2">
+                <Label className="text-texto-2">Motivo de consulta</Label>
+                <TypographySmall className="block text-tenue">Marcá con qué vino tu paciente. Arma el título y se suma a las etiquetas.</TypographySmall>
+                <MotivosConsulta seleccionados={motivos} onCambiar={cambiarMotivo} disabled={isSubmitting} />
+              </div>
+
+              <div className="space-y-2">
                 <Label htmlFor="titulo" className="text-texto-2">Título</Label>
                 <Input
                   id="titulo" name="titulo" value={formData.titulo} onChange={handleInputChange}
-                  placeholder="Ej: Informe de Progreso Trimestral"
+                  placeholder="Ej: Ansiedad · Primera entrevista"
                   className={cn("bg-background text-foreground border-borde-fuerte focus:border-dorado", formErrors.titulo && "border-red-500")}
                 />
                 {formErrors.titulo && <TypographySmall className="text-peligro">{formErrors.titulo}</TypographySmall>}
