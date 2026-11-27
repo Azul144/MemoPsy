@@ -104,3 +104,22 @@ export async function enviarPorInfobip(r: RecordatorioWhatsapp): Promise<void> {
 
   if (!respuesta.ok) throw new WhatsappError(respuesta.status);
 }
+
+// Mensaje de texto libre (por ejemplo, el aviso de crisis al psicólogo). Mismo remitente que el
+// recordatorio. Con el remitente de prueba solo llega a los números verificados en la cuenta, y
+// WhatsApp lo entrega dentro de las 24 horas después de que el destinatario le escribió al número.
+export async function enviarTextoPorInfobip(para: string, texto: string): Promise<void> {
+  const propio = process.env.INFOBIP_WHATSAPP_FROM?.replace(/\D/g, "");
+  const from = propio || REMITENTE_PRUEBA;
+  const to = propio ? para : para.replace(/^549/, "54");
+  const respuesta = await fetch(`${urlBase()}/whatsapp/1/message/text`, {
+    method: "POST",
+    headers: {
+      Authorization: `App ${process.env.INFOBIP_API_KEY}`,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({ from, to, content: { text: texto } }),
+  });
+  if (!respuesta.ok) throw new WhatsappError(respuesta.status);
+}

@@ -563,7 +563,7 @@ export default function EditarUsuarioPage() {
                   {fieldErrors.telefono ? (
                     <p className="text-peligro text-sm mt-1">{fieldErrors.telefono}</p>
                   ) : (
-                    <p className="text-tenue text-sm mt-1">Opcional. Dato de contacto del paciente.</p>
+                    <p className="text-tenue text-sm mt-1">Opcional. Al paciente le llegan ahí los recordatorios; al psicólogo, los avisos de crisis de sus pacientes.</p>
                   )}
                   {formData.telefono.trim() !== "" && (
                   <div className="flex items-start gap-3 pt-3">
