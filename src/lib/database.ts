@@ -103,25 +103,29 @@ function usarZonaHoraria(dataSource: DataSource) {
   })
 }
 
-// Singleton para mantener la conexión
-let initialized = false
+// Singleton para mantener la conexión. Se guarda la PROMESA de la inicialización: al arrancar el
+// servidor, los recordatorios y los turnos pactados piden la base al mismo tiempo, y si cada uno
+// inicializaba por su cuenta, el segundo fallaba («ya se está conectando»).
+let inicializando: Promise<DataSource> | null = null
 
 export async function initializeDatabase() {
-  if (!initialized) {
-    try {
+  if (AppDataSource.isInitialized && !inicializando) return AppDataSource
+  if (!inicializando) {
+    inicializando = (async () => {
       if (!AppDataSource.isInitialized) {
         console.log("Intentando inicializar la conexión a la base de datos...")
         await AppDataSource.initialize()
         await usarZonaHoraria(AppDataSource)
         console.log("¡Data Source ha sido inicializado correctamente!")
       }
-      initialized = true
-    } catch (error) {
+      return AppDataSource
+    })().catch((error) => {
       console.error("Error durante la inicialización del Data Source", error)
+      inicializando = null // el próximo pedido lo vuelve a intentar
       throw error
-    }
+    })
   }
-  return AppDataSource
+  return inicializando
 }
 
 // Función para obtener un repositorio
