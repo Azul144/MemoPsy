@@ -141,7 +141,9 @@ function diaMas(n: number): { fecha: string; diaSemana: number } {
   return { fecha, diaSemana }
 }
 
-let generando = false
+// Momento en que empezó la pasada general en curso (0 = ninguna). Si una pasada se trabó más de
+// 5 minutos, la siguiente no la espera.
+let generandoDesde = 0
 
 // Crea los turnos que faltan de los horarios pactados activos, para las próximas semanas.
 // Se puede llamar todas las veces que haga falta: no repite turnos.
@@ -152,8 +154,8 @@ export async function generarTurnosPactados(
   // La pasada general (sin filtro) no se superpone consigo misma; las de un paciente o psicólogo sí
   // pueden correr a la vez: la clave única (horario pactado + fecha) evita los turnos repetidos
   const general = !filtro.pacienteId && !filtro.psicologoId
-  if (general && generando) return { creados: 0 }
-  if (general) generando = true
+  if (general && generandoDesde && Date.now() - generandoDesde < 5 * 60 * 1000) return { creados: 0 }
+  if (general) generandoDesde = Date.now()
   let creados = 0
   let error: string | undefined
   try {
@@ -213,7 +215,7 @@ export async function generarTurnosPactados(
     error = e instanceof Error ? e.message : String(e)
     console.error("No se pudieron generar los turnos de los horarios pactados:", error)
   } finally {
-    if (general) generando = false
+    if (general) generandoDesde = 0
   }
   return { creados, error }
 }
@@ -227,4 +229,15 @@ export async function pactosActivos(
     where: { activo: true, ...filtro },
     order: { diaSemana: "ASC", horaInicio: "ASC" },
   })
+}
+
+// Completa los turnos pactados de TODOS los psicólogos, como mucho una vez cada 10 minutos por servidor.
+// La llama la agenda al cargarse: en Render gratis el servidor se duerme y la pasada de arranque o la de
+// cada hora no siempre llegan a correr.
+let ultimaPasada = 0
+export async function asegurarTurnosPactados(db: DataSource): Promise<void> {
+  if (Date.now() - ultimaPasada < 10 * 60 * 1000) return
+  ultimaPasada = Date.now()
+  const { error } = await generarTurnosPactados(db)
+  if (error) ultimaPasada = 0 // si falló, el próximo pedido lo vuelve a intentar
 }

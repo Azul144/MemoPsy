@@ -10,6 +10,7 @@ import { validarSesionesDelPaciente } from "@/lib/validaciones/sesiones-del-paci
 import { datosPago, puedeVerPagos } from "@/lib/sesiones/pagos"
 import { validarHorarioDeAtencion } from "@/lib/sesiones/horarios-libres"
 import { enlaceParaSesion } from "@/lib/videollamada"
+import { asegurarTurnosPactados } from "@/lib/sesiones/pacto"
 import { getServerSession } from "next-auth/next"
 import { authConfig } from "@/lib/auth/auth-config"
 import { initializeDatabase } from "@/lib/database"
@@ -31,6 +32,9 @@ export async function GET() {
     const dataSource = await initializeDatabase()
     const sesionRepository = dataSource.getRepository(SesionEntity)
     const pacienteTieneSesionRepository = dataSource.getRepository(PacienteTieneSesionEntity)
+
+    // RF 3.1 - Antes de mostrar la agenda se completan los turnos de los horarios pactados que falten
+    await asegurarTurnosPactados(dataSource)
 
     // RF 3.5 - Pago y obra social solo para quien tiene permiso
     const verPagos = puedeVerPagos(session.user)
