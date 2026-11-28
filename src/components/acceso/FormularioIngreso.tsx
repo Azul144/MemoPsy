@@ -24,9 +24,10 @@ const MENSAJES_ERROR: Record<string, string> = {
   CODIGO_INVALIDO: "El código no es correcto. Revisá tu app de autenticación.",
 };
 
-// Email que /login le pasa a /pacientes cuando una cuenta de paciente entró por el acceso del consultorio
+// Email que un acceso le pasa al otro cuando la cuenta entró por el que no es el suyo
 // (en sessionStorage y no en la dirección, para que el email no quede en el historial)
 const EMAIL_PARA_PACIENTES = "memopsy_email_paciente";
+const EMAIL_PARA_CONSULTORIO = "memopsy_email_consultorio";
 
 // Etiquetas en crema suave: así resalta lo que se escribe en el campo y no la etiqueta
 const ETIQUETA = { color: "color-mix(in srgb, var(--crema) 75%, transparent)" };
@@ -43,14 +44,18 @@ export default function FormularioIngreso({ paraPaciente = false }: { paraPacien
   const [cargando, setCargando] = useState(false);
   const [aviso, setAviso] = useState<string | null>(null);
 
-  // Llega desde /login: el email ya viene escrito
+  // Llega desde el otro acceso: el email ya viene escrito
   useEffect(() => {
-    if (!paraPaciente) return;
-    const guardado = sessionStorage.getItem(EMAIL_PARA_PACIENTES);
+    const clave = paraPaciente ? EMAIL_PARA_PACIENTES : EMAIL_PARA_CONSULTORIO;
+    const guardado = sessionStorage.getItem(clave);
     if (guardado) {
       setEmail(guardado);
-      setAviso("Esta es tu entrada como paciente. Ingresá de nuevo tu contraseña.");
-      sessionStorage.removeItem(EMAIL_PARA_PACIENTES);
+      setAviso(
+        paraPaciente
+          ? "Esta es tu entrada como paciente. Ingresá de nuevo tu contraseña."
+          : "Esta es la entrada del consultorio. Ingresá de nuevo tu contraseña."
+      );
+      sessionStorage.removeItem(clave);
     }
   }, [paraPaciente]);
 
@@ -79,6 +84,15 @@ export default function FormularioIngreso({ paraPaciente = false }: { paraPacien
         : "memopsy_acceso=; path=/; max-age=0; samesite=lax";
       router.replace("/welcome"); // reemplaza el login en el historial
       router.refresh();
+      return;
+    }
+
+    if (resultado?.error === "ES_CONSULTORIO") {
+      // Cuenta del consultorio en el acceso de pacientes: va a /login
+      setCargando(true);
+      setAviso("Esta cuenta es del consultorio. Te llevamos a su acceso…");
+      sessionStorage.setItem(EMAIL_PARA_CONSULTORIO, email);
+      setTimeout(() => router.replace("/login"), 1800);
       return;
     }
 

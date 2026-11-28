@@ -50,10 +50,11 @@ const ERRORES_CONOCIDOS = [
   "MFA_REQUERIDO",
   "CODIGO_INVALIDO",
   "ES_PACIENTE",
+  "ES_CONSULTORIO",
 ];
 
-// /login es el acceso del consultorio (psicólogo, recepción, auditoría, administración).
-// Una cuenta de paciente que entra por ahí no inicia sesión: la pantalla la manda a /pacientes.
+// /login es el acceso del consultorio (psicólogo, recepción, auditoría, administración) y /pacientes el del paciente.
+// Una cuenta que entra por el acceso que no es el suyo no inicia sesión: la pantalla la manda al que le corresponde.
 // Se revisa recién cuando la contraseña es correcta, así nadie averigua qué emails son de pacientes.
 async function esCuentaDePaciente(dataSource: Awaited<ReturnType<typeof initializeDatabase>>, email: string): Promise<boolean> {
   const usuario = await new UsuarioRepository(dataSource).findByEmail(email);
@@ -79,6 +80,15 @@ export const authConfig: NextAuthOptions = {
 
         const dataSource = await initializeDatabase();
         const porConsultorio = credentials.acceso === "consultorio";
+        const porPacientes = credentials.acceso === "paciente";
+        // Acceso equivocado: paciente por /login o personal del consultorio por /pacientes
+        const accesoEquivocado = async () => {
+          if (!porConsultorio && !porPacientes) return null;
+          const esPaciente = await esCuentaDePaciente(dataSource, credentials.email);
+          if (porConsultorio && esPaciente) return "ES_PACIENTE";
+          if (porPacientes && !esPaciente) return "ES_CONSULTORIO";
+          return null;
+        };
 
         // 1. Contraseña + código (si tiene MFA). Si algo falla, se corta acá
         //    y NO se crea la sesión.
@@ -91,9 +101,10 @@ export const authConfig: NextAuthOptions = {
             credentials.codigo || undefined
           );
         } catch (error) {
-          // Contraseña correcta pero falta el código: si es paciente y entró por /login, no se le pide el código
-          if (error instanceof Error && error.message === "MFA_REQUERIDO" && porConsultorio && (await esCuentaDePaciente(dataSource, credentials.email))) {
-            throw new Error("ES_PACIENTE");
+          // Contraseña correcta pero falta el código: si entró por el acceso equivocado, no se le pide el código
+          if (error instanceof Error && error.message === "MFA_REQUERIDO") {
+            const equivocado = await accesoEquivocado();
+            if (equivocado) throw new Error(equivocado);
           }
           // RF 1.4 - Intento de ingreso fallido (MFA_REQUERIDO no es un fallo: es el paso del código)
           if (!(error instanceof Error && error.message === "MFA_REQUERIDO")) {
@@ -112,10 +123,9 @@ export const authConfig: NextAuthOptions = {
           throw new Error("ERROR_INTERNO");
         }
 
-        // Cuenta de paciente por el acceso del consultorio: no se crea la sesión
-        if (porConsultorio && (await esCuentaDePaciente(dataSource, credentials.email))) {
-          throw new Error("ES_PACIENTE");
-        }
+        // Acceso equivocado: no se crea la sesión
+        const equivocado = await accesoEquivocado();
+        if (equivocado) throw new Error(equivocado);
 
         // 2. Perfiles y permisos del usuario (para el control de acceso por rol)
         const personaRepository = new PersonaRepository(dataSource);
