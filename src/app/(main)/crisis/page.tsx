@@ -48,7 +48,7 @@ export default function AvisoCrisisPage() {
             Le avisamos que estás pasando un momento difícil{canales.length > 0 ? ` (${canales.join(", ")})` : ""}. Se va a
             comunicar con vos cuando lo vea: no es atención inmediata.
           </p>
-          <LineasEmergencia className="rounded-2xl border border-red-400/50 bg-red-500/10 p-4" textoClassName="text-crema" />
+          <LineasEmergencia className="rounded-2xl bg-superficie p-4 text-crema" />
         </section>
       ) : (
         <section className="space-y-5 rounded-3xl bg-crisis-fondo p-6 text-crisis-texto">

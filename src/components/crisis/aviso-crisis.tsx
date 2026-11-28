@@ -39,24 +39,31 @@ export function useAvisoCrisis() {
 }
 
 // Teléfonos de emergencia, después de avisar: el psicólogo puede tardar en ver el aviso.
+// Una fila por teléfono (el número en una sola línea y una descripción corta abajo), con el color del lugar
+// donde se muestra: solo el círculo del teléfono va en rojo, para que se vea sin alarmar.
 // Sin indicaciones ni ejercicios: la intervención la decide el profesional.
 export function LineasEmergencia({ className, textoClassName }: { className?: string; textoClassName?: string }) {
   return (
     <div className={className}>
-      <p className={cn("text-sm font-semibold", textoClassName)}>Si estás en peligro ahora, no esperes la respuesta: llamá.</p>
-      <div className="mt-3 flex flex-wrap gap-2">
+      <p className={cn("text-sm font-semibold", textoClassName)}>¿Estás en peligro ahora? No esperes, llamá:</p>
+      <ul className="mt-2 space-y-2">
         {LINEAS_EMERGENCIA.map((l) => (
-          <a
-            key={l.numero}
-            href={`tel:${l.marcar}`}
-            className="inline-flex items-center gap-2 rounded-full bg-red-600 px-4 py-2 text-sm font-bold text-white transition-opacity hover:opacity-90"
-          >
-            <Phone className="h-4 w-4" aria-hidden="true" />
-            {l.numero}
-            <span className="font-medium">· {l.nombre}</span>
-          </a>
+          <li key={l.numero}>
+            <a
+              href={`tel:${l.marcar}`}
+              className="flex items-center gap-3 rounded-2xl border border-current/15 px-3 py-2 transition-colors hover:bg-current/5"
+            >
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-red-600 text-white">
+                <Phone className="h-4 w-4" aria-hidden="true" />
+              </span>
+              <span className="min-w-0 leading-tight">
+                <span className="block whitespace-nowrap text-base font-bold">{l.numero}</span>
+                <span className="block text-xs opacity-75">{l.corto}</span>
+              </span>
+            </a>
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   )
 }

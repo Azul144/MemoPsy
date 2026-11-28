@@ -14,9 +14,10 @@ export interface LineaAyuda {
   numero: string
   marcar: string // lo que va en tel:
   nombre: string
+  corto: string // descripción breve, para la tarjeta del sistema
 }
 
 export const LINEAS_EMERGENCIA: LineaAyuda[] = [
-  { numero: "911", marcar: "911", nombre: "Emergencias" },
-  { numero: "0800 999 0091", marcar: "08009990091", nombre: "Línea nacional de salud mental, gratuita, 24 h" },
+  { numero: "911", marcar: "911", nombre: "Emergencias", corto: "Emergencias" },
+  { numero: "0800 999 0091", marcar: "08009990091", nombre: "Línea nacional de salud mental, gratuita, 24 h", corto: "Salud mental · gratis, las 24 h" },
 ]
