@@ -14,6 +14,10 @@ export class PsicologoEntity extends BaseEntity {
   @Column({ name: "numero_licencia" })
   numeroLicencia: string;
 
+  // RF 3.1 - Lugares por semana que quiere dejar libres aparte de los horarios pactados
+  @Column({ name: "lugares_reservados", type: "tinyint", default: 5 })
+  lugaresReservados?: number;
+
   @OneToOne("PersonaEntity")
   @JoinColumn({ name: "id_persona" })
   persona: PersonaEntity;

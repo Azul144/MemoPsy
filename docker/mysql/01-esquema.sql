@@ -266,6 +266,7 @@ CREATE TABLE `psicologo` (
   `id_persona` int NOT NULL,
   `especialidad` varchar(100) DEFAULT NULL,
   `numero_licencia` varchar(50) DEFAULT NULL,
+  `lugares_reservados` tinyint NOT NULL DEFAULT '5',
   PRIMARY KEY (`id_psicologo`),
   KEY `persona_id` (`id_persona`),
   CONSTRAINT `psicologo_ibfk_1` FOREIGN KEY (`id_persona`) REFERENCES `persona` (`id_persona`)

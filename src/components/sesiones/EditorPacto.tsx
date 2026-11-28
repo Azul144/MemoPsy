@@ -6,7 +6,7 @@
 import { useCallback, useEffect, useState } from "react"
 import { AlertCircle, CalendarClock, Loader2, Pencil, Plus, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { avisoExito } from "@/lib/avisos"
+import { avisoExito, confirmar } from "@/lib/avisos"
 import { DIAS_ATENCION, horasDeInicio, type FranjaAtencion } from "@/lib/sesiones/turnos-atencion"
 
 interface Pacto { diaSemana: number; horaInicio: string; modalidadId: number; modalidad?: string }
@@ -76,16 +76,22 @@ export default function EditorPacto({
     }))
   }
 
-  const guardar = async () => {
+  const guardar = async (confirmado = false) => {
     setGuardando(true)
     setError("")
     try {
       const res = await fetch("/api/pactos", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ psicologoId: Number(psicologoId), pacienteId: Number(pacienteId), horarios: borrador }),
+        body: JSON.stringify({ psicologoId: Number(psicologoId), pacienteId: Number(pacienteId), horarios: borrador, confirmar: confirmado }),
       })
       const datos = await res.json().catch(() => ({}))
+      // Se queda sin los lugares libres que quiere reservar: decide el profesional
+      if (res.status === 409 && datos.requiereConfirmar) {
+        setGuardando(false)
+        if (await confirmar(datos.aviso, "Sí, pactarlo")) await guardar(true)
+        return
+      }
       if (!res.ok) throw new Error(datos.error || "No se pudo guardar el horario pactado.")
       avisoExito(
         borrador.length === 0
@@ -172,7 +178,7 @@ export default function EditorPacto({
             </p>
           )}
           <div className="flex gap-2">
-            <Button type="button" onClick={guardar} disabled={guardando} className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
+            <Button type="button" onClick={() => guardar()} disabled={guardando} className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
               {guardando && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Guardar
             </Button>

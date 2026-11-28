@@ -69,6 +69,7 @@ const NOMBRE_ACCION: Record<string, string> = {
   PEDIR_RESTABLECER: "Pidió restablecer la contraseña",
   ENVIAR_ACCESO: "Envió el email de acceso",
   PACTAR_HORARIO: "Horario pactado",
+  RESERVAR_LUGARES: "Lugares libres reservados",
   AVISO_CRISIS: "Aviso de crisis al psicólogo",
 }
 

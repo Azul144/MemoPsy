@@ -5,22 +5,52 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { CalendarClock, Monitor, Users } from "lucide-react"
+import { CalendarClock, Check, Loader2, Monitor, Pencil, Users } from "lucide-react"
+import { avisoError, avisoExito } from "@/lib/avisos"
 import { DIAS_ATENCION, TURNOS } from "@/lib/sesiones/turnos-atencion"
 import { cn } from "@/lib/utils"
 
 interface Pacto { id: number; pacienteId: number; paciente: string; diaSemana: number; horaInicio: string; modalidad: string }
 interface SinPacto { id: string; nombre: string }
+interface Margen { capacidad: number; pactados: number; reservados: number; libres: number }
 
 export default function MiSemana({ psicologoId, sinPactoCandidatos = [] }: { psicologoId: string; sinPactoCandidatos?: SinPacto[] }) {
   const [pactos, setPactos] = useState<Pacto[] | null>(null)
+  const [margen, setMargen] = useState<Margen | null>(null)
+  const [editandoReserva, setEditandoReserva] = useState(false)
+  const [reserva, setReserva] = useState(0)
+  const [guardandoReserva, setGuardandoReserva] = useState(false)
 
   useEffect(() => {
     fetch(`/api/pactos?psicologoId=${psicologoId}`)
       .then((r) => r.json())
-      .then((d) => setPactos(d.pactos ?? []))
+      .then((d) => {
+        setPactos(d.pactos ?? [])
+        if (d.margen) setMargen(d.margen)
+      })
       .catch(() => setPactos([]))
   }, [psicologoId])
+
+  // Cuántos lugares por semana quiere dejar libres para pacientes nuevos o urgencias
+  const guardarReserva = async () => {
+    setGuardandoReserva(true)
+    try {
+      const res = await fetch("/api/pactos", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ psicologoId: Number(psicologoId), reservados: reserva }),
+      })
+      const datos = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(datos.error || "No se pudo guardar.")
+      setMargen(datos.margen)
+      setEditandoReserva(false)
+      avisoExito(`Vas a dejar ${reserva} ${reserva === 1 ? "lugar libre" : "lugares libres"} por semana.`)
+    } catch (e) {
+      avisoError(e instanceof Error ? e.message : "No se pudo guardar.")
+    } finally {
+      setGuardandoReserva(false)
+    }
+  }
 
   const conPacto = new Set((pactos ?? []).map((p) => String(p.pacienteId)))
   const sinPacto = sinPactoCandidatos.filter((p) => !conPacto.has(String(p.id)))
@@ -41,6 +71,57 @@ export default function MiSemana({ psicologoId, sinPactoCandidatos = [] }: { psi
           </p>
         </div>
       </div>
+
+      {/* Encuadre: lugares de la semana, cuántos están pactados y cuántos quedan para nuevos o urgencias */}
+      {margen && (
+        <div className="mb-4 flex flex-wrap items-center gap-x-6 gap-y-2 rounded-xl border border-foreground/10 bg-card px-4 py-3 text-sm">
+          <span className="text-suave"><strong className="text-foreground">{margen.capacidad}</strong> lugares por semana</span>
+          <span className="text-suave"><strong className="text-foreground">{margen.pactados}</strong> pactados</span>
+          <span className={margen.libres < margen.reservados ? "text-aviso" : "text-exito"}>
+            <strong>{margen.libres}</strong> libres
+          </span>
+          <span className="flex items-center gap-2 text-suave">
+            Reservás
+            {editandoReserva ? (
+              <>
+                <input
+                  type="number"
+                  min={0}
+                  max={30}
+                  value={reserva}
+                  onChange={(e) => setReserva(Math.max(0, Math.min(30, Number(e.target.value) || 0)))}
+                  aria-label="Lugares libres que querés reservar por semana"
+                  className="h-8 w-16 rounded-lg border border-borde-fuerte bg-superficie px-2 text-foreground focus:border-dorado focus:outline-none"
+                />
+                <button type="button" onClick={guardarReserva} disabled={guardandoReserva} aria-label="Guardar" className="rounded-full p-1.5 text-dorado hover:bg-primary/15">
+                  {guardandoReserva ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+                </button>
+              </>
+            ) : (
+              <>
+                <strong className="text-foreground">{margen.reservados}</strong>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setReserva(margen.reservados)
+                    setEditandoReserva(true)
+                  }}
+                  aria-label="Cambiar los lugares reservados"
+                  className="rounded-full p-1 text-dorado hover:bg-primary/15"
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                </button>
+              </>
+            )}
+            para pacientes nuevos o urgencias
+          </span>
+          {margen.libres < margen.reservados && (
+            <span className="w-full text-xs text-aviso">
+              Te quedan menos lugares libres de los que querés reservar. Pensalo antes de pactar otro horario.
+            </span>
+          )}
+        </div>
+      )}
 
       <div className="grid gap-3 md:grid-cols-5">
         {DIAS_ATENCION.map((dia) => {

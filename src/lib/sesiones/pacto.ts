@@ -6,6 +6,7 @@ import type { DataSource, EntityManager } from "typeorm"
 import { In } from "typeorm"
 import {
   EstadoEntity,
+  PsicologoEntity,
   HorarioDisponibleEntity,
   HorarioPactadoEntity,
   PacienteTieneSesionEntity,
@@ -240,4 +241,42 @@ export async function asegurarTurnosPactados(db: DataSource): Promise<void> {
   ultimaPasada = Date.now()
   const { error } = await generarTurnosPactados(db)
   if (error) ultimaPasada = 0 // si falló, el próximo pedido lo vuelve a intentar
+}
+
+export interface Margen {
+  capacidad: number // turnos por semana que entran en sus días y horarios de atención
+  pactados: number // horarios pactados activos
+  reservados: number // lugares que quiere dejar libres
+  libres: number // capacidad - pactados
+}
+
+// Cuántos lugares tiene el psicólogo por semana, cuántos ya pactó y cuántos quiere dejar libres
+export async function margenDelPsicologo(db: DataSource | EntityManager, psicologoId: number): Promise<Margen> {
+  const franjas = await db.getRepository(HorarioDisponibleEntity).find({ where: { psicologoId } })
+  let capacidad = 0
+  for (const f of franjas) {
+    for (let m = aMin(f.horaInicio); m + DURACION_SESION_MIN <= aMin(f.horaFin); m += 60) capacidad++
+  }
+  const pactados = await db.getRepository(HorarioPactadoEntity).count({ where: { psicologoId, activo: true } })
+  const psicologo = await db.getRepository(PsicologoEntity).findOne({ where: { id: String(psicologoId) } })
+  const reservados = Number(psicologo?.lugaresReservados ?? 0)
+  return { capacidad, pactados, reservados, libres: Math.max(0, capacidad - pactados) }
+}
+
+// Si con este pacto el psicólogo se queda con menos lugares libres de los que quiere reservar,
+// devuelve el aviso para que confirme. No impide pactar: decide el profesional.
+export async function avisoDeMargen(
+  db: DataSource | EntityManager,
+  psicologoId: number,
+  pacienteId: number,
+  horarios: HorarioPacto[],
+): Promise<string | null> {
+  const margen = await margenDelPsicologo(db, psicologoId)
+  const actuales = await db.getRepository(HorarioPactadoEntity).count({ where: { psicologoId, pacienteId, activo: true } })
+  if (horarios.length <= actuales) return null // no ocupa lugares nuevos
+  const libresDespues = margen.capacidad - (margen.pactados - actuales + horarios.length)
+  if (libresDespues >= margen.reservados) return null
+  return libresDespues <= 0
+    ? "Con este horario tu semana queda completa: no te queda ningún lugar libre para pacientes nuevos o urgencias. ¿Pactarlo igual?"
+    : `Con este horario te quedan ${libresDespues} ${libresDespues === 1 ? "lugar libre" : "lugares libres"} por semana y querés reservar ${margen.reservados} para pacientes nuevos o urgencias. ¿Pactarlo igual?`
 }
