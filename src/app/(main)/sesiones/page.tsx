@@ -114,6 +114,8 @@ export default function SesionesPage() {
   const router = useRouter()
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
+  // Pestaña elegida (si no eligió ninguna, la que corresponde a su rol)
+  const [pestana, setPestana] = useState<string | undefined>(undefined)
   const [sesiones, setSesiones] = useState<Sesion[]>([])
   const [modalidades, setModalidades] = useState<any[]>([])
   const [estados, setEstados] = useState<any[]>([])
@@ -1160,7 +1162,7 @@ const handleUpdateSesion = async () => {
 
   // El psicólogo entra directo a su agenda de turnos; recepción, a registrar turnos
   // Pestañas que ve esta persona: si es una sola, no se muestra la barra de pestañas
-  const cantidadPestanas = [puedeRegistrarSesiones, !!session?.user?.psicologoId, !!session?.user?.pacienteId, soloConsulta].filter(Boolean).length
+  const cantidadPestanas = [puedeRegistrarSesiones, puedeVerTodaLaAgenda && puedeRegistrarSesiones, !!session?.user?.psicologoId, !!session?.user?.pacienteId, soloConsulta].filter(Boolean).length
 
   // Del lado del paciente se habla de "sesiones" (el psicólogo da turnos)
   const soloPaciente = !!session?.user?.pacienteId && !session?.user?.psicologoId && !puedeRegistrarSesiones
@@ -1190,14 +1192,7 @@ const handleUpdateSesion = async () => {
         )}
 
         {puedeVerSesiones ? (
-          <Tabs
-            defaultValue={defaultTabValue}
-            className="w-full"
-            onValueChange={() => {
-              // When changing tabs, we keep the same selected date
-              // This ensures consistency across different views
-            }}
-          >
+          <Tabs value={pestana ?? defaultTabValue} onValueChange={setPestana} className="w-full">
             {/* Con una sola pestaña (recepción, paciente, auditor) no hace falta mostrarla */}
             <TabsList className={cn("mb-2 flex w-full max-w-full justify-start overflow-x-auto sm:w-fit", cantidadPestanas <= 1 && "hidden")}>
               {puedeRegistrarSesiones && (
@@ -1206,6 +1201,12 @@ const handleUpdateSesion = async () => {
                   className="shrink-0 px-3 sm:px-6"
                 >
                   Registrar turnos
+                </TabsTrigger>
+              )}
+              {/* RF 3.1 - Recepción: alguien llega y quiere atenderse ya */}
+              {puedeVerTodaLaAgenda && puedeRegistrarSesiones && (
+                <TabsTrigger value="atender" className="shrink-0 px-3 sm:px-6">
+                  Atender ahora
                 </TabsTrigger>
               )}
               {session?.user?.psicologoId && (
@@ -1251,6 +1252,20 @@ const handleUpdateSesion = async () => {
               </TabsContent>
             )}
 
+            {puedeRegistrarSesiones && puedeVerTodaLaAgenda && (
+              <TabsContent value="atender" className="space-y-4">
+                <LibresAhora
+                  psicologos={psicologosAgenda}
+                  sesiones={sesiones}
+                  onElegir={(h) => {
+                    // El formulario de «Nuevo turno» vive en «Registrar turnos»
+                    setPestana("registrar")
+                    darTurnoEnHorario(h)
+                  }}
+                />
+              </TabsContent>
+            )}
+
             {puedeRegistrarSesiones && (
               <TabsContent value="registrar" className="space-y-4">
                 <Card style={{ backgroundColor: "var(--card)" }}>
@@ -1266,10 +1281,6 @@ const handleUpdateSesion = async () => {
                   <CardContent>
                     <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-6">
                       <div className="min-w-0 flex-1">
-                        {/* RF 3.1 - Alguien llega y quiere atenderse ya: psicólogos libres, ocupados y derivación */}
-                        {puedeVerTodaLaAgenda && (
-                          <LibresAhora psicologos={psicologosAgenda} sesiones={sesiones} onElegir={darTurnoEnHorario} />
-                        )}
                         {puedeVerTodaLaAgenda && (
                           <AgendaDelPsicologo
                             psicologos={psicologosAgenda}
