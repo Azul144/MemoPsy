@@ -16,26 +16,26 @@ export default function PantallaAcceso({ children, paraPaciente = false }: { chi
       {/* Panel con la foto (solo en pantallas grandes) */}
       <aside className="relative hidden overflow-hidden lg:block">
         <Image
-          // Paciente: una paciente sonriendo en el sillón; consultorio: la foto del consultorio
-          src={paraPaciente ? "/assets/consultorio2.jpg" : "/assets/consultorio.jpg"}
+          // Paciente: psicóloga y paciente charlando, encuadrada en la paciente; consultorio: la foto del consultorio
+          src={paraPaciente ? "/assets/terapia.jpg" : "/assets/consultorio.jpg"}
           alt=""
           fill
           priority
           sizes="55vw"
-          className={`foto-lenta object-cover ${paraPaciente ? "object-[50%_25%]" : ""}`}
+          className={`foto-lenta object-cover ${paraPaciente ? "object-[68%_50%]" : ""}`}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-background/10" />
 
         <div className="absolute inset-x-0 bottom-0 p-14">
-          <p className="titulo entrar max-w-lg text-4xl text-crema xl:text-5xl">
-            {paraPaciente ? "Tu terapia, siempre a mano." : "Tu consultorio, ordenado y protegido."}
+          <p className="titulo entrar max-w-lg text-balance text-4xl text-crema xl:text-5xl">
+            {paraPaciente ? "Seguí tu proceso, también entre sesiones." : "Tu consultorio, ordenado y protegido."}
           </p>
           <p
             className="entrar mt-5 flex items-center gap-2 text-crema/80"
             style={{ animationDelay: "0.2s" }}
           >
             {paraPaciente ? <CalendarCheck className="h-5 w-5 text-salvia" /> : <ShieldCheck className="h-5 w-5 text-salvia" />}
-            {paraPaciente ? "Confirmá tus turnos y repasá tus pautas desde el celular." : "Notas cifradas y acceso con verificación en dos pasos."}
+            {paraPaciente ? "Tus turnos, tus pautas y tus actividades, en tu cuenta." : "Notas cifradas y acceso con verificación en dos pasos."}
           </p>
         </div>
       </aside>
