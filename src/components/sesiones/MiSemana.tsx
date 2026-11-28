@@ -40,7 +40,6 @@ export default function MiSemana({ psicologoId, sinPactoCandidatos = [] }: { psi
               : `${pacientes} ${pacientes === 1 ? "paciente" : "pacientes"} con horario pactado. Los turnos de las próximas 4 semanas se crean solos.`}
           </p>
         </div>
-        <Link href="/informes/carpetas" className="text-sm text-dorado hover:underline">Ver todas las carpetas</Link>
       </div>
 
       <div className="grid gap-3 md:grid-cols-5">
