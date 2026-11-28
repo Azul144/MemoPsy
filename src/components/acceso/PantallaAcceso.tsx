@@ -2,7 +2,8 @@
 // Diseño compartido por login, "olvidé mi contraseña" y "nueva contraseña":
 // a la izquierda una foto con una frase, a la derecha el formulario.
 // En el celular se ve solo el formulario.
-// Para el paciente (enlace fijo /pacientes, email de bienvenida) no se muestra «Volver al inicio»:
+// Para el paciente (enlace fijo /pacientes, email de bienvenida) no se muestra «Volver al inicio»,
+// el formulario va sobre crema y a la izquierda, y la foto a la derecha:
 // la portada es para el psicólogo y el paciente entra directo a su cuenta, como al campus de una facultad.
 import Image from "next/image";
 import Link from "next/link";
@@ -12,9 +13,13 @@ import LogoMemoPsy from "@/components/comunes/LogoMemoPsy"
 
 export default function PantallaAcceso({ children, paraPaciente = false }: { children: React.ReactNode; paraPaciente?: boolean }) {
   return (
-    <main className="tema-oscuro grid min-h-dvh bg-background text-foreground lg:grid-cols-[1.1fr_1fr]">
-      {/* Panel con la foto (solo en pantallas grandes) */}
-      <aside className="relative hidden overflow-hidden lg:block">
+    <main
+      className={`tema-oscuro grid min-h-dvh bg-background text-foreground ${
+        paraPaciente ? "lg:grid-cols-[1fr_1.1fr]" : "lg:grid-cols-[1.1fr_1fr]"
+      }`}
+    >
+      {/* Panel con la foto (solo en pantallas grandes). Paciente: a la derecha */}
+      <aside className={`relative hidden overflow-hidden lg:block ${paraPaciente ? "lg:order-last" : ""}`}>
         <Image
           // Paciente: psicóloga y paciente charlando, encuadrada en la paciente; consultorio: la foto del consultorio
           src={paraPaciente ? "/assets/terapia.jpg" : "/assets/consultorio.jpg"}
@@ -40,8 +45,10 @@ export default function PantallaAcceso({ children, paraPaciente = false }: { chi
         </div>
       </aside>
 
-      {/* Formulario */}
-      <section className="relative flex flex-col overflow-hidden px-6 py-6 sm:px-12 sm:py-8">
+      {/* Formulario. Paciente: sobre crema y a la izquierda */}
+      <section
+        className={`relative flex flex-col overflow-hidden px-6 py-6 sm:px-12 sm:py-8 ${paraPaciente ? "acceso-crema bg-background text-foreground" : ""}`}
+      >
         {/* En el celular las manchas de luz se apagan cerca del borde de arriba y del de abajo:
             así la pantalla termina en el mismo verde con que Safari pinta la barra de la hora y la de la dirección */}
         <FondoAnimado

@@ -149,6 +149,45 @@
   color-scheme: light;
 }
 
+/* Acceso del paciente (/pacientes, crear y recuperar la contraseña): formulario sobre crema,
+   para que se distinga a simple vista del acceso del consultorio, que es verde oscuro.
+   Toma los colores del modo claro con el fondo crema de la portada */
+.acceso-crema {
+  --background: #F6EFE2;
+  --foreground: #173030;
+  --card: #FFFFFF;
+  --card-foreground: #173030;
+  --popover: #FFFFFF;
+  --popover-foreground: #173030;
+  --primary: #1D4A48;
+  --primary-foreground: #FFFFFF;
+  --secondary: #FBF7EF;
+  --secondary-foreground: #173030;
+  --muted: #FBF7EF;
+  --muted-foreground: #1D5E5B;
+  --border: #E6DCC8;
+  --input: #FFFDF8;
+  --ring: #1D5E5B;
+  --crema: #173030;
+  --dorado: #1D5E5B;
+  --superficie: #FFFFFF; /* Campos en blanco sobre el crema */
+  --borde: #E6DCC8;
+  --texto-2: #1F3A39;
+  --texto-suave: #3F5755;
+  --texto-tenue: #4E6664;
+  --peligro: #B42318;
+  --exito: #1A6B43;
+  --luz-fondo: rgba(29, 94, 91, 0.14);
+  --logo-fondo: #1D4A48;
+  --logo-hoja: #FFFFFF;
+  --logo-trazo: #1D4A48;
+  --logo-onda-1: #1D4A48;
+  --logo-onda-2: #D9A441;
+  --logo-memo: #173030;
+  --logo-psy: #86621A;
+  color-scheme: light;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -255,6 +294,15 @@ html {
 html:has(.tema-oscuro),
 html:has(.tema-oscuro) body {
   background-color: #152A2A;
+}
+/* En el acceso del paciente los campos llevan borde: blanco sobre crema solo no se distingue */
+.acceso-crema input {
+  border-color: #D9CBB0;
+}
+/* El acceso del paciente es crema: las barras de Safari en el celular van del mismo color */
+html:has(.acceso-crema),
+html:has(.acceso-crema) body {
+  background-color: #F6EFE2;
 }
 section,
 footer {
