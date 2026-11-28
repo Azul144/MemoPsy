@@ -167,7 +167,8 @@ export async function responderMensaje(m: MensajeEntrante): Promise<string> {
       // En la auditoría queda el evento, nunca el texto del mensaje
       await auditar(paciente, "CRISIS_WHATSAPP", "WhatsApp", intencion.nivel === "riesgo" ? "Mensaje con posible riesgo" : "Pedido de ayuda en crisis");
     }
-    return respuestaCrisis(intencion.nivel, `${urlBase()}/crisis`, avisado);
+    // El enlace lleva al acceso del paciente: al entrar, el aviso está en el inicio con un toque
+    return respuestaCrisis(intencion.nivel, `${urlBase()}/pacientes`, avisado);
   }
 
   // 2) Celular desconocido

@@ -23,7 +23,9 @@ export async function middleware(request: NextRequest) {
       return NextResponse.json({ error: "No autenticado" }, { status: 401 });
     }
     // El paciente (lo recuerda la cookie que pone el inicio de sesión) vuelve a su acceso, sin la portada
-    const ingreso = request.cookies.get("memopsy_acceso")?.value === "paciente" ? "/pacientes" : "/login";
+    // /crisis también: solo la usa el paciente
+    const ingreso =
+      request.cookies.get("memopsy_acceso")?.value === "paciente" || pathname.startsWith("/crisis") ? "/pacientes" : "/login";
     return NextResponse.redirect(new URL(ingreso, request.url));
   }
 

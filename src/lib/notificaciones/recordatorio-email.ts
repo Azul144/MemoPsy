@@ -49,7 +49,7 @@ export function armarEmail(turno: TurnoPendiente) {
       boton: enlace
         ? { texto: "Entrar a la videollamada", enlace }
         : sitio
-          ? { texto: "Ver mi turno", enlace: `${sitio}/sesiones` }
+          ? { texto: "Entrar a mi cuenta", enlace: `${sitio}/pacientes` }
           : undefined,
       notas: [
         "Si no podés asistir, reprogramá el turno desde tu cuenta de MemoPsy hasta 24 horas antes, o avisale al consultorio.",

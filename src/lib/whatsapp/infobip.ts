@@ -32,7 +32,9 @@ function urlBase(): string {
 // Con Infobip el chatbot (1 confirmar / 2 cancelar) no recibe las respuestas, así que no se piden.
 export function textoRecordatorio(r: RecordatorioWhatsapp): string {
   const [dia, hora] = fechaTurno(r.inicio).split(" a las ");
+  // El paciente entra por su acceso (/pacientes), no por la portada, que es para el psicólogo
   const sitio = (process.env.NEXTAUTH_URL ?? "").replace(/\/$/, "");
+  const acceso = sitio ? `${sitio}/pacientes` : "";
   const lineas = [
     "*Recordatorio de turno*",
     "",
@@ -45,7 +47,7 @@ export function textoRecordatorio(r: RecordatorioWhatsapp): string {
     ...(r.enlace ? [`🔗 *Videollamada:* ${r.enlace}`] : []),
     "",
     "Si no podés asistir, reprogramá el turno desde tu cuenta de MemoPsy hasta 24 horas antes" +
-      (sitio ? ` (${sitio})` : "") +
+      (acceso ? ` (${acceso})` : "") +
       " o avisale al centro.",
     "",
     "— MemoPsy",
