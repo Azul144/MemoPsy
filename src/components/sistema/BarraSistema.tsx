@@ -7,16 +7,19 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { HomeIcon, LifeBuoy, LogOut, Menu, UserRound, X } from "lucide-react";
+import { Check, HeartHandshake, HomeIcon, Loader2, LogOut, Menu, UserRound, X } from "lucide-react";
 import { cerrarSesion } from "@/lib/auth/cerrar-sesion";
 import { MODULOS_DISPONIBLES, modulosParaUsuario } from "@/config/modulos";
 import CampanaNotificaciones from "./CampanaNotificaciones";
 import BotonTema from "./BotonTema";
 import LogoMemoPsy from "@/components/comunes/LogoMemoPsy"
 import FotoPerfil from "./FotoPerfil";
+import { LineasEmergencia, useAvisoCrisis } from "@/components/crisis/aviso-crisis";
 
 export default function BarraSistema() {
   const { data: session } = useSession();
+  // RF 4.3 - Aviso de crisis desde el menú: sale al tocar, sin abrir otra pantalla
+  const avisoCrisis = useAvisoCrisis();
   const ruta = usePathname();
   const [abierto, setAbierto] = useState(false);
   const menu = useRef<HTMLDivElement>(null);
@@ -113,13 +116,37 @@ export default function BarraSistema() {
                       {m.nombre}
                     </Link>
                   ))}
-                  {/* RF 4.3 - El paciente le avisa a su psicólogo/a de una crisis desde cualquier pantalla */}
-                  {usuario?.pacienteId && (
-                    <Link href="/crisis" className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-peligro transition-colors hover:bg-red-500/10">
-                      <LifeBuoy className="h-5 w-5" />
-                      Avisar a mi psicólogo/a
-                    </Link>
-                  )}
+                  {/* RF 4.3 - El paciente le avisa a su psicólogo/a de una crisis desde cualquier pantalla:
+                      un toque y el aviso sale; debajo aparecen los teléfonos de emergencia */}
+                  {usuario?.pacienteId &&
+                    (avisoCrisis.estado === "enviado" ? (
+                      <div className="rounded-xl px-3 py-2.5" role="status">
+                        <p className="flex items-center gap-2 font-semibold text-exito">
+                          <Check className="h-5 w-5" aria-hidden="true" />
+                          Tu psicólogo/a ya recibió el aviso.
+                        </p>
+                        <LineasEmergencia className="mt-2" textoClassName="font-normal text-suave" />
+                      </div>
+                    ) : (
+                      <>
+                        <button
+                          type="button"
+                          onClick={avisoCrisis.avisar}
+                          disabled={avisoCrisis.estado === "enviando"}
+                          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-peligro transition-colors hover:bg-red-500/10 disabled:cursor-wait"
+                        >
+                          {avisoCrisis.estado === "enviando" ? (
+                            <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
+                          ) : (
+                            <HeartHandshake className="h-5 w-5" aria-hidden="true" />
+                          )}
+                          {avisoCrisis.estado === "enviando" ? "Avisando..." : "Avisar a mi psicólogo/a"}
+                        </button>
+                        {avisoCrisis.estado === "error" && (
+                          <p className="px-3 pb-2 text-sm text-peligro" role="alert">{avisoCrisis.error}</p>
+                        )}
+                      </>
+                    ))}
                 </div>
                 <div className="border-t border-foreground/10 p-2">
                   <button

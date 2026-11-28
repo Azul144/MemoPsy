@@ -21,7 +21,7 @@ const roles = [
     beneficios: [
       { icono: CalendarDays, titulo: "Sus turnos a mano", texto: "Y la videollamada a un toque, si la sesión es remota." },
       { icono: Repeat, titulo: "Reprograman solos", texto: "Eligen otro horario libre sin llamarte." },
-      { icono: LifeBuoy, titulo: "Te avisan si están mal", texto: "Desde su cuenta te avisan qué les pasa y te llega al WhatsApp." },
+      { icono: LifeBuoy, titulo: "Te avisan si están mal", texto: "Con un toque desde su cuenta te avisan y te llega al WhatsApp." },
     ],
   },
 ];

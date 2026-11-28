@@ -1,16 +1,15 @@
 // src/lib/crisis/aviso-psicologo.ts
-// RF 4.3 - Aviso de crisis al psicólogo. El paciente que inició sesión elige qué le está pasando y toca
-// «Avisar a mi psicólogo/a». Le llega al profesional por la campanita de MemoPsy, por WhatsApp (si tiene
-// celular cargado) y por email (si tiene casilla real), con el día, la hora y la situación elegida.
+// RF 4.3 - Aviso de crisis al psicólogo. El paciente que inició sesión toca «Avisar a mi psicólogo/a»
+// (un solo toque, sin elegir qué le pasa). Le llega al profesional por la campanita de MemoPsy, por WhatsApp
+// (si tiene celular cargado) y por email (si tiene casilla real), con el día y la hora.
 import { Like, MoreThan } from "typeorm";
 import { initializeDatabase } from "@/lib/database";
 import { NotificacionEntity } from "@/entities";
 import { enviarEmail } from "@/lib/email/brevo";
 import { enviarTextoWhatsapp } from "@/lib/whatsapp";
 import { psicologosDelPaciente } from "@/lib/whatsapp/alerta-crisis";
-import type { SituacionCrisis } from "./contenido";
 
-// Si el paciente vuelve a avisar en este lapso, no se repite el aviso (salvo que pase a la opción de riesgo)
+// Si el paciente vuelve a avisar en este lapso, no se repite el aviso
 const MINUTOS_SIN_REPETIR = 10;
 
 export type ResultadoAviso = { avisados: number; repetido: boolean; canales: string[] };
@@ -24,30 +23,26 @@ function fechaYHora(fecha: Date) {
   };
 }
 
-export async function avisarCrisisAlPsicologo(pacienteId: number, paciente: string, situacion: SituacionCrisis): Promise<ResultadoAviso> {
+export async function avisarCrisisAlPsicologo(pacienteId: number, paciente: string): Promise<ResultadoAviso> {
   const psicologos = await psicologosDelPaciente(pacienteId);
   if (psicologos.length === 0) return { avisados: 0, repetido: false, canales: [] };
 
   const ahora = new Date();
   const { dia, hora } = fechaYHora(ahora);
-  const riesgo = !!situacion.riesgo;
-  const titulo = riesgo ? "⚠️ Urgente: aviso de crisis de un paciente" : "Aviso de crisis de un paciente";
+  const titulo = "Aviso de crisis de un paciente";
   const inicio = `${paciente} te avisó desde MemoPsy`;
-  const mensaje =
-    `${inicio} el ${dia} a las ${hora} que está atravesando una crisis: «${situacion.titulo}». ` +
-    (riesgo ? "Comunicate con la persona lo antes posible." : "Comunicate con la persona cuando puedas.");
+  const mensaje = `${inicio} el ${dia} a las ${hora} que está atravesando un momento difícil. Comunicate con la persona lo antes posible.`;
 
   const dataSource = await initializeDatabase();
   const repo = dataSource.getRepository(NotificacionEntity);
 
   // Si toca el botón varias veces seguidas, el psicólogo recibe un solo aviso.
-  // La excepción es pasar a la situación de riesgo, que siempre avisa.
   const desde = new Date(ahora.getTime() - MINUTOS_SIN_REPETIR * 60 * 1000);
   const previo = await repo.findOne({
     where: { usuarioId: psicologos[0].usuarioId, tipo: "CRISIS", fecha: MoreThan(desde), mensaje: Like(`${inicio}%`) },
     order: { fecha: "DESC" },
   });
-  if (previo && (!riesgo || previo.titulo.startsWith("⚠️"))) {
+  if (previo) {
     return { avisados: psicologos.length, repetido: true, canales: [] };
   }
 
@@ -58,7 +53,7 @@ export async function avisarCrisisAlPsicologo(pacienteId: number, paciente: stri
   for (const p of psicologos) {
     if (p.telefono) {
       try {
-        if (await enviarTextoWhatsapp(p.telefono, `${riesgo ? "⚠️ *URGENTE* — " : ""}Hola ${p.nombre}. ${mensaje}\n— MemoPsy`)) {
+        if (await enviarTextoWhatsapp(p.telefono, `Hola ${p.nombre}. ${mensaje}\n— MemoPsy`)) {
           canales.add("por WhatsApp");
         }
       } catch {
@@ -69,7 +64,7 @@ export async function avisarCrisisAlPsicologo(pacienteId: number, paciente: stri
     try {
       await enviarEmail({
         para: p.email,
-        asunto: riesgo ? "MemoPsy: aviso urgente de un paciente" : "MemoPsy: aviso de crisis de un paciente",
+        asunto: "MemoPsy: aviso de crisis de un paciente",
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 560px; margin: 0 auto; padding: 24px;">
             <h2 style="color: #B42318; margin-top: 0;">${titulo}</h2>

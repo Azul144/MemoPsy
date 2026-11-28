@@ -10,16 +10,19 @@ import FondoAnimado from "@/components/comunes/FondoAnimado";
 import CampanaNotificaciones from "@/components/sistema/CampanaNotificaciones";
 import BotonTema from "@/components/sistema/BotonTema";
 import { Button } from "@/components/ui/button";
-import { Menu, X, LogOut, HomeIcon, UserRound, KeyRound, Loader2, ArrowRight, ShieldCheck, ShieldAlert, LifeBuoy } from "lucide-react"
+import { Menu, X, LogOut, HomeIcon, UserRound, KeyRound, Loader2, ArrowRight, ShieldCheck, ShieldAlert, HeartHandshake } from "lucide-react"
 import ModalActivarMfa from "@/components/mfa/ModalActivarMfa";
 import ModalDesactivarMfa from "@/components/mfa/ModalDesactivarMfa";
 import toast from "react-hot-toast";
 import LogoMemoPsy from "@/components/comunes/LogoMemoPsy"
 import FotoPerfil from "@/components/sistema/FotoPerfil";
+import { LineasEmergencia, useAvisoCrisis } from "@/components/crisis/aviso-crisis";
 
 export default function WelcomePage() {
   const { data: session, status, update: updateSession } = useSession(); // Added updateSession
   const router = useRouter();
+  // RF 4.3 - Aviso de crisis con un solo toque desde la tarjeta del inicio
+  const avisoCrisis = useAvisoCrisis();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [modulosPermitidos, setModulosPermitidos] = useState<ModuloConfig[]>([]);
 
@@ -261,7 +264,7 @@ export default function WelcomePage() {
             )}
           </div>
 
-          {/* RF 4.3 - Aviso de crisis: el paciente le avisa a su psicólogo/a qué le está pasando.
+          {/* RF 4.3 - Aviso de crisis: un toque y el psicólogo/a recibe el aviso (sin elegir qué le pasa).
               Va dentro del saludo, con los colores invertidos del tema (no en rojo de "error") para que resalte sin alarmar */}
           {session.user.pacienteId && (
             <aside
@@ -271,19 +274,39 @@ export default function WelcomePage() {
             >
               <div className="flex items-start gap-3">
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-crisis-icono-fondo text-crisis-icono">
-                  <LifeBuoy className="h-5 w-5" aria-hidden="true" />
+                  <HeartHandshake className="h-5 w-5" aria-hidden="true" />
                 </span>
                 <div>
-                  <p className="font-semibold">¿Momento difícil?</p>
-                  <p className="mt-0.5 text-sm text-crisis-texto-2">Contale a tu psicólogo/a qué te está pasando: le llega un aviso al momento.</p>
+                  {avisoCrisis.estado === 'enviado' ? (
+                    <>
+                      <p className="font-semibold" role="status">Tu psicólogo/a ya recibió el aviso.</p>
+                      <p className="mt-0.5 text-sm text-crisis-texto-2">Se va a comunicar con vos cuando lo vea: no es atención inmediata.</p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="font-semibold">¿Momento difícil?</p>
+                      <p className="mt-0.5 text-sm text-crisis-texto-2">Tocá el botón y tu psicólogo/a recibe un aviso al momento.</p>
+                    </>
+                  )}
                 </div>
               </div>
-              <Button
-                onClick={() => router.push('/crisis')}
-                className="mt-4 w-full rounded-full bg-crisis-boton font-semibold text-crisis-boton-texto hover:bg-crisis-boton/90"
-              >
-                Avisar a mi psicólogo/a
-              </Button>
+              {avisoCrisis.estado === 'enviado' ? (
+                <LineasEmergencia className="mt-4" />
+              ) : (
+                <>
+                  <Button
+                    onClick={avisoCrisis.avisar}
+                    disabled={avisoCrisis.estado === 'enviando'}
+                    className="mt-4 w-full rounded-full bg-crisis-boton font-semibold text-crisis-boton-texto hover:bg-crisis-boton/90"
+                  >
+                    {avisoCrisis.estado === 'enviando' && <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />}
+                    {avisoCrisis.estado === 'enviando' ? 'Avisando...' : 'Avisar a mi psicólogo/a'}
+                  </Button>
+                  {avisoCrisis.estado === 'error' && (
+                    <p className="mt-2 text-sm text-crisis-texto-2" role="alert">{avisoCrisis.error}</p>
+                  )}
+                </>
+              )}
             </aside>
           )}
           </div>

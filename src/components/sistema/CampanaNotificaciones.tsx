@@ -6,7 +6,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { Bell, CalendarCheck, CalendarClock, CalendarX, CircleCheck, ClipboardCheck, LifeBuoy, MessageSquare, RefreshCw, Wallet } from "lucide-react";
+import { Bell, CalendarCheck, CalendarClock, CalendarX, CircleCheck, ClipboardCheck, HeartHandshake, MessageSquare, RefreshCw, Wallet } from "lucide-react";
 
 interface Notificacion {
   id: string;
@@ -27,7 +27,7 @@ const ICONOS: Record<string, { icono: typeof Bell; color: string }> = {
   SEGUIMIENTO: { icono: ClipboardCheck, color: "text-dorado" },
   RESPUESTA_ACTIVIDAD: { icono: MessageSquare, color: "text-exito" },
   CONFIRMACION: { icono: CalendarCheck, color: "text-exito" },
-  CRISIS: { icono: LifeBuoy, color: "text-peligro" },
+  CRISIS: { icono: HeartHandshake, color: "text-peligro" },
   SESION_REALIZADA: { icono: CircleCheck, color: "text-exito" },
   PAGO_REGISTRADO: { icono: Wallet, color: "text-dorado" },
 };
