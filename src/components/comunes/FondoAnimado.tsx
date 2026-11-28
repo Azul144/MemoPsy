@@ -11,7 +11,7 @@ export default function FondoAnimado({
   const opacidad = intensidad === "suave" ? "opacity-60" : "opacity-100";
   return (
     <div aria-hidden className={`pointer-events-none absolute inset-0 overflow-hidden ${opacidad} ${className}`}>
-      <div className="mancha absolute -top-32 right-[-10%] h-[34rem] w-[34rem] rounded-full bg-primary/15 blur-3xl" />
+      <div className="mancha absolute -top-32 right-[-10%] h-[34rem] w-[34rem] rounded-full bg-[var(--mancha-1)] blur-3xl" />
       <div
         className="mancha absolute bottom-[-20%] left-[-10%] h-[30rem] w-[30rem] rounded-full bg-[var(--luz-fondo)] blur-3xl"
         style={{ animationDelay: "-8s", animationDuration: "26s" }}

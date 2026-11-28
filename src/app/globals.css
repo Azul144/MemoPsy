@@ -65,6 +65,7 @@
   --naranja: #FDBA74;
   --violeta: #C4B5FD; /* Iniciales del perfil Auditor */
   --luz-fondo: rgba(62, 124, 122, 0.3); /* Manchas de luz de los encabezados */
+  --mancha-1: rgba(241, 199, 122, 0.15); /* Mancha grande de los encabezados: dorado */
   --fondo-pestanas: rgba(0, 0, 0, 0.2); /* Barra de pestañas */
   --logo-fondo: #F1C77A; /* Logo: cuaderno con la Ψ y las ondas de la voz sobre un cuadrado */
   --logo-hoja: #FFFDF8; /* Hoja del cuaderno */
@@ -76,9 +77,10 @@
   color-scheme: dark;
 }
 
-/* Modo claro "Niebla petróleo": el petróleo del logo en versión clara; el dorado queda solo como acento (todos AA de WCAG) */
+/* Modo claro "Crema": el fondo crema de la portada y del acceso del paciente, con textos y botones en el petróleo del logo;
+   el dorado queda solo como acento (todos AA de WCAG) */
 :root.claro {
-  --background: #EEF3F2;
+  --background: #F6EFE2;
   --foreground: #173030;
   --card: #FFFFFF;
   --card-foreground: #173030;
@@ -86,25 +88,25 @@
   --popover-foreground: #173030;
   --primary: #1D4A48;
   --primary-foreground: #FFFFFF;
-  --secondary: #E3ECEA;
+  --secondary: #EFE6D4;
   --secondary-foreground: #173030;
-  --muted: #E3ECEA;
+  --muted: #EFE6D4;
   --muted-foreground: #1D5E5B;
-  --accent: #DCE8E6;
+  --accent: #EADFC9;
   --accent-foreground: #173030;
   --destructive: #B42318;
-  --border: #D6E2E0;
-  --input: #C3D3D0;
+  --border: #E6DCC8;
+  --input: #D9CBB0;
   --ring: #1D5E5B;
   --sidebar: #FFFFFF;
   --sidebar-foreground: #173030;
-  --sidebar-border: #D6E2E0;
+  --sidebar-border: #E6DCC8;
   --sidebar-ring: #1D5E5B;
   --crema: #173030;
   --dorado: #1D5E5B;
-  --superficie: #E3ECEA;
-  --borde: #D6E2E0;
-  --borde-fuerte: #AFC4C1;
+  --superficie: #EFE6D4;
+  --borde: #E6DCC8;
+  --borde-fuerte: #CBB994;
   --texto-2: #1F3A39;
   --texto-suave: #3F5755;
   --texto-tenue: #4E6664;
@@ -121,8 +123,9 @@
   --info: #1D5F8A;
   --naranja: #9A4A00;
   --violeta: #5B3FA8;
-  --luz-fondo: rgba(29, 94, 91, 0.18);
-  --fondo-pestanas: #DCE8E6;
+  --luz-fondo: rgba(217, 164, 65, 0.16); /* Manchas de luz cálidas sobre el crema */
+  --mancha-1: rgba(217, 164, 65, 0.14);
+  --fondo-pestanas: #EADFC9;
   --logo-fondo: #1D4A48;
   --logo-hoja: #FFFFFF;
   --logo-trazo: #1D4A48;
