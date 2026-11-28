@@ -22,7 +22,7 @@ export default function PantallaAcceso({ children, paraPaciente = false }: { chi
           fill
           priority
           sizes="55vw"
-          className={`foto-lenta object-cover ${paraPaciente ? "object-[68%_50%]" : ""}`}
+          className={`foto-lenta object-cover ${paraPaciente ? "object-[56%_50%]" : ""}`}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-background/10" />
 
