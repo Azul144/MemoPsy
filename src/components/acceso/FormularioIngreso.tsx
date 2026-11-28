@@ -5,7 +5,7 @@
 // Las dos validan igual; lo que cada uno ve después depende de su rol.
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { getSession, signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -24,6 +24,10 @@ const MENSAJES_ERROR: Record<string, string> = {
   CODIGO_INVALIDO: "El código no es correcto. Revisá tu app de autenticación.",
 };
 
+// Email que /login le pasa a /pacientes cuando una cuenta de paciente entró por el acceso del consultorio
+// (en sessionStorage y no en la dirección, para que el email no quede en el historial)
+const EMAIL_PARA_PACIENTES = "memopsy_email_paciente";
+
 // Etiquetas en crema suave: así resalta lo que se escribe en el campo y no la etiqueta
 const ETIQUETA = { color: "color-mix(in srgb, var(--crema) 75%, transparent)" };
 
@@ -37,10 +41,23 @@ export default function FormularioIngreso({ paraPaciente = false }: { paraPacien
   const [codigo, setCodigo] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [cargando, setCargando] = useState(false);
+  const [aviso, setAviso] = useState<string | null>(null);
+
+  // Llega desde /login: el email ya viene escrito
+  useEffect(() => {
+    if (!paraPaciente) return;
+    const guardado = sessionStorage.getItem(EMAIL_PARA_PACIENTES);
+    if (guardado) {
+      setEmail(guardado);
+      setAviso("Esta es tu entrada como paciente. Ingresá de nuevo tu contraseña.");
+      sessionStorage.removeItem(EMAIL_PARA_PACIENTES);
+    }
+  }, [paraPaciente]);
 
   async function ingresar(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
+    setAviso(null);
     setCargando(true);
 
     const resultado = await signIn("credentials", {
@@ -48,6 +65,7 @@ export default function FormularioIngreso({ paraPaciente = false }: { paraPacien
       email,
       password,
       codigo: paso === "codigo" ? codigo : "",
+      acceso: paraPaciente ? "paciente" : "consultorio",
     });
 
     setCargando(false);
@@ -61,6 +79,15 @@ export default function FormularioIngreso({ paraPaciente = false }: { paraPacien
         : "memopsy_acceso=; path=/; max-age=0; samesite=lax";
       router.replace("/welcome"); // reemplaza el login en el historial
       router.refresh();
+      return;
+    }
+
+    if (resultado?.error === "ES_PACIENTE") {
+      // Cuenta de paciente en el acceso del consultorio: no entra por acá, va a /pacientes
+      setCargando(true);
+      setAviso("Esta cuenta es de paciente. Te llevamos a tu acceso…");
+      sessionStorage.setItem(EMAIL_PARA_PACIENTES, email);
+      setTimeout(() => router.replace("/pacientes"), 1800);
       return;
     }
 
@@ -129,6 +156,7 @@ export default function FormularioIngreso({ paraPaciente = false }: { paraPacien
               </div>
 
               {error && <p role="alert" className="text-sm text-peligro">{error}</p>}
+              {aviso && <p role="status" className="text-sm text-dorado">{aviso}</p>}
 
               <Button type="submit" className="mt-2 h-12 w-full text-base" disabled={cargando}>
                 {cargando && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
