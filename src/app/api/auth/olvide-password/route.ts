@@ -3,6 +3,7 @@
 import { NextResponse } from "next/server";
 import { initializeDatabase } from "@/lib/database";
 import { UsuarioEntity } from "@/entities";
+import { PacienteRepository } from "@/repositories/index";
 import { enviarEmail } from "@/lib/email/brevo";
 import { generarToken, MINUTOS_VALIDEZ } from "@/lib/auth/recuperacion";
 import { esEmailValido, normalizarEmail } from "@/lib/validaciones/password";
@@ -32,6 +33,7 @@ export async function POST(request: Request) {
     const repo = dataSource.getRepository(UsuarioEntity);
     const usuario = await repo
       .createQueryBuilder("usuario")
+      .leftJoinAndSelect("usuario.persona", "persona")
       .where("LOWER(usuario.email) = :email", { email: normalizarEmail(email) })
       .getOne();
 
@@ -48,7 +50,12 @@ export async function POST(request: Request) {
           resetExpira: new Date(Date.now() + MINUTOS_VALIDEZ * 60 * 1000),
         });
 
-        const enlace = `${process.env.NEXTAUTH_URL}/reset-password?token=${token}`;
+        // Si es paciente, la pantalla de la contraseña nueva no le muestra la vuelta a la portada
+        // (la misma búsqueda que usa el inicio de sesión para saber si la cuenta es de un paciente)
+        const esPaciente = usuario.persona?.id
+          ? Boolean(await new PacienteRepository(dataSource).findByPersonaId(usuario.persona.id))
+          : false;
+        const enlace = `${process.env.NEXTAUTH_URL}/reset-password?token=${token}${esPaciente ? "&paciente=1" : ""}`;
         await enviarEmail({
           para: usuario.email,
           asunto: "Restablecer tu contraseña de MemoPsy",

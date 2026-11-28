@@ -30,7 +30,7 @@ export async function enviarBienvenidaPaciente(usuarioId: number, email: string,
     await enviarEmail({
       para: email,
       asunto: "Tu psicólogo/a te dio acceso a MemoPsy",
-      html: htmlBienvenida(nombre, `${sitio}/reset-password?token=${token}&bienvenida=1`, `${sitio}/login`),
+      html: htmlBienvenida(nombre, `${sitio}/reset-password?token=${token}&bienvenida=1`, `${sitio}/pacientes`),
     });
     return "enviada";
   } catch {
@@ -57,7 +57,7 @@ export function htmlBienvenida(nombre: string, enlace: string, login: string): s
     boton: { texto: "Crear mi contraseña", enlace },
     notas: [
       `El enlace es personal, vence en ${HORAS_VALIDEZ_BIENVENIDA / 24} días y sirve una sola vez. Si vence, entrá a MemoPsy y tocá «¿La olvidaste?» con este mismo email.`,
-      `Para entrar después: <a href="${login}" style="color: #1D4A48;">${login.replace(/^https?:\/\//, "")}</a>`,
+      `Guardá este enlace para entrar después: <a href="${login}" style="color: #1D4A48;">${login.replace(/^https?:\/\//, "")}</a>`,
     ],
   });
 }

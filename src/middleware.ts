@@ -22,7 +22,9 @@ export async function middleware(request: NextRequest) {
     if (esApi) {
       return NextResponse.json({ error: "No autenticado" }, { status: 401 });
     }
-    return NextResponse.redirect(new URL("/login", request.url));
+    // El paciente (lo recuerda la cookie que pone el inicio de sesión) vuelve a su acceso, sin la portada
+    const ingreso = request.cookies.get("memopsy_acceso")?.value === "paciente" ? "/pacientes" : "/login";
+    return NextResponse.redirect(new URL(ingreso, request.url));
   }
 
   // 2) Con sesión: ¿su rol tiene permiso para esto?
@@ -43,7 +45,7 @@ export async function middleware(request: NextRequest) {
   return NextResponse.next();
 }
 
-// Rutas protegidas. Quedan PÚBLICAS: la landing (/), /login, /olvide-password, /reset-password
+// Rutas protegidas. Quedan PÚBLICAS: la landing (/), /login, /pacientes, /olvide-password, /reset-password
 // y lo que NextAuth necesita para iniciar sesión (/api/auth/session, /api/auth/csrf, etc.).
 export const config = {
   matcher: [

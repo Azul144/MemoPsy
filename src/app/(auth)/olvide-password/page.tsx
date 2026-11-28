@@ -1,7 +1,8 @@
 // src/app/(auth)/olvide-password/page.tsx
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { Suspense, useState, type FormEvent } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Loader2, Mail } from "lucide-react";
 import PantallaAcceso from "@/components/acceso/PantallaAcceso";
@@ -10,7 +11,19 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { esEmailValido } from "@/lib/validaciones/password";
 
+// Next pide envolver en <Suspense> a los componentes que leen la URL con useSearchParams
 export default function OlvidePasswordPage() {
+  return (
+    <Suspense>
+      <FormularioOlvide />
+    </Suspense>
+  );
+}
+
+function FormularioOlvide() {
+  // Viene del acceso de pacientes: sin «Volver al inicio» y la vuelta es a /pacientes
+  const paraPaciente = useSearchParams().get("paciente") === "1";
+  const ingreso = paraPaciente ? "/pacientes" : "/login";
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [mensaje, setMensaje] = useState<string | null>(null);
@@ -46,7 +59,7 @@ export default function OlvidePasswordPage() {
   }
 
   return (
-    <PantallaAcceso>
+    <PantallaAcceso paraPaciente={paraPaciente}>
         <h1 className="mt-4 titulo text-3xl text-crema">¿Olvidaste tu contraseña?</h1>
 
         {mensaje ? (
@@ -54,7 +67,7 @@ export default function OlvidePasswordPage() {
             <Mail className="h-10 w-10 text-dorado" aria-hidden="true" />
             <p role="status" className="mt-3 text-foreground/90">{mensaje}</p>
             <p className="mt-2 text-sm text-foreground/70">Revisá también la carpeta de spam. El enlace vence en 30 minutos.</p>
-            <Link href="/login" className="mt-6 inline-block text-dorado underline">Volver al inicio de sesión</Link>
+            <Link href={ingreso} className="mt-6 inline-block text-dorado underline">Volver al inicio de sesión</Link>
           </div>
         ) : (
           <>
@@ -84,7 +97,7 @@ export default function OlvidePasswordPage() {
               </Button>
             </form>
             <p className="mt-6 text-sm">
-              <Link href="/login" className="text-dorado underline">Volver al inicio de sesión</Link>
+              <Link href={ingreso} className="text-dorado underline">Volver al inicio de sesión</Link>
             </p>
           </>
         )}

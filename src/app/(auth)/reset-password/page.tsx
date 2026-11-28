@@ -26,6 +26,9 @@ function FormularioNuevaPassword() {
   const token = parametros.get("token") ?? "";
   // Enlace del email de bienvenida al paciente nuevo: la misma pantalla, con otro texto
   const bienvenida = parametros.get("bienvenida") === "1";
+  // Paciente (bienvenida o recuperación de su cuenta): sin «Volver al inicio» y entra por /pacientes
+  const paraPaciente = bienvenida || parametros.get("paciente") === "1";
+  const ingreso = paraPaciente ? "/pacientes" : "/login";
 
   const [password, setPassword] = useState("");
   const [confirmacion, setConfirmacion] = useState("");
@@ -60,18 +63,18 @@ function FormularioNuevaPassword() {
   }
 
   return (
-    <PantallaAcceso>
+    <PantallaAcceso paraPaciente={paraPaciente}>
 
         {!token ? (
           <div className="mt-6">
             <p className="text-foreground/90">Este enlace no es válido.</p>
-            <Link href="/olvide-password" className="mt-4 inline-block text-dorado underline">Pedir un enlace nuevo</Link>
+            <Link href={paraPaciente ? "/olvide-password?paciente=1" : "/olvide-password"} className="mt-4 inline-block text-dorado underline">Pedir un enlace nuevo</Link>
           </div>
         ) : listo ? (
           <div className="mt-6">
             <CheckCircle2 className="h-10 w-10 text-dorado" aria-hidden="true" />
             <p role="status" className="mt-3 text-foreground/90">{bienvenida ? "Listo, ya creaste tu contraseña." : "Tu contraseña se actualizó."}</p>
-            <Link href="/login" className="mt-6 inline-block text-dorado underline">Iniciar sesión</Link>
+            <Link href={ingreso} className="mt-6 inline-block text-dorado underline">Iniciar sesión</Link>
           </div>
         ) : (
           <>
