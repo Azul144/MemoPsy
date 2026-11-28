@@ -49,8 +49,10 @@ export default function BarraSistema() {
   // Cada módulo aparece si la persona tiene al menos uno de sus permisos (lista central en src/config/modulos.ts)
   const modulos = modulosParaUsuario(MODULOS_DISPONIBLES.filter((m) => m.permisosRequeridos.some((p) => permisos.includes(p))), usuario);
 
+  // Fondo sólido: Safari (iOS 26) pinta la barra de la hora con el color de esta barra fija, y si es
+  // semitransparente no toma el crema del modo claro y queda oscura
   return (
-    <nav className="sticky top-0 z-40 border-b border-foreground/10 bg-background/80 backdrop-blur-md">
+    <nav className="sticky top-0 z-40 border-b border-foreground/10 bg-background">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 sm:gap-4 sm:px-6">
         <Link href="/welcome" className="flex items-center gap-3">
           {/* En el celular, logo más chico para que entren la campanita, el tema y el menú */}
