@@ -1,12 +1,11 @@
 // scripts/cargar-pactos-demo.mjs
-// RF 3.1 - Le pone a cada paciente de la demo su horario pactado con su psicólogo (2 por semana, en
-// días distintos, sin pisarse con otros pacientes) y borra sus turnos FUTUROS sin pagar, para que el
+// RF 3.1 - Le pone a cada paciente de la demo su horario pactado con su psicólogo (uno por semana,
+// repartidos en distintos días y horas, sin pisarse con otros pacientes, dejando horarios libres) y borra sus turnos FUTUROS sin pagar, para que el
 // servidor los vuelva a crear desde el pacto (lo hace solo al arrancar y después cada hora).
 // Las sesiones pasadas, las notas, los seguimientos y los pagos no se tocan.
 // Antes de cambiar nada guarda un respaldo en JSON de lo que va a borrar.
 //
-// Azul Coronel (la paciente de referencia) queda con Carla Benítez: lunes 8:00 presencial y
-// jueves 18:00 por videollamada.
+// Azul Coronel (la paciente de referencia) queda con Carla Benítez los lunes a las 8:00, presencial.
 //
 // Uso:
 //   node --env-file=.env.local  scripts/cargar-pactos-demo.mjs <respaldo.json>
@@ -32,6 +31,7 @@ const c = await mysql.createConnection({
 await c.query("SET time_zone = '-03:00'")
 
 const DURACION = 50
+const POR_PACIENTE = 1 // igual que PACTOS_POR_PACIENTE en src/lib/sesiones/pacto.ts
 const aMin = (h) => Number(h.slice(0, 2)) * 60 + Number(h.slice(3, 5))
 const aHora = (m) => `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`
 
@@ -90,16 +90,15 @@ for (const p of pacientes) {
   if (esAzul(p) && carla) {
     p.psicologo = carla.id
     if (tomar(carla.id, 1, "08:00")) pactos.push({ ...p, dia: 1, hora: "08:00", modalidad: presencial })
-    if (tomar(carla.id, 4, "18:00")) pactos.push({ ...p, dia: 4, hora: "18:00", modalidad: remota })
     continue
   }
   const dias = libres.get(p.psicologo)
   let puestos = 0
-  for (let intento = 0; intento < PARES.length && puestos < 2; intento++) {
+  for (let intento = 0; intento < PARES.length && puestos < POR_PACIENTE; intento++) {
     const par = PARES[(indice + intento) % PARES.length]
     const usados = pactos.filter((x) => x.paciente === p.paciente).map((x) => x.dia)
     for (const dia of par) {
-      if (puestos >= 2 || usados.includes(dia)) continue
+      if (puestos >= POR_PACIENTE || usados.includes(dia)) continue
       const horas = dias?.get(dia) ?? []
       if (horas.length === 0) continue
       // Alterna mañana y tarde cuando el psicólogo atiende en las dos
@@ -166,7 +165,7 @@ for (const p of pactos) {
   resumen.set(clave, [...(resumen.get(clave) ?? []), `${DIAS[p.dia]} ${p.hora}${p.modalidad === remota ? " (remota)" : ""}`])
 }
 for (const [clave, horarios] of [...resumen].sort()) console.log(`${clave}: ${horarios.join(", ")}`)
-const sinDos = pacientes.filter((p) => pactos.filter((x) => x.paciente === p.paciente).length < 2)
+const sinDos = pacientes.filter((p) => pactos.filter((x) => x.paciente === p.paciente).length < POR_PACIENTE)
 console.log(`${pactos.length} horarios pactados para ${pacientes.length} pacientes; borrados ${sesionIds.length} turnos futuros.`)
-if (sinDos.length) console.log(`Con menos de 2 por falta de lugar: ${sinDos.map((p) => p.nombre).join(", ")}`)
+if (sinDos.length) console.log(`Con menos de ${POR_PACIENTE} por falta de lugar: ${sinDos.map((p) => p.nombre).join(", ")}`)
 await c.end()

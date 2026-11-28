@@ -1,6 +1,6 @@
 "use client"
-// RF 3.1 - Horario pactado con el paciente: 1 o 2 horarios fijos por semana (día, hora y modalidad),
-// en días distintos y dentro de los días y turnos en que atiende el psicólogo.
+// RF 3.1 - Horario pactado con el paciente: un horario fijo por semana (día, hora y modalidad),
+// dentro de los días y turnos en que atiende el psicólogo.
 // Al guardar, MemoPsy crea solo los turnos de las próximas 4 semanas y los va renovando.
 
 import { useCallback, useEffect, useState } from "react"
@@ -13,7 +13,7 @@ interface Pacto { diaSemana: number; horaInicio: string; modalidadId: number; mo
 interface Modalidad { id: string | number; nombre: string }
 
 const DURACION = 50
-const MAXIMO = 2
+const MAXIMO = 1 // igual que PACTOS_POR_PACIENTE en src/lib/sesiones/pacto.ts
 const nombreDia = (n: number) => DIAS_ATENCION.find((d) => d.numero === n)?.nombre ?? ""
 const mayuscula = (t: string) => t.charAt(0).toUpperCase() + t.slice(1)
 const claseSelect = "h-10 rounded-lg border border-borde-fuerte bg-superficie px-3 text-sm text-foreground focus:border-dorado focus:outline-none"
@@ -165,7 +165,7 @@ export default function EditorPacto({
               <Plus className="mr-1 h-4 w-4" /> {borrador.length ? "Agregar otro día" : "Agregar un día"}
             </Button>
           )}
-          <p className="text-xs text-tenue">Hasta {MAXIMO} por semana, en días distintos. Cada sesión dura {DURACION} minutos.</p>
+          <p className="text-xs text-tenue">Un horario fijo por semana; cada sesión dura {DURACION} minutos. Si alguna semana hace falta otra sesión, cargala como turno suelto.</p>
           {error && (
             <p className="flex items-start gap-2 text-sm text-peligro" role="alert">
               <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" /> {error}

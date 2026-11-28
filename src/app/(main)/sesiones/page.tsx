@@ -1,6 +1,7 @@
 "use client"
 
 import MiSemana from "@/components/sesiones/MiSemana"
+import LibresAhora from "@/components/sesiones/LibresAhora"
 import PactoDelPaciente from "@/components/sesiones/PactoDelPaciente"
 import { useState, useEffect, useRef, useCallback } from "react"
 import { useSession } from "next-auth/react"
@@ -1265,6 +1266,10 @@ const handleUpdateSesion = async () => {
                   <CardContent>
                     <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-6">
                       <div className="min-w-0 flex-1">
+                        {/* RF 3.1 - Alguien llega y quiere atenderse ya: psicólogos libres, ocupados y derivación */}
+                        {puedeVerTodaLaAgenda && (
+                          <LibresAhora psicologos={psicologosAgenda} sesiones={sesiones} onElegir={darTurnoEnHorario} />
+                        )}
                         {puedeVerTodaLaAgenda && (
                           <AgendaDelPsicologo
                             psicologos={psicologosAgenda}

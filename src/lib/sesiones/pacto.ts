@@ -1,6 +1,5 @@
 // src/lib/sesiones/pacto.ts
-// RF 3.1 - Horario pactado: el psicólogo y el paciente acuerdan 1 o 2 horarios fijos por semana
-// (día y hora, en días distintos). MemoPsy crea solos los turnos de las próximas semanas y los
+// RF 3.1 - Horario pactado: el psicólogo y el paciente acuerdan un horario fijo por semana (día y hora). MemoPsy crea solos los turnos de las próximas semanas y los
 // renueva en cada pasada del servidor. Si un turno se cancela o se reprograma, no se vuelve a crear,
 // porque en la sesión queda de qué horario pactado salió y para qué fecha.
 import type { DataSource, EntityManager } from "typeorm"
@@ -13,11 +12,15 @@ import {
   SesionEntity,
 } from "@/entities"
 import { DIAS_ATENCION, validarEnAtencion } from "./turnos-atencion"
-import { MAXIMO_SESIONES_POR_SEMANA, validarSesionesDelPaciente } from "@/lib/validaciones/sesiones-del-paciente"
+import { validarSesionesDelPaciente } from "@/lib/validaciones/sesiones-del-paciente"
 import { buscarSesionSuperpuesta } from "@/lib/validaciones/superposicion-sesiones"
 import { enlaceParaSesion } from "@/lib/videollamada"
 
 export const DURACION_SESION_MIN = 50
+// Por ahora, un horario fijo por paciente: así el psicólogo conserva horarios libres para pacientes
+// nuevos o urgencias. Si hace falta, un paciente puede tener un segundo turno suelto en la semana
+// (el máximo de sesiones por semana sigue siendo MAXIMO_SESIONES_POR_SEMANA).
+export const PACTOS_POR_PACIENTE = 1
 export const SEMANAS_A_GENERAR = 4
 const DESFASE_ARGENTINA = "-03:00"
 
@@ -49,8 +52,10 @@ export async function validarPacto(
   horarios: HorarioPacto[],
 ): Promise<string | null> {
   if (horarios.length === 0) return null // sin horario pactado: se puede dejar vacío
-  if (horarios.length > MAXIMO_SESIONES_POR_SEMANA) {
-    return `Se pueden pactar hasta ${MAXIMO_SESIONES_POR_SEMANA} horarios por semana.`
+  if (horarios.length > PACTOS_POR_PACIENTE) {
+    return PACTOS_POR_PACIENTE === 1
+      ? "Se pacta un solo horario fijo por semana. Si alguna semana hace falta otra sesión, cargala como turno suelto."
+      : `Se pueden pactar hasta ${PACTOS_POR_PACIENTE} horarios por semana.`
   }
   const dias = horarios.map((h) => h.diaSemana)
   if (new Set(dias).size !== dias.length) return "Los horarios pactados tienen que ser en días distintos."
