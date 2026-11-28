@@ -29,6 +29,11 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL(ingreso, request.url));
   }
 
+  // /crisis es solo del paciente: al personal del consultorio lo devuelve a su inicio, sin cartel
+  if (!esApi && pathname.startsWith("/crisis") && !token.pacienteId) {
+    return NextResponse.redirect(new URL("/welcome", request.url));
+  }
+
   // 2) Con sesión: ¿su rol tiene permiso para esto?
   const permisos = Array.isArray(token.permisos)
     ? (token.permisos as { nombre?: string }[]).map((p) => p?.nombre).filter((n): n is string => Boolean(n))

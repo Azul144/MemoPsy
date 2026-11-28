@@ -290,6 +290,9 @@ textarea,
 }
 html {
   scroll-behavior: smooth;
+  /* Mismo fondo que la página en los dos modos: Safari en el celular pinta con este color la barra de
+     la hora y la de la dirección (si no, queda el verde oscuro de la última pantalla de acceso) */
+  background-color: var(--background);
 }
 /* La portada, el login y la ayuda en crisis siempre van en oscuro, aunque el usuario haya
    elegido el modo claro. Safari en el celular pinta la barra de arriba (la hora) y la de abajo
