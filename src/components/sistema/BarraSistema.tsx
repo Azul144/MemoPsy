@@ -52,7 +52,7 @@ export default function BarraSistema() {
   // Fondo sólido: Safari (iOS 26) pinta la barra de la hora con el color de esta barra fija, y si es
   // semitransparente no toma el crema del modo claro y queda oscura
   return (
-    <nav className="sticky top-0 z-40 border-b border-foreground/10 bg-background">
+    <nav className="sticky top-0 z-40 border-b border-foreground/10 bg-[var(--barra)]">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 sm:gap-4 sm:px-6">
         <Link href="/welcome" className="flex items-center gap-3">
           {/* En el celular, logo más chico para que entren la campanita, el tema y el menú */}

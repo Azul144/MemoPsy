@@ -66,6 +66,9 @@
   --violeta: #C4B5FD; /* Iniciales del perfil Auditor */
   --luz-fondo: rgba(62, 124, 122, 0.3); /* Manchas de luz de los encabezados */
   --mancha-1: rgba(241, 199, 122, 0.15); /* Mancha grande de los encabezados: dorado */
+  --barra: #152A2A; /* Barra superior fija (en oscuro, igual que el fondo) */
+  --encabezado: #1D3434; /* Tarjeta del saludo y encabezados de página (en oscuro, igual que las tarjetas) */
+  --encabezado-borde: rgba(255, 255, 255, 0.1);
   --fondo-pestanas: rgba(0, 0, 0, 0.2); /* Barra de pestañas */
   --logo-fondo: #F1C77A; /* Logo: cuaderno con la Ψ y las ondas de la voz sobre un cuadrado */
   --logo-hoja: #FFFDF8; /* Hoja del cuaderno */
@@ -125,6 +128,10 @@
   --violeta: #5B3FA8;
   --luz-fondo: rgba(217, 164, 65, 0.16); /* Manchas de luz cálidas sobre el crema */
   --mancha-1: rgba(217, 164, 65, 0.14);
+  /* En claro todo era crema y se mezclaba: la barra va en blanco y los encabezados en arena, con borde */
+  --barra: #FFFFFF;
+  --encabezado: #EADDC3;
+  --encabezado-borde: #D9C7A4;
   --fondo-pestanas: #EADFC9;
   --logo-fondo: #1D4A48;
   --logo-hoja: #FFFFFF;

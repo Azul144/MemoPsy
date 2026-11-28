@@ -157,7 +157,7 @@ export default function WelcomePage() {
       {/* Barra superior */}
       {/* Fondo sólido: Safari (iOS 26) pinta la barra de la hora con el color de esta barra fija, y si es
           semitransparente no toma el crema del modo claro y queda oscura */}
-      <nav className="sticky top-0 z-40 border-b border-foreground/10 bg-background">
+      <nav className="sticky top-0 z-40 border-b border-foreground/10 bg-[var(--barra)]">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 sm:px-6">
           <button type="button" onClick={() => router.push('/welcome')} className="flex items-center gap-3">
             {/* En el celular, logo más chico para que entren la campanita, el tema y el menú */}
@@ -244,7 +244,7 @@ export default function WelcomePage() {
 
       <main className="mx-auto max-w-6xl px-6 py-10">
         {/* Saludo */}
-        <section className="relative overflow-hidden rounded-[2rem] border border-foreground/10 bg-card px-8 py-10 sm:px-12">
+        <section className="relative overflow-hidden rounded-[2rem] border border-[var(--encabezado-borde)] bg-[var(--encabezado)] px-8 py-10 sm:px-12">
           <FondoAnimado />
           <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
           <div>
