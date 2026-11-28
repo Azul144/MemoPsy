@@ -6,7 +6,7 @@
 // la portada es para el psicólogo y el paciente entra directo a su cuenta, como al campus de una facultad.
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, ShieldCheck } from "lucide-react";
+import { ArrowLeft, CalendarCheck, ShieldCheck } from "lucide-react";
 import FondoAnimado from "@/components/comunes/FondoAnimado";
 import LogoMemoPsy from "@/components/comunes/LogoMemoPsy"
 
@@ -16,25 +16,26 @@ export default function PantallaAcceso({ children, paraPaciente = false }: { chi
       {/* Panel con la foto (solo en pantallas grandes) */}
       <aside className="relative hidden overflow-hidden lg:block">
         <Image
-          src="/assets/consultorio.jpg"
+          // Paciente: una paciente sonriendo en el sillón; consultorio: la foto del consultorio
+          src={paraPaciente ? "/assets/consultorio2.jpg" : "/assets/consultorio.jpg"}
           alt=""
           fill
           priority
           sizes="55vw"
-          className="foto-lenta object-cover"
+          className={`foto-lenta object-cover ${paraPaciente ? "object-[50%_25%]" : ""}`}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-background/10" />
 
         <div className="absolute inset-x-0 bottom-0 p-14">
           <p className="titulo entrar max-w-lg text-4xl text-crema xl:text-5xl">
-            {paraPaciente ? "Tus sesiones y tus pautas, en un solo lugar." : "Tu consultorio, ordenado y protegido."}
+            {paraPaciente ? "Tu terapia, siempre a mano." : "Tu consultorio, ordenado y protegido."}
           </p>
           <p
             className="entrar mt-5 flex items-center gap-2 text-crema/80"
             style={{ animationDelay: "0.2s" }}
           >
-            <ShieldCheck className="h-5 w-5 text-salvia" />
-            {paraPaciente ? "Tu cuenta es personal y lo que hablás en sesión queda protegido." : "Notas cifradas y acceso con verificación en dos pasos."}
+            {paraPaciente ? <CalendarCheck className="h-5 w-5 text-salvia" /> : <ShieldCheck className="h-5 w-5 text-salvia" />}
+            {paraPaciente ? "Confirmá tus turnos y repasá tus pautas desde el celular." : "Notas cifradas y acceso con verificación en dos pasos."}
           </p>
         </div>
       </aside>
